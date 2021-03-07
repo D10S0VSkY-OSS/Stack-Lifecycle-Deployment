@@ -17,7 +17,7 @@
   <h3 align="center">Stack Lifecycle Deployment</h3>
 
   <p align="center">
-    OpenSource solution that defines and manages the complete lifecycle of resources used by and provisioned into a cloud!
+    OpenSource solution that defines and manages the complete lifecycle of resources used and provisioned into a cloud!
     <br />
     <a href="https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment"><strong>Explore the docs »</strong></a>
     <br />
@@ -56,8 +56,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About SLD
 
-SLD helps accelerate deployment, weighting and making IaaC reusable, generating dynamic forms and maintaining different variables per environment with the same code.
-With SLD you can schedule infrastructure deployments such as its destruction, manage users by roles and separate stacks by squad and environment
+SLD helps to accelerate deployment, weighting and making IaaC reusable, generating dynamic forms and maintaining different variables in each environment with the same code. With SLD you can schedule infrastructure deployments like its destruction, manage users by roles and separate stacks by squad and environment
 
 
 ![Product Name Screen Shot](img/dashboard.png)
@@ -65,7 +64,7 @@ With SLD you can schedule infrastructure deployments such as its destruction, ma
 
 ![Product Name Screen Shot](img/api.png)
 
-Principals features:
+Main features:
 * Fast API async
 * Dashboard / UI
 * Distributed tasks routing by squad
@@ -190,7 +189,7 @@ You need docker and docker-compse or kind ( recomended ).
     * Squad: squad1 
     * Environment: develop
     
-    > by default are workers running as squad1 and squad2 for play purpose, but you can change it and scale when you want
+    > by default workers are running as squad1 and squad2 for play purpose, but you can change it and scale when you want
     
     finally add:
     * Access_key_id
@@ -255,7 +254,7 @@ You need docker and docker-compse or kind ( recomended ).
 * Prometheus
 * Estimate pricing by stack
 * Anomaly detection
-* Adavance metrics and logs
+* Advance metrics and logs
 * Resource size recommendation based on metrics
 * Shift Left Security deployment
 * Multi tenancy
@@ -270,7 +269,7 @@ You need docker and docker-compse or kind ( recomended ).
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
+Contributions are what makes the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
 
 1. Fork the Project
 2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
