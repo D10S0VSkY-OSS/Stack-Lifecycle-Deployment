@@ -1,0 +1,78 @@
+{% extends "layouts/base.html" %}
+
+{% from "helpers/_forms.html" import render_field %}
+
+{% block title %} New GCP Account {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+{% block content %}
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+    <div class="preloader bg-soft flex-column justify-content-center align-items-center">
+        <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+    </div>
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item"><a href="/gcp-list">Accounts</a></li>
+                <li class="breadcrumb-item"><a href="/gcp-list">GCP</a></li>
+                <li class="breadcrumb-item active" aria-current="page">New</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Add New GCP Account</h1>
+                <p class="mb-0">Add account by squad and environment</p>
+            </div>
+            <div>
+                <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Accounts Docs</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-light shadow-sm components-section">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-lg-4 col-sm-6">
+                            <!-- Form -->
+                            <div class="col-md-12 col-md-offset-1">
+                                <form class="" method="post">
+                                    <div class="form-group">
+                                        {{ render_field(form.squad, class='form-control', placeholder='Squad Name') }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.environment, class='form-control', placeholder='Environment Name') }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.gcloud_keyfile_json, class='form-control', placeholder='gcloud_keyfile_json') }}
+                                    </div>
+
+                                    <button type="submit" class="btn btn-primary" name="button">
+                                        Create new Account
+                                    </button>
+
+                                </form>
+                                <!-- End Form -->
+
+                                <div class="input-group">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% include 'includes/footer.html' %}
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

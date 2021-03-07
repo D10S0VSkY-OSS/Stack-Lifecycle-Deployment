@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: remote-state
+  labels:
+    name: remote-state
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      name: remote-state
+  template:
+    metadata:
+      labels:
+        name: remote-state
+    spec:
+      subdomain: primary
+      containers:
+        - name: remote-state
+          image: d10s0vsky/sld-remote-state:1.0.0
+          imagePullPolicy: Always
+          command: ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+              - name: status
+                value: healthy
+            initialDelaySeconds: 60
+            periodSeconds: 60

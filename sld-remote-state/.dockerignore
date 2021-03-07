@@ -1,0 +1,10 @@
+Dockerfile
+1
+env
+*.md
+__pycache__
+.git
+*.pyc
+*.pyo
+*.pyd
+.remote_states

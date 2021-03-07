@@ -1,0 +1,119 @@
+{% extends "layouts/base.html" %}
+
+{% from "helpers/_forms.html" import render_field %}
+
+{% block title %} New Stacks {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+{% block content %}
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+    <div class="preloader bg-soft flex-column justify-content-center align-items-center">
+        <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+    </div>
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item"><a href="/users-list">Users</a></li>
+                <li class="breadcrumb-item active" aria-current="page">New</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Add New User</h1>
+                <p class="mb-0">Add user by squad </p>
+            </div>
+            <div>
+                <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Users Docs</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-light shadow-sm components-section">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-lg-4 col-sm-6">
+                            <!-- Form -->
+                            <div class="col-md-12 col-md-offset-1">
+                                <form class="" method="post">
+                                    <div class="form-group">
+                                        {{ render_field(form.username, class='form-control', placeholder='User Name') }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.fullname, class='form-control', placeholder='Full Name') }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.email, class='form-control', placeholder='Email') }}
+                                    </div>
+                                    {% if  current_user.master %}
+                                    <div class="form-group">
+                                        {{ render_field(form.squad, class='form-control', placeholder='squad') }}
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="form-group">
+                                        {{ render_field(form.password, class='form-control', placeholder='password') }}
+                                    </div>
+
+                                    <!-- End Form
+                                        <div class="form-group">
+                                        {{ render_field(form.confirm_password, class='form-control', placeholder='Confirm Password') }}
+                                        </div>
+                                    -->
+                                    {% if  current_user.master %}
+                                    <div class="form-group">
+                                        <h6><strong>Master Role</strong></h6>
+                                        <select class="form-control" name=master v-model="master">
+                                            <option value=false>No</option>
+                                            <option value=true>Yes</option>
+                                        </select>
+                                        </label>
+                                    </div>
+                                    {% endif %}
+
+                                    <div class="form-group">
+                                    <h6><strong>Privilege</strong></h6>
+                                    <select class="form-control" name=privilege v-model="master">
+                                        <option value=false>No</option>
+                                        <option value=true>Yes</option>
+                                    </select>
+                                    </div>
+
+                                    <div class="form-group">
+                                    <h6><strong>Active</strong></h6>
+                                    <select class="form-control" name=is_active v-model="is_active">
+                                        <option value=true>Yes</option>
+                                        <option value=false>No</option>
+                                    </select>
+                                    </div>
+
+
+                                    <button type="submit" class="btn btn-primary" name="button">
+                                        Create new User
+                                    </button>
+
+                                </form>
+                                <!-- End Form -->
+
+                                <div class="input-group">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% include 'includes/footer.html' %}
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

@@ -1,0 +1,162 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tasks {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+    <div class="preloader bg-soft flex-column justify-content-center align-items-center">
+        <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+    </div>
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                    <li class="breadcrumb-item"><a href="#">Tasks</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">List</li>
+                </ol>
+            </nav>
+            <h2 class="h4">All Tasks</h2>
+            <p class="mb-0">List all tasks</p>
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group">
+            </div>
+        </div>
+    </div>
+    <div class="table-settings mb-4">
+        <div class="row align-items-center justify-content-between">
+            <div class="col col-md-6 col-lg-3 col-xl-4">
+                <div class="input-group">
+                    <span class="input-group-text" id="basic-addon2"><span class="fas fa-search"></span></span>
+                    <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
+                </div>
+            </div>
+            <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
+                <!-- refresh -->
+                <span class="icon icon-sm">
+                    <a class="nav-link icon-notifications text-dark" href="/tasks-logs">
+                <span class="fas fa-redo-alt mr-1"></span></a>
+                <!-- end refresh -->
+                <div class="btn-group">
+                    <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="icon icon-sm icon-gray">
+                            <span class="fas fa-cog"></span>
+                        </span>
+                        <span class="sr-only">Toggle Dropdown</span>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">
+                        <span class="dropdown-item font-weight-bold text-dark">Show</span>
+                        <a class="dropdown-item d-flex font-weight-bold" href="/tasks-logs/5">15 <span class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
+                        <a class="dropdown-item font-weight-bold" href="/tasks-logs/20">20</a>
+                        <a class="dropdown-item font-weight-bold" href="/tasks-logs/30">30</a>
+                        <a class="dropdown-item font-weight-bold" href="/tasks-logs/50">50</a>
+                        <a class="dropdown-item font-weight-bold" href="/tasks-logs/100">100</a>
+                        <a class="dropdown-item font-weight-bold" href="/tasks-logs/200">200</a>
+                        <a class="dropdown-item font-weight-bold" href="/tasks-logs/300">300</a>
+                        <a class="dropdown-item font-weight-bold" href="/tasks-logs/500">500</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card card-body border-light shadow-sm table-wrapper table-responsive pt-0">
+        <table class="table table-hover" id="table">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th>Task Id</th>
+                    <th>Deploy Id</th>
+                    <th>Action</th>
+                    <th>Username</th>
+                    <th>Task Name</th>
+                    <th>squad</th>
+                    <th>Created_at</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Item -->
+                {% for task in tasks%}
+                <tr>
+                    </td>
+                    {% if "Apply" in task.action %}
+                    <td><span class="icon icon-sm w-30" ><span class="fas fa-box-open"></span></span></td>
+                    {% elif "Destroy" in task.action %}
+                    <td><span class="icon icon-sm w-30"><span class="fas fa-box"></span></span></td>
+                    {% elif "Update" in task.action %}
+                    <td><span class="icon icon-sm w-30"><span class="fas fa-cube"></span></span></td>
+                    {% else %}
+                    <td><span class="icon icon-sm"><span class="fas fa-box-open"></span></span></td>
+                    {% endif %}
+                    <td><span class="font-weight-normal">{{ task.task_id }}</span></td>
+                    <td><span class="font-weight-normal">{{ task.deploy_id }}</span></td>
+                    <td><span class="font-weight-normal">{{ task.action }}</span></td>
+                    <td><span class="font-weight-normal">{{ task.username }}</span></td>
+                    <td><span class="font-weight-normal">{{ task.task_name }}</span></td>
+                    <td><span class="font-weight-normal">{{ task.squad}}</span></td>
+                    <td><span class="font-weight-bold">{{ task.created_at }}</span></td>
+                    <td>
+    </div>
+    </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="card-footer px-3 border-0 d-flex align-items-center justify-content-between">
+            <nav aria-label="Page navigation example">
+                <ul class="pagination mb-0">
+                    <li class="page-item">
+                    </li>
+                    <li class="page-item active">
+                    </li>
+                    <li class="page-item">
+                    </li>
+                    <li class="page-item">
+                    </li>
+                    <li class="page-item">
+                    </li>
+                    <li class="page-item">
+                    </li>
+                    <li class="page-item">
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        </div>
+
+        {% include 'includes/footer.html' %}
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+    function search() {
+        const input = document.getElementById('search')
+        const filter = input.value.toLowerCase()
+        const table = document.getElementById('table')
+        const tr = [...table.getElementsByTagName('tr')]
+
+        tr.forEach((t) => {
+            const foundMatch = [...t.getElementsByTagName('td')].some((td) => {
+                return td.innerHTML.toLowerCase().indexOf(filter) > -1
+            })
+            if (foundMatch) {
+                t.style.display = ''
+            } else {
+                t.style.display = 'none'
+            }
+        })
+    }
+</script>
+{% endblock javascripts %}

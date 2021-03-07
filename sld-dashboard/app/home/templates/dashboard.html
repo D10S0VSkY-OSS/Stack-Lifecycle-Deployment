@@ -1,0 +1,230 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Dashboard {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <div class="btn-toolbar dropdown">
+            <button class="btn btn-primary btn-sm mr-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+                <span class="fas fa-plus mr-2"></span>New Task
+            </button>
+            <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2">
+                {% if current_user.master or current_user.privilege %}
+                <a class="dropdown-item font-weight-bold" href="users-new"><span class="fas fa-user-shield"></span>New
+                    user account</a>
+                <a class="dropdown-item font-weight-bold" href="stacks-new"><span class="fas fa-box-open"></span>New
+                    Stack</a>
+                {% endif %}
+                <a class="dropdown-item font-weight-bold" href="stacks-list"><span class="fas fa-layer-group"></span>New
+                    Deploy</a>
+                <div role="separator" class="dropdown-divider"></div>
+            </div>
+        </div>
+        <div class="btn-group">
+        </div>
+    </div>
+
+    <div class="row justify-content-md-center">
+        <div class="col-12 mb-4">
+            <div class="card bg-white-alt shadow-sm">
+                <div class="card-header d-flex flex-row align-items-center flex-0">
+                    <div class="d-block">
+                        <div class="small mt-2">
+                        </div>
+                    </div>
+                    <div class="d-flex ml-auto">
+                    </div>
+                </div>
+                <div class="card-body p-2">
+                    <!--  Add graph 
+                    <div class="ct-chart-sales-value ct-series-g"></div>
+                        -->
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-4 mb-4 ">
+            <div class="card border-light shadow-sm">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div
+                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                            <div class="icon icon-shape icon-md icon-shape-blue rounded mr-4 mr-sm-0"><span
+                                    class="fas fa-box-open"></span></div>
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h5">Stacks</h2>
+
+
+                                <h3 class="mb-1">{{ stacks|length }}</h3>
+                            </div>
+                            <div class="small mt-2">
+                                <span class="text-success font-weight-bold"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-light shadow-sm">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div
+                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                            <div class="icon icon-shape icon-md icon-shape-blue rounded mr-4"><span
+                                    class="fas fa-layer-group"></span></div>
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h5">Deployments</h2>
+                                <h3 class="mb-1">{{ deployments|length }}</h3>
+                            </div>
+                            <div class="small mt-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-light shadow-sm">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div
+                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                            <div class="icon icon-shape icon-md icon-shape-quaternary rounded mr-4"><span
+                                    class="fas fa-tasks"></span></div>
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h5">Tasks</h2>
+                                <h3 class="mb-1">{{ tasks|length }}</h3>
+                            </div>
+                            <div class="small mt-2">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-4 mb-4">
+            <div class="card border-light shadow-sm">
+                <div class="card-body">
+                    <div class="row d-block d-xl-flex align-items-center">
+                        <div
+                            class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                            {% if "healthy" in api_healthy['status'] %}
+                            <div class="icon icon-shape icon-md icon-shape-tertiary rounded mr-4"><span
+                                    class="fas fa-code"></span></div>
+                        </div>
+                        <div class="col-12 col-xl-7 px-xl-0">
+                            <div class="d-none d-sm-block">
+                                <h2 class="h5">Api</h2>
+                                <h3 class="mb-1">{{ api_healthy['status'] }}</h3>
+                            </div>
+                            <div class="small mt-2">
+                                {% else %}
+                                <div class="icon icon-shape icon-md icon-shape-primary rounded mr-4"><span
+                                        class="fas fa-code"></span></div>
+                            </div>
+                            <div class="col-12 col-xl-7 px-xl-0">
+                                <div class="d-none d-sm-block">
+                                    <h2 class="h5">Api</h2>
+                                    <h3 class="mb-1">down</h3>
+                                </div>
+                                <div class="small mt-2">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-sm-6 col-xl-4 mb-4">
+                <div class="card border-light shadow-sm">
+                    <div class="card-body">
+                        <div class="row d-block d-xl-flex align-items-center">
+                            <div
+                                class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                                {% if "healthy" in remote_state_healthy['status'] %}
+                                <div class="icon icon-shape icon-md icon-shape-tertiary rounded mr-4"><span
+                                        class="fas fa-project-diagram"></span></div>
+                            </div>
+                            <div class="col-12 col-xl-7 px-xl-0">
+                                <div class="d-none d-sm-block">
+                                    <h2 class="h5">RemoteState</h2>
+                                    <h3 class="mb-1">{{ remote_state_healthy['status'] }}</h3>
+                                </div>
+                                <div class="small mt-2">
+                                    {% else %}
+                                    <div class="icon icon-shape icon-md icon-shape-primary rounded mr-4"><span
+                                            class="fas fa-project-diagram"></span></div>
+                                </div>
+                                <div class="col-12 col-xl-7 px-xl-0">
+                                    <div class="d-none d-sm-block">
+                                        <h2 class="h5">RemoteState</h2>
+                                        <h3 class="mb-1">down</h3>
+                                    </div>
+                                    <div class="small mt-2">
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-sm-6 col-xl-4 mb-4">
+                    <div class="card border-light shadow-sm">
+                        <div class="card-body">
+                            <div class="row d-block d-xl-flex align-items-center">
+                                <div
+                                    class="col-12 col-xl-5 text-xl-center mb-3 mb-xl-0 d-flex align-items-center justify-content-xl-center">
+                                    {% if "healthy" in schedule_healthy['status'] %}
+                                    <div class="icon icon-shape icon-md icon-shape-tertiary rounded mr-4"><span
+                                            class="far fa-calendar-check"></span></div>
+                                </div>
+                                <div class="col-12 col-xl-7 px-xl-0">
+                                    <div class="d-none d-sm-block">
+                                        <h2 class="h5">Schedule</h2>
+                                        <h3 class="mb-1">{{ schedule_healthy['status'] }}</h3>
+                                    </div>
+                                    <div class="small mt-2">
+                                        {% else %}
+                                        <div class="icon icon-shape icon-md icon-shape-primary rounded mr-4"><span
+                                                class="far fa-calendar-times"></span></div>
+                                    </div>
+                                    <div class="col-12 col-xl-7 px-xl-0">
+                                        <div class="d-none d-sm-block">
+                                            <h2 class="h5">Schedule</h2>
+                                            <h3 class="mb-1">down</h3>
+                                        </div>
+                                        <div class="small mt-2">
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% include 'includes/footer.html' %}
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script src='/static/assets/js/Chart.min.js'></script>
+{% endblock javascripts %}
