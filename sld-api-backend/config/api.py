@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "API Stack Lifecycle Deployment"
     DESCRIPTION: str = '''
-    OpenSource solution that defines and manages the complete lifecycle of resources used by and provisioned into a cloud
+    OpenSource solution that defines and manages the complete lifecycle of resources used and provisioned into a cloud
                     '''
     VERSION: str = "1.0.0"
     AWS_PREFIX: List = ["aws", "amazon"]
