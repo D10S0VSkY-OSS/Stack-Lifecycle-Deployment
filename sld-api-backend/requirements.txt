@@ -18,7 +18,7 @@ click-didyoumean==0.0.3
 click-repl==0.1.6
 configobj==5.0.6
 croniter==1.0.7
-cryptography==3.2.1
+cryptography==3.3.2
 dnspython==2.0.0
 docutils==0.16
 ecdsa==0.14.1
