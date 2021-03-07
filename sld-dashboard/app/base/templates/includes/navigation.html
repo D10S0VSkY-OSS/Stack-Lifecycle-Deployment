@@ -1,0 +1,88 @@
+<nav class="navbar navbar-top navbar-expand navbar-dashboard navbar-dark pl-0 pr-2 pb-0">
+    <div class="container-fluid px-0">
+        <div class="d-flex justify-content-between w-100" id="navbarSupportedContent">
+            <div class="d-flex">
+                <!-- Search form -->
+                <form class="navbar-search form-inline" id="navbar-search-main">
+                    <div class="input-group input-group-merge search-bar">
+                    </div>
+                </form>
+            </div>
+            <!-- Navbar links -->
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item dropdown">
+                    <a class="nav-link text-dark mr-lg-3 icon-notifications" data-unread-notifications="true" href="#"
+                        role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <span class="icon icon-sm">
+                            <span class="fas fa-bell bell-shake"></span>
+                            {% if schedule_healthy is defined %}
+                            {% if "healthy" not in schedule_healthy['status'] %}
+                            <span class="icon-badge rounded-circle unread-notifications"></span>
+                            {% endif %}
+                            {% endif %}
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dashboard-dropdown dropdown-menu-lg dropdown-menu-center mt-2 py-0">
+                        <div class="list-group list-group-flush">
+                            <a href="#"
+                                class="text-center text-primary font-weight-bold border-bottom border-light py-3">Notifications</a>
+                            <a href="#" class="list-group-item list-group-item-action border-bottom border-light">
+                                <div class="row align-items-center">
+                                    <div class="col-auto">
+                                        <!-- Avatar -->
+                                    </div>
+                                    {% if schedule_healthy is defined %}
+                                    {% if "healthy" not in schedule_healthy['status'] %}
+                                    <div class="col pl-0 ml--2">
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <h4 class="h6 mb-0 text-small">Schedule service down</h4>
+                                            </div>
+                                            <div class="text-right">
+                                                <small class="text-danger">Error output</small>
+                                            </div>
+                                        </div>
+                                        <p class="font-small mt-1 mb-0">{{ schedule_healthy }}</p>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% endif %}
+                            </a>
+                            <div class="row align-items-center">
+                                <div class="col-auto">
+                                </div>
+                            </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link pt-1 px-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
+                        aria-expanded="false">
+                        <div class="media d-flex align-items-center">
+                            {% if current_user.master %}
+                            <img src="/static/assets/img/team/root.png" class="user-avatar md-avatar rounded-circle"
+                                alt="Image placeholder">
+                            {% elif current_user.privilege %}
+                            <img src="/static/assets/img/team/admin.png" class="user-avatar md-avatar rounded-circle"
+                                alt="Image placeholder">
+                            {% else %}
+                            <img src="/static/assets/img/team/user.png" class="user-avatar md-avatar rounded-circle"
+                                alt="Image placeholder">
+                            {% endif %}
+                            <div class="media-body ml-2 text-dark align-items-center d-none d-lg-block">
+                                <span class="mb-0 font-small font-weight-bold">
+                                    {{ current_user.username }}
+                                </span>
+                            </div>
+                        </div>
+                    </a>
+                    <div class="dropdown-menu dashboard-dropdown dropdown-menu-right mt-2">
+                        <a class="dropdown-item font-weight-bold" href="/user-setting.html"><span
+                                class="fas fa-cog"></span>Settings</a>
+                        <div role="separator" class="dropdown-divider"></div>
+                        <a class="dropdown-item font-weight-bold" href="{{ url_for('base_blueprint.logout') }}">
+                            <span class="fas fa-sign-out-alt text-danger"></span>Logout</a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

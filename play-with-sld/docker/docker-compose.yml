@@ -1,0 +1,119 @@
+version: "3.7"
+
+services:
+  # Mysql database
+  db:
+    hostname: db
+    image: mysql:latest
+    cap_add:
+      - SYS_NICE 
+    volumes:
+      - sld-db:/var/lib/mysql
+    restart: always
+    ports:
+      - 3306:3306
+        #    command: --init-file init.sql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: restapi
+      MYSQL_USER: adm
+      MYSQL_PASSWORD: 123
+    healthcheck:
+        test: mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER --password=$$MYSQL_PASSWORD
+        timeout: 20s
+        retries: 10
+
+  # Redis - result backend
+  redis:
+    image: redis
+    hostname: redis
+    ports:
+      - 6379:6379
+
+
+  # RabbitMQ - queue
+  rabbit:
+    hostname: rabbit
+    image: rabbitmq:3-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    ports:
+      - "5672:5672"  
+      - "15672:15672"  # here, we can access rabbitmq management plugin
+     
+  
+
+  # sd-remote-state
+  remote-state:
+    image: d10s0vsky/sld-remote-state:1.0.0
+    entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8080 --workers 4
+    hostname: remote-state
+    ports:
+      - "8080:8080"
+  
+  # sd-remote-state
+  schedule:
+    image: d10s0vsky/sld-schedule:1.0.0
+    entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 10000 --workers 4
+    hostname: schedule
+    ports:
+      - "10000:10000"
+    depends_on:
+      - api-backend
+      - db
+      - redis
+      - remote-state
+      - worker
+      - rabbit
+
+
+  # Celery worker
+  worker:
+    image: d10s0vsky/sld-api:2.0.1
+    entrypoint: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "4", "-E", "-Q", "celery,squad,squad1"]
+    depends_on:
+      - rabbit
+      - redis
+      - db
+      - remote-state
+
+  # SLD Dashboard - UI
+  sld-dashboard:
+    image: d10s0vsky/sld-dashboard:1.0.0
+    hostname: sld-dashboard
+    entrypoint: gunicorn --config gunicorn-cfg.py run:app
+    restart: always
+    env_file: ../../sld-dashboard/.env
+    ports:
+      - "5000:5000"
+    depends_on:
+      - api-backend
+      - db
+      - redis
+      - remote-state
+      - worker
+      - rabbit
+      - schedule
+
+
+
+  # FastApi Stack Deploy
+  api-backend:
+    image: d10s0vsky/sld-api:2.0.1
+    entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 
+    hostname: api-backend
+    ports:
+      - "8000:8000"
+    environment:
+      MYSQL_USER: adm
+      MYSQL_PASSWORD: 123
+    depends_on:
+      - db
+      - redis
+      - remote-state
+      - worker
+      - rabbit
+
+volumes:
+  sld-db:

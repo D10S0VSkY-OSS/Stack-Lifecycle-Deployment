@@ -1,0 +1,103 @@
+{% extends "layouts/base.html" %}
+{% from 'helpers/_forms.html' import render_field %}
+
+{% block title %} New Stacks {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+{% block content %}
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item"><a href="/stacks-list">Stacks</a></li>
+                <li class="breadcrumb-item active" aria-current="page">New</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Deploy Stack</h1>
+                <p class="mb-0">Add reusable stacks or modules built to provide easy way to deployment infra</p>
+            </div>
+            <div>
+                <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Stack Docs</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-light shadow-sm components-section">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-lg-4 col-sm-6">
+                            <!-- Form -->
+                            <div class="col-md-12 col-md-offset-1">
+                                <h3>Stack {{ stack['json']['stack_name'] }}</h3>
+                                <form class="" method="post">
+
+
+                                    <div class="form-group">
+                                        {{ render_field(form.deploy_name, class='form-control', placeholder='Deploy name') }}
+                                    </div>
+                                    {% if current_user.master %}
+                                    <div class="form-group">
+                                        {{ render_field(form.squad, class='form-control', placeholder='Squad name') }}
+                                    {% endif %}
+
+                                    <div class="form-group">
+                                        {{ render_field(form.environment, class='form-control', placeholder='Environment') }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.start_time, class='form-control', placeholder='30 7 * * 1-5') }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.destroy_time, class='form-control', placeholder='30 18 * * 1-5') }}
+                                    </div>
+
+                                    {% for key, value in data_json.items()|sort %}
+                                    <div class="form-group">
+                                        <span style="text-transform:capitalize">
+                                          <p class="mb-110">  <h6><strong>{{key}}</strong></h6></p>
+                                       <footer class="blockquote-footer"> {{value.get('description', "")}}</footer>
+                                        </span>
+                                        {% for key, value in value.items() %}
+                                        {% if "default" in key %}
+                                        <input type="text" value="{{ value|lower }}"
+                                                           {% else %}
+                                                           <input type="text" title="{{key}} {{value}}"
+                                                                  {% endif %}
+                                                                  {% endfor %}
+                                                                  name={{ key }} class='form-control' placeholder={{key}}>
+                                    </div>
+                                        {% endfor %}
+
+                                        <button type="submit" class="btn btn-primary" name="button" action="{{url_for('.list_deploys')}}">
+                                            Deploy
+                                        </button>
+
+                                </form>
+                            </div>
+
+                            <!-- End Form -->
+
+                            <div class="input-group">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% include 'includes/footer.html' %}
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

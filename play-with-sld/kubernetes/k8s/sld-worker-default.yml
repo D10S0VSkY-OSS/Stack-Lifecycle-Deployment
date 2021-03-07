@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stack-deploy-worker-default
+  labels:
+    name: stack-deploy-worker-default
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      name: stack-deploy-worker-default
+  template:
+    metadata:
+      labels:
+        name: stack-deploy-worker-default
+    spec:
+      subdomain: primary
+      containers:
+        - name: stack-deploy-worker-default
+          image: d10s0vsky/sld-api:1.0.0
+          imagePullPolicy: Always
+          command: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "squad,celery"]

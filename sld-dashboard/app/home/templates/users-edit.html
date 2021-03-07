@@ -1,0 +1,141 @@
+{% extends "layouts/base.html" %}
+{% from 'helpers/_forms.html' import render_field %}
+
+{% block title %} Edit User {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}{% endblock stylesheets %}
+{% block content %}
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item"><a href="/users-list">Users</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">User Edit</h1>
+            </div>
+            <div>
+                <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Users Docs</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <div class="card border-light shadow-sm components-section">
+                <div class="card-body">
+                    <div class="row mb-4">
+                        <div class="col-lg-4 col-sm-6">
+                            <!-- Form -->
+                            <div class="col-md-12 col-md-offset-1">
+                                <h3>{{data_json.username }} </h3>
+                                <form  method="post">
+                                    <div class="form-group">
+                                        {% for key, value in data_json.items() %}
+                                        <!-- Username -->
+                                        {% if key == "username" %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                                <h6><strong>{{key}}</strong></h6>
+                                            </span>
+                                            <input type="text" name={{ key }} value={{ value }} class='form-control' placeholder={{key}}>
+                                        </div>
+                                        <!-- Fullname -->
+                                        {% elif key == "fullname" %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                                <h6><strong>{{key}}</strong></h6>
+                                            </span>
+                                            <input type="text" name={{ key }} value={{ value }} class='form-control' placeholder={{key}}>
+                                        </div>
+                                        <!-- Email -->
+                                        {% elif key == "email" %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                                <h6><strong>{{key}}</strong></h6>
+                                            </span>
+                                            <input type="email" value={{ value }} name={{ key }} class='form-control' placeholder={{key}}>
+                                        </div>
+                                        <!--Pasword-->
+                                        {% elif key == "password" %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                                <h6><strong>{{key}}</strong></h6>
+                                            </span>
+                                            <input type="password" name={{ key }} class='form-control' placeholder={{key}}>
+                                        </div>
+                                        <!--Privilege-->
+                                        {% elif key == "privilege" %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                                <h6><strong>{{key}}</strong></h6>
+                                            </span>
+                                            <select class="form-control" name={{key}} v-model="is_active">
+                                                <option value=false>No</option>
+                                                <option value=true>Yes</option>
+                                            </select>
+                                        </div>
+                                        <!--is-active-->
+                                        {% elif key == "is_active" %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                                <h6><strong>{{key}}</strong></h6>
+                                            </span>
+                                            <select class="form-control" name={{key}} v-model="is_active">
+                                                <option value=true>Yes</option>
+                                                <option value=false>No</option>
+                                            </select>
+                                        </div>
+                                        <!--master-->
+                                        {% elif key == "master" and current_user.master %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                                <h6><strong>{{key}}</strong></h6>
+                                            </span>
+                                            <select class="form-control" name={{key}} v-model="is_active">
+                                                <option value=false>No</option>
+                                                <option value=true>Yes</option>
+                                            </select>
+                                        </div>
+                                        <!--squad-->
+                                        {% elif key == "squad" and current_user.master %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                                <h6><strong>{{key}}</strong></h6>
+                                            </span>
+                                            <input type="text" value={{ value }} name={{ key }} class='form-control' placeholder={{key}}>
+                                        </div>
+                                        <!--squad-->
+                                        {% endif %}
+
+                                        {% endfor %}
+                                        <button type="submit" class="btn btn-secondary text-dark" name="button" action="{{url_for('.list_users')}}">
+                                            Apply
+                                        </button>
+                                </form>
+                                    </div>
+
+                                    <!-- End Form -->
+
+                                    <div class="input-group">
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% include 'includes/footer.html' %}
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}{% endblock javascripts %}

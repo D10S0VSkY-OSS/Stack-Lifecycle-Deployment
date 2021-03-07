@@ -1,0 +1,40 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: db
+spec:
+  selector:
+    matchLabels:
+      name: db
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        name: db
+    spec:
+      containers:
+      - image: mysql:latest
+        name: db
+        env:
+          # Use secret in real usage
+        - name: MYSQL_DATABASE
+          value: "restapi"
+        - name: MYSQL_USER
+          valueFrom:
+            secretKeyRef:
+              name: db
+              key: username
+        - name: MYSQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db
+              key: password
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql

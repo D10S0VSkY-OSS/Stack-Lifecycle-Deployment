@@ -1,0 +1,30 @@
+# kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+commonLabels:
+  app: stack-lifecycle-deploy
+  environment: play
+
+resources:
+ - mysql-service.yml
+ - mysql.yml
+ - rabbitmq.yml
+ - rabbit-service.yml
+ - redis-service.yml
+ - redis.yml
+ - sld-api-backend-service.yml
+ - sld-api-backend.yml
+ - sld-worker-default.yml
+ - sld-worker-squad1.yml
+ - sld-worker-squad2.yml
+ - sld-remote-state-service.yml
+ - sld-remote-state.yml
+ - sld-dashboard.yml
+ - sld-dashboard-service.yml
+ - sld-schedule.yml
+ - sld-schedule-service.yml
+ - db-secret.yml
+ - dashboard-secret.yml
+ - rabbit-secret.yml
+
