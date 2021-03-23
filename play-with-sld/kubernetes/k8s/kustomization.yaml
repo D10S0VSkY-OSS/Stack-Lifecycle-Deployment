@@ -27,4 +27,4 @@ resources:
  - db-secret.yml
  - dashboard-secret.yml
  - rabbit-secret.yml
-
+ - ingress-controller.yaml

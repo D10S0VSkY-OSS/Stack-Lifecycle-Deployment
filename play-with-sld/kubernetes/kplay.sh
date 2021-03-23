@@ -128,7 +128,7 @@ while [ -n "$1" ]; do # while loop starts
 
 	*)  echo "Option $1 not recognized"
         echo ""
-	    echo "Use: start | stop | list "
+	    echo "Use: start | stop | list | init "
         ;;
 
 	esac
