@@ -17,6 +17,6 @@ spec:
       subdomain: primary
       containers:
         - name: stack-deploy-worker-default
-          image: d10s0vsky/sld-api:1.0.0
+          image: d10s0vsky/sld-api:1.0.1
           imagePullPolicy: Always
           command: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "squad,celery"]
