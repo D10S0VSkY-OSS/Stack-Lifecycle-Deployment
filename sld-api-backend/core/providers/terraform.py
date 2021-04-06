@@ -129,7 +129,7 @@ class TerraformActions(object):
                 deploy_state=f'{environment}_{stack_name}_{squad}_{name}')
             with open(f'/tmp/{stack_name}/{environment}/{squad}/{name}/data_{environment}_{stack_name}_{name}.tf', 'w') as tf_state:
                 tf_state.write(provider_backend)
-            return {"command": "dataSorce", "rc": 0, "stdout": data}
+            return {"command": "datasource", "rc": 0, "stdout": data}
         except Exception as err:
             return {"command": "datasource", "rc": 1, "stdout": err}
 
@@ -143,9 +143,9 @@ class TerraformActions(object):
         try:
             with open(f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfvars.json', 'w') as tfvars_json:
                 json.dump(kwargs.get("vars"), tfvars_json)
-            return {"command": "dataSorce", "rc": 0, "stdout": kwargs.get("vars")}
+            return {"command": "tfvars", "rc": 0, "stdout": kwargs.get("vars")}
         except Exception as err:
-            return {"command": "datasource", "rc": 1, "stdout": f'{err}'}
+            return {"command": "tfvars", "rc": 1, "stdout": f'{err}'}
 
     @staticmethod
     def planExcute(
@@ -177,8 +177,8 @@ class TerraformActions(object):
             rc = runner_response.rc
             # check result
             if rc != 0:
-                return {"command": "apply", "rc": rc, "stdout": plan_stderr}
-            return {"command": "apply", "rc": rc, "stdout": plan_stdout}
+                return {"command": "plan", "rc": rc, "stdout": plan_stderr}
+            return {"command": "plan", "rc": rc, "stdout": plan_stdout}
         except Exception as err:
             return {"command": "plan", "rc": 1, "stdout": f'{err}'}
 
@@ -198,7 +198,8 @@ class TerraformActions(object):
                 host_pattern='localhost',
                 module='terraform',
                 module_args=f'binary_path=/tmp/{version}/terraform lock=True force_init=True project_path=/tmp/{stack_name}/{environment}/{squad}/{name} '
-                            f'plan_file=/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfplan state=present',
+                            f'plan_file=/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfplan state=present '
+                            f'variables_files={stack_name}.tfvars.json',
             )
             unsecret(stack_name, environment, squad, name, secreto)
             # Capture events
@@ -242,10 +243,10 @@ class TerraformActions(object):
                 '[*].event_data.res.msg', destroy_logs)
             rc = runner_response.rc
             if rc != 0:
-                return {"command": "apply", "rc": rc, "stdout": destroy_stderr}
-            return {"command": "apply", "rc": rc, "stdout": destroy_stdout}
+                return {"command": "destroy", "rc": rc, "stdout": destroy_stderr}
+            return {"command": "destroy", "rc": rc, "stdout": destroy_stdout}
         except Exception as err:
-            return {"command": "apply", "rc": 1, "stdout": f'{err}'}
+            return {"command": "destroy", "rc": 1, "stdout": f'{err}'}
 
     @staticmethod
     def outputExecute(
@@ -292,7 +293,7 @@ class TerraformActions(object):
             json_data = response.json()
             return json_data
         except Exception as err:
-            return {"command": "output", "rc": 1, "stdout": err}
+            return {"command": "show", "rc": 1, "stdout": err}
 
     @staticmethod
     def getVarsTfvars(
