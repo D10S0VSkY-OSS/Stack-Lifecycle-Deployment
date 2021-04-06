@@ -1,0 +1,79 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: sld-dashboard
+spec:
+  hosts:
+  - sld-dashboard.acme.com
+  gateways:
+  - sld-dashboard
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: sld-dashboard
+        port:
+          number: 5000
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: sld-dashboard
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: sld-dashboard-credential # must be the same as secret
+    hosts:
+    - sld-dashboard.acme.com
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: sld-api
+spec:
+  hosts:
+  - sld-api.acme.com
+  gateways:
+  - sld-api
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: api-backend
+        port:
+          number: 8000
+
+---
+
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: sld-api
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    tls:
+      mode: SIMPLE
+      credentialName: sld-api-credential # must be the same as secret
+    hosts:
+    - sld-api.acme.com

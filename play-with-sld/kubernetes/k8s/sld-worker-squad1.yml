@@ -19,4 +19,11 @@ spec:
         - name: stack-deploy-worker-squad1
           image: d10s0vsky/sld-api:1.0.1
           imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 600Mi
+              cpu: 1
+            requests:
+              memory: 300Mi
+              cpu: 500m
           command: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "squad1"]
