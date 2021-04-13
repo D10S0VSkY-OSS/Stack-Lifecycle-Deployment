@@ -1,0 +1,1 @@
+kubectl annotate ing ingress-sld kubernetes.io/tls-acme="true"

@@ -3,6 +3,7 @@ MAINTAINER D10S0VSkY
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
+ENV TZ=Europe/Madrid
 ENV FLASK_APP run.py
 
 WORKDIR /app
@@ -16,8 +17,10 @@ COPY run.py gunicorn-cfg.py requirements.txt config.py .env ./
 RUN export DEBIAN_FRONTEND=noninteractive && \
 apt-get update && \
 apt-get upgrade -yq && \
+echo $TZ > /etc/timezone && \
+ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 apt-get -yq install \
-python3 python3-pip default-libmysqlclient-dev zip git && \
+python3 python3-pip default-libmysqlclient-dev zip git tzdata && \
 pip3 install --no-cache-dir -r requirements.txt && \
 apt-get clean autoclean && \
 apt-get autoremove -y && \

@@ -1,5 +1,6 @@
 FROM ubuntu:20.04
 MAINTAINER D10S0VSkY
+ENV TZ=Europe/Madrid
 
 ENV LC_ALL=C.UTF-8
 ENV LANG=C.UTF-8
@@ -13,8 +14,10 @@ RUN groupadd --gid 10000 sld && \
 RUN export DEBIAN_FRONTEND=noninteractive && \
 apt-get update && \
 apt-get upgrade -yq && \
+echo $TZ > /etc/timezone && \
+ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 apt-get -yq install \
-python3 python3-pip default-libmysqlclient-dev zip git && \
+python3 python3-pip default-libmysqlclient-dev zip git tzdata && \
 pip3 install --no-cache-dir -r requirements.txt && \
 apt-get clean autoclean && \
 apt-get autoremove -y && \
