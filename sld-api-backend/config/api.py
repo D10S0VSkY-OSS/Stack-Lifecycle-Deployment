@@ -7,8 +7,6 @@ from pydantic import BaseSettings
 class Settings(BaseSettings):
     #Schedle config
     SCHEDULE_SERVER: str = os.getenv('SLD_SCHEDULE_SERVER', "http://schedule:10000")
-    SCHEDULE_USER: str = os.getenv('SLD_SCHEDULE_USER', "schedule")
-    SCHEDULE_PASSWORD: str = os.getenv('SLD_SCHEDULE_PASSWORD', "Schedule1@local")
     # API server  config
     API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "API Stack Lifecycle Deployment"

@@ -47,7 +47,7 @@
                                         {{ render_field(form.destroy_time, class='form-control',
                                         value=deploy.destroy_time) }}
                                     </div>
-                                    {% for key, value in data_json.items() %}
+                                    {% for key, value in data_json.items()|sort %}
                                     <div class="form-group">
                                         <span style="text-transform:capitalize">
                                             <h6><strong>{{key}}</strong></h6>

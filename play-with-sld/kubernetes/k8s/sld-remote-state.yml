@@ -17,7 +17,7 @@ spec:
       subdomain: primary
       containers:
         - name: remote-state
-          image: d10s0vsky/sld-remote-state:1.0.1
+          image: d10s0vsky/sld-remote-state:1.0.2
           resources:
             limits:
               memory: 600Mi

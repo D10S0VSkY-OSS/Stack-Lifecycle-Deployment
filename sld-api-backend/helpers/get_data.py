@@ -99,7 +99,7 @@ def check_deploy_exist(db, deploy_name: str, squad: str, env: str, stack: str):
 
 def check_deploy_state(task_id: str):
     result = AsyncResult(task_id)
-    list_state = ["SUCCESS", "FAILURE", "REVOKED"]
+    list_state = ["SUCCESS", "FAILURE", "REVOKED", "PENDING"]
     return any(result.state == i for i in list_state)
 
 
