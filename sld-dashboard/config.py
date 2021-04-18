@@ -20,6 +20,10 @@ class Config(object):
         config( 'DB_NAME'     , default='restapi' )
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    # Connection
+    SQLALCHEMY_POOL_SIZE = 10
+    SQLALCHEMY_POOL_TIMEOUT = 20
+    SQLALCHEMY_POOL_RECYCLE = 299
 
 class ProductionConfig(Config):
     DEBUG = False
@@ -28,6 +32,10 @@ class ProductionConfig(Config):
     SESSION_COOKIE_HTTPONLY  = True
     REMEMBER_COOKIE_HTTPONLY = True
     REMEMBER_COOKIE_DURATION = 3600
+    # Connection
+    SQLALCHEMY_POOL_SIZE = 10
+    SQLALCHEMY_POOL_TIMEOUT = 20
+    SQLALCHEMY_POOL_RECYCLE = 299
 
     # PostgreSQL database
     SQLALCHEMY_DATABASE_URI = '{}://{}:{}@{}:{}/{}'.format(

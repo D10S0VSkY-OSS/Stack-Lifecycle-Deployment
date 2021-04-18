@@ -34,7 +34,6 @@ class User(db.Model, UserMixin):
 
     @passwd.setter
     def passwd(self, value):
-        print(value)
         self.password = pwd_context.hash(value)
         return self.password
 
