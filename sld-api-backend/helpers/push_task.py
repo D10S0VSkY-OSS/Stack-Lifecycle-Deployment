@@ -3,7 +3,7 @@ from fastapi import HTTPException
 from tasks.celery_worker import (
     git, unlock, schedule_add, schedule_delete,
     output, get_variable_json, get_variable_list, show, pipelineDeploy,
-    pipelineDestroy, pipelinePlan
+    pipelineDestroy, pipelinePlan, schedules_list, schedule_get
 )
 from config.api import settings
 
@@ -116,10 +116,21 @@ def asyncUnlock(stack_name: str, environment: str, squad: str, name: str):
     return pipeline_unlock.task_id
 
 
-def asyncScheduleDelete(name: str, squad: str):
-    deploy_schedule_delete = schedule_delete.s(name).apply_async(queue=squad)
+def asyncScheduleDelete(deploy_name: str, squad: str):
+    deploy_schedule_delete = schedule_delete.s(deploy_name).apply_async(queue=squad)
     return deploy_schedule_delete.task_id
 
+def asyncScheduleAdd(deploy_name: str, squad: str):
+    deploy_schedule_add = schedule_add.s(deploy_name).apply_async(queue=squad)
+    return deploy_schedule_add.task_id
+
+def asyncScheduleList(squad: str):
+    pipeline_schedule_list = schedules_list.s().apply_async(queue=squad)
+    return pipeline_schedule_list.task_id
+
+def asyncScheduleGet(deploy_name, squad: str):
+    pipeline_schedule_get = schedule_get.s(deploy_name).apply_async(queue=squad)
+    return pipeline_schedule_get.task_id
 
 def asyncShow(stack_name: str, environment: str, squad: str, name: str):
     pipeline_show = show.s(stack_name, environment, squad,
