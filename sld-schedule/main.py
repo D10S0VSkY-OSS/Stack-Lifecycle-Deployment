@@ -27,7 +27,10 @@ async def get_schedule(id: str):
 
 @app.post('/schedule/{id}')
 async def add_schedule_by_deploy_id(id: str):
-    result = addDeployToSchedule(id)
+    try:
+        result = addDeployToSchedule(id)
+    except Exception as err:
+        result = [err, err]
     return {"deploy": str(result[0]), "destroy": str(result[1])}
 
 

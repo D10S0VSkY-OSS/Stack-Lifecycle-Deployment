@@ -347,7 +347,6 @@ async def delete_infra_by_id(
         _result = asyncScheduleDelete(name, squad)
 
 
-
 @router.get("/output/{deploy_id}", status_code=200)
 async def get_output(
         deploy_id: int,
@@ -372,6 +371,7 @@ async def get_output(
             status_code=400,
             detail=f"{err}")
 
+
 @router.put("/unlock/{deploy_id}", status_code=200)
 async def unlock_deploy(
         deploy_id: int,
@@ -395,6 +395,7 @@ async def unlock_deploy(
         raise HTTPException(
             status_code=400,
             detail=f"{err}")
+
 
 @router.get("/show/{deploy_id}", status_code=202)
 async def get_show(

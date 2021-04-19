@@ -207,18 +207,32 @@ def show(self, stack_name, environment, squad, name):
     return show_result
 
 
-@celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedule remove')
-def schedule_delete(self, name):
+@celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedules list')
+def schedules_list(self):
     try:
-        return request_url(verb='DELETE', uri=f'schedule/{name}')
+        return request_url(verb='GET', uri=f'schedules/')
+    except Exception as err:
+        pass
+
+@celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedule get')
+def schedule_get(self, deploy_name):
+    try:
+        return request_url(verb='GET', uri=f'schedule/{deploy_name}')
+    except Exception as err:
+        pass
+
+@celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedule remove')
+def schedule_delete(self, deploy_name):
+    try:
+        return request_url(verb='DELETE', uri=f'schedule/{deploy_name}')
     except Exception as err:
         pass
 
 
 @celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedule add')
-def schedule_add(self, stack_name):
+def schedule_add(self, deploy_name):
     try:
-        return request_url(verb='POST', uri=f'schedule/{name}')
+        return request_url(verb='POST', uri=f'schedule/{deploy_name}')
     except Exception as err:
         return err
 
