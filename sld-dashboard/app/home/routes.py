@@ -34,11 +34,13 @@ def decrypt(secreto):
 r = redis.Redis(host='redis', port=6379, db=1,
                 charset="utf-8", decode_responses=True)
 
+external_api_dns = settings.EXTERNAL_DNS_API
+
 
 @blueprint.route('/index')
 @login_required
 def index():
-    return render_template('index.html', segment='index')
+    return render_template('index.html', segment='index', external_api_dns=external_api_dns)
 
 
 # Start Deploy
@@ -54,7 +56,7 @@ def list_deploys(limit):
         response = request_url(verb='GET', uri=f'{endpoint}', headers={
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
-        return render_template('deploys-list.html', name='Name', token=token, deploys=content)
+        return render_template('deploys-list.html', name='Name', token=token, deploys=content, external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -456,7 +458,7 @@ def list_tasks(limit):
         response = request_url(verb='GET', uri=f'{endpoint}', headers={
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
-        return render_template('tasks-logs.html', name='Tasks', tasks=content)
+        return render_template('tasks-logs.html', name='Tasks', tasks=content, external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -491,7 +493,7 @@ def list_activity(limit):
         response = request_url(verb='GET', uri=f'{endpoint}', headers={
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
-        return render_template('activity-logs.html', name='Activity', activity=content)
+        return render_template('activity-logs.html', name='Activity', activity=content, external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -533,7 +535,7 @@ def new_user():
                 flash(response['json']['detail'], 'error')
 
         return render_template('/users-new.html', title='New user',
-                               form=form, active='new_user')
+                               form=form, active='new_user', external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -550,7 +552,7 @@ def list_users(limit):
         response = request_url(verb='GET', uri=f'{endpoint}', headers={
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
-        return render_template('users-list.html', name='Name', users=content)
+        return render_template('users-list.html', name='Name', users=content, external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -668,6 +670,7 @@ def setting_user():
         return render_template('user-setting.html',
                                name='User',
                                form=form,
+                               external_api_dns=external_api_dns
                                )
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
@@ -707,7 +710,7 @@ def new_aws_account():
                 flash(response['json'], 'error')
 
         return render_template('/aws-new.html', title='New aws account',
-                               form=form, active='new_aws_account')
+                               form=form, active='new_aws_account', external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -722,7 +725,8 @@ def list_aws_account():
         response = request_url(verb='GET', uri=f'accounts/aws/', headers={
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
-        return render_template('aws-list.html', name='Name', aws=content)
+        return render_template('aws-list.html', name='Name', aws=content, external_api_dns=external_api_dns)
+
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -771,7 +775,7 @@ def new_gcp_account():
                 flash(response['json'], 'error')
 
         return render_template('/gcp-new.html', title='New gcp account',
-                               form=form, active='new_gcp_account')
+                               form=form, active='new_gcp_account', external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -786,7 +790,7 @@ def list_gcp_account():
         response = request_url(verb='GET', uri=f'accounts/gcp/', headers={
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
-        return render_template('gcp-list.html', name='Name', gcp=content)
+        return render_template('gcp-list.html', name='Name', gcp=content, external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -838,7 +842,7 @@ def new_azure_account():
                 flash(response['json'], 'error')
 
         return render_template('/azure-new.html', title='New azure account',
-                               form=form, active='new_azure_account')
+                               form=form, active='new_azure_account', external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -853,7 +857,7 @@ def list_azure_account():
         response = request_url(verb='GET', uri=f'accounts/azure/', headers={
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
-        return render_template('azure-list.html', name='Name', azure=content)
+        return render_template('azure-list.html', name='Name', azure=content, external_api_dns=external_api_dns)
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
@@ -911,7 +915,7 @@ def route_template(template):
         return render_template(
             template, segment=segment,
             user=current_user, stacks=stacks,
-            deployments=deployments, tasks=tasks,
+            deployments=deployments, tasks=tasks, external_api_dns=external_api_dns,
             api_healthy=api_healthy['json'], schedule_healthy=schedule_healthy['json'],
             remote_state_healthy=remote_state_healthy['json']
         )
