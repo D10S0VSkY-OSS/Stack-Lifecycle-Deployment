@@ -141,7 +141,7 @@ async def Update_infra_by_stack_name(
         db_task = crud_tasks.create_task(
             db=db,
             task_id=pipeline_deploy,
-            task_name=f"{environment}-{stack_name}-{squad}-{name}",
+            task_name=f"{deploy.stack_name}-{squad}-{deploy.environment}-{deploy.name}",
             user_id=current_user.id,
             deploy_id=deploy_id,
             username=current_user.username,
@@ -216,7 +216,7 @@ async def destroy_infra(
         db_task = crud_tasks.create_task(
             db=db,
             task_id=pipeline_destroy,
-            task_name=f"{environment}-{stack_name}-{squad}-{name}",
+            task_name=f"{stack_name}-{squad}-{environment}-{name}",
             user_id=current_user.id,
             deploy_id=deploy_id,
             username=current_user.username,
@@ -331,7 +331,7 @@ async def delete_infra_by_id(
         db_task = crud_tasks.create_task(
             db=db,
             task_id=pipeline_destroy,
-            task_name=f"{deploy_data.environment}-{deploy_data.stack_name}-{squad}-{deploy_data.name}",
+            task_name=f"{deploy_data.stack_name}-{squad}-{deploy_data.environment}-{deploy_data.name}",
             user_id=current_user.id,
             deploy_id=deploy_id,
             username=current_user.username,
