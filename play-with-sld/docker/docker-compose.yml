@@ -54,7 +54,7 @@ services:
   
   # sd-remote-state
   schedule:
-    image: d10s0vsky/sld-schedule:1.0.2
+    image: d10s0vsky/sld-schedule:1.0.3
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 10000 --workers 4
     hostname: schedule
     ports:
@@ -70,7 +70,7 @@ services:
 
   # Celery worker
   worker:
-    image: d10s0vsky/sld-api:1.0.3
+    image: d10s0vsky/sld-api:1.0.5
     entrypoint: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "celery,squad,squad1"]
     depends_on:
       - rabbit
@@ -80,7 +80,7 @@ services:
 
   # SLD Dashboard - UI
   sld-dashboard:
-    image: d10s0vsky/sld-dashboard:1.0.3
+    image: d10s0vsky/sld-dashboard:1.0.5
     hostname: sld-dashboard
     entrypoint: gunicorn --config gunicorn-cfg.py run:app
     restart: always
@@ -100,7 +100,7 @@ services:
 
   # FastApi Stack Deploy
   api-backend:
-    image: d10s0vsky/sld-api:1.0.3
+    image: d10s0vsky/sld-api:1.0.5
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 
     hostname: api-backend
     ports:
