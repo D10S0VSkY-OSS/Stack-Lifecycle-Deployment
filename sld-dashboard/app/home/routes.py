@@ -44,7 +44,7 @@ def index():
 
 
 # Start Deploy
-@blueprint.route('/deploys-list', defaults={'limit': 5})
+@blueprint.route('/deploys-list', defaults={'limit': 15})
 @blueprint.route('/deploys-list/<int:limit>')
 @login_required
 def list_deploys(limit):

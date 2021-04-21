@@ -17,7 +17,7 @@ spec:
       subdomain: primary
       containers:
         - name: stack-deploy-worker-squad1
-          image: d10s0vsky/sld-api:1.0.3
+          image: d10s0vsky/sld-api:1.0.5
           imagePullPolicy: Always
           env:
           - name: TF_WARN_OUTPUT_ERRORS

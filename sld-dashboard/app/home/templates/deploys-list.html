@@ -72,10 +72,10 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">
                             <span class="dropdown-item font-weight-bold text-dark">Show</span>
-                            <a class="dropdown-item d-flex font-weight-bold" href="/deploys-list/5">5 <span
+                            <a class="dropdown-item d-flex font-weight-bold" href="/deploys-list/15">15 <span
                                     class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/20">20</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/30">30</a>
+                            <a class="dropdown-item font-weight-bold" href="/deploys-list/25">25</a>
+                            <a class="dropdown-item font-weight-bold" href="/deploys-list/35">35</a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/50">50</a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/100">100</a>
                         </div>
@@ -321,22 +321,21 @@
 {% block javascripts %}
 <script>
     function search() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("search");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("table");
-        tr = table.getElementsByTagName("tr");
-        for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[1];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
+        const input = document.getElementById('search')
+        const filter = input.value.toLowerCase()
+        const table = document.getElementById('table')
+        const tr = [...table.getElementsByTagName('tr')]
+
+        tr.forEach((t) => {
+            const foundMatch = [...t.getElementsByTagName('td')].some((td) => {
+                return td.innerHTML.toLowerCase().indexOf(filter) > -1
+            })
+            if (foundMatch) {
+                t.style.display = ''
+            } else {
+                t.style.display = 'none'
             }
-        }
+        })
     }
 </script>
 {% endblock javascripts %}
