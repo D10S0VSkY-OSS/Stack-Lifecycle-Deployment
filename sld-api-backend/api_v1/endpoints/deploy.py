@@ -6,7 +6,7 @@ from crud import deploys as crud_deploys
 from crud import tasks as crud_tasks
 from security import deps
 from security import tokens
-from helpers.get_data import check_deploy_exist, check_deploy_state
+from helpers.get_data import check_deploy_exist, check_deploy_state, checkCronSchedule
 from helpers.get_data import stack, deploy, deploy_squad, check_deploy_exist
 from helpers.push_task import asyncDeploy, asyncDestroy
 from helpers.push_task import asyncOutput, asyncUnlock, asyncScheduleDelete
@@ -43,6 +43,9 @@ async def deploy_infra_by_stack_name(
         deploy.stack_name
     )
     try:
+        #check crontime
+        checkCronSchedule(deploy.start_time)
+        checkCronSchedule(deploy.destroy_time)
         # push task Deploy to queue and return task_id
         pipeline_deploy = asyncDeploy(
             git_repo,
@@ -112,6 +115,9 @@ async def Update_infra_by_stack_name(
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:
+        #check crontime
+        checkCronSchedule(deploy_update.start_time)
+        checkCronSchedule(deploy_update.destroy_time)
         # Check deploy state
         if not check_deploy_state(deploy_data.task_id):
             raise ValueError("Deploy state running, cannot upgrade")
@@ -141,7 +147,7 @@ async def Update_infra_by_stack_name(
         db_task = crud_tasks.create_task(
             db=db,
             task_id=pipeline_deploy,
-            task_name=f"{deploy.stack_name}-{squad}-{deploy.environment}-{deploy.name}",
+            task_name=f"{stack_name}-{squad}-{environment}-{name}",
             user_id=current_user.id,
             deploy_id=deploy_id,
             username=current_user.username,

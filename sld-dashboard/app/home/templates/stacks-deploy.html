@@ -54,12 +54,14 @@
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.start_time, class='form-control', placeholder='30 7 * * 1-5') }}
+                                        {{ render_field(form.start_time, class='form-control', placeholder='30 7 * * 0-4') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.destroy_time, class='form-control', placeholder='30 18 * * 1-5') }}
+                                        {{ render_field(form.destroy_time, class='form-control', placeholder='30 18 * * 0-4') }}
                                     </div>
+
+                                    <div class="border-top my-4"></div>
 
                                     {% for key, value in data_json.items()|sort %}
                                     <div class="form-group">

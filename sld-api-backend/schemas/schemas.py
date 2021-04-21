@@ -145,8 +145,8 @@ class DeployCreate(BaseModel):
     name: str
     stack_name: str
     environment: str
-    start_time: str
-    destroy_time: str
+    start_time: Optional[str] = Field(None, example="30 9 * * 0-4")
+    destroy_time: Optional[str] = Field(None, example="30 17 * * 0-4")
     variables: dict
 
 
