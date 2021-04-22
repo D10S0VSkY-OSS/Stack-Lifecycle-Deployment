@@ -56,9 +56,10 @@
                                         {% if "passw" in key %}
                                         <input type="password" value="{{ value }}" name={{ key }} class='form-control'
                                             placeholder={{key}}>
-                                        {% endif %}
+                                        {% else %}
                                         <input type="text" value="{{ value }}" name={{ key }} class='form-control'
                                             placeholder={{key}}>
+                                        {% endif %}
                                     </div>
                                     {% endfor %}
                                     <button type="submit" class="btn btn-primary" name="button"

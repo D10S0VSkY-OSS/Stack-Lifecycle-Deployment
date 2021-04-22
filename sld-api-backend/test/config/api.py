@@ -160,7 +160,7 @@ class Settings(BaseSettings):
                     "protocol": "udp"
                 }
             ],
-            "image_id": "2"
+            "password": "PassWW"
         }
     }
     DEPLOY_VARS_USER: dict = {
@@ -188,7 +188,7 @@ class Settings(BaseSettings):
                     "protocol": "udp"
                 }
             ],
-            "image_id": "2"
+            "password": "Password"
         }
     }
     DEPLOY_VARS_MASTER: dict = {
@@ -216,7 +216,7 @@ class Settings(BaseSettings):
                     "protocol": "tcp"
                 }
             ],
-            "image_id": "1"
+            "password": "PasswordAdmin"
         }
     }
     DEPLOY_VARS_UPDATE: dict = {
@@ -244,7 +244,7 @@ class Settings(BaseSettings):
                     "protocol": "tcp"
                 }
             ],
-            "image_id": "1"
+            "password": "Pass123"
         }
     }
 
