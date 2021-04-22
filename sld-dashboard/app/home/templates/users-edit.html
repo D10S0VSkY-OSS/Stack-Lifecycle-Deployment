@@ -39,7 +39,7 @@
                                 <h3>{{data_json.username }} </h3>
                                 <form  method="post">
                                     <div class="form-group">
-                                        {% for key, value in data_json.items() %}
+                                        {% for key, value in data_json.items() |sort(attribute='key', reverse = True) %}
                                         <!-- Username -->
                                         {% if key == "username" %}
                                         <div class="form-group">
@@ -54,7 +54,7 @@
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <input type="text" name={{ key }} value={{ value }} class='form-control' placeholder={{key}}>
+                                            <input type="text" name={{ key }} value={{ value }} class='form-control' placeholder={{ value }}>
                                         </div>
                                         <!-- Email -->
                                         {% elif key == "email" %}

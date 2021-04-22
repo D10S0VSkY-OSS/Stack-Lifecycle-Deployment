@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from celery.result import AsyncResult
 from datetime import datetime
 from functools import wraps
+from croniter import croniter
 
 from crud import stacks as crud_stacks
 from crud import deploys as crud_deploys
@@ -135,4 +136,12 @@ def activity_log(func):
         return await func(*args, **kwargs)
 
     return wrapper
+
+def checkCronSchedule(cron_time: str):
+    if cron_time:
+        print(cron_time)
+        if not croniter.is_valid(cron_time):
+            print("raise")
+            raise  ValueError("Cron time its no valid")
+    return True
 

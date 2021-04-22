@@ -7,7 +7,7 @@ from crud import master as crud_master
 from crud import tasks as crud_tasks
 from security import deps
 from security import tokens
-from helpers.get_data import stack, getDeploy, check_deploy_exist, check_deploy_state
+from helpers.get_data import stack, getDeploy, check_deploy_exist, check_deploy_state, checkCronSchedule
 from helpers.push_task import asyncDeploy, asyncDestroy
 
 router = APIRouter()
@@ -40,6 +40,9 @@ async def deploy_infra_by_stack_name(
         deploy.stack_name
     )
     try:
+        #check crontime
+        checkCronSchedule(deploy.start_time)
+        checkCronSchedule(deploy.destroy_time)
         # push task Deploy to queue and return task_id
         pipeline_deploy = asyncDeploy(
             git_repo,
@@ -107,6 +110,9 @@ async def Update_infra_by_stack_name(
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:
+        #check crontime
+        checkCronSchedule(deploy_update.start_time)
+        checkCronSchedule(deploy_update.destroy_time)
         # Check deploy state
         if not check_deploy_state(task_id):
             raise ValueError("Deploy state running, cannot upgrade")
