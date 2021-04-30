@@ -9,8 +9,9 @@ from config.api import settings
 
 @celery_app.task(bind=True, acks_late=True, time_limit=7200, name='pipelineDeploy')
 def pipelineDeploy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
+    filter_kwargs = {key:value for (key,value) in kwargs.items() if "pass" not in key}
     print(git_repo, name, stack_name, environment,
-          squad, branch, version, kwargs)
+          squad, branch, version, filter_kwargs)
     try:
         # Git clone repo
         result = tf.gitClone(git_repo, name, stack_name,
@@ -79,8 +80,9 @@ def pipelineDeploy(self, git_repo, name, stack_name, environment, squad, branch,
 
 @celery_app.task(bind=True, acks_late=True, name='pipelineDestroy')
 def pipelineDestroy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
+    filter_kwargs = {key:value for (key,value) in kwargs.items() if "pass" not in key}
     print(git_repo, name, stack_name, environment,
-          squad, branch, version, kwargs)
+          squad, branch, version, filter_kwargs)
     try:
         # Git clone repo
         result = tf.gitClone(git_repo, name, stack_name,
@@ -124,8 +126,9 @@ def pipelineDestroy(self, git_repo, name, stack_name, environment, squad, branch
 
 @celery_app.task(bind=True, acks_late=True, name='pipelinePlan')
 def pipelinePlan(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
+    filter_kwargs = {key:value for (key,value) in kwargs.items() if "pass" not in key}
     print(git_repo, name, stack_name, environment,
-          squad, branch, version, kwargs)
+          squad, branch, version, filter_kwargs)
     try:
         self.update_state(state='GIT', meta={'done': "1 of 5"})
         result = tf.gitClone(git_repo, name, stack_name,

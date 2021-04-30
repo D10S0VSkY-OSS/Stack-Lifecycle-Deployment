@@ -106,35 +106,35 @@ def asyncPlan(
 
 def asyncOutput(stack_name: str, environment: str, squad: str, name: str):
     pipeline_output = output.s(stack_name, environment, squad,
-                               name).apply_async(queue=squad)
+                               name).apply_async(queue="squad")
     return pipeline_output.task_id
 
 
 def asyncUnlock(stack_name: str, environment: str, squad: str, name: str):
     pipeline_unlock = unlock.s(stack_name, environment, squad,
-                               name).apply_async(queue=squad)
+                               name).apply_async(queue="squad")
     return pipeline_unlock.task_id
 
 
 def asyncScheduleDelete(deploy_name: str, squad: str):
-    deploy_schedule_delete = schedule_delete.s(deploy_name).apply_async(queue=squad)
+    deploy_schedule_delete = schedule_delete.s(deploy_name).apply_async(queue="squad")
     return deploy_schedule_delete.task_id
 
 def asyncScheduleAdd(deploy_name: str, squad: str):
-    deploy_schedule_add = schedule_add.s(deploy_name).apply_async(queue=squad)
+    deploy_schedule_add = schedule_add.s(deploy_name).apply_async(queue="squad")
     return deploy_schedule_add.task_id
 
 def asyncScheduleList(squad: str):
-    pipeline_schedule_list = schedules_list.s().apply_async(queue=squad)
+    pipeline_schedule_list = schedules_list.s().apply_async(queue="squad")
     return pipeline_schedule_list.task_id
 
 def asyncScheduleGet(deploy_name, squad: str):
-    pipeline_schedule_get = schedule_get.s(deploy_name).apply_async(queue=squad)
+    pipeline_schedule_get = schedule_get.s(deploy_name).apply_async(queue="squad")
     return pipeline_schedule_get.task_id
 
 def asyncShow(stack_name: str, environment: str, squad: str, name: str):
     pipeline_show = show.s(stack_name, environment, squad,
-                               name).apply_async(queue=squad)
+                               name).apply_async(queue="squad")
     return pipeline_show.task_id
 
 
