@@ -18,4 +18,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Build the Docker image
-      run: docker build . --file sld-api-backend/Dockerfile --tag d10s0vsky/sld-api:$(date +%s)
+      working-directory: ./sld-api-backend
+      run: docker build . --file Dockerfile --tag d10s0vsky/sld-api:$(date +%s)
