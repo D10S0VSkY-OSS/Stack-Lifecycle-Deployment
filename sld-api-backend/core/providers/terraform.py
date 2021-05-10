@@ -260,6 +260,8 @@ class TerraformActions(object):
             response = requests.get(f'{settings.REMOTE_STATE}/terraform_state/{get_path}')
             json_data = response.json()
             result = json_data.get('outputs')
+            if not result:
+                result = jmespath.search('modules[*].outputs', json_data)
             return result
         except Exception as err:
             return {"command": "output", "rc": 1, "stdout": err}

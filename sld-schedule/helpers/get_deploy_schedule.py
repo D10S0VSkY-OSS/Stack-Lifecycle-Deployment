@@ -2,34 +2,46 @@ from fastapi import HTTPException
 from helpers.api_request import request_url
 from helpers.api_token import get_token
 from config.api import settings
+from retrying import retry
+
 import jmespath
 import time
 import json
 import logging
+from datetime import datetime
 
 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from apscheduler.triggers.cron import CronTrigger
-from datetime import datetime
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.executors.pool import ThreadPoolExecutor, ProcessPoolExecutor
 
 
 logging.basicConfig(
     format='%(levelname)-8s  %(message)s',
     level=logging.INFO,
 )
-scheduler = BackgroundScheduler()
+executors = {
+    'default': ThreadPoolExecutor(settings.THREAD_POOL_EXECUTOR),
+    'processpool': ProcessPoolExecutor(settings.PROCESS_POOL_EXECUTOR)
+}
+job_defaults = {
+    'coalesce': False,
+    'max_instances': settings.MAX_INSTANCES
+}
+
+scheduler = BackgroundScheduler(executors=executors, job_defaults=job_defaults)
 
 
 def init_check_schedule():
     try:
-        count=1000
+        count = 1000
         for i in range(count):
-            count -=1
-            logging.warning(f"Can't validate in the api-backend, Set user and password bot in api-backend try {count} of 100")
+            count -= 1
+            logging.warning(f"Can't validate in the api-backend, Set user and password bot in api-backend try {count} of 1000")
             time.sleep(3)
             token = get_token(settings.CREDENTIALS_BOT)
-            response = request_url(verb='GET',uri=f'deploy/',headers={"Authorization": f"Bearer {token}"})
+            response = request_url(verb='GET', uri=f'deploy/', headers={"Authorization": f"Bearer {token}"})
             if response.get("status_code") == 200:
                 break
 
@@ -67,6 +79,7 @@ def get_deploy_by_id(deploy_id):
             detail=f"{err}")
 
 
+@retry(stop_max_attempt_number=settings.STOP_MAX_ATTEMPT, wait_fixed=settings.WAIT_FIXED)
 def update_deploy(deploy_id):
     token = get_token(settings.CREDENTIALS_BOT)
     endpoint = f'deploy/{deploy_id}'
@@ -90,6 +103,7 @@ def update_deploy(deploy_id):
         f'Update deploy info by id {deploy_id} - {response["status_code"]}')
 
 
+@retry(stop_max_attempt_number=settings.STOP_MAX_ATTEMPT, wait_fixed=settings.WAIT_FIXED)
 def destroy_deploy(deploy_id):
     token = get_token(settings.CREDENTIALS_BOT)
     endpoint = f'deploy/{deploy_id}'
