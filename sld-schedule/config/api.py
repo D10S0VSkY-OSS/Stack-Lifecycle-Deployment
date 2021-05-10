@@ -9,6 +9,11 @@ class Settings(BaseSettings):
     API: str = os.getenv('SLD_API_SERVER_API', '/api/v1')
     BOT: str = os.getenv('SLD_API_SERVER_USER', 'schedule')
     BOTC: str = os.getenv('SLD_API_SERVER_PASSWORD', 'Schedule1@local')
+    STOP_MAX_ATTEMPT: int = os.getenv('STOP_MAX_ATTEMPT', 10)
+    WAIT_FIXED: int = os.getenv('WAIT_FIXED', 600000)
+    THREAD_POOL_EXECUTOR: int = os.getenv('THREAD_POOL_EXECUTOR', 20)
+    PROCESS_POOL_EXECUTOR: int = os.getenv('THREAD_POOL_EXECUTOR', 5)
+    MAX_INSTANCES: int = os.getenv('MAX_INSTANCES', 30)
     CREDENTIALS_BOT: dict = {
         "username": BOT,
         "password": BOTC
