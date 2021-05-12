@@ -68,7 +68,7 @@ def get_current_active_superuser(
 
 
 def validate_password(password: str):
-    SpecialSymbol = ['$', '@', '#', '%']
+    SpecialSymbol = ['$', '@', '#', '%', '.', '!', '&', '"', '?']
     if len(password) < settings.PASSWORD_LEN:
         raise HTTPException(
             status_code=400, detail=f"Make sure your password is at lest {settings.PASSWORD_LEN} letters")
