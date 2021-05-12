@@ -43,7 +43,7 @@ async def deploy_infra_by_stack_name(
         deploy.stack_name
     )
     try:
-        #check crontime
+        # check crontime
         checkCronSchedule(deploy.start_time)
         checkCronSchedule(deploy.destroy_time)
         # push task Deploy to queue and return task_id
@@ -115,7 +115,7 @@ async def Update_infra_by_stack_name(
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:
-        #check crontime
+        # check crontime
         checkCronSchedule(deploy_update.start_time)
         checkCronSchedule(deploy_update.destroy_time)
         # Check deploy state
@@ -371,7 +371,7 @@ async def get_output(
         environment = deploy_data.environment
         name = deploy_data.name
         # Get  credentials by providers supported
-        return asyncOutput(stack_name, environment, squad, name)
+        return {"task": asyncOutput(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
             status_code=400,
@@ -396,7 +396,7 @@ async def unlock_deploy(
         environment = deploy_data.environment
         name = deploy_data.name
         # Get  credentials by providers supported
-        return asyncUnlock(stack_name, environment, squad, name)
+        return {"task": asyncUnlock(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
             status_code=400,
@@ -420,7 +420,7 @@ async def get_show(
     environment = deploy_data.environment
     name = deploy_data.name
     try:
-        return asyncShow(stack_name, environment, squad, name)
+        return {"task": asyncShow(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
             status_code=400,
