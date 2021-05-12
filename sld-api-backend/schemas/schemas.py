@@ -172,6 +172,13 @@ class Deploy(StackBase):
     class Config:
         orm_mode = True
 
+class PlanCreate(BaseModel):
+    name: str
+    stack_name: str
+    squad: str
+    environment: str
+    variables: dict
+
 
 class TasksBase(BaseModel):
     id: str

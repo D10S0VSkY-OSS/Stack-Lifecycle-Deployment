@@ -54,11 +54,11 @@
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.start_time, class='form-control', placeholder='30 7 * * 0-4') }}
+                                        {{ render_field(form.start_time, class='form-control', value='30 7 * * 0-4') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.destroy_time, class='form-control', placeholder='30 18 * * 0-4') }}
+                                        {{ render_field(form.destroy_time, class='form-control', value='30 18 * * 0-4') }}
                                     </div>
 
                                     <div class="border-top my-4"></div>
@@ -69,14 +69,16 @@
                                           <p class="mb-110">  <h6><strong>{{key}}</strong></h6></p>
                                        <footer class="blockquote-footer"> {{value.get('description', "")}}</footer>
                                         </span>
-                                        {% for key, value in value.items() %}
-                                        {% if "default" in key %}
-                                        <input type="text" value="{{ value|lower }}"
+                                        {% for k, v in value.items() %}
+                                        {% if "default" in k %}
+                                        <input type="text" value="{{ v|lower }}"
+                                        {% elif "passw" in key %}
+                                        <input type="password"
                                                            {% else %}
-                                                           <input type="text" title="{{key}} {{value}}"
+                                                           <input type="text" title="{{k}} {{v}}"
                                                                   {% endif %}
                                                                   {% endfor %}
-                                                                  name={{ key }} class='form-control' placeholder={{key}}>
+                                                                  name={{ key }} class='form-control'>
                                     </div>
                                         {% endfor %}
 

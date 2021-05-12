@@ -16,12 +16,17 @@ router = APIRouter()
 async def plan_infra_by_stack_name(
         response: Response,
         background_tasks: BackgroundTasks,
-        deploy: schemas.DeployCreate,
+        deploy: schemas.PlanCreate,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
     response.status_code = status.HTTP_202_ACCEPTED
+
+    squad = deploy.squad
     # Get squad from current user
-    squad = current_user.squad
+    if not current_user.master:
+        current_squad = current_user.squad
+        if current_squad != squad:
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad)
