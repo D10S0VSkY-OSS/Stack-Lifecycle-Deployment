@@ -24,7 +24,7 @@ mysqlclient==2.0.3
 passlib==1.7.4
 pyaes==1.6.1
 pycparser==2.20
-pydantic==1.7.3
+pydantic==1.7.4
 python-dateutil==2.8.1
 python-decouple==3.4
 python-editor==1.0.4
