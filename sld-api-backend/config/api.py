@@ -26,6 +26,7 @@ class Settings(BaseSettings):
     PASSWORD_LEN: int = os.getenv('SLD_PASSWORD_LEN', 8)
     ROLLBACK: bool = os.getenv('SLD_ROLLBACK', False)
     ENV: str = os.getenv('SLD_ENV', "dev")
+    DEBUG: bool = os.getenv('SLD_DEBUG', False)
     #init user
     INIT_USER = {
         "username": os.getenv('SLD_INIT_USER_NAME', "admin"),

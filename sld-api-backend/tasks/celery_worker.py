@@ -69,7 +69,8 @@ def pipelineDeploy(self, git_repo, name, stack_name, environment, squad, branch,
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        tf.deleteLocalFolder(dir_path)
+        if not settings.DEBUG:
+            tf.deleteLocalFolder(dir_path)
         try:
             print(request_url(verb='DELETE', uri=f'schedule/{name}'))
             print(request_url(verb='POST', uri=f'schedule/{name}'))
