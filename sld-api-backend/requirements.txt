@@ -55,7 +55,7 @@ ptyprocess==0.6.0
 py==1.10.0
 pyasn1==0.4.8
 pycparser==2.20
-pydantic==1.7.2
+pydantic==1.7.4
 pyhcl==0.4.4
 PyJWT==1.7.1
 PyMySQL==0.10.1
