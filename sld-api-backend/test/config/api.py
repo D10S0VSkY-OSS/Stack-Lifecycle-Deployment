@@ -114,7 +114,7 @@ class Settings(BaseSettings):
         "squad_access": ["*"],
         "branch": "master",
         "description": STACK_NAME_AWS,
-        "tf_version": "0.13.5"
+        "tf_version": "0.15.0"
     }
     STACK_POST_GCP: dict = {
         "stack_name": STACK_NAME_GCP,
@@ -122,7 +122,7 @@ class Settings(BaseSettings):
         "branch": "master",
         "squad_access": ["*"],
         "description": STACK_NAME_GCP,
-        "tf_version": "0.13.5"
+        "tf_version": "0.14.1"
     }
     AWS_TEST_ACCOUNT: dict = {
         "squad": "squad1",
@@ -134,7 +134,7 @@ class Settings(BaseSettings):
         "role_arn": "string",
         "source_profile": "string"
     }
-    DEPLOY_URI: str = '?tf_ver=0.13.5'
+    DEPLOY_URI: str = '?tf_ver=0.15.0'
     DEPLOY_VARS: dict = {
         "name": "aws_vpc_darth_vader",
         "stack_name": "aws_vpc",
