@@ -8,7 +8,7 @@ idna==2.10
 jmespath==0.10.0
 loguru==0.5.3
 mysqlclient==2.0.3
-pydantic==1.7.3
+pydantic==1.7.4
 pytz==2020.5
 requests==2.25.1
 six==1.15.0
