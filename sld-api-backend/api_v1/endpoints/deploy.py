@@ -284,12 +284,13 @@ async def get_deploy_by_id(
             detail=f"{err}")
 
 
-@router.delete("/{deploy_id}")
+@router.delete("/{deploy_id}", status_code=202)
 async def delete_infra_by_id(
         deploy_id: int,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
 
+    response.status_code = status.HTTP_202_ACCEPTED
     # Get info from deploy data
     if current_user.master:
         deploy_data = deploy(db, deploy_id=deploy_id)
@@ -353,11 +354,13 @@ async def delete_infra_by_id(
         _result = asyncScheduleDelete(name, squad)
 
 
-@router.get("/output/{deploy_id}", status_code=200)
+@router.get("/output/{deploy_id}", status_code=202)
 async def get_output(
         deploy_id: int,
         db: Session = Depends(deps.get_db),
         current_user: schemas.User = Depends(deps.get_current_active_user)):
+
+    response.status_code = status.HTTP_202_ACCEPTED
     # Get info from deploy data
     if current_user.master:
         deploy_data = deploy(db, deploy_id=deploy_id)
@@ -378,11 +381,13 @@ async def get_output(
             detail=f"{err}")
 
 
-@router.put("/unlock/{deploy_id}", status_code=200)
+@router.put("/unlock/{deploy_id}", status_code=202)
 async def unlock_deploy(
         deploy_id: int,
         db: Session = Depends(deps.get_db),
         current_user: schemas.User = Depends(deps.get_current_active_user)):
+
+    response.status_code = status.HTTP_202_ACCEPTED
     # Get info from deploy data
     if current_user.master:
         deploy_data = deploy(db, deploy_id=deploy_id)
@@ -408,6 +413,8 @@ async def get_show(
         deploy_id: int,
         db: Session = Depends(deps.get_db),
         current_user: schemas.User = Depends(deps.get_current_active_user)):
+
+    response.status_code = status.HTTP_202_ACCEPTED
     # Get info from deploy data
     if current_user.master:
         deploy_data = deploy(db, deploy_id=deploy_id)
