@@ -19,15 +19,14 @@ kind create cluster --config kind.yml
 curl -L https://istio.io/downloadIstio | sh -
 ```
 
-### 3-Deploy Istio with addons
+### 3-Deploy Istio
 ```
 istio-1.9.1/bin/istioctl install --set profile=demo -y
-kubectl apply -f k8s/istio/addons/
 ```
 
-### 4-Deploy Istio
+### 4-Deploy Istio with addons
 ```
-istio-1.9.1/bin/istioctl install --set profile=demo -y
+kubectl apply -f k8s/istio/addons/
 ```
 
 ### 5-Inyect istio to namespace
@@ -37,7 +36,6 @@ kubectl label namespace default istio-injection=enabled
 
 ### 5-Apply SLD
 ```
-kubectl label namespace default istio-injection=enabled
 kubectl apply -k k8s/ 
 ```
 
