@@ -7,15 +7,15 @@ from helpers.schedule import request_url
 from config.api import settings
 
 
-@celery_app.task(bind=True, acks_late=True, time_limit=7200, name='pipeline Deploy')
-def pipelineDeploy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
-    filter_kwargs = {key:value for (key,value) in kwargs.items() if "pass" not in key}
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.DEPLOY_TMOUT, name='pipeline Deploy')
+def pipeline_deploy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
+    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     print(git_repo, name, stack_name, environment,
           squad, branch, version, filter_kwargs)
     try:
         # Git clone repo
         result = tf.git_clone(git_repo, name, stack_name,
-                             environment, squad, branch)
+                              environment, squad, branch)
         self.update_state(state='PULLING', meta={'done': "1 of 6"})
         if result['rc'] != 0:
             raise Exception(result)
@@ -40,7 +40,7 @@ def pipelineDeploy(self, git_repo, name, stack_name, environment, squad, branch,
         # Plan execute
         self.update_state(state='PLANNING', meta={'done': "5 of 6"})
         result = tf.plan_execute(stack_name, environment,
-                               squad, name, version, data=secreto)
+                                 squad, name, version, data=secreto)
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
         tf.delete_local_folder(dir_path)
@@ -65,7 +65,7 @@ def pipelineDeploy(self, git_repo, name, stack_name, environment, squad, branch,
         self.update_state(state=states.FAILURE, meta={
             'exc_type': type(err).__name__,
             'exc_message': traceback.format_exc().split('\n')
-            })
+        })
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
@@ -80,14 +80,14 @@ def pipelineDeploy(self, git_repo, name, stack_name, environment, squad, branch,
 
 
 @celery_app.task(bind=True, acks_late=True, name='pipeline Destroy')
-def pipelineDestroy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
-    filter_kwargs = {key:value for (key,value) in kwargs.items() if "pass" not in key}
+def pipeline_destroy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
+    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     print(git_repo, name, stack_name, environment,
           squad, branch, version, filter_kwargs)
     try:
         # Git clone repo
         result = tf.git_clone(git_repo, name, stack_name,
-                             environment, squad, branch)
+                              environment, squad, branch)
         self.update_state(state='PULLING', meta={'done': "1 of 6"})
         if result['rc'] != 0:
             raise Exception(result)
@@ -126,14 +126,14 @@ def pipelineDestroy(self, git_repo, name, stack_name, environment, squad, branch
 
 
 @celery_app.task(bind=True, acks_late=True, name='pipeline Plan')
-def pipelinePlan(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
-    filter_kwargs = {key:value for (key,value) in kwargs.items() if "pass" not in key}
+def pipeline_plan(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
+    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     print(git_repo, name, stack_name, environment,
           squad, branch, version, filter_kwargs)
     try:
         self.update_state(state='GIT', meta={'done': "1 of 5"})
         result = tf.git_clone(git_repo, name, stack_name,
-                             environment, squad, branch)
+                              environment, squad, branch)
         if result['rc'] != 0:
             raise Exception(result)
 
@@ -156,7 +156,7 @@ def pipelinePlan(self, git_repo, name, stack_name, environment, squad, branch, v
 
         self.update_state(state='PLAN', meta={'done': "5 of 5"})
         result = tf.plan_execute(stack_name, environment,
-                               squad, name, version, data=secreto)
+                                 squad, name, version, data=secreto)
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
         tf.delete_local_folder(dir_path)
         if result['rc'] != 0:
@@ -173,18 +173,18 @@ def pipelinePlan(self, git_repo, name, stack_name, environment, squad, branch, v
 
 @celery_app.task(bind=True,
                  acks_late=True,
-                 time_limit=60,
+                 time_limit=settings.GIT_TMOUT,
                  name='download git repo')
 def git(self, git_repo, name, stack_name, environment, squad, branch):
     try:
         result = tf.git_clone(git_repo, name, stack_name,
-                             environment, squad, branch)
+                              environment, squad, branch)
     except Exception as err:
         raise err
     return stack_name, environment, squad, name, result
 
 
-@celery_app.task(bind=True, acks_late=True, time_limit=300, max_retries=1, name='terraform output')
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, max_retries=1, name='terraform output')
 def output(self, stack_name, environment, squad, name):
     try:
         output_result = tf.output_execute(
@@ -194,7 +194,7 @@ def output(self, stack_name, environment, squad, name):
         return {"stdout": err}
 
 
-@celery_app.task(bind=True, acks_late=True, time_limit=300, max_retries=1, name='terraform unlock')
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, max_retries=1, name='terraform unlock')
 def unlock(self, stack_name, environment, squad, name):
     try:
         unlock_result = tf.unlock_execute(
@@ -204,28 +204,30 @@ def unlock(self, stack_name, environment, squad, name):
         return {"stdout": err}
 
 
-@celery_app.task(bind=True, acks_late=True, time_limit=300, name='terraform show')
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='terraform show')
 def show(self, stack_name, environment, squad, name):
     show_result = tf.show_execute(
         stack_name, environment, squad, name)
     return show_result
 
 
-@celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedules list')
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='schedules list')
 def schedules_list(self):
     try:
         return request_url(verb='GET', uri=f'schedules/')
     except Exception as err:
         pass
 
-@celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedule get')
+
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='schedule get')
 def schedule_get(self, deploy_name):
     try:
         return request_url(verb='GET', uri=f'schedule/{deploy_name}')
     except Exception as err:
         pass
 
-@celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedule remove')
+
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='schedule remove')
 def schedule_delete(self, deploy_name):
     try:
         return request_url(verb='DELETE', uri=f'schedule/{deploy_name}')
@@ -233,7 +235,7 @@ def schedule_delete(self, deploy_name):
         pass
 
 
-@celery_app.task(bind=True, acks_late=True, time_limit=300, name='schedule add')
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='schedule add')
 def schedule_add(self, deploy_name):
     try:
         return request_url(verb='POST', uri=f'schedule/{deploy_name}')
