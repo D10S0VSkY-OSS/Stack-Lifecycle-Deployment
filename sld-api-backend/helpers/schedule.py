@@ -6,7 +6,7 @@ from config.api import settings
 
 server = settings.SCHEDULE_SERVER
 
-def resourceLifeCycle(start_time: str, end_time: str) -> bool:
+def resource_life_cycle(start_time: str, end_time: str) -> bool:
     if start_time == 0:
         return None
     date.today().weekday()

@@ -12,7 +12,7 @@ from crud import activityLogs as crud_activity
 from config.api import settings
 
 
-def userSquadScope(db, user, squad):
+def user_squad_scope(db, user, squad):
     try:
         print(user)
         print(squad)
@@ -69,7 +69,7 @@ def deploy_squad(db, deploy_id: int, squad: str):
             detail=f"{err}")
 
 
-def getDeploy(db, deploy_id: int):
+def get_deploy(db, deploy_id: int):
     try:
         deploy_data = crud_master.get_deploy_by_id(
             db=db, deploy_id=deploy_id)
@@ -104,7 +104,7 @@ def check_deploy_state(task_id: str):
     return any(result.state == i for i in list_state)
 
 
-def checkProviders(stack_name):
+def check_providers(stack_name):
     providers_support = settings.PROVIDERS_SUPPORT
     if any(i in stack_name.lower() for i in providers_support):
         return True
@@ -112,17 +112,6 @@ def checkProviders(stack_name):
         raise HTTPException(
             status_code=404,
             detail=f"stack name {stack_name.lower()} no content providers support name preffix: {providers_support}")
-
-def funcion_a(funcion_b):
-    def funcion_c():
-        start = datetime.now()
-        print('Antes de la ejecución de la función a decorar')
-        funcion_b()
-        print('Después de la ejecución de la función a decorar')
-        final = datetime.now()
-        delta = final - start
-        return delta.total_seconds()
-    return funcion_c
 
 def activity_log(func):
     @wraps(func)
@@ -137,11 +126,9 @@ def activity_log(func):
 
     return wrapper
 
-def checkCronSchedule(cron_time: str):
+def check_cron_schedule(cron_time: str):
     if cron_time:
-        print(cron_time)
         if not croniter.is_valid(cron_time):
-            print("raise")
             raise  ValueError("Cron time its no valid")
     return True
 

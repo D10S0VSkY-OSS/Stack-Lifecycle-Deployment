@@ -7,8 +7,8 @@ from crud import master as crud_master
 from crud import tasks as crud_tasks
 from security import deps
 from security import tokens
-from helpers.get_data import stack, getDeploy, check_deploy_exist, check_deploy_state, checkCronSchedule
-from helpers.push_task import asyncDeploy, asyncDestroy
+from helpers.get_data import stack, get_deploy, check_deploy_exist, check_deploy_state, check_cron_schedule
+from helpers.push_task import async_deploy, async_destroy
 
 router = APIRouter()
 
@@ -41,10 +41,10 @@ async def deploy_infra_by_stack_name(
     )
     try:
         #check crontime
-        checkCronSchedule(deploy.start_time)
-        checkCronSchedule(deploy.destroy_time)
+        check_cron_schedule(deploy.start_time)
+        check_cron_schedule(deploy.destroy_time)
         # push task Deploy to queue and return task_id
-        pipeline_deploy = asyncDeploy(
+        pipeline_deploy = async_deploy(
             git_repo,
             deploy.name,
             deploy.stack_name,
@@ -95,7 +95,7 @@ async def Update_infra_by_stack_name(
         raise HTTPException(status_code=403, detail="Not enough permissions")
     response.status_code = status.HTTP_202_ACCEPTED
     # Get info from deploy data
-    deploy_data = getDeploy(db, deploy_id=deploy_id)
+    deploy_data = get_deploy(db, deploy_id=deploy_id)
     stack_name = deploy_data.stack_name
     environment = deploy_data.environment
     name = deploy_data.name
@@ -111,13 +111,13 @@ async def Update_infra_by_stack_name(
     tf_ver = stack_data.tf_version
     try:
         #check crontime
-        checkCronSchedule(deploy_update.start_time)
-        checkCronSchedule(deploy_update.destroy_time)
+        check_cron_schedule(deploy_update.start_time)
+        check_cron_schedule(deploy_update.destroy_time)
         # Check deploy state
         if not check_deploy_state(task_id):
             raise ValueError("Deploy state running, cannot upgrade")
         # push task Deploy Update to queue and return task_id
-        pipeline_deploy = asyncDeploy(
+        pipeline_deploy = async_deploy(
             git_repo,
             name,
             stack_name,
@@ -167,7 +167,7 @@ async def destroy_infra(
         raise HTTPException(status_code=403, detail="Not enough permissions")
     response.status_code = status.HTTP_202_ACCEPTED
     # Get info from deploy data
-    deploy_data = getDeploy(db, deploy_id=deploy_id)
+    deploy_data = get_deploy(db, deploy_id=deploy_id)
     stack_name = deploy_data.stack_name
     environment = deploy_data.environment
     start_time = deploy_data.start_time
@@ -189,7 +189,7 @@ async def destroy_infra(
         if not check_deploy_state(deploy_data.task_id):
             raise ValueError("Deploy state running, cannot upgrade")
         # push task destroy to queue and return task_id
-        pipeline_destroy = asyncDestroy(
+        pipeline_destroy = async_destroy(
             git_repo,
             name,
             stack_name,

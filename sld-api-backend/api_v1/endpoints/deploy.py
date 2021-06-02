@@ -6,11 +6,11 @@ from crud import deploys as crud_deploys
 from crud import tasks as crud_tasks
 from security import deps
 from security import tokens
-from helpers.get_data import check_deploy_exist, check_deploy_state, checkCronSchedule
+from helpers.get_data import check_deploy_exist, check_deploy_state, check_cron_schedule
 from helpers.get_data import stack, deploy, deploy_squad, check_deploy_exist
-from helpers.push_task import asyncDeploy, asyncDestroy
-from helpers.push_task import asyncOutput, asyncUnlock, asyncScheduleDelete
-from helpers.push_task import asyncShow
+from helpers.push_task import async_deploy, async_destroy
+from helpers.push_task import async_output, async_unlock, async_schedule_delete
+from helpers.push_task import async_show
 
 
 router = APIRouter()
@@ -44,10 +44,10 @@ async def deploy_infra_by_stack_name(
     )
     try:
         # check crontime
-        checkCronSchedule(deploy.start_time)
-        checkCronSchedule(deploy.destroy_time)
+        check_cron_schedule(deploy.start_time)
+        check_cron_schedule(deploy.destroy_time)
         # push task Deploy to queue and return task_id
-        pipeline_deploy = asyncDeploy(
+        pipeline_deploy = async_deploy(
             git_repo,
             deploy.name,
             deploy.stack_name,
@@ -116,13 +116,13 @@ async def Update_infra_by_stack_name(
     tf_ver = stack_data.tf_version
     try:
         # check crontime
-        checkCronSchedule(deploy_update.start_time)
-        checkCronSchedule(deploy_update.destroy_time)
+        check_cron_schedule(deploy_update.start_time)
+        check_cron_schedule(deploy_update.destroy_time)
         # Check deploy state
         if not check_deploy_state(deploy_data.task_id):
             raise ValueError("Deploy state running, cannot upgrade")
         # push task Deploy Update to queue and return task_id
-        pipeline_deploy = asyncDeploy(
+        pipeline_deploy = async_deploy(
             git_repo,
             name,
             stack_name,
@@ -196,7 +196,7 @@ async def destroy_infra(
         if not check_deploy_state(deploy_data.task_id):
             raise ValueError("Deploy state running, cannot upgrade")
         # push task destroy to queue and return task_id
-        pipeline_destroy = asyncDestroy(
+        pipeline_destroy = async_destroy(
             git_repo,
             name,
             stack_name,
@@ -322,7 +322,7 @@ async def delete_infra_by_id(
         )
         # push task destroy to queue and return task_id
         # push task destroy to queue and return task_id
-        pipeline_destroy = asyncDestroy(
+        pipeline_destroy = async_destroy(
             git_repo,
             name,
             stack_name,
@@ -350,7 +350,7 @@ async def delete_infra_by_id(
             status_code=400,
             detail=f"{err}")
     finally:
-        _result = asyncScheduleDelete(name, squad)
+        _result = async_schedule_delete(name, squad)
 
 
 @router.get("/output/{deploy_id}", status_code=200)
@@ -371,7 +371,7 @@ async def get_output(
         environment = deploy_data.environment
         name = deploy_data.name
         # Get  credentials by providers supported
-        return {"task": asyncOutput(stack_name, environment, squad, name)}
+        return {"task": async_output(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
             status_code=400,
@@ -396,7 +396,7 @@ async def unlock_deploy(
         environment = deploy_data.environment
         name = deploy_data.name
         # Get  credentials by providers supported
-        return {"task": asyncUnlock(stack_name, environment, squad, name)}
+        return {"task": async_unlock(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
             status_code=400,
@@ -420,7 +420,7 @@ async def get_show(
     environment = deploy_data.environment
     name = deploy_data.name
     try:
-        return {"task": asyncShow(stack_name, environment, squad, name)}
+        return {"task": async_show(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
             status_code=400,

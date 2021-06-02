@@ -18,7 +18,7 @@ os.environ['ANSIBLE_NOCOLOR'] = "True"
 class TerraformActions(object):
 
     @staticmethod
-    def binaryDownload(
+    def binary_download(
             stack_name: str,
             environment: str,
             squad: str,
@@ -54,7 +54,7 @@ class TerraformActions(object):
             return {"command": "binaryDownload", "rc": 1, "stdout": str(err)}
 
     @staticmethod
-    def gitClone(
+    def git_clone(
             git_repo: str,
             name: str,
             stack_name: str,
@@ -83,7 +83,7 @@ class TerraformActions(object):
             return {"command": "git", "rc": 1, "stdout": err}
 
     @staticmethod
-    def tftstateRender(
+    def tfstate_render(
             stack_name: str,
             environment: str,
             squad: str,
@@ -110,7 +110,7 @@ class TerraformActions(object):
             return {"command": "tfserver", "rc": 1, "stderr": err}
 
     @staticmethod
-    def dataSourceRender(
+    def data_source_render(
             stack_name: str,
             environment: str,
             squad: str,
@@ -148,7 +148,7 @@ class TerraformActions(object):
             return {"command": "tfvars", "rc": 1, "stdout": f'{err}'}
 
     @staticmethod
-    def planExcute(
+    def plan_execute(
             stack_name: str,
             environment: str,
             squad: str,
@@ -183,7 +183,7 @@ class TerraformActions(object):
             return {"command": "plan", "rc": 1, "stdout": f'{err}'}
 
     @staticmethod
-    def applyExecute(
+    def apply_execute(
             stack_name: str,
             environment: str,
             squad: str,
@@ -217,7 +217,7 @@ class TerraformActions(object):
             return {"command": "apply", "rc": 1, "stdout": f'{err}'}
 
     @staticmethod
-    def destroyExecute(
+    def destroy_execute(
             stack_name: str,
             environment: str,
             squad: str,
@@ -249,7 +249,7 @@ class TerraformActions(object):
             return {"command": "destroy", "rc": 1, "stdout": f'{err}'}
 
     @staticmethod
-    def outputExecute(
+    def output_execute(
             stack_name: str,
             environment: str,
             squad: str,
@@ -267,7 +267,7 @@ class TerraformActions(object):
             return {"command": "output", "rc": 1, "stdout": err}
 
     @staticmethod
-    def UnlockExecute(
+    def unlock_execute(
             stack_name: str,
             environment: str,
             squad: str,
@@ -283,7 +283,7 @@ class TerraformActions(object):
             return {"command": "unlock", "rc": 1, "stdout": err}
 
     @staticmethod
-    def showExecute(
+    def show_execute(
             stack_name: str,
             environment: str,
             squad: str,
@@ -298,7 +298,7 @@ class TerraformActions(object):
             return {"command": "show", "rc": 1, "stdout": err}
 
     @staticmethod
-    def getVarsTfvars(
+    def get_vars_tfvars(
             stack_name: str,
             environment: str,
             squad: str,
@@ -314,7 +314,7 @@ class TerraformActions(object):
                 "rc": 1}
 
     @staticmethod
-    def getVarsList(
+    def get_vars_list(
             stack_name: str,
             environment: str,
             squad: str,
@@ -334,7 +334,7 @@ class TerraformActions(object):
             return {"result": "Variable file is empty, not iterable"}
 
     @staticmethod
-    def getVarsJson(
+    def get_vars_json(
             stack_name: str,
             environment: str,
             squad: str,
@@ -353,7 +353,7 @@ class TerraformActions(object):
             return {"result": "Variable file is empty, not iterable"}
 
     @staticmethod
-    def deleteLocalFolder(dir_path: str) -> dict:
+    def delete_local_folder(dir_path: str) -> dict:
         try:
             shutil.rmtree(dir_path)
         except FileNotFoundError:

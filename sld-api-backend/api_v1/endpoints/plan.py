@@ -6,7 +6,7 @@ from security import deps
 from security import tokens
 from helpers.get_data import check_deploy_state
 from helpers.get_data import deploy, deploy_squad, stack
-from helpers.push_task import asyncPlan
+from helpers.push_task import async_plan
 
 
 router = APIRouter()
@@ -37,7 +37,7 @@ async def plan_infra_by_stack_name(
     tf_ver = stack_data.tf_version
     try:
         # push task Deploy to queue and return task_id
-        pipeline_plan = asyncPlan(
+        pipeline_plan = async_plan(
             git_repo,
             deploy.name,
             deploy.stack_name,

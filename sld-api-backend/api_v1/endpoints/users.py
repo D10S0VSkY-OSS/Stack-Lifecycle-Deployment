@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from crud import user as crud_users
 from crud import activityLogs as crud_activity
-from helpers.get_data import userSquadScope, activity_log
+from helpers.get_data import user_squad_scope, activity_log
 from security import deps
 from schemas.schemas import (
     User, UserCreate, UserUpdate, PasswordReset)
@@ -55,7 +55,7 @@ async def update_user(
     '''
     if not crud_users.is_superuser(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    if not userSquadScope(db, user_id, current_user.squad):
+    if not user_squad_scope(db, user_id, current_user.squad):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     check_None = [None, "", "string"]
     if user.password not in check_None:
@@ -139,7 +139,7 @@ async def list_user_by_id_or_name(
 
     if not crud_users.is_superuser(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    if not userSquadScope(db, user, current_user.squad):
+    if not user_squad_scope(db, user, current_user.squad):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     try:
         if not user.isdigit():
@@ -164,7 +164,7 @@ async def delete_user_by_id_or_username(
         return crud_users.delete_user_by_id(db=db, id=user)
     if not crud_users.is_superuser(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    if not userSquadScope(db, user, current_user.squad):
+    if not user_squad_scope(db, user, current_user.squad):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     try:
         if not user.isdigit():
