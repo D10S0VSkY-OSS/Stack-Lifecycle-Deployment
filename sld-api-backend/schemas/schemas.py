@@ -143,6 +143,7 @@ class DeployBase(BaseModel):
 
 class DeployCreate(BaseModel):
     name: str
+    squad: str
     stack_name: str
     environment: str
     start_time: Optional[str] = Field(None, example="30 9 * * 0-4")

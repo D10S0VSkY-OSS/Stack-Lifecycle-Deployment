@@ -26,7 +26,12 @@ async def deploy_infra_by_stack_name(
 
     response.status_code = status.HTTP_202_ACCEPTED
     # Get squad from current user
-    squad = current_user.squad
+    squad = deploy.squad
+    # Get squad from current user
+    if not current_user.master:
+        current_squad = current_user.squad
+        if current_squad != squad:
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad)

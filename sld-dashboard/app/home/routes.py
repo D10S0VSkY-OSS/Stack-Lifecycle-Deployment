@@ -90,10 +90,7 @@ def destroy_deploy(deploy_id):
         token = decrypt(r.get(current_user.id))
         # Check if token no expired
         check_unauthorized_token(token)
-        if current_user.master:
-            endpoint = f'master/deploy/{deploy_id}'
-        else:
-            endpoint = f'deploy/{deploy_id}'
+        endpoint = f'deploy/{deploy_id}'
         response = request_url(
             verb='PUT',
             uri=f'{endpoint}',
@@ -147,10 +144,6 @@ def relaunch_deploy(deploy_id):
             "destroy_time": content['destroy_time'],
             "variables": content['variables']
         }
-        if current_user.master:
-            endpoint = f'master/deploy/{deploy_id}'
-        else:
-            endpoint = f'deploy/{deploy_id}'
         response = request_url(
             verb='PATCH',
             uri=f'{endpoint}',
@@ -390,12 +383,12 @@ def deploy_stack(stack_id):
                 "environment": form.environment.data,
                 "variables": ast.literal_eval(variables)
             }
-            if current_user.master:
-                endpoint = f'master/deploy'
-            else:
-                endpoint = f'deploy'
+            endpoint = f'deploy'
             if current_user.master:
                 data['squad'] = form.squad.data
+            else:
+                data['squad'] = current_user.squad
+            
             # Deploy
             response = request_url(
                 verb='POST',

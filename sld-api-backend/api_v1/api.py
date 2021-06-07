@@ -21,4 +21,4 @@ api_router.include_router(activity_logs.router, prefix="/activity", tags=["Logs"
 api_router.include_router(variables.router,prefix="/variables",tags=["Variables"])
 api_router.include_router(healthy.router, tags=["Healthy"])
 api_router.include_router(master_user.router, prefix="/master/users", tags=["Master"])
-api_router.include_router(master_deploy.router, prefix="/master/deploy", tags=["Master"])
+#api_router.include_router(master_deploy.router, prefix="/master/deploy", tags=["Master"])
