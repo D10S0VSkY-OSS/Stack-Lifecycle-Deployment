@@ -64,7 +64,7 @@ start_init_credentials() {
         kubectl get deployments.apps api-backend
         exit 1
     fi
-    curl -X POST "http://0.0.0.0:8000/api/v1/master/users/start" \
+    curl -X POST "http://0.0.0.0:8000/api/v1/users/start" \
     -H  "accept: application/json" \
     -H  "Content-Type: application/json" \
     -d "{\"password\":\"Password08@\"}" \
@@ -76,7 +76,7 @@ start_init_credentials() {
          -H  "Content-Type: application/json" \
          -d "{\"username\":\"admin\",\"password\":\"Password08@\"}"|jq .access_token|tr -d '"')
 
-    curl -X POST "http://0.0.0.0:8000/api/v1/master/users/" \
+    curl -X POST "http://0.0.0.0:8000/api/v1/users/" \
         -H  "accept: application/json" \
         -H  "Authorization: Bearer ${token}" \
         -H  "Content-Type: application/json" \

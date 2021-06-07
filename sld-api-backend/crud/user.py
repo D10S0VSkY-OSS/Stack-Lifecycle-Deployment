@@ -143,10 +143,14 @@ def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
         db_user.email = user.email
     if user.fullname not in check_None:
         db_user.fullname = user.fullname
+    if user.squad not in check_None:
+        db_user.squad = user.squad
     if user.privilege not in check_None:
         db_user.privilege = user.privilege
     if user.is_active not in check_None:
         db_user.is_active = user.is_active
+    if user.master not in check_None:
+        db_user.master = user.master
     try:
         db.add(db_user)
         db.commit()

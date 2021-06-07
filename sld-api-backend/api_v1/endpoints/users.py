@@ -5,12 +5,33 @@ from crud import user as crud_users
 from crud import activityLogs as crud_activity
 from helpers.get_data import user_squad_scope, activity_log
 from security import deps
+from config.api import settings
 from schemas.schemas import (
-    User, UserCreate, UserUpdate, PasswordReset)
+    User, UserCreate, UserUpdate, PasswordReset, UserInit)
 
 
 router = APIRouter()
 
+@router.post("/start", response_model=User)
+async def create_init_user(passwd: UserInit, db: Session = Depends(deps.get_db)):
+    '''
+    Create init user
+    '''
+    deps.validate_password(passwd.password)
+    init_user = settings.INIT_USER
+    db_user = crud_users.get_user_by_username(
+        db, username=init_user.get("username"))
+    if db_user:
+        raise HTTPException(
+            status_code=409,
+            detail="Username already registered")
+    else:
+        try:
+            return crud_users.create_init_user(db=db, password=passwd.password)
+        except Exception as err:
+            raise HTTPException(
+                status_code=400,
+                detail=str(err))
 
 @router.post("/", response_model=User)
 async def create_user(
@@ -20,9 +41,18 @@ async def create_user(
     '''
     Create user and define squad and privilege
     '''
-    db_user = crud_users.get_user_by_username(db, username=user.username)
-    if not crud_users.is_superuser(db, current_user):
+    # Check if the user has privileges
+    if not current_user.privilege:
         raise HTTPException(status_code=403, detail="Not enough permissions")
+    # Get squad from current user
+    if not current_user.master:
+        current_squad = current_user.squad
+        if current_squad != user.squad:
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {user.squad}")
+        if user.master:
+            raise HTTPException(status_code=403, detail=f"Not enough permissions to set the user as master to true")
+    #Check if user exists
+    db_user = crud_users.get_user_by_username(db, username=user.username)
     if db_user:
         raise HTTPException(
             status_code=400,
@@ -53,10 +83,16 @@ async def update_user(
     '''
     Update user
     '''
-    if not crud_users.is_superuser(db, current_user):
+    # Check if the user has privileges
+    if not current_user.privilege:
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    if not user_squad_scope(db, user_id, current_user.squad):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+    # Get squad from current user
+    if not current_user.master:
+        current_squad = current_user.squad
+        if current_squad != user.squad:
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {user.squad}")
+        if user.master:
+            raise HTTPException(status_code=403, detail=f"Not enough permissions to set the user as master to true")
     check_None = [None, "", "string"]
     if user.password not in check_None:
         deps.validate_password(user.password)
@@ -95,7 +131,7 @@ async def password_reset(
             squad=current_user.squad,
             action=f'Reset password'
         )
-        return result
+        return {"result": "Password updated"}
     except Exception as err:
         raise HTTPException(
             status_code=400,

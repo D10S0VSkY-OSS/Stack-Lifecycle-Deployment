@@ -510,13 +510,13 @@ def new_user():
                 "email": form.email.data,
                 "privilege": form.privilege.data,
                 "is_active": form.is_active.data,
-                "squad": form.squad.data,
                 "master": form.master.data,
             }
             if current_user.master:
-                endpoint = f'master/users/'
+                new_user['squad'] = form.squad.data
             else:
-                endpoint = f'users/'
+                new_user['squad'] = current_user.squad
+            endpoint = f'users/'
             response = request_url(
                 verb='POST',
                 uri=f'{endpoint}',
@@ -592,11 +592,11 @@ def edit_user(user_id):
                         value in request.form.items() if key not in form_vars}
             variables = json.dumps(convert_to_dict(data_raw))
             data = ast.literal_eval(variables)
+            if not current_user.master:
+                data['squad'] = current_user.squad
+            print(data)
         # Apply user change
-            if current_user.master:
-                endpoint = f'master/users/{user_id}'
-            else:
-                endpoint = f'users/{user_id}'
+            endpoint = f'users/{user_id}'
             response = request_url(
                 verb='PATCH',
                 uri=f'{endpoint}',
@@ -636,6 +636,7 @@ def setting_user():
                     "password": form.password.data,
                     "privilege": current_user.privilege,
                     "is_active": current_user.is_active,
+                    "master": current_user.master,
                     "squad": "string"
                 }
                 response = request_url(

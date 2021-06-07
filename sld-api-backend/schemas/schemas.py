@@ -10,8 +10,10 @@ class UserCreate(UserBase):
     fullname: str
     password: str
     email: EmailStr = None
-    privilege: bool = False
+    squad: str
     is_active: bool = True
+    privilege: bool = False
+    master: bool = False
 
 
 class UserCreateMaster(UserBase):

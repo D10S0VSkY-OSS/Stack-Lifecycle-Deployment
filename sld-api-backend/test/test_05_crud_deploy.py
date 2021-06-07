@@ -50,7 +50,7 @@ def test_deploy_stack_darth_vader():
 
 
 def test_deploy_stack_yoda():
-    response = request_url(verb='POST', uri=f'master/deploy/{uri}', headers={
+    response = request_url(verb='POST', uri=f'deploy/{uri}', headers={
                            "Authorization": f"Bearer {token}"}, json=data_master)
     if response.get('status_code') != 409:
         task_id = response.get('json').get('task').get('task_id')
@@ -99,7 +99,7 @@ def test_update_stack():
     deploy_id = response.get('json')[0].get("id")
     response = request_url(
         verb='PATCH',
-        uri=f'master/deploy/{deploy_id}',
+        uri=f'deploy/{deploy_id}',
         headers={
             "Authorization": f"Bearer {token}"},
         json=data_update)
