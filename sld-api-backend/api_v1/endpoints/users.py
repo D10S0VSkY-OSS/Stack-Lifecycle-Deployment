@@ -12,6 +12,7 @@ from schemas.schemas import (
 
 router = APIRouter()
 
+
 @router.post("/start", response_model=User)
 async def create_init_user(passwd: UserInit, db: Session = Depends(deps.get_db)):
     '''
@@ -33,6 +34,7 @@ async def create_init_user(passwd: UserInit, db: Session = Depends(deps.get_db))
                 status_code=400,
                 detail=str(err))
 
+
 @router.post("/", response_model=User)
 async def create_user(
     user: UserCreate, current_user: User = Depends(
@@ -41,17 +43,18 @@ async def create_user(
     '''
     Create user and define squad and privilege
     '''
+    squad = user.squad
     # Check if the user has privileges
     if not current_user.privilege:
         raise HTTPException(status_code=403, detail="Not enough permissions")
     # Get squad from current user
     if not current_user.master:
         current_squad = current_user.squad
-        if current_squad != user.squad:
+        if squad != user.squad:
             raise HTTPException(status_code=403, detail=f"Not enough permissions in {user.squad}")
         if user.master:
             raise HTTPException(status_code=403, detail=f"Not enough permissions to set the user as master to true")
-    #Check if user exists
+    # Check if user exists
     db_user = crud_users.get_user_by_username(db, username=user.username)
     if db_user:
         raise HTTPException(
@@ -60,7 +63,7 @@ async def create_user(
     deps.validate_password(user.password)
     try:
         result = crud_users.create_user(
-            db=db, squad=current_user.squad, user=user)
+            db=db, squad=squad, user=user)
         db_task = crud_activity.create_activity_log(
             db=db,
             username=current_user.username,
