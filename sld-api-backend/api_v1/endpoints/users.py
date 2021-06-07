@@ -50,7 +50,7 @@ async def create_user(
     # Get squad from current user
     if not current_user.master:
         current_squad = current_user.squad
-        if squad != user.squad:
+        if current_squad != user.squad:
             raise HTTPException(status_code=403, detail=f"Not enough permissions in {user.squad}")
         if user.master:
             raise HTTPException(status_code=403, detail=f"Not enough permissions to set the user as master to true")

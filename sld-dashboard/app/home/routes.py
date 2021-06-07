@@ -637,7 +637,7 @@ def setting_user():
                     "privilege": current_user.privilege,
                     "is_active": current_user.is_active,
                     "master": current_user.master,
-                    "squad": "string"
+                    "squad": current_user.squad
                 }
                 response = request_url(
                     verb='PATCH',

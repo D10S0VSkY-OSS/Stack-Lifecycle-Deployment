@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from api_v1.endpoints import users, auth, stacks
 from api_v1.endpoints import aws, azure, gcp
 from api_v1.endpoints import deploy, tasks, variables, healthy
-from api_v1.endpoints import master_deploy, master_user, activity_logs, plan, schedule
+from api_v1.endpoints import activity_logs, plan, schedule
 
 
 api_router = APIRouter()
