@@ -6,7 +6,6 @@ from croniter import croniter
 
 from crud import stacks as crud_stacks
 from crud import deploys as crud_deploys
-from crud import master as crud_master
 from crud import user as crud_users
 from crud import activityLogs as crud_activity
 from config.api import settings
@@ -71,7 +70,7 @@ def deploy_squad(db, deploy_id: int, squad: str):
 
 def get_deploy(db, deploy_id: int):
     try:
-        deploy_data = crud_master.get_deploy_by_id(
+        deploy_data = crud_deploys.get_deploy_by_id(
             db=db, deploy_id=deploy_id)
         if deploy_data is None:
             raise Exception("Deploy id Not Found")

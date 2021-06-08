@@ -3,7 +3,7 @@ from fastapi import APIRouter
 from api_v1.endpoints import users, auth, stacks
 from api_v1.endpoints import aws, azure, gcp
 from api_v1.endpoints import deploy, tasks, variables, healthy
-from api_v1.endpoints import master_deploy, master_user, activity_logs, plan, schedule
+from api_v1.endpoints import activity_logs, plan, schedule
 
 
 api_router = APIRouter()
@@ -20,5 +20,3 @@ api_router.include_router(tasks.router, prefix="/tasks", tags=["Tasks"])
 api_router.include_router(activity_logs.router, prefix="/activity", tags=["Logs"])
 api_router.include_router(variables.router,prefix="/variables",tags=["Variables"])
 api_router.include_router(healthy.router, tags=["Healthy"])
-api_router.include_router(master_user.router, prefix="/master/users", tags=["Master"])
-api_router.include_router(master_deploy.router, prefix="/master/deploy", tags=["Master"])

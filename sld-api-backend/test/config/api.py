@@ -56,6 +56,8 @@ class Settings(BaseSettings):
         "password": PASS_USER,
         "email": "test01@example.com",
         "privilege": False,
+        "master": True,
+        "squad": "squad1",
         "is_active": True,
     }
     USER_POST_SQUAD1: dict = {
@@ -138,6 +140,7 @@ class Settings(BaseSettings):
     DEPLOY_VARS: dict = {
         "name": "aws_vpc_darth_vader",
         "stack_name": "aws_vpc",
+        "squad": "squad1",
         "environment": "develop",
         "start_time": "30 9 * * 1-5",
         "destroy_time": "30 17 * * 1-5",
@@ -167,6 +170,7 @@ class Settings(BaseSettings):
         "name": "aws_vpc_stormtrooper",
         "stack_name": "aws_vpc",
         "environment": "develop",
+        "squad": "squad1",
         "start_time": "30 9 * * 1-5",
         "destroy_time": "30 17 * * 1-5",
         "variables": {

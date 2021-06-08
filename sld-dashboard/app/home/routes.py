@@ -90,10 +90,7 @@ def destroy_deploy(deploy_id):
         token = decrypt(r.get(current_user.id))
         # Check if token no expired
         check_unauthorized_token(token)
-        if current_user.master:
-            endpoint = f'master/deploy/{deploy_id}'
-        else:
-            endpoint = f'deploy/{deploy_id}'
+        endpoint = f'deploy/{deploy_id}'
         response = request_url(
             verb='PUT',
             uri=f'{endpoint}',
@@ -147,10 +144,6 @@ def relaunch_deploy(deploy_id):
             "destroy_time": content['destroy_time'],
             "variables": content['variables']
         }
-        if current_user.master:
-            endpoint = f'master/deploy/{deploy_id}'
-        else:
-            endpoint = f'deploy/{deploy_id}'
         response = request_url(
             verb='PATCH',
             uri=f'{endpoint}',
@@ -390,12 +383,12 @@ def deploy_stack(stack_id):
                 "environment": form.environment.data,
                 "variables": ast.literal_eval(variables)
             }
-            if current_user.master:
-                endpoint = f'master/deploy'
-            else:
-                endpoint = f'deploy'
+            endpoint = f'deploy'
             if current_user.master:
                 data['squad'] = form.squad.data
+            else:
+                data['squad'] = current_user.squad
+            
             # Deploy
             response = request_url(
                 verb='POST',
@@ -517,13 +510,13 @@ def new_user():
                 "email": form.email.data,
                 "privilege": form.privilege.data,
                 "is_active": form.is_active.data,
-                "squad": form.squad.data,
                 "master": form.master.data,
             }
             if current_user.master:
-                endpoint = f'master/users/'
+                new_user['squad'] = form.squad.data
             else:
-                endpoint = f'users/'
+                new_user['squad'] = current_user.squad
+            endpoint = f'users/'
             response = request_url(
                 verb='POST',
                 uri=f'{endpoint}',
@@ -599,11 +592,11 @@ def edit_user(user_id):
                         value in request.form.items() if key not in form_vars}
             variables = json.dumps(convert_to_dict(data_raw))
             data = ast.literal_eval(variables)
+            if not current_user.master:
+                data['squad'] = current_user.squad
+            print(data)
         # Apply user change
-            if current_user.master:
-                endpoint = f'master/users/{user_id}'
-            else:
-                endpoint = f'users/{user_id}'
+            endpoint = f'users/{user_id}'
             response = request_url(
                 verb='PATCH',
                 uri=f'{endpoint}',
@@ -643,7 +636,8 @@ def setting_user():
                     "password": form.password.data,
                     "privilege": current_user.privilege,
                     "is_active": current_user.is_active,
-                    "squad": "string"
+                    "master": current_user.master,
+                    "squad": current_user.squad
                 }
                 response = request_url(
                     verb='PATCH',

@@ -10,8 +10,10 @@ class UserCreate(UserBase):
     fullname: str
     password: str
     email: EmailStr = None
-    privilege: bool = False
+    squad: str
     is_active: bool = True
+    privilege: bool = False
+    master: bool = False
 
 
 class UserCreateMaster(UserBase):
@@ -143,6 +145,7 @@ class DeployBase(BaseModel):
 
 class DeployCreate(BaseModel):
     name: str
+    squad: str
     stack_name: str
     environment: str
     start_time: Optional[str] = Field(None, example="30 9 * * 0-4")

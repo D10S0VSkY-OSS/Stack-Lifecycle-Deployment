@@ -13,7 +13,7 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
         <div class="btn-toolbar dropdown">
             <button class="btn btn-primary btn-sm mr-2 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
-                aria-expanded="false">
+                                                                                               aria-expanded="false">
                 <span class="fas fa-plus mr-2"></span>New Task
             </button>
             <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2">
@@ -53,7 +53,7 @@
                 <div class="input-group">
                     <span class="input-group-text" id="asic-addon2"><span class="fas fa-search"></span></span>
                     <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search"
-                        aria-label="Search" aria-describedby="basic-addon2">
+                                                                                           aria-label="Search" aria-describedby="basic-addon2">
                 </div>
             </div>
             <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
@@ -64,7 +64,7 @@
                         <span class="fas fa-redo-alt mr-1"></span></a>
                     <div class="btn-group">
                         <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
-                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="icon icon-sm icon-gray">
                                 <span class="fas fa-cog"></span>
                             </span>
@@ -73,7 +73,7 @@
                         <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">
                             <span class="dropdown-item font-weight-bold text-dark">Show</span>
                             <a class="dropdown-item d-flex font-weight-bold" href="/deploys-list/15">15 <span
-                                    class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
+                                                                             class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/25">25</a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/35">35</a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/50">50</a>
@@ -102,7 +102,7 @@
             </thead>
             <tbody>
                 <!-- Item -->
-                {% for deploy in deploys %}
+                {% for deploy in deploys| sort(attribute='id') %}
                 <tr>
                     <td>
                         <a href="" class="font-weight-bold">
@@ -134,7 +134,7 @@
                         <!-- button group-->
                         <div class="btn-group">
                             <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-1 p-1"
-                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="icon icon-sm">
                                     <span class="fas fa-ellipsis-h icon-dark"></span>
                                 </span>
@@ -146,23 +146,23 @@
                                 <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
                                     <span class="fas fa-sync mr-2"></span>Re-Deploy</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal"
-                                    data-target="#DestroyModalCenter-{{deploy.id}}">
+                                                                     data-target="#DestroyModalCenter-{{deploy.id}}">
                                     <span class="fas fa-trash-alt mr-2"></span>Destroy</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal"
-                                    data-target="#DeleteModalCenter-{{deploy.id}}">
+                                                                     data-target="#DeleteModalCenter-{{deploy.id}}">
                                     <span class="fas fa-skull-crossbones mr-2"></span> delete </a>
                             </div>
                             <!-- Output-->
                             <span class="icon icon-sm">
                                 <a class="nav-link icon-notifications text-dark" data-toggle="modal"
-                                    data-target="#OutputModalCenter-{{deploy.id}}">
+                                                                                 data-target="#OutputModalCenter-{{deploy.id}}">
                                     <span class="fab fa-searchengin mr-0"></span></a>
                             </span>
                             {% if current_user.privilege %}
                             <!-- Unlock-->
                             <span class="icon icon-sm">
                                 <a class="nav-link icon-notifications text-dark" data-toggle="modal"
-                                    data-target="#UnlockModalCenter-{{deploy.id}}">
+                                                                                 data-target="#UnlockModalCenter-{{deploy.id}}">
                                     <span class="fas fa-unlock mr-0"></span></a>
                             </span>
                             {% endif %}
@@ -182,9 +182,9 @@
                             </div>
                             <div class="modal-body">
                                 <p> <strong>Acquires a state lock to protect the state from being written
-                                        by multiple users at the same time. Please resolve the issue and try
-                                        again. You can disable locking with the "Unlock botton", but this is not
-                                        recommended:</strong></p>
+                                    by multiple users at the same time. Please resolve the issue and try
+                                    again. You can disable locking with the "Unlock botton", but this is not
+                                    recommended:</strong></p>
                                 <p><strong>Are you sure? </strong></p>
                             </div>
                             <div class="modal-footer">
@@ -266,11 +266,11 @@
                             </div>
                             <div class="modal-body">
                                 <p><strong>If you destroy before delete would be better.
-                                        This Deploy will be deleted permanently and cannot be recovered later:</strong>
+                                    This Deploy will be deleted permanently and cannot be recovered later:</strong>
                                 </p>
                                 <p><strong>Are you sure? </strong></p>
                                 <p> <small>Fear is the path to the dark side. Fear leads to anger;
-                                        anger leads to hate; hate leads to suffering. I sense much fear in you</small>
+                                    anger leads to hate; hate leads to suffering. I sense much fear in you</small>
                                 </p>
                             </div>
                             <div class="modal-footer">
