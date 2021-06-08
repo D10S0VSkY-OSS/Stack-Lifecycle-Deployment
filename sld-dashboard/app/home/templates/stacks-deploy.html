@@ -63,11 +63,11 @@
 
                                     <div class="border-top my-4"></div>
 
-                                    {% for key, value in data_json.items()|sort %}
+                                    {% for key, value in data_json.items()|sort(attribute='1.description') %}
                                     <div class="form-group">
                                         <span style="text-transform:capitalize">
                                           <p class="mb-110">  <h6><strong>{{key}}</strong></h6></p>
-                                       <footer class="blockquote-footer"> {{value.get('description', "")}}</footer>
+                                       <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
                                         </span>
                                         {% for k, v in value.items() %}
                                         {% if "default" in k %}
