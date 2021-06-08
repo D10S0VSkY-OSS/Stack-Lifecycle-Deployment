@@ -95,7 +95,7 @@ def update_deploy(deploy_id):
     }
     response = request_url(
         verb='PATCH',
-        uri=f'master/deploy/{content.get("id")}',
+        uri=f'deploy/{content.get("id")}',
         headers={
             "Authorization": f"Bearer {token}"},
         json=data)
@@ -119,7 +119,7 @@ def destroy_deploy(deploy_id):
     }
     response = request_url(
         verb='PUT',
-        uri=f'master/deploy/{content.get("id")}',
+        uri=f'deploy/{content.get("id")}',
         headers={
             "Authorization": f"Bearer {token}"},
         json=data)
