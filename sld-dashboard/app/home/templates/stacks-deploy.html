@@ -47,57 +47,62 @@
                                     {% if current_user.master %}
                                     <div class="form-group">
                                         {{ render_field(form.squad, class='form-control', placeholder='Squad name') }}
-                                    {% endif %}
+                                        {% endif %}
 
-                                    <div class="form-group">
-                                        {{ render_field(form.environment, class='form-control', placeholder='Environment') }}
-                                    </div>
+                                        <div class="form-group">
+                                            {{ render_field(form.environment, class='form-control', placeholder='Environment') }}
+                                        </div>
 
-                                    <div class="form-group">
-                                        {{ render_field(form.start_time, class='form-control', value='30 7 * * 0-4') }}
-                                    </div>
+                                        <div class="form-group">
+                                            {{ render_field(form.start_time, class='form-control', value='30 7 * * 0-4') }}
+                                        </div>
 
-                                    <div class="form-group">
-                                        {{ render_field(form.destroy_time, class='form-control', value='30 18 * * 0-4') }}
-                                    </div>
+                                        <div class="form-group">
+                                            {{ render_field(form.destroy_time, class='form-control', value='30 18 * * 0-4') }}
+                                        </div>
 
-                                    <div class="border-top my-4"></div>
 
-                                    {% for key, value in data_json.items()|sort(attribute='1.description') %}
-                                    <div class="form-group">
-                                        <span style="text-transform:capitalize">
-                                          <p class="mb-110">  <h6><strong>{{key}}</strong></h6></p>
-                                       <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
-                                        </span>
-                                        {% for k, v in value.items() %}
-                                        {% if "default" in k %}
-                                        <input type="text" value="{{ v|lower }}"
-                                        {% elif "passw" in key %}
-                                        <input type="password"
-                                                           {% else %}
-                                                           <input type="text" title="{{k}} {{v}}"
-                                                                  {% endif %}
-                                                                  {% endfor %}
-                                                                  name={{ key }} class='form-control'>
-                                    </div>
+                                        {% for key, value in data_json.items()|sort(attribute='1.description') %}
+                                            {% if value.get('description').split('|')[1] %}
+                                                <div class="border-top my-4"></div>
+                                                <h5>{{value.get('description').split('|')[1]}}</h4>
+                                                <div class="border border-dark"></div>
+                                            {% endif %}
+                                        <div class="form-group">
+                                            <span style="text-transform:capitalize">
+                                              <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
+                                             <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
+                                            </span>
+                                            {% for k, v in value.items() %}
+                                                {% if "default" in k %}
+                                                    <input type="text" value="{{ v|lower }}"
+                                                {% elif "passw" in key %}
+                                                    <input type="password"
+                                                {% elif "type" in k %}
+                                                    <input type="text" title="{{k}} {{v}}"
+                                                {% else %}
+                                                    <input type="text"
+                                                {% endif %}
+                                            {% endfor %}
+                                                name={{ key }} class='form-control'>
+                                                </div>
                                         {% endfor %}
-
-                                        <button type="submit" class="btn btn-primary" name="button" action="{{url_for('.list_deploys')}}">
-                                            Deploy
-                                        </button>
+                                    <button type="submit" class="btn btn-primary" name="button" action="{{url_for('.list_deploys')}}">
+                                    Deploy
+                                    </button>
 
                                 </form>
-                            </div>
+                                    </div>
 
-                            <!-- End Form -->
+                                    <!-- End Form -->
 
-                            <div class="input-group">
+                                    <div class="input-group">
+                                    </div>
                             </div>
                         </div>
                     </div>
-                </div>
 
-                {% include 'includes/footer.html' %}
+                    {% include 'includes/footer.html' %}
 
 </main>
 

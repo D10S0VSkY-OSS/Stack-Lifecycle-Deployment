@@ -66,8 +66,8 @@ class StackBase(BaseModel):
     stack_name: str
     git_repo: str
     branch: str = "master"
-    squad_access: List[str] = "*"
-    tf_version: str = "0.12.30"
+    squad_access: List[str] = "[*]"
+    tf_version: str = "1.0.0"
     description: str
 
 
@@ -148,8 +148,8 @@ class DeployCreate(BaseModel):
     squad: str
     stack_name: str
     environment: str
-    start_time: Optional[str] = Field(None, example="30 9 * * 0-4")
-    destroy_time: Optional[str] = Field(None, example="30 17 * * 0-4")
+    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")
     variables: dict
 
 
