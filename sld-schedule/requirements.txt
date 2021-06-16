@@ -13,7 +13,7 @@ pytz==2020.5
 requests==2.25.1
 six==1.15.0
 SQLAlchemy==1.3.23
-starlette==0.13.6
+starlette==0.14.2
 tzlocal==2.1
 urllib3==1.26.5
 uvicorn==0.13.3
