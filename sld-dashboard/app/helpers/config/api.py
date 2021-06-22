@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     SCHEDULE: str = os.getenv('SLD_SCHEDULE_SERVER', 'http://schedule:10000')
     REMOTE_STATE: str = os.getenv('SLD_REMOTE_STATE', 'http://remote-state:8080')
     SECRET_VAULT: bytes = os.getenv('SLD_SECRET_VAULT', b'h0aW9hCz_wmEplvlFdoWjqx2pund1gGlcoZ2eqvYpCM=')
+    SORT_BY_DESC: bool = os.getenv('SLD_SORT', False)
     
 
 settings = Settings()

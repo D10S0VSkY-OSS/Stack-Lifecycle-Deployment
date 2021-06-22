@@ -406,6 +406,7 @@ def deploy_stack(stack_id):
         return render_template(
             "stacks-deploy.html",
             form=form, stack=stack,
+            sort_form=settings.SORT_BY_DESC,
             data_json=vars_json
         )
     except ValueError:
