@@ -534,7 +534,7 @@ def new_user():
         return redirect(url_for('base_blueprint.logout'))
 
 
-@blueprint.route('/users-list/', defaults={'limit': 10})
+@blueprint.route('/users-list/', defaults={'limit': 30})
 @blueprint.route('/users-list/<int:limit>')
 @login_required
 def list_users(limit):
