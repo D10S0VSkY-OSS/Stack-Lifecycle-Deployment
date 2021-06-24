@@ -87,7 +87,6 @@
 
                                         {% if sort_form %}
                                         {% for key, value in data_json.items()|sort(attribute='1.description') %}
-                                        {{value.get('description').split('|')[2]}}
                                             {% if value.get('description').split('|')[1] %}
                                                 <div class="border-top my-4"></div>
                                                 <h5>{{value.get('description').split('|')[1]}}</h4>

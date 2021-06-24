@@ -66,7 +66,7 @@ class StackBase(BaseModel):
     stack_name: str
     git_repo: str
     branch: str = "master"
-    squad_access: List[str] = "[*]"
+    squad_access: List[str] = ["*"]
     tf_version: str = "1.0.0"
     description: str
 
