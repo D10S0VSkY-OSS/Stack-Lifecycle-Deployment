@@ -180,6 +180,8 @@ class PlanCreate(BaseModel):
     stack_name: str
     squad: str
     environment: str
+    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")
     variables: dict
 
 
