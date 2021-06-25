@@ -195,6 +195,8 @@ def edit_deploy(deploy_id):
                 "destroy_time": form.destroy_time.data,
                 "variables": ast.literal_eval(variables)
             }
+            if  not "deploy" in request.form.get('button'):
+                endpoint=f'plan/{deploy_id}'
             # Deploy
             response = request_url(
                 verb='PATCH',
@@ -383,7 +385,9 @@ def deploy_stack(stack_id):
                 "environment": form.environment.data,
                 "variables": ast.literal_eval(variables)
             }
-            endpoint = f'deploy'
+            endpoint = f'plan'
+            if not "plan" in request.form.get('button'):
+                endpoint = f'deploy'
             if current_user.master:
                 data['squad'] = form.squad.data
             else:

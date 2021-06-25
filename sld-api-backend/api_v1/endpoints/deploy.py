@@ -91,7 +91,7 @@ async def deploy_infra_by_stack_name(
 
 
 @router.patch("/{deploy_id}", status_code=202)
-async def Update_infra_by_stack_name(
+async def update_deploy_by_id(
         deploy_id: int,
         background_tasks: BackgroundTasks,
         deploy_update: schemas.DeployUpdate,

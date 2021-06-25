@@ -112,7 +112,11 @@
                                                 </div>
                                         {% endfor %}
                                         {% endif %}
-                                    <button type="submit" class="btn btn-primary" name="button" action="{{url_for('.list_deploys')}}">
+                                    <div class="border-top my-4"></div>
+                                    <button type="submit" class="btn btn-success" name="button" value=plan action="{{url_for('.list_deploys')}}">
+                                    Plan 
+                                    </button>
+                                    <button type="submit" class="btn btn-primary" name="button" value=deploy action="{{url_for('.list_deploys')}}">
                                     Deploy
                                     </button>
 
