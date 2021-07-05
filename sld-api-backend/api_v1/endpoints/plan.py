@@ -77,7 +77,7 @@ async def plan_infra_by_stack_name(
             squad=squad,
             action="Plan"
         )
-        return {"task": pipeline_plan}
+        return {"task_id": pipeline_plan}
     except Exception as err:
         raise HTTPException(
             status_code=400,
