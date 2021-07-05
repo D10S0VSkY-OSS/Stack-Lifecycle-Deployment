@@ -106,6 +106,7 @@ class Tasks(Base):
     action = Column(String(50), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now())
 
+
 class ActivityLogs(Base):
     __tablename__ = "activity_logs"
     id = Column(Integer, primary_key=True, index=True)

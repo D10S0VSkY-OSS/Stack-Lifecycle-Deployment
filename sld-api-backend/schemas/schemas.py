@@ -10,8 +10,10 @@ class UserCreate(UserBase):
     fullname: str
     password: str
     email: EmailStr = None
-    privilege: bool = False
+    squad: str
     is_active: bool = True
+    privilege: bool = False
+    master: bool = False
 
 
 class UserCreateMaster(UserBase):
@@ -35,10 +37,13 @@ class UserAuthenticate(UserBase):
 class UserInit(BaseModel):
     password: str
 
+
 class PasswordReset(BaseModel):
     passwd: str
-    class  Config :
-         orm_mode  =  True
+
+    class Config:
+        orm_mode = True
+
 
 class User(UserBase):
     id: int
@@ -64,8 +69,8 @@ class StackBase(BaseModel):
     stack_name: str
     git_repo: str
     branch: str = "master"
-    squad_access: List[str] = "*"
-    tf_version: str = "0.12.30"
+    squad_access: List[str] = ["*"]
+    tf_version: str = "1.0.0"
     description: str
 
 
@@ -143,10 +148,11 @@ class DeployBase(BaseModel):
 
 class DeployCreate(BaseModel):
     name: str
+    squad: str
     stack_name: str
     environment: str
-    start_time: str
-    destroy_time: str
+    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")
     variables: dict
 
 
@@ -173,10 +179,21 @@ class Deploy(StackBase):
         orm_mode = True
 
 
+class PlanCreate(BaseModel):
+    name: str
+    stack_name: str
+    squad: str
+    environment: str
+    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")
+    variables: dict
+
+
 class TasksBase(BaseModel):
     id: str
     deploy_id: str
     name: str
+
 
 class ActivityLogs(BaseModel):
     id: int
@@ -186,3 +203,8 @@ class ActivityLogs(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ScheduleUpdate(BaseModel):
+    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")

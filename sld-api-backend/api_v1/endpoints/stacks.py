@@ -6,8 +6,8 @@ from security import deps
 from crud import user as crud_users
 from crud import stacks as crud_stacks
 from crud import activityLogs as crud_activity
-from helpers.push_task import syncGit, syncGetVars
-from helpers.get_data import checkProviders
+from helpers.push_task import sync_git, sync_get_vars
+from helpers.get_data import check_providers
 
 router = APIRouter()
 
@@ -26,7 +26,7 @@ def create_new_stack(
     branch = stack.branch
 
     # Checkif stack name providers are supperted
-    checkProviders(stack_name=stack.stack_name)
+    check_providers(stack_name=stack.stack_name)
     # Check if stack exist
     db_stack = crud_stacks.get_stack_by_name(db, stack_name=stack.stack_name)
     if db_stack:
@@ -34,7 +34,7 @@ def create_new_stack(
             status_code=409,
             detail="The stack name already exist")
     # Push git task to queue squad, all workers are subscribed to this queue
-    task_id = syncGit(
+    task_id = sync_git(
         stack_name=stack.stack_name,
         git_repo=stack.git_repo,
         branch=branch,
@@ -42,14 +42,14 @@ def create_new_stack(
         squad=squad,
         name=name)
     # Get vars in json ans list format
-    variables_json = syncGetVars(
+    variables_json = sync_get_vars(
         stack_name=stack.stack_name,
         environment=environment,
         squad=squad,
         name=name,
         task_id=task_id,
         otype="json")
-    variables_list = syncGetVars(
+    variables_list = sync_get_vars(
         stack_name=stack.stack_name,
         environment=environment,
         squad=squad,
@@ -79,6 +79,70 @@ def create_new_stack(
         raise HTTPException(status_code=409, detail=f"Duplicate entry {err}")
 
 
+@router.patch("/{stack_id}", response_model=schemas.Stack)
+def update_stack(
+        stack_id: int,
+        stack: schemas.StackCreate,
+        current_user: schemas.User = Depends(deps.get_current_active_user),
+        db: Session = Depends(deps.get_db)):
+    if not current_user.master:
+        raise HTTPException(status_code=403, detail="Not enough permissions")
+    name = "default"
+    environment = "default"
+    squad = "squad"
+    branch = stack.branch
+
+    # Checkif stack name providers are supperted
+    check_providers(stack_name=stack.stack_name)
+    # Check if stack exist
+    db_stack = crud_stacks.get_stack_by_name(db, stack_name=stack.stack_name)
+    # Push git task to queue squad, all workers are subscribed to this queue
+    task_id = sync_git(
+        stack_name=stack.stack_name,
+        git_repo=stack.git_repo,
+        branch=branch,
+        environment=environment,
+        squad=squad,
+        name=name)
+    # Get vars in json ans list format
+    variables_json = sync_get_vars(
+        stack_name=stack.stack_name,
+        environment=environment,
+        squad=squad,
+        name=name,
+        task_id=task_id,
+        otype="json")
+    variables_list = sync_get_vars(
+        stack_name=stack.stack_name,
+        environment=environment,
+        squad=squad,
+        name=name,
+        task_id=task_id,
+        otype="list")
+    try:
+        # pesrsist data in db
+        result = crud_stacks.update_stack(
+            db=db,
+            stack_id=stack_id,
+            stack=stack,
+            user_id=current_user.id,
+            task_id=task_id,
+            var_json=variables_json,
+            var_list=variables_list,
+            squad_access=stack.squad_access
+        )
+
+        crud_activity.create_activity_log(
+            db=db,
+            username=current_user.username,
+            squad=current_user.squad,
+            action=f'Update Stack {stack.stack_name}'
+        )
+        return result
+    except Exception as err:
+        raise HTTPException(status_code=409, detail=f"Duplicate entry {err}")
+
+
 @router.get("/")
 async def get_all_stacks(
         current_user: schemas.User = Depends(deps.get_current_active_user),
@@ -95,7 +159,7 @@ async def get_stack_by_id_or_name(
         stack,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    
+
     if not stack.isdigit():
         result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
         if result is None:

@@ -31,6 +31,7 @@ def encrypt(secreto):
     except Exception as err:
         raise err
 
+
 # Move to config
 r = redis.Redis(host='redis', port=6379, db=1,
                 charset="utf-8", decode_responses=True)
@@ -61,7 +62,6 @@ def login():
         db.session.remove()
         db.engine.dispose()
         user = User.get_by_username(username)
-
 
         # Check the password
         if user and user.verify_password(password):

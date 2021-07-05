@@ -46,7 +46,7 @@ services:
 
   # sd-remote-state
   remote-state:
-    image: d10s0vsky/sld-remote-state:1.0.2
+    image: d10s0vsky/sld-remote-state:latest
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8080 --workers 4
     hostname: remote-state
     ports:
@@ -54,7 +54,7 @@ services:
   
   # sd-remote-state
   schedule:
-    image: d10s0vsky/sld-schedule:1.0.2
+    image: d10s0vsky/sld-schedule:latest
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 10000 --workers 4
     hostname: schedule
     ports:
@@ -70,8 +70,11 @@ services:
 
   # Celery worker
   worker:
-    image: d10s0vsky/sld-api:1.0.3
+    image: d10s0vsky/sld-api:latest
     entrypoint: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "celery,squad,squad1"]
+    environment:
+      BROKER_USER: admin
+      BROKER_PASSWD: admin123
     depends_on:
       - rabbit
       - redis
@@ -80,7 +83,7 @@ services:
 
   # SLD Dashboard - UI
   sld-dashboard:
-    image: d10s0vsky/sld-dashboard:1.0.3
+    image: d10s0vsky/sld-dashboard:latest
     hostname: sld-dashboard
     entrypoint: gunicorn --config gunicorn-cfg.py run:app
     restart: always
@@ -100,7 +103,7 @@ services:
 
   # FastApi Stack Deploy
   api-backend:
-    image: d10s0vsky/sld-api:1.0.3
+    image: d10s0vsky/sld-api:latest
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 
     hostname: api-backend
     ports:
@@ -108,6 +111,8 @@ services:
     environment:
       MYSQL_USER: adm
       MYSQL_PASSWORD: 123
+      BROKER_USER: admin
+      BROKER_PASSWD: admin123
     depends_on:
       - db
       - redis

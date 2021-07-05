@@ -70,6 +70,46 @@ def update_deploy(
         raise err
 
 
+def update_plan(
+        db: Session,
+        deploy_id: int,
+        action: str,
+        task_id: str):
+
+    db_deploy = db.query(models.Deploy).filter(
+        models.Deploy.id == deploy_id).first()
+
+    db_deploy.action = action
+    db_deploy.task_id = task_id
+    try:
+        db.add(db_deploy)
+        db.commit()
+        db.refresh(db_deploy)
+        return db_deploy
+    except Exception as err:
+        raise err
+
+
+def update_schedule(
+        db: Session,
+        deploy_id: int,
+        start_time: str,
+        destroy_time: str):
+
+    db_deploy = db.query(models.Deploy).filter(
+        models.Deploy.id == deploy_id).first()
+
+    db_deploy.start_time = start_time
+    db_deploy.destroy_time = destroy_time
+    try:
+        db.add(db_deploy)
+        db.commit()
+        db.refresh(db_deploy)
+        return db_deploy
+    except Exception as err:
+        raise err
+
+
 def delete_deploy_by_id(db: Session, deploy_id: int, squad: str):
     db.query(
         models.Deploy).filter(

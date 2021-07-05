@@ -56,6 +56,8 @@ class Settings(BaseSettings):
         "password": PASS_USER,
         "email": "test01@example.com",
         "privilege": False,
+        "master": True,
+        "squad": "squad1",
         "is_active": True,
     }
     USER_POST_SQUAD1: dict = {
@@ -114,7 +116,7 @@ class Settings(BaseSettings):
         "squad_access": ["*"],
         "branch": "master",
         "description": STACK_NAME_AWS,
-        "tf_version": "0.13.5"
+        "tf_version": "1.0.0"
     }
     STACK_POST_GCP: dict = {
         "stack_name": STACK_NAME_GCP,
@@ -122,7 +124,7 @@ class Settings(BaseSettings):
         "branch": "master",
         "squad_access": ["*"],
         "description": STACK_NAME_GCP,
-        "tf_version": "0.13.5"
+        "tf_version": "0.14.1"
     }
     AWS_TEST_ACCOUNT: dict = {
         "squad": "squad1",
@@ -134,10 +136,11 @@ class Settings(BaseSettings):
         "role_arn": "string",
         "source_profile": "string"
     }
-    DEPLOY_URI: str = '?tf_ver=0.13.5'
+    DEPLOY_URI: str = '?tf_ver=1.0.0'
     DEPLOY_VARS: dict = {
         "name": "aws_vpc_darth_vader",
         "stack_name": "aws_vpc",
+        "squad": "squad1",
         "environment": "develop",
         "start_time": "30 9 * * 1-5",
         "destroy_time": "30 17 * * 1-5",
@@ -160,13 +163,14 @@ class Settings(BaseSettings):
                     "protocol": "udp"
                 }
             ],
-            "image_id": "2"
+            "password": "PassWW"
         }
     }
     DEPLOY_VARS_USER: dict = {
         "name": "aws_vpc_stormtrooper",
         "stack_name": "aws_vpc",
         "environment": "develop",
+        "squad": "squad1",
         "start_time": "30 9 * * 1-5",
         "destroy_time": "30 17 * * 1-5",
         "variables": {
@@ -188,7 +192,7 @@ class Settings(BaseSettings):
                     "protocol": "udp"
                 }
             ],
-            "image_id": "2"
+            "password": "Password"
         }
     }
     DEPLOY_VARS_MASTER: dict = {
@@ -216,7 +220,7 @@ class Settings(BaseSettings):
                     "protocol": "tcp"
                 }
             ],
-            "image_id": "1"
+            "password": "PasswordAdmin"
         }
     }
     DEPLOY_VARS_UPDATE: dict = {
@@ -244,7 +248,7 @@ class Settings(BaseSettings):
                     "protocol": "tcp"
                 }
             ],
-            "image_id": "1"
+            "password": "Pass123"
         }
     }
 

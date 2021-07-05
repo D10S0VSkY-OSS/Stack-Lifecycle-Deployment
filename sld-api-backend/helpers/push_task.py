@@ -1,14 +1,15 @@
 import json
+
 from fastapi import HTTPException
-from tasks.celery_worker import (
-    git, unlock, schedule_add, schedule_delete,
-    output, get_variable_json, get_variable_list, show, pipelineDeploy,
-    pipelineDestroy, pipelinePlan, schedules_list, schedule_get
-)
+
+from tasks.celery_worker import (git, unlock, output, show)
+from tasks.celery_worker import (get_variable_list, get_variable_json)
+from tasks.celery_worker import (schedules_list, schedule_get, schedule_add, schedule_delete, schedule_update)
+from tasks.celery_worker import (pipeline_plan, pipeline_deploy, pipeline_destroy)
 from config.api import settings
 
 
-def asyncDeploy(
+def async_deploy(
         git_repo: str,
         name: str,
         stack_name: str,
@@ -19,7 +20,7 @@ def asyncDeploy(
         variables: dict,
         secreto: str):
 
-    pipeline_deploy = pipelineDeploy.s(
+    pipeline_deploy_result = pipeline_deploy.s(
         git_repo=git_repo,
         name=name,
         stack_name=stack_name,
@@ -37,10 +38,10 @@ def asyncDeploy(
                   }
                   )
 
-    return pipeline_deploy.task_id
+    return pipeline_deploy_result.task_id
 
 
-def asyncDestroy(
+def async_destroy(
         git_repo: str,
         name: str,
         stack_name: str,
@@ -51,7 +52,7 @@ def asyncDestroy(
         variables: dict,
         secreto: str):
 
-    pipeline_destroy = pipelineDestroy.s(
+    pipeline_destroy_result = pipeline_destroy.s(
         git_repo=git_repo,
         name=name,
         stack_name=stack_name,
@@ -70,10 +71,10 @@ def asyncDestroy(
         }
     )
 
-    return pipeline_destroy.task_id
+    return pipeline_destroy_result.task_id
 
 
-def asyncPlan(
+def async_plan(
         git_repo: str,
         name: str,
         stack_name: str,
@@ -83,7 +84,8 @@ def asyncPlan(
         tf_ver: str,
         variables: dict,
         secreto: str):
-    pipeline_plan = pipelinePlan.s(
+
+    pipeline_plan_result = pipeline_plan.s(
         git_repo=git_repo,
         name=name,
         stack_name=stack_name,
@@ -101,44 +103,53 @@ def asyncPlan(
                   }
                   )
 
-    return pipeline_plan.task_id
+    return pipeline_plan_result.task_id
 
 
-def asyncOutput(stack_name: str, environment: str, squad: str, name: str):
-    pipeline_output = output.s(stack_name, environment, squad,
-                               name).apply_async(queue=squad)
-    return pipeline_output.task_id
+def async_output(stack_name: str, environment: str, squad: str, name: str):
+    output_result = output.s(stack_name, environment, squad,
+                             name).apply_async(queue="squad")
+    return output_result.task_id
 
 
-def asyncUnlock(stack_name: str, environment: str, squad: str, name: str):
-    pipeline_unlock = unlock.s(stack_name, environment, squad,
-                               name).apply_async(queue=squad)
-    return pipeline_unlock.task_id
+def async_unlock(stack_name: str, environment: str, squad: str, name: str):
+    unlock_result = unlock.s(stack_name, environment, squad,
+                             name).apply_async(queue="squad")
+    return unlock_result.task_id
 
 
-def asyncScheduleDelete(deploy_name: str, squad: str):
-    deploy_schedule_delete = schedule_delete.s(deploy_name).apply_async(queue=squad)
-    return deploy_schedule_delete.task_id
-
-def asyncScheduleAdd(deploy_name: str, squad: str):
-    deploy_schedule_add = schedule_add.s(deploy_name).apply_async(queue=squad)
-    return deploy_schedule_add.task_id
-
-def asyncScheduleList(squad: str):
-    pipeline_schedule_list = schedules_list.s().apply_async(queue=squad)
-    return pipeline_schedule_list.task_id
-
-def asyncScheduleGet(deploy_name, squad: str):
-    pipeline_schedule_get = schedule_get.s(deploy_name).apply_async(queue=squad)
-    return pipeline_schedule_get.task_id
-
-def asyncShow(stack_name: str, environment: str, squad: str, name: str):
-    pipeline_show = show.s(stack_name, environment, squad,
-                               name).apply_async(queue=squad)
-    return pipeline_show.task_id
+def async_schedule_delete(deploy_name: str, squad: str):
+    deploy_schedule_delete_result = schedule_delete.s(deploy_name).apply_async(queue="squad")
+    return deploy_schedule_delete_result.task_id
 
 
-def syncGit(
+def async_schedule_add(deploy_name: str, squad: str):
+    deploy_schedule_add_result = schedule_add.s(deploy_name).apply_async(queue="squad")
+    return deploy_schedule_add_result.task_id
+
+
+def async_schedule_list(squad: str):
+    schedule_list_result = schedules_list.s().apply_async(queue="squad")
+    return schedule_list_result.task_id
+
+
+def async_schedule_get(deploy_name, squad: str):
+    schedule_get_result = schedule_get.s(deploy_name).apply_async(queue="squad")
+    return schedule_get_result.task_id
+
+
+def async_schedule_update(deploy_name: str):
+    schedule_update_result = schedule_update.s(deploy_name).apply_async(queue="squad")
+    return schedule_update_result.task_id
+
+
+def async_show(stack_name: str, environment: str, squad: str, name: str):
+    show_result = show.s(stack_name, environment, squad,
+                         name).apply_async(queue="squad")
+    return show_result.task_id
+
+
+def sync_git(
         stack_name: str,
         git_repo: str,
         branch: str,
@@ -146,22 +157,21 @@ def syncGit(
         squad: str,
         name: str):
     try:
-        pipeline_git = git.s(
+        pipeline_git_result = git.s(
             stack_name=stack_name,
             git_repo=git_repo,
             branch=branch,
             environment=environment,
             squad=squad,
             name=name).delay()
-        pipeline_git.get()
-        task_id = pipeline_git.task_id
-        return task_id
+        pipeline_git_result.get()
+        return pipeline_git_result.task_id
     except Exception as err:
         raise HTTPException(status_code=408,
                             detail=f"git TimeoutError {err}")
 
 
-def syncGetVars(
+def sync_get_vars(
         stack_name: str,
         environment: str,
         squad: str,

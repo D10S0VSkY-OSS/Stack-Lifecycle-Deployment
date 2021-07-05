@@ -13,7 +13,7 @@ def test_update_user_init():
     list_user = request_url(verb='GET', uri=f'users/{user_adm}', headers={
         "Authorization": f"Bearer {token}"})
     id = list_user.get("json").get("id")
-    response = request_url(verb='PATCH', uri=f'master/users/{id}', headers={
+    response = request_url(verb='PATCH', uri=f'users/{id}', headers={
                            "Authorization": f"Bearer {token}"}, json=data)
     assert response.get('status_code') == 200
 
@@ -45,7 +45,7 @@ def test_create_unprivilege_user():
 
 def test_create_unprivilege_user_squad1():
     data = settings.USER_POST_SQUAD1
-    response = request_url(verb='POST', uri='master/users/', headers={
+    response = request_url(verb='POST', uri='users/', headers={
                            "Authorization": f"Bearer {token}"}, json=data)
     result = response.get('status_code')
     if result != 400:
@@ -54,7 +54,7 @@ def test_create_unprivilege_user_squad1():
 
 def test_create_unprivilege_user_squad2():
     data = settings.USER_POST_SQUAD2
-    response = request_url(verb='POST', uri='master/users/', headers={
+    response = request_url(verb='POST', uri='users/', headers={
                            "Authorization": f"Bearer {token}"}, json=data)
     result = response.get('status_code')
     if result != 400:
@@ -63,7 +63,7 @@ def test_create_unprivilege_user_squad2():
 
 def test_create_privilege_user_squad1():
     data = settings.USER_POST_PRIV
-    response = request_url(verb='POST', uri='master/users/', headers={
+    response = request_url(verb='POST', uri='users/', headers={
                            "Authorization": f"Bearer {token}"}, json=data)
     result = response.get('status_code')
     if result != 400:
@@ -72,7 +72,7 @@ def test_create_privilege_user_squad1():
 
 def test_create_bot_user():
     data = settings.USER_SCHEDULE
-    response = request_url(verb='POST', uri='master/users/', headers={
+    response = request_url(verb='POST', uri='users/', headers={
                            "Authorization": f"Bearer {token}"}, json=data)
     result = response.get('status_code')
     if result != 400:
@@ -81,7 +81,7 @@ def test_create_bot_user():
 
 def test_create_unprivilege_user_disable():
     data = settings.USER_POST_OFF
-    response = request_url(verb='POST', uri='master/users/', headers={
+    response = request_url(verb='POST', uri='users/', headers={
                            "Authorization": f"Bearer {token}"}, json=data)
     result = response.get('status_code')
     if result != 400:
