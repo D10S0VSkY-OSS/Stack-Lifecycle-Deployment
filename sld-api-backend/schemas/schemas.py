@@ -37,10 +37,13 @@ class UserAuthenticate(UserBase):
 class UserInit(BaseModel):
     password: str
 
+
 class PasswordReset(BaseModel):
     passwd: str
-    class  Config :
-         orm_mode  =  True
+
+    class Config:
+        orm_mode = True
+
 
 class User(UserBase):
     id: int
@@ -175,6 +178,7 @@ class Deploy(StackBase):
     class Config:
         orm_mode = True
 
+
 class PlanCreate(BaseModel):
     name: str
     stack_name: str
@@ -190,6 +194,7 @@ class TasksBase(BaseModel):
     deploy_id: str
     name: str
 
+
 class ActivityLogs(BaseModel):
     id: int
     username: str
@@ -198,3 +203,8 @@ class ActivityLogs(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class ScheduleUpdate(BaseModel):
+    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")

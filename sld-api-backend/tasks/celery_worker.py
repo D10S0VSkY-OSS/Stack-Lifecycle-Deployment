@@ -1,3 +1,4 @@
+import logging
 from config.celery_config import celery_app
 from celery import states
 from celery.exceptions import Ignore
@@ -10,8 +11,6 @@ from config.api import settings
 @celery_app.task(bind=True, acks_late=True, time_limit=settings.DEPLOY_TMOUT, name='pipeline Deploy')
 def pipeline_deploy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
-    print(git_repo, name, stack_name, environment,
-          squad, branch, version, filter_kwargs)
     try:
         # Git clone repo
         result = tf.git_clone(git_repo, name, stack_name,
@@ -72,18 +71,16 @@ def pipeline_deploy(self, git_repo, name, stack_name, environment, squad, branch
         if not settings.DEBUG:
             tf.delete_local_folder(dir_path)
         try:
-            print(request_url(verb='DELETE', uri=f'schedule/{name}'))
-            print(request_url(verb='POST', uri=f'schedule/{name}'))
+            logging.info(request_url(verb='DELETE', uri=f'schedule/{name}'))
+            logging.info(request_url(verb='POST', uri=f'schedule/{name}'))
         except Exception as err:
-            print(err)
+            logging.error(err)
             pass
 
 
 @celery_app.task(bind=True, acks_late=True, name='pipeline Destroy')
 def pipeline_destroy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
-    print(git_repo, name, stack_name, environment,
-          squad, branch, version, filter_kwargs)
     try:
         # Git clone repo
         result = tf.git_clone(git_repo, name, stack_name,
@@ -128,8 +125,6 @@ def pipeline_destroy(self, git_repo, name, stack_name, environment, squad, branc
 @celery_app.task(bind=True, acks_late=True, name='pipeline Plan')
 def pipeline_plan(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
-    print(git_repo, name, stack_name, environment,
-          squad, branch, version, filter_kwargs)
     try:
         self.update_state(state='GIT', meta={'done': "1 of 5"})
         result = tf.git_clone(git_repo, name, stack_name,
@@ -240,6 +235,16 @@ def schedule_add(self, deploy_name):
     try:
         return request_url(verb='POST', uri=f'schedule/{deploy_name}')
     except Exception as err:
+        return err
+
+
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, max_retries=1, name='Update schedule')
+def schedule_update(self, deploy_name):
+    try:
+        logging.info(request_url(verb='DELETE', uri=f'schedule/{deploy_name}'))
+        logging.info(request_url(verb='POST', uri=f'schedule/{deploy_name}'))
+    except Exception as err:
+        logging.warning(request_url(verb='POST', uri=f'schedule/{deploy_name}'))
         return err
 
 

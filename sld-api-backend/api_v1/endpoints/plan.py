@@ -77,7 +77,7 @@ async def plan_infra_by_stack_name(
             squad=squad,
             action="Plan"
         )
-        return {"task": pipeline_plan}
+        return {"task_id": pipeline_plan}
     except Exception as err:
         raise HTTPException(
             status_code=400,
@@ -161,7 +161,7 @@ async def update_plan_by_id(
             squad=squad,
             action=action)
 
-        return {"task": db_task}
+        return {"task_id": pipeline_plan}
     except Exception as err:
         raise HTTPException(
             status_code=400,
@@ -194,7 +194,7 @@ async def get_plan_by_id_deploy(
         if not check_deploy_state(deploy_data.task_id):
             raise ValueError("Deploy state running, cannot upgrade")
         # push task Deploy to queue and return task_id
-        pipeline_plan = asyncPlan(
+        pipeline_plan = async_plan(
             git_repo,
             deploy_data.name,
             deploy_data.stack_name,
@@ -204,7 +204,7 @@ async def get_plan_by_id_deploy(
             tf_ver,
             deploy_data.variables,
             secreto)
-        return {"task": pipeline_plan}
+        return {"task_id": pipeline_plan}
     except Exception as err:
         raise HTTPException(
             status_code=400,

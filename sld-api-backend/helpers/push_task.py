@@ -2,10 +2,10 @@ import json
 
 from fastapi import HTTPException
 
-from tasks.celery_worker import (pipeline_plan, pipeline_deploy, pipeline_destroy)
-from tasks.celery_worker import (schedules_list, schedule_get, schedule_add, schedule_delete)
-from tasks.celery_worker import (get_variable_list, get_variable_json)
 from tasks.celery_worker import (git, unlock, output, show)
+from tasks.celery_worker import (get_variable_list, get_variable_json)
+from tasks.celery_worker import (schedules_list, schedule_get, schedule_add, schedule_delete, schedule_update)
+from tasks.celery_worker import (pipeline_plan, pipeline_deploy, pipeline_destroy)
 from config.api import settings
 
 
@@ -108,13 +108,13 @@ def async_plan(
 
 def async_output(stack_name: str, environment: str, squad: str, name: str):
     output_result = output.s(stack_name, environment, squad,
-                               name).apply_async(queue="squad")
+                             name).apply_async(queue="squad")
     return output_result.task_id
 
 
 def async_unlock(stack_name: str, environment: str, squad: str, name: str):
     unlock_result = unlock.s(stack_name, environment, squad,
-                               name).apply_async(queue="squad")
+                             name).apply_async(queue="squad")
     return unlock_result.task_id
 
 
@@ -138,9 +138,14 @@ def async_schedule_get(deploy_name, squad: str):
     return schedule_get_result.task_id
 
 
+def async_schedule_update(deploy_name: str):
+    schedule_update_result = schedule_update.s(deploy_name).apply_async(queue="squad")
+    return schedule_update_result.task_id
+
+
 def async_show(stack_name: str, environment: str, squad: str, name: str):
     show_result = show.s(stack_name, environment, squad,
-                           name).apply_async(queue="squad")
+                         name).apply_async(queue="squad")
     return show_result.task_id
 
 
