@@ -195,8 +195,8 @@ def edit_deploy(deploy_id):
                 "destroy_time": form.destroy_time.data,
                 "variables": ast.literal_eval(variables)
             }
-            if  not "deploy" in request.form.get('button'):
-                endpoint=f'plan/{deploy_id}'
+            if not "deploy" in request.form.get('button'):
+                endpoint = f'plan/{deploy_id}'
             # Deploy
             response = request_url(
                 verb='PATCH',
@@ -284,6 +284,55 @@ def get_plan(deploy_id):
                                form=form,
                                deploy=deploy,
                                data_json=vars_json['json']
+                               )
+    except ValueError:
+        return redirect(url_for('base_blueprint.logout'))
+
+
+@blueprint.route('/edit-schedule', methods=['GET', 'POST'], defaults={'deploy_id': None})
+@blueprint.route('/edit-schedule/<deploy_id>', methods=['GET', 'POST'])
+@login_required
+def edit_schedule(deploy_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        form = DeployForm(request.form)
+
+        endpoint = f'deploy/{deploy_id}'
+        # Get deploy data vars and set var for render
+        response = request_url(verb='GET', uri=f'{endpoint}', headers={
+                               "Authorization": f"Bearer {token}"})
+        deploy = response.get('json')
+
+        # When user push data with POST verb
+        if request.method == 'POST':
+            # List for exclude in vars
+            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time']
+            data = {
+                "start_time": form.start_time.data,
+                "destroy_time": form.destroy_time.data,
+            }
+
+            endpoint = f'schedule/{deploy_id}'
+            # Deploy
+            response = request_url(
+                verb='PATCH',
+                uri=f'{endpoint}',
+                headers={
+                    "Authorization": f"Bearer {token}"},
+                json=data)
+
+            if response.get('status_code') == 202:
+                flash(f"Updating schedule")
+            else:
+                flash(response.get('json').get('detail'), "error")
+            return redirect(url_for('home_blueprint.route_template', template="deploys-list"))
+
+        return render_template('schedule-edit.html',
+                               name='Edit schedule',
+                               form=form,
+                               deploy=deploy,
                                )
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
@@ -392,7 +441,7 @@ def deploy_stack(stack_id):
                 data['squad'] = form.squad.data
             else:
                 data['squad'] = current_user.squad
-            
+
             # Deploy
             response = request_url(
                 verb='POST',

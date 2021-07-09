@@ -177,6 +177,11 @@
                                                                                  data-target="#OutputModalCenter-{{deploy.id}}">
                                     <span class="fab fa-searchengin mr-0"></span></a>
                             </span>
+                            <!-- Schedule -->
+                            <span class="icon icon-sm">
+                                <a class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
+                                    <span class="far fa-clock mr-0"></span></a>
+                            </span>
                             {% if current_user.privilege %}
                             <!-- Unlock-->
                             <span class="icon icon-sm">
@@ -194,16 +199,16 @@
                         <div class="modal-content">
                             <div class="modal-header">
                                 <h5 class="modal-title" id="UnlockModalLongTitle-{{deploy.id}}">Unlock Deploy
-                                    {{deploy.name}}</h5>
+                                                                                                {{deploy.name}}</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
                             <div class="modal-body">
                                 <p> <strong>Acquires a state lock to protect the state from being written
-                                    by multiple users at the same time. Please resolve the issue and try
-                                    again. You can disable locking with the "Unlock botton", but this is not
-                                    recommended:</strong></p>
+                                by multiple users at the same time. Please resolve the issue and try
+                                again. You can disable locking with the "Unlock botton", but this is not
+                                                                                          recommended:</strong></p>
                                 <p><strong>Are you sure? </strong></p>
                             </div>
                             <div class="modal-footer">
