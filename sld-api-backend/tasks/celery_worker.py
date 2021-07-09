@@ -241,8 +241,8 @@ def schedule_add(self, deploy_name):
 @celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, max_retries=1, name='Update schedule')
 def schedule_update(self, deploy_name):
     try:
-        logging.info(request_url(verb='DELETE', uri=f'schedule/{deploy_name}'))
-        logging.info(request_url(verb='POST', uri=f'schedule/{deploy_name}'))
+        request_url(verb='DELETE', uri=f'schedule/{deploy_name}')
+        return request_url(verb='POST', uri=f'schedule/{deploy_name}')
     except Exception as err:
         logging.warning(request_url(verb='POST', uri=f'schedule/{deploy_name}'))
         return err
