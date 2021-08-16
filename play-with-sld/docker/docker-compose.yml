@@ -34,7 +34,7 @@ services:
   # RabbitMQ - queue
   rabbit:
     hostname: rabbit
-    image: rabbitmq:3-management
+    image: rabbitmq:3.8-management
     environment:
       - RABBITMQ_DEFAULT_USER=admin
       - RABBITMQ_DEFAULT_PASS=admin

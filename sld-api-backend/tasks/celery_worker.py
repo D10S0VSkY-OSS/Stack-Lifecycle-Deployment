@@ -70,13 +70,6 @@ def pipeline_deploy(self, git_repo, name, stack_name, environment, squad, branch
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
         if not settings.DEBUG:
             tf.delete_local_folder(dir_path)
-        try:
-            logging.info(request_url(verb='DELETE', uri=f'schedule/{name}'))
-            logging.info(request_url(verb='POST', uri=f'schedule/{name}'))
-        except Exception as err:
-            logging.error(err)
-            pass
-
 
 @celery_app.task(bind=True, acks_late=True, name='pipeline Destroy')
 def pipeline_destroy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
@@ -209,7 +202,7 @@ def show(self, stack_name, environment, squad, name):
 @celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='schedules list')
 def schedules_list(self):
     try:
-        return request_url(verb='GET', uri=f'schedules/')
+        return request_url(verb='GET', uri=f'schedules/').get('json')
     except Exception as err:
         pass
 
@@ -217,7 +210,7 @@ def schedules_list(self):
 @celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='schedule get')
 def schedule_get(self, deploy_name):
     try:
-        return request_url(verb='GET', uri=f'schedule/{deploy_name}')
+        return request_url(verb='GET', uri=f'schedule/{deploy_name}').get('json')
     except Exception as err:
         pass
 
@@ -225,7 +218,7 @@ def schedule_get(self, deploy_name):
 @celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='schedule remove')
 def schedule_delete(self, deploy_name):
     try:
-        return request_url(verb='DELETE', uri=f'schedule/{deploy_name}')
+        return request_url(verb='DELETE', uri=f'schedule/{deploy_name}').get('json')
     except Exception as err:
         pass
 
@@ -233,7 +226,7 @@ def schedule_delete(self, deploy_name):
 @celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name='schedule add')
 def schedule_add(self, deploy_name):
     try:
-        return request_url(verb='POST', uri=f'schedule/{deploy_name}')
+        return request_url(verb='POST', uri=f'schedule/{deploy_name}').get('json')
     except Exception as err:
         return err
 
@@ -242,7 +235,7 @@ def schedule_add(self, deploy_name):
 def schedule_update(self, deploy_name):
     try:
         request_url(verb='DELETE', uri=f'schedule/{deploy_name}')
-        return request_url(verb='POST', uri=f'schedule/{deploy_name}')
+        return request_url(verb='POST', uri=f'schedule/{deploy_name}').get('json')
     except Exception as err:
         logging.warning(request_url(verb='POST', uri=f'schedule/{deploy_name}'))
         return err

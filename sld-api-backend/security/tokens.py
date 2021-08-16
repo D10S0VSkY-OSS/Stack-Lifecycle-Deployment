@@ -53,12 +53,12 @@ def validate_user(db, user: str, plain_passwd: str):
         pass
     if not user:
         raise HTTPException(
-            status_code=400, detail="Incorrect username or password")
+            status_code=404, detail="Incorrect username or password")
     elif not verify_password(plain_passwd, hash_passwd):
         raise HTTPException(
-            status_code=400, detail="Incorrect username or password")
+            status_code=403, detail="Incorrect username or password")
     elif not crud_users.is_active(db, user):
-        raise HTTPException(status_code=400, detail="Inactive user")
+        raise HTTPException(status_code=403, detail="Inactive user")
     access_token_expires = timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return {

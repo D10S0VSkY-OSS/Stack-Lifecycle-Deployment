@@ -48,7 +48,7 @@ def init_check_schedule():
         if response.get("status_code") != 200:
             raise Exception(response)
         data_json = response.get('json')
-        deploy_list = jmespath.search('[*].name', data_json)
+        deploy_list = jmespath.search('[*].id', data_json)
 
         for i in deploy_list:
             addDeployToSchedule(i)
@@ -69,6 +69,7 @@ def get_deploy_by_id(deploy_id):
         data = {
             "deploy_id": deploy_id,
             "name": response['json']['name'],
+            "squad": response['json']['squad'],
             "start": response['json']['start_time'],
             "destroy": response['json']['destroy_time'],
         }
@@ -143,10 +144,13 @@ def removeJob(deploy_id):
     logging.info(f'Remove job {deploy_id}')
     try:
         scheduler.remove_job(f'start-{deploy_id}')
-        scheduler.remove_job(f'destroy-{deploy_id}')
-        return {deploy_id: "removed"}
     except Exception as err:
-        return err
+        pass
+    try:
+        scheduler.remove_job(f'destroy-{deploy_id}')
+    except Exception as err:
+        pass
+    return {deploy_id: "removed"}
 
 
 def add_job(func, job_name: str, job_id: str, start_time: str = None):
@@ -196,7 +200,7 @@ def destroy_job(func, job_name: str, job_id: str, destroy_time: str = None,):
 def addDeployToSchedule(deploy_id: int):
     # Get data by deploy_id
     data = get_deploy_by_id(deploy_id)
-    name = data['name']
+    name = f"{data['name']}_{data['squad']}"
     start_time = data['start']
     destroy_time = data['destroy']
     # Add start job to scheduler state pending
