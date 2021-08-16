@@ -9,7 +9,8 @@ from security import tokens
 from helpers.get_data import check_deploy_exist, check_deploy_state, check_cron_schedule
 from helpers.get_data import stack, deploy, deploy_squad, check_deploy_exist
 from helpers.push_task import async_deploy, async_destroy
-from helpers.push_task import async_output, async_unlock, async_schedule_delete
+from helpers.push_task import async_output, async_unlock
+from helpers.push_task import async_schedule_delete, async_schedule_add
 from helpers.push_task import async_show
 
 
@@ -88,6 +89,10 @@ async def deploy_infra_by_stack_name(
         raise HTTPException(
             status_code=400,
             detail=f"{err}")
+    finally:
+        result = async_schedule_delete(db_deploy.id, squad)
+        # Add schedule
+        async_schedule_add(db_deploy.id, squad)
 
 
 @router.patch("/{deploy_id}", status_code=202)
@@ -164,6 +169,10 @@ async def update_deploy_by_id(
         raise HTTPException(
             status_code=400,
             detail=f"{err}")
+    finally:
+        result = async_schedule_delete(deploy_id, squad)
+        # Add schedule
+        async_schedule_add(deploy_id, squad)
 
 
 @router.put("/{deploy_id}", status_code=202)
@@ -261,25 +270,17 @@ async def get_all_deploys(
 
 @router.get("/{deploy_id}")
 async def get_deploy_by_id(
-        deploy_id,
+        deploy_id: int,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
     try:
         if current_user.master:
-            if deploy_id.isdigit():
-                result = crud_deploys.get_deploy_by_id(
-                    db=db, deploy_id=deploy_id)
-            else:
-                result = crud_deploys.get_deploy_by_name(
-                    db=db, deploy_name=deploy_id)
+            result = crud_deploys.get_deploy_by_id(
+                db=db, deploy_id=deploy_id)
         else:
             squad = current_user.squad
-            if deploy_id.isdigit():
-                result = crud_deploys.get_deploy_by_id_squad(
-                    db=db, deploy_id=deploy_id, squad=squad)
-            else:
-                result = crud_deploys.get_deploy_by_name_squad(
-                    db=db, deploy_name=deploy_id)
+            result = crud_deploys.get_deploy_by_id_squad(
+                db=db, deploy_id=deploy_id, squad=squad)
         if result is None:
             raise Exception("Deploy id Not Found")
         return result
@@ -355,7 +356,7 @@ async def delete_infra_by_id(
             status_code=400,
             detail=f"{err}")
     finally:
-        _result = async_schedule_delete(name, squad)
+        result = async_schedule_delete(deploy_id, squad)
 
 
 @router.get("/output/{deploy_id}", status_code=200)

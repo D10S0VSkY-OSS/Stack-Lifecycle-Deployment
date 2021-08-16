@@ -31,7 +31,7 @@ def test_users_with_bad_passwd():
         uri='authenticate/access-token-json',
         json=settings.CREDENTIALS_BAD_PASSWD
     )
-    assert response.get('status_code') == 400
+    assert response.get('status_code') == 403
 
 
 def test_create_unprivilege_user():

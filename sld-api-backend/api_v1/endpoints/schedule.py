@@ -41,7 +41,7 @@ async def get_schedule(
         # Get squad from current user
         squad = current_user.squad
         deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
-    deploy_name = deploy_data.name
+    deploy_name = deploy_data.id
     try:
         return {"task_id": async_schedule_get(deploy_name=deploy_name, squad=squad)}
     except Exception as err:
@@ -63,7 +63,7 @@ async def add_schedule(
         # Get squad from current user
         squad = current_user.squad
         deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
-    deploy_name = deploy_data.name
+    deploy_name = deploy_data.id
     try:
         return {"task_id":async_schedule_add(deploy_name=deploy_name, squad=squad)}
     except Exception as err:
@@ -85,7 +85,7 @@ async def delete_schedule(
         # Get squad from current user
         squad = current_user.squad
         deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
-    deploy_name = deploy_data.name
+    deploy_name = deploy_data.id
     try:
         return {"task_id":async_schedule_delete(deploy_name=deploy_name, squad=squad)}
     except Exception as err:
@@ -122,7 +122,7 @@ async def update_schedule(
         check_cron_schedule(deploy_update.start_time)
         check_cron_schedule(deploy_update.destroy_time)
         # push task Deploy to queue and return task_id
-        pipeline_schedule = async_schedule_update(deploy_data.name)
+        pipeline_schedule = async_schedule_update(deploy_id)
         # Update db data time schedule
         crud_deploys.update_schedule(
             db=db,
