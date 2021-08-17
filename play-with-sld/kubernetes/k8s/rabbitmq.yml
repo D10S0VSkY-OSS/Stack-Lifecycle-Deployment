@@ -17,7 +17,7 @@ spec:
       subdomain: primary
       containers:
       - name: rabbit
-        image: rabbitmq:3-management
+        image: rabbitmq:3.8-management
         env:
         - name: RABBITMQ_DEFAULT_USER
           valueFrom:
