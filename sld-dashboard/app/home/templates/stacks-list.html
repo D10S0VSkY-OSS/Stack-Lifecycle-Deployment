@@ -48,6 +48,7 @@
                     <th>Stack Name</th>
                     {% if current_user.privilege %}
                     <th>Stack Repo</th>
+                    <th>Branch</th>
                     <th>Tf version</th>
                     <th>squad_access</th>
                     {% endif %}
@@ -73,6 +74,7 @@
                     <td><span class="font-weight-normal">{{ stack.stack_name }}</span></td>
                     {% if current_user.privilege %}
                     <td><span class="font-weight-normal">{{ stack.git_repo }}</span></td>
+                    <td><span class="font-weight-normal">{{ stack.branch }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.tf_version }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.squad_access }}</span></td>
                     {% endif %}
@@ -88,7 +90,8 @@
                             </button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{ url_for('.deploy_stack', stack_id=stack.id)}}"><span class="fas fa-power-off mr-2"></span>Deploy</a>
-                    {% if current_user.privilege %}
+                    {% if current_user.master %}
+                                <a class="dropdown-item" href="{{ url_for('.edit_stack', stack_id=stack.id)}}"><span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item text-danger" href="{{ url_for('.delete_stack', stack_name=stack.stack_name)}}"><span class="fas fa-trash-alt mr-2"></span>Remove</a>
                     {% endif %}
                             </div>

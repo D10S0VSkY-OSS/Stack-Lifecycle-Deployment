@@ -359,7 +359,6 @@ def new_stack():
                 "tf_version": form.tf_version.data,
                 "description": form.description.data
             }
-            print(new_stack)
             response = request_url(
                 verb='POST',
                 uri='stacks/',
@@ -372,6 +371,57 @@ def new_stack():
 
         return render_template('/stacks-new.html', title='New Stack',
                                form=form, active='new_Stack')
+    except ValueError:
+        return redirect(url_for('base_blueprint.logout'))
+
+
+@blueprint.route('/edit-stack', methods=['GET', 'POST'], defaults={'stack_id': None})
+@blueprint.route('/edit-stack/<stack_id>', methods=['GET', 'POST'])
+@login_required
+def edit_stack(stack_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        form = StackForm(request.form)
+        endpoint = f'stacks/{stack_id}'
+        # Get deploy data vars and set var for render
+        response = request_url(verb='GET', uri=f'{endpoint}', headers={
+                               "Authorization": f"Bearer {token}"})
+        stack = response.get('json')
+        print(request.form)
+
+        # When user push data with POST verb
+        if request.method == 'POST':
+            # Data dend to deploy
+            squad_acces_form = form.squad_access_edit.data
+            squad_acces_form_to_list = squad_acces_form.split(",")
+            update_stack = {
+                "stack_name": form.name.data,
+                "git_repo": form.git.data,
+                "branch": form.branch.data,
+                "squad_access": squad_acces_form_to_list,
+                "tf_version": form.tf_version.data,
+                "description": form.description_edit.data
+            }
+            # Deploy
+            response = request_url(
+                verb='PATCH',
+                uri=f'{endpoint}',
+                headers={
+                    "Authorization": f"Bearer {token}"},
+                json=update_stack)
+            if response.get('status_code') == 200:
+                flash(f"Updating Stack")
+            else:
+                flash(response.get('json').get('detail'), "error")
+            return redirect(url_for('home_blueprint.route_template', template="stacks-list"))
+
+        return render_template('stack-edit.html',
+                               name='Edit Stack',
+                               form=form,
+                               stack=stack
+                               )
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
