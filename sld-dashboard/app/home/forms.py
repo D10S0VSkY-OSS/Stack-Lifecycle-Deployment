@@ -6,6 +6,8 @@ from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, Email, DataRequired
 
 # login and registration
+
+
 class StackForm(FlaskForm):
     name = StringField('Name', [
         validators.length(min=4, max=50, message='Name out of reange.'),
@@ -20,7 +22,7 @@ class StackForm(FlaskForm):
         validators.DataRequired(message='Branch requerid.')
     ])
     #squad_access = FieldList(StringField('squads'), min_entries=1)
-    squad_access = TextAreaField('Squad Access (* share with everyone or pass a list: squad1, squad2)',default='*', render_kw={'rows': 1})
+    squad_access = TextAreaField('Squad Access (* share with everyone or pass a list: squad1, squad2)', default='*', render_kw={'rows': 1})
 
     tf_version = StringField('tf version', [
         validators.length(min=4, max=10, message='tf version out of reange.'),
@@ -29,6 +31,8 @@ class StackForm(FlaskForm):
     description = TextAreaField('Description', [
         validators.DataRequired(message='The description is required.')
     ], render_kw={'rows': 5})
+    squad_access_edit = StringField('Squad Access (* share with everyone or pass a list: squad1, squad2)', render_kw={'rows': 1})
+    description_edit = StringField('Description', render_kw={'rows': 1})
 
 
 class DeployForm(FlaskForm):
@@ -147,7 +151,7 @@ class GcpForm(FlaskForm):
     ])
     gcloud_keyfile_json = TextAreaField('gcloud keyfile json', [
         validators.DataRequired(message='The gcloud keyfile json is required.')
-        ], render_kw={'rows': 20})
+    ], render_kw={'rows': 20})
 
 
 class AzureForm(FlaskForm):
