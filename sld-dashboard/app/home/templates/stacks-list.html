@@ -53,7 +53,6 @@
                     <th>squad_access</th>
                     {% endif %}
                     <th>Description</th>
-                    <th>Created_at</th>
                 </tr>
             </thead>
             <tbody>
@@ -79,7 +78,6 @@
                     <td><span class="font-weight-normal">{{ stack.squad_access }}</span></td>
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.description}}</span></td>
-                    <td><span class="font-weight-bold">{{ stack.created_at }}</span></td>
                     <td>
                         <div class="btn-group">
                             <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -92,12 +90,71 @@
                                 <a class="dropdown-item" href="{{ url_for('.deploy_stack', stack_id=stack.id)}}"><span class="fas fa-power-off mr-2"></span>Deploy</a>
                     {% if current_user.master %}
                                 <a class="dropdown-item" href="{{ url_for('.edit_stack', stack_id=stack.id)}}"><span class="fas fa-edit mr-2"></span>Edit</a>
-                                <a class="dropdown-item text-danger" href="{{ url_for('.delete_stack', stack_name=stack.stack_name)}}"><span class="fas fa-trash-alt mr-2"></span>Remove</a>
+                                <a class="dropdown-item" data-toggle="modal" data-target="#SyncModalCenter-{{stack.id}}"><span class="fas fa-sync mr-2"></span>sync</a>
+                                <a class="dropdown-item text-danger" data-toggle="modal" data-target="#RemoveModalCenter-{{stack.stack_name}}"><span class="fas fa-trash-alt mr-2"></span>Remove</a>
                     {% endif %}
                             </div>
                         </div>
                     </td>
                 </tr>
+                <!-- Modal sync-->
+                <div class="modal fade" id="SyncModalCenter-{{stack.id}}">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="SyncModalLongTitle-{{stack.id}}">Sync Repo
+                                                                                                {{stack.stack_name}}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p> <strong>This will sync the repository again,
+                                    updating any changes to the stack variables and resources,
+                                    that could affect all implementations deployed with this stack.
+                                </strong></p>
+                                <p><strong>Are you sure? </strong></p>
+                            </div>
+                            <div class="modal-footer">
+
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+
+                                <form action="{{ url_for('.resync_stack', stack_id=stack.id)}}">
+                                    <input type="submit" value="Sync Repo" class="btn btn-danger">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Remove-->
+                <div class="modal fade" id="RemoveModalCenter-{{stack.stack_name}}">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="SyncModalLongTitle-{{stack.stack_name}}">Remove Repo
+                                                                                                {{stack.stack_name}}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p> <strong>This change will permanently delete the repository.
+                                            could affect all deployed implementations.
+                                </strong></p>
+                                <p><strong>Are you sure? </strong></p>
+                            </div>
+                            <div class="modal-footer">
+
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+
+                                <form action="{{ url_for('.delete_stack', stack_name=stack.stack_name)}}">
+                                    <input type="submit" value="Remove Repo" class="btn btn-danger">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Modal -->
                 {% endfor %}
             </tbody>
         </table>
