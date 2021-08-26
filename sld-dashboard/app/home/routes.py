@@ -389,7 +389,6 @@ def edit_stack(stack_id):
         response = request_url(verb='GET', uri=f'{endpoint}', headers={
                                "Authorization": f"Bearer {token}"})
         stack = response.get('json')
-        print(request.form)
 
         # When user push data with POST verb
         if request.method == 'POST':
@@ -447,6 +446,42 @@ def delete_stack(stack_name):
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
+@blueprint.route('/stack/resync/<stack_id>')
+@login_required
+def resync_stack(stack_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        endpoint = f'stacks/{stack_id}'
+        # Get deploy data vars and set var for render
+        response = request_url(verb='GET', uri=f'{endpoint}', headers={
+                               "Authorization": f"Bearer {token}"})
+        if response.get('status_code') == 200:
+            result = response.get('json').get('branch')
+            update_stack = {
+                "stack_name": response.get('json').get('stack_name'),
+                "git_repo": response.get('json').get('git_repo'),
+                "branch": response.get('json').get('branch'),
+                "squad_access": response.get('json').get('squad_access'),
+                "tf_version": response.get('json').get('tf_version'),
+                "description": response.get('json').get('description')
+            }
+            response = request_url(
+                verb='PATCH',
+                uri=f'{endpoint}',
+                headers={
+                    "Authorization": f"Bearer {token}"},
+                json=update_stack)
+            if response.get('status_code') == 200:
+                flash(f"Updating Stack")
+            else:
+                flash(response.get('json').get('detail'), "error")
+        else:
+            flash(response.get('json').get('detail'), "error")
+        return redirect(url_for('home_blueprint.route_template', template="stacks-list"))
+    except ValueError:
+        return redirect(url_for('base_blueprint.logout'))
 
 @blueprint.route('/stacks-deploy', methods=['GET', 'POST'], defaults={'stack_id': None})
 @blueprint.route('/stacks-deploy/<stack_id>', methods=['GET', 'POST'])
