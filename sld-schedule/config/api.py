@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     THREAD_POOL_EXECUTOR: int = os.getenv('THREAD_POOL_EXECUTOR', 20)
     PROCESS_POOL_EXECUTOR: int = os.getenv('THREAD_POOL_EXECUTOR', 5)
     MAX_INSTANCES: int = os.getenv('MAX_INSTANCES', 30)
+    CHECK_TIME: int = os.getenv('CHECK_TIME', 5)
     CREDENTIALS_BOT: dict = {
         "username": BOT,
         "password": BOTC
