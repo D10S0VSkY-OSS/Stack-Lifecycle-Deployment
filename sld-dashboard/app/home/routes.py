@@ -184,10 +184,15 @@ def edit_deploy(deploy_id):
         # When user push data with POST verb
         if request.method == 'POST':
             # List for exclude in vars
-            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time']
+            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time', 'sld_key', 'sld_value']
             # Clean exclude data vars
             data_raw = {key: value for key,
                         value in request.form.items() if key not in form_vars}
+            #Add custom variables from form
+            key_list = request.values.getlist('sld_key')
+            value_list = request.values.getlist('sld_value')
+            data_raw.update(dict(list(zip(key_list,value_list))))
+            # Set vars to json
             variables = json.dumps(convert_to_dict(data_raw))
             # Data dend to deploy
             data = {
@@ -733,7 +738,6 @@ def edit_user(user_id):
             data = ast.literal_eval(variables)
             if not current_user.master:
                 data['squad'] = current_user.squad
-            print(data)
         # Apply user change
             endpoint = f'users/{user_id}'
             response = request_url(
