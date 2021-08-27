@@ -171,19 +171,19 @@
                             {% endif %}
                             <!-- Output-->
                             <span class="icon icon-sm">
-                                <a class="nav-link icon-notifications text-dark" data-toggle="modal"
+                                <a title="Output Deploy" class="nav-link icon-notifications text-dark" data-toggle="modal"
                                                                                  data-target="#OutputModalCenter-{{deploy.id}}">
                                     <span class="fab fa-searchengin mr-0"></span></a>
                             </span>
                             <!-- Schedule -->
                             <span class="icon icon-sm">
-                                <a class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
+                                <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
                                     <span class="far fa-clock mr-0"></span></a>
                             </span>
                             {% if current_user.privilege %}
                             <!-- Unlock-->
                             <span class="icon icon-sm">
-                                <a class="nav-link icon-notifications text-dark" data-toggle="modal"
+                                <a title="Unlock Deploy" class="nav-link icon-notifications text-dark" data-toggle="modal"
                                                                                  data-target="#UnlockModalCenter-{{deploy.id}}">
                                     <span class="fas fa-unlock mr-0"></span></a>
                             </span>
