@@ -197,6 +197,23 @@ def destroy_job(func, job_name: str, job_id: str, destroy_time: str = None,):
     return destroy
 
 
+def _check_schedules():
+    token = get_token(settings.CREDENTIALS_BOT)
+    response = request_url(verb='GET', uri=f'deploy/', headers={"Authorization": f"Bearer {token}"})
+    data_json = response.get('json')
+    deploy_list = jmespath.search('[*].id', data_json)
+    for i in deploy_list:
+        try:
+            addDeployToSchedule(i)
+        except Exception as err:
+            pass
+
+
+def addCheckTask():
+    logging.info("Check_Task Add schedule")
+    scheduler.add_job(_check_schedules, CronTrigger.from_crontab(f'*/{settings.CHECK_TIME} * * * *'))
+
+
 def addDeployToSchedule(deploy_id: int):
     # Get data by deploy_id
     data = get_deploy_by_id(deploy_id)
@@ -219,3 +236,6 @@ def addDeployToSchedule(deploy_id: int):
     logging.info(f'Deploy deploy info {update}')
     logging.info(f'Destroy deploy info {destroy}')
     return update, destroy
+
+
+addCheckTask()
