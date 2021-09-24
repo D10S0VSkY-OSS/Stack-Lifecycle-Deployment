@@ -54,7 +54,7 @@
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <input type="text" name={{ key }} value="{{ value }}" class='form-control'>
+                                            <input type="text" name={{ key }} value="{{ value }}" class='form-control' autocomplete="off">
                                         </div>
                                         <!-- Email -->
                                         {% elif key == "email" %}
@@ -62,7 +62,7 @@
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <input type="email" value={{ value }} name={{ key }} class='form-control' placeholder={{key}}>
+                                            <input type="email" value={{ value }} name={{ key }} class='form-control' autocomplete="off" placeholder={{key}}>
                                         </div>
                                         <!--Pasword-->
                                         {% elif key == "password" %}
@@ -70,7 +70,7 @@
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <input type="password" name={{ key }} class='form-control' placeholder={{key}}>
+                                            <input type="password" name={{ key }} class='form-control' placeholder={{key}} autocomplete="off">
                                         </div>
                                         <!--Privilege-->
                                         {% elif key == "privilege" %}
@@ -111,7 +111,7 @@
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <input type="text" value={{ value }} name={{ key }} class='form-control' placeholder={{key}}>
+                                            <input type="text" value={{ value }} name={{ key }} class='form-control' placeholder={{key}} autocomplete="off">
                                         </div>
                                         <!--squad-->
                                         {% endif %}
