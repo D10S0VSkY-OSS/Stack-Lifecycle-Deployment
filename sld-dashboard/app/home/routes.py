@@ -801,8 +801,8 @@ def setting_user():
             if response.get('status_code') == 200:
                 flash(f"User Updated ")
             else:
-                flash(response['json'], 'error')
-            return redirect(url_for('home_blueprint.route_template', template="user-setting.html"))
+                flash(response.get('json').get('detail'), 'error')
+            return redirect(url_for('home_blueprint.route_template', template="user-setting"))
 
         return render_template('user-setting.html',
                                name='User',
