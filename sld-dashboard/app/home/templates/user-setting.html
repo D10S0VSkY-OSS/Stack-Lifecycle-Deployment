@@ -35,9 +35,9 @@
                             <div>
                                 <label for="last_name">Fullname</label>
                                 {% if current_user.master %}
-                                <input type="text" value="{{ current_user.fullname }}" name=fullname class='form-control'>
+                                <input type="text" value="{{ current_user.fullname }}" name=fullname autocomplete="off" class='form-control'>
                                 {% else %}
-                                <input type="text" value="{{ current_user.fullname }}" name=fullname class='form-control' readonly>
+                                <input type="text" value="{{ current_user.fullname }}" name=fullname  autocomplete="off" class='form-control' readonly>
                                 {% endif %}
 
                             </div>
@@ -52,9 +52,9 @@
                             <label for="email">Email</label>
                             <div class="input-group">
                                 {% if current_user.master %}
-                                <input type="text" value="{{ current_user.email }}" name=email class='form-control'>
+                                <input type="text" value="{{ current_user.email }}" name=email autocomplete="off" class='form-control'>
                                 {% else %}
-                                <input type="text" value="{{ current_user.email }}" name=email class='form-control' readonly>
+                                <input type="text" value="{{ current_user.email }}" name=email autocomplete="off" class='form-control' readonly>
                                 {% endif %}
                             </div>
                         </div>
@@ -76,7 +76,7 @@
                         <div class="col-sm-9 mb-3">
                             <div class="form-group">
                                 <label for="password">Password</label>
-                                <input class="form-control" type="password" name=password placeholder="Enter your new secret Password" >
+                                <input class="form-control" type="password" autocomplete="off" name=password placeholder="Enter your new secret Password" >
                             </div>
                         </div>
                         <div class="col-sm-3 mb-3">
