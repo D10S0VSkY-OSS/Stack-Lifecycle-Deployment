@@ -65,13 +65,11 @@
                                         {% if not sort_form %}
                                         {% for key, value in data_json.items()|sort %}
                                         <div class="form-group">
-                                            <span style="text-transform:capitalize">
                                               <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
                                              <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
-                                            </span>
                                             {% for k, v in value.items() %}
                                                 {% if "default" in k %}
-                                                    <input type="text" value="{{ v|lower }}"
+                                                    <input type="text" value="{{ v }}"
                                                 {% elif "passw" in key %}
                                                     <input type="password"
                                                 {% elif "type" in k %}
@@ -93,13 +91,11 @@
                                                 <div class="border border-dark"></div>
                                             {% endif %}
                                         <div class="form-group">
-                                            <span style="text-transform:capitalize">
                                               <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
                                              <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
-                                            </span>
                                             {% for k, v in value.items() %}
                                                 {% if "default" in k %}
-                                                    <input type="text" value="{{ v|lower }}"
+                                                    <input type="text" value="{{ v }}"
                                                 {% elif "passw" in key %}
                                                     <input type="password"
                                                 {% elif "type" in k %}
