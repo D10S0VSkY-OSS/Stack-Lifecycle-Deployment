@@ -327,7 +327,6 @@ async def delete_infra_by_id(
             squad=squad
         )
         # push task destroy to queue and return task_id
-        # push task destroy to queue and return task_id
         pipeline_destroy = async_destroy(
             git_repo,
             name,

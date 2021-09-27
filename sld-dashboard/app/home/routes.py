@@ -497,6 +497,18 @@ def deploy_stack(stack_id):
         # Check if token no expired
         check_unauthorized_token(token)
         form = DeployForm(request.form)
+        # Get data from aws accounts
+        aws_response = request_url(verb='GET', uri=f'accounts/aws/', headers={
+                               "Authorization": f"Bearer {token}"})
+        aws_content = aws_response.get('json')
+        # Get data from gcp accounts
+        gcp_response = request_url(verb='GET', uri=f'accounts/gcp/', headers={
+                               "Authorization": f"Bearer {token}"})
+        gcp_content = gcp_response.get('json')
+        # Get data from azure accounts
+        azure_response = request_url(verb='GET', uri=f'accounts/azure/', headers={
+                               "Authorization": f"Bearer {token}"})
+        azure_content = azure_response.get('json')
         # Get data from stack
         stack = request_url(verb='GET', uri=f'stacks/{stack_id}', headers={
             "Authorization": f"Bearer {token}"})
@@ -521,14 +533,14 @@ def deploy_stack(stack_id):
                 "stack_name": stack['json']['stack_name'],
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
-                "environment": form.environment.data,
+                "environment": request.form.get('environment') ,
                 "variables": ast.literal_eval(variables)
             }
             endpoint = f'plan'
             if not "plan" in request.form.get('button'):
                 endpoint = f'deploy'
             if current_user.master:
-                data['squad'] = form.squad.data
+                data['squad'] = request.form.get('squad')
             else:
                 data['squad'] = current_user.squad
 
@@ -550,6 +562,9 @@ def deploy_stack(stack_id):
             "stacks-deploy.html",
             form=form, stack=stack,
             sort_form=settings.SORT_BY_DESC,
+            aws_content=aws_content,
+            gcp_content=gcp_content,
+            azure_content=azure_content,
             data_json=vars_json
         )
     except ValueError:
