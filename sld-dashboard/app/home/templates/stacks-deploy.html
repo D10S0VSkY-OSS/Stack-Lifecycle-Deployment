@@ -45,89 +45,175 @@
                                         {{ render_field(form.deploy_name, autocomplete="off", class='form-control', placeholder='Deploy name') }}
                                     </div>
                                     {% if current_user.master %}
+                                    {% set aws_squad_status_before = [] %}
+                                    <!-- Specific AWS account  -->
+                                    {% if "aws" in stack['json']['stack_name']  %}
+                                    {% for aws_account in aws_content %}
+                                    {% set __ = aws_squad_status_before.append(aws_account.squad) %}
+                                    {% endfor %}
                                     <div class="form-group">
-                                        {{ render_field(form.squad, autocomplete="off", class='form-control', placeholder='Squad name') }}
-                                        {% endif %}
-
-                                        <div class="form-group">
-                                            {{ render_field(form.environment, autocomplete="off", class='form-control', placeholder='Environment') }}
-                                        </div>
-
-                                        <div class="form-group">
-                                            {{ render_field(form.start_time, autocomplete="off", class='form-control', value='30 7 * * 0-4') }}
-                                        </div>
-
-                                        <div class="form-group">
-                                            {{ render_field(form.destroy_time, autocomplete="off", class='form-control', value='30 18 * * 0-4') }}
-                                        </div>
-
-                                        
-                                        {% if not sort_form %}
-                                        {% for key, value in data_json.items()|sort %}
-                                        <div class="form-group">
-                                              <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
-                                             <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
-                                            {% for k, v in value.items() %}
-                                                {% if "default" in k %}
-                                                    <input type="text" value="{{ v }}"
-                                                {% elif "passw" in key %}
-                                                    <input type="password"
-                                                {% elif "type" in k %}
-                                                    <input type="text" title="{{k}} {{v}}"
-                                                {% else %}
-                                                    <input type="text"
-                                                {% endif %}
+                                        <h6><strong>Squad</strong></h6>
+                                        <select class="form-control" name=squad v-model="squad">
+                                            {% for aws_squad in aws_squad_status_before|unique %}
+                                            <option value={{ aws_squad }}>{{ aws_squad }}</option>
                                             {% endfor %}
-                                                name={{ key }} class='form-control'>
-                                                </div>
-                                        {% endfor %}
-                                        {% endif %}
+                                        </select>
+                                        </label>
+                                    </div>
 
-                                        {% if sort_form %}
-                                        {% for key, value in data_json.items()|sort(attribute='1.description') %}
-                                            {% if value.get('description').split('|')[1] %}
-                                                <div class="border-top my-4"></div>
-                                                <h5>{{value.get('description').split('|')[1]}}</h4>
-                                                <div class="border border-dark"></div>
-                                            {% endif %}
-                                        <div class="form-group">
-                                              <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
-                                             <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
-                                            {% for k, v in value.items() %}
-                                                {% if "default" in k %}
-                                                    <input type="text" value="{{ v }}"
-                                                {% elif "passw" in key %}
-                                                    <input type="password"
-                                                {% elif "type" in k %}
-                                                    <input type="text" title="{{k}} {{v}}"
-                                                {% else %}
-                                                    <input type="text"
-                                                {% endif %}
+                                    {% set aws_env_status_before = [] %}
+                                    {% for aws_account in aws_content %}
+                                    {% set __ = aws_env_status_before.append(aws_account.environment) %}
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <h6><strong>Environment</strong></h6>
+                                        <select class="form-control" name=environment v-model="environment">
+                                            {% for aws_env in aws_env_status_before|unique %}
+                                            <option value={{ aws_env }}>{{ aws_env }}</option>
                                             {% endfor %}
-                                                name={{ key }} class='form-control' autocomplete="off">
-                                                </div>
-                                        {% endfor %}
+                                        </select>
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                    <!-- Specific GCP account  -->
+                                    {% set gcp_squad_status_before = [] %}
+                                    {% if "gcp" in  stack['json']['stack_name'] %}
+                                    {% for gcp_account in gcp_content %}
+                                    {% set __ = gcp_squad_status_before.append(gcp_account.squad) %}
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <h6><strong>Squad</strong></h6>
+                                        <select class="form-control" name=squad v-model="squad">
+                                            {% for gcp_squad in gcp_squad_status_before|unique %}
+                                            <option value={{ gcp_squad }}>{{ gcp_squad }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        </label>
+                                    </div>
+
+                                    {% set gcp_env_status_before = [] %}
+                                    {% for gcp_account in gcp_content %}
+                                    {% set __ = gcp_env_status_before.append(gcp_account.environment) %}
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <h6><strong>Environment</strong></h6>
+                                        <select class="form-control" name=environment v-model="environment">
+                                            {% for gcp_env in gcp_env_status_before|unique %}
+                                            <option value={{ gcp_env }}>{{ gcp_env }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                    <!-- Specific AZURE account  -->
+                                    {% set azure_squad_status_before = [] %}
+                                    {% if "azure" in stack['json']['stack_name'] %}
+                                    {% for azure_account in azure_content %}
+                                    {% set __ = azure_squad_status_before.append(azure_account.squad) %}
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <h6><strong>Squad</strong></h6>
+                                        <select class="form-control" name=squad v-model="squad">
+                                            {% for azure_squad in azure_squad_status_before|unique %}
+                                            <option value={{ azure_squad }}>{{ azure_squad }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        </label>
+                                    </div>
+
+                                    {% set azure_env_status_before = [] %}
+                                    {% for azure_account in azure_content %}
+                                    {% set __ = azure_env_status_before.append(azure_account.environment) %}
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <h6><strong>Environment</strong></h6>
+                                        <select class="form-control" name=environment v-model="environment">
+                                            {% for azure_env in azure_env_status_before|unique %}
+                                            <option value={{ azure_env }}>{{ azure_env }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        </label>
+                                    </div>
+                                    {% endif %}
+                                    {% endif %}
+
+
+
+                                    <div class="form-group">
+                                        {{ render_field(form.start_time, autocomplete="off", class='form-control', value='30 7 * * 0-4') }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.destroy_time, autocomplete="off", class='form-control', value='30 18 * * 0-4') }}
+                                    </div>
+
+
+                                    {% if not sort_form %}
+                                    {% for key, value in data_json.items()|sort %}
+                                    <div class="form-group">
+                                        <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
+                                        <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
+                                        {% for k, v in value.items() %}
+                                        {% if "default" in k %}
+                                        <input type="text" value="{{ v }}"
+                                                           {% elif "passw" in key %}
+                                                           <input type="password"
+                                                                  {% elif "type" in k %}
+                                                                  <input type="text" title="{{k}} {{v}}"
+                                                                                     {% else %}
+                                                                                     <input type="text"
+                                                                                            {% endif %}
+                                                                                            {% endfor %}
+                                                                                            name={{ key }} class='form-control'>
+                                    </div>
+                                                                  {% endfor %}
+                                                                  {% endif %}
+
+                                                                  {% if sort_form %}
+                                                                  {% for key, value in data_json.items()|sort(attribute='1.description') %}
+                                                                  {% if value.get('description').split('|')[1] %}
+                                                                  <div class="border-top my-4"></div>
+                                                                  <h5>{{value.get('description').split('|')[1]}}</h4>
+                                        <div class="border border-dark"></div>
                                         {% endif %}
-                                    <div class="border-top my-4"></div>
-                                    <button type="submit" class="btn btn-success" name="button" value=plan action="{{url_for('.list_deploys')}}">
-                                    Plan 
-                                    </button>
-                                    <button type="submit" class="btn btn-primary" name="button" value=deploy action="{{url_for('.list_deploys')}}">
-                                    Deploy
-                                    </button>
+                                        <div class="form-group">
+                                            <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
+                                            <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
+                                            {% for k, v in value.items() %}
+                                            {% if "default" in k %}
+                                            <input type="text" value="{{ v }}"
+                                                               {% elif "passw" in key %}
+                                                               <input type="password"
+                                                                      {% elif "type" in k %}
+                                                                      <input type="text" title="{{k}} {{v}}"
+                                                                                         {% else %}
+                                                                                         <input type="text"
+                                                                                                {% endif %}
+                                                                                                {% endfor %}
+                                                                                                name={{ key }} class='form-control' autocomplete="off">
+                                        </div>
+                                                                      {% endfor %}
+                                                                      {% endif %}
+                                                                      <div class="border-top my-4"></div>
+                                                                      <button type="submit" class="btn btn-success" name="button" value=plan action="{{url_for('.list_deploys')}}">
+                                                                          Plan
+                                                                      </button>
+                                            <button type="submit" class="btn btn-primary" name="button" value=deploy action="{{url_for('.list_deploys')}}">
+                                                Deploy
+                                            </button>
 
                                 </form>
-                                    </div>
+                            </div>
 
-                                    <!-- End Form -->
+                            <!-- End Form -->
 
-                                    <div class="input-group">
-                                    </div>
+                            <div class="input-group">
                             </div>
                         </div>
                     </div>
+                </div>
 
-                    {% include 'includes/footer.html' %}
+                {% include 'includes/footer.html' %}
 
 </main>
 

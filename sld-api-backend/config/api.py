@@ -14,9 +14,9 @@ class Settings(BaseSettings):
     OpenSource solution that defines and manages the complete lifecycle of resources used and provisioned into a cloud
                     '''
     VERSION: str = "1.0.0"
-    AWS_PREFIX: List = ["aws", "amazon"]
-    GCLOUD_PREFIX: List = ["gcloud", "gcp", "google"]
-    AZURE_PREFIX: List = ["azure", "azurerm"]
+    AWS_PREFIX: List = ["aws"]
+    GCLOUD_PREFIX: List = ["gcp"]
+    AZURE_PREFIX: List = ["azure"]
     PROVIDERS_SUPPORT: List = AWS_PREFIX + GCLOUD_PREFIX + AZURE_PREFIX
     SECRET_KEY: str = os.getenv('SLD_SECRET_KEY', "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
     ALGORITHM = "HS256"
