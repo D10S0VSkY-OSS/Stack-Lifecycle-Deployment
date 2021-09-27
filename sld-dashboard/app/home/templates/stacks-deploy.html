@@ -42,23 +42,23 @@
 
 
                                     <div class="form-group">
-                                        {{ render_field(form.deploy_name, class='form-control', placeholder='Deploy name') }}
+                                        {{ render_field(form.deploy_name, autocomplete="off", class='form-control', placeholder='Deploy name') }}
                                     </div>
                                     {% if current_user.master %}
                                     <div class="form-group">
-                                        {{ render_field(form.squad, class='form-control', placeholder='Squad name') }}
+                                        {{ render_field(form.squad, autocomplete="off", class='form-control', placeholder='Squad name') }}
                                         {% endif %}
 
                                         <div class="form-group">
-                                            {{ render_field(form.environment, class='form-control', placeholder='Environment') }}
+                                            {{ render_field(form.environment, autocomplete="off", class='form-control', placeholder='Environment') }}
                                         </div>
 
                                         <div class="form-group">
-                                            {{ render_field(form.start_time, class='form-control', value='30 7 * * 0-4') }}
+                                            {{ render_field(form.start_time, autocomplete="off", class='form-control', value='30 7 * * 0-4') }}
                                         </div>
 
                                         <div class="form-group">
-                                            {{ render_field(form.destroy_time, class='form-control', value='30 18 * * 0-4') }}
+                                            {{ render_field(form.destroy_time, autocomplete="off", class='form-control', value='30 18 * * 0-4') }}
                                         </div>
 
                                         
@@ -108,7 +108,7 @@
                                                     <input type="text"
                                                 {% endif %}
                                             {% endfor %}
-                                                name={{ key }} class='form-control'>
+                                                name={{ key }} class='form-control' autocomplete="off">
                                                 </div>
                                         {% endfor %}
                                         {% endif %}

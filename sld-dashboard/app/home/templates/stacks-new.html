@@ -42,27 +42,27 @@
                             <div class="col-md-12 col-md-offset-1">
                                 <form class="" method="post">
                                     <div class="form-group">
-                                        {{ render_field(form.name, class='form-control', placeholder='Stack name') }}
+                                        {{ render_field(form.name, autocomplete="off", class='form-control', placeholder='Stack name') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.git, class='form-control', placeholder='Git repo') }}
+                                        {{ render_field(form.git, autocomplete="off", class='form-control', placeholder='Git repo') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.branch, class='form-control', value='master') }}
+                                        {{ render_field(form.branch, autocomplete="off", class='form-control', value='master') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.squad_access, class='form-control') }}
+                                        {{ render_field(form.squad_access, autocomplete="off", class='form-control') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.tf_version, class='form-control', value='1.0.0') }}
+                                        {{ render_field(form.tf_version, autocomplete="off", class='form-control', value='1.0.7') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.description, class='form-control', placeholder='Description') }}
+                                        {{ render_field(form.description, autocomplete="off", class='form-control', placeholder='Description') }}
                                     </div>
 
                                     <button type="submit" class="btn btn-primary" name="button">

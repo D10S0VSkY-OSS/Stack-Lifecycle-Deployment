@@ -20,7 +20,7 @@
         </nav>
         <div class="d-flex justify-content-between w-100 flex-wrap">
             <div class="mb-3 mb-lg-0">
-                <h1 class="h4">User Edit</h1>
+                <h1 class="h4">User Edit {{data_json.username}}</h1>
             </div>
             <div>
                 <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Users Docs</a>
@@ -36,17 +36,19 @@
                         <div class="col-lg-4 col-sm-6">
                             <!-- Form -->
                             <div class="col-md-12 col-md-offset-1">
-                                <h3>{{data_json.username }} </h3>
                                 <form  method="post">
                                     <div class="form-group">
-                                        {% for key, value in data_json.items() |sort(attribute='key', reverse = True) %}
+                                        {% for key, value in data_json.items() %}
+
                                         <!-- Username -->
                                         {% if key == "username" %}
+                                        <span style="text-transform:capitalize">
+                                            <h6><strong>{{key}}</strong></h6>
+                                        </span>
                                         <div class="form-group">
                                             <span style="text-transform:capitalize">
-                                                <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <input type="text" name={{ key }} value={{ value }} class='form-control' placeholder={{key}}>
+                                            <input type="text" name={{ key }} value={{ value }} class='form-control' placeholder={{key}} autocomplete="off">
                                         </div>
                                         <!-- Fullname -->
                                         {% elif key == "fullname" %}
@@ -78,9 +80,14 @@
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <select class="form-control" name={{key}} v-model="is_active">
+                                            <select class="form-control" name={{key}} v-model="privilege">
+                                            {% if data_json.privilege %}
+                                                <option value=true>Yes</option>
+                                                <option value=false>No</option>
+                                            {% else %}
                                                 <option value=false>No</option>
                                                 <option value=true>Yes</option>
+                                            {% endif %}
                                             </select>
                                         </div>
                                         <!--is-active-->
@@ -90,8 +97,13 @@
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
                                             <select class="form-control" name={{key}} v-model="is_active">
+                                            {% if data_json.is_active %}
                                                 <option value=true>Yes</option>
                                                 <option value=false>No</option>
+                                            {% else %}
+                                                <option value=false>No</option>
+                                                <option value=true>Yes</option>
+                                            {% endif %}
                                             </select>
                                         </div>
                                         <!--master-->
@@ -100,9 +112,14 @@
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <select class="form-control" name={{key}} v-model="is_active">
+                                            <select class="form-control" name={{key}} v-model="master">
+                                            {% if data_json.master %}
+                                                <option value=true>Yes</option>
+                                                <option value=false>No</option>
+                                            {% else %}
                                                 <option value=false>No</option>
                                                 <option value=true>Yes</option>
+                                            {% endif %}
                                             </select>
                                         </div>
                                         <!--squad-->
@@ -111,7 +128,7 @@
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <input type="text" value={{ value }} name={{ key }} class='form-control' placeholder={{key}} autocomplete="off">
+                                            <input type="text" value={{ value }} name={{ key }} class='form-control'  autocomplete="off">
                                         </div>
                                         <!--squad-->
                                         {% endif %}

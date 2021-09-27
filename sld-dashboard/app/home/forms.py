@@ -82,6 +82,7 @@ class UserForm(FlaskForm):
     ])
     squad = StringField('Squad', [
         validators.length(min=4, max=50),
+        validators.Required('The squad name is required.'),
     ])
     password = PasswordField(
         'Password', [
