@@ -39,27 +39,27 @@
                                 <h3>{{stack.stack_name}}</h3>
                                 <form class="" method="post">
                                     <div class="form-group">
-                                        {{ render_field(form.name, class='form-control', value=stack.stack_name) }}
+                                        {{ render_field(form.name, autocomplete="off", class='form-control', value=stack.stack_name) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.git, class='form-control', value=stack.git_repo) }}
+                                        {{ render_field(form.git, autocomplete="off", class='form-control', value=stack.git_repo) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.branch, class='form-control', value=stack.branch) }}
+                                        {{ render_field(form.branch, autocomplete="off", class='form-control', value=stack.branch) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.squad_access_edit, class='form-control', value=stack.squad_access|join(',')) }}
+                                        {{ render_field(form.squad_access_edit, autocomplete="off", class='form-control', value=stack.squad_access|join(',')) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.tf_version, class='form-control', value=stack.tf_version) }}
+                                        {{ render_field(form.tf_version, autocomplete="off", class='form-control', value=stack.tf_version) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.description_edit, class='form-control',value=stack.description) }}
+                                        {{ render_field(form.description_edit, autocomplete="off", class='form-control',value=stack.description) }}
                                     </div>
 
                                     <button type="submit" class="btn btn-primary" name="button">

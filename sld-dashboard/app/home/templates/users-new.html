@@ -43,29 +43,29 @@
                             <div class="col-md-12 col-md-offset-1">
                                 <form class="" method="post">
                                     <div class="form-group">
-                                        {{ render_field(form.username, class='form-control', placeholder='User Name') }}
+                                        {{ render_field(form.username, autocomplete="off", class='form-control', placeholder='User Name') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.fullname, class='form-control', placeholder='Full Name') }}
+                                        {{ render_field(form.fullname, autocomplete="off", class='form-control', placeholder='Full Name') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.email, class='form-control', placeholder='Email') }}
+                                        {{ render_field(form.email, autocomplete="off", class='form-control', placeholder='Email') }}
                                     </div>
                                     {% if  current_user.master %}
                                     <div class="form-group">
-                                        {{ render_field(form.squad, class='form-control', placeholder='squad') }}
+                                        {{ render_field(form.squad, autocomplete="off", class='form-control', placeholder='squad') }}
                                     </div>
                                     {% endif %}
 
                                     <div class="form-group">
-                                        {{ render_field(form.password, class='form-control', placeholder='password') }}
+                                        {{ render_field(form.password, autocomplete="off", class='form-control', placeholder='password') }}
                                     </div>
 
                                     <!-- End Form
                                         <div class="form-group">
-                                        {{ render_field(form.confirm_password, class='form-control', placeholder='Confirm Password') }}
+                                        {{ render_field(form.confirm_password, autocomplete="off",  class='form-control', placeholder='Confirm Password') }}
                                         </div>
                                     -->
                                     {% if  current_user.master %}
