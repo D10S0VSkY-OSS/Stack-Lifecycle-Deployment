@@ -1,4 +1,5 @@
 import logging
+import redis
 from config.celery_config import celery_app
 from celery import states
 from celery.exceptions import Ignore
@@ -8,10 +9,17 @@ from helpers.schedule import request_url
 from config.api import settings
 
 
+r = redis.Redis(host='redis', port=6379, db=2,
+                charset="utf-8", decode_responses=True)
+
+
 @celery_app.task(bind=True, acks_late=True, time_limit=settings.DEPLOY_TMOUT, name='pipeline Deploy')
 def pipeline_deploy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
-    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
+    filter_kwargs = {key: value for (
+        key, value) in kwargs.items() if "pass" not in key}
     try:
+        r.set(f"{name}-{squad}", "Locked")
+        r.expire(f"{name}-{squad}", settings.TASK_LOCKED_EXPIRED)
         # Git clone repo
         result = tf.git_clone(git_repo, name, stack_name,
                               environment, squad, branch)
@@ -68,13 +76,18 @@ def pipeline_deploy(self, git_repo, name, stack_name, environment, squad, branch
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
+        r.delete(f"{name}-{squad}")
         if not settings.DEBUG:
             tf.delete_local_folder(dir_path)
 
+
 @celery_app.task(bind=True, acks_late=True, name='pipeline Destroy')
 def pipeline_destroy(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
-    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
+    filter_kwargs = {key: value for (
+        key, value) in kwargs.items() if "pass" not in key}
     try:
+        r.set(f"{name}-{squad}", "Locked")
+        r.expire(f"{name}-{squad}", settings.TASK_LOCKED_EXPIRED)
         # Git clone repo
         result = tf.git_clone(git_repo, name, stack_name,
                               environment, squad, branch)
@@ -113,11 +126,13 @@ def pipeline_destroy(self, git_repo, name, stack_name, environment, squad, branc
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
         tf.delete_local_folder(dir_path)
+        r.delete(f"{name}-{squad}")
 
 
 @celery_app.task(bind=True, acks_late=True, name='pipeline Plan')
 def pipeline_plan(self, git_repo, name, stack_name, environment, squad, branch, version, kwargs, secreto):
-    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
+    filter_kwargs = {key: value for (
+        key, value) in kwargs.items() if "pass" not in key}
     try:
         self.update_state(state='GIT', meta={'done': "1 of 5"})
         result = tf.git_clone(git_repo, name, stack_name,
@@ -237,7 +252,8 @@ def schedule_update(self, deploy_name):
         request_url(verb='DELETE', uri=f'schedule/{deploy_name}')
         return request_url(verb='POST', uri=f'schedule/{deploy_name}').get('json')
     except Exception as err:
-        logging.warning(request_url(verb='POST', uri=f'schedule/{deploy_name}'))
+        logging.warning(request_url(
+            verb='POST', uri=f'schedule/{deploy_name}'))
         return err
 
 

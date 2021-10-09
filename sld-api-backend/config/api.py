@@ -30,6 +30,9 @@ class Settings(BaseSettings):
     WORKER_TMOUT: int =os.getenv('SLD_WORKER_TMOUT', 300 ) 
     ENV: str = os.getenv('SLD_ENV', "dev")
     DEBUG: bool = os.getenv('SLD_DEBUG', False)
+    BACKEND_USER = os.getenv('BACKEND_USER', "")
+    BACKEND_PASSWD = os.getenv('BACKEND_PASSWD', "")
+    BACKEND_SERVER = os.getenv('BACKEND_SERVER', "redis")
     #init user
     INIT_USER = {
         "username": os.getenv('SLD_INIT_USER_NAME', "admin"),
@@ -40,7 +43,8 @@ class Settings(BaseSettings):
     AWS_SHARED_CREDENTIALS_FILE: str = f"{AWS_CONGIG_DEFAULT_FOLDER}/credentials"
     AWS_SHARED_CONFIG_FILE: str = f"{AWS_CONGIG_DEFAULT_FOLDER}/config"
     TASK_MAX_RETRY: int = os.getenv('SLD_TASK_MAX_RETRY', 1)
-    TASK_RETRY_INTERVAL: int = os.getenv('SLD_TASK_RETRY_INTERVAL', 5)
+    TASK_RETRY_INTERVAL: int = os.getenv('SLD_TASK_RETRY_INTERVAL', 20)
+    TASK_LOCKED_EXPIRED = os.getenv('SLD_TASK_LOCKED_EXPIRED', 3600)
     TERRAFORM_BIN_REPO: str = os.getenv('SLD_TERRAFORM_BIN_REPO', "https://releases.hashicorp.com/terraform")
     REMOTE_STATE: str = os.getenv('SLD_REMOTE_STATE', "http://remote-state:8080")
 

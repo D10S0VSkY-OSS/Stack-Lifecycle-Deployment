@@ -3,6 +3,7 @@ from celery.result import AsyncResult
 from datetime import datetime
 from functools import wraps
 from croniter import croniter
+import redis
 
 from crud import stacks as crud_stacks
 from crud import deploys as crud_deploys
@@ -10,11 +11,11 @@ from crud import user as crud_users
 from crud import activityLogs as crud_activity
 from config.api import settings
 
+r = redis.Redis(host=settings.BACKEND_SERVER, port=6379, db=2,
+                charset="utf-8", decode_responses=True)
 
 def user_squad_scope(db, user, squad):
     try:
-        print(user)
-        print(squad)
         if user.isdigit():
             user_info = crud_users.get_user_by_id(db=db, id=user)
         else:
@@ -103,6 +104,22 @@ def check_deploy_state(task_id: str):
     return any(result.state == i for i in list_state)
 
 
+def check_deploy_task_pending_state(deploy_name, squad, task_id=None):
+    if task_id:
+        result = AsyncResult(str(task_id))
+        list_state = ["REVOKED"]
+        if any(result.state == i for i in list_state):
+            return True
+    try:
+        if r.exists(f"{deploy_name}-{squad}"):
+            raise Exception("Task already exists in pending state waiting to be executed")
+    except Exception as err:
+        raise HTTPException(
+            status_code=409, detail=f"{err}")
+    r.set(f"{deploy_name}-{squad}", "Locked")
+    r.expire(f"{deploy_name}-{squad}", settings.TASK_LOCKED_EXPIRED)
+
+
 def check_providers(stack_name):
     providers_support = settings.PROVIDERS_SUPPORT
     if any(i in stack_name.lower() for i in providers_support):
@@ -111,6 +128,7 @@ def check_providers(stack_name):
         raise HTTPException(
             status_code=404,
             detail=f"stack name {stack_name.lower()} no content providers support name preffix: {providers_support}")
+
 
 def activity_log(func):
     @wraps(func)
@@ -125,9 +143,9 @@ def activity_log(func):
 
     return wrapper
 
+
 def check_cron_schedule(cron_time: str):
     if cron_time:
         if not croniter.is_valid(cron_time):
-            raise  ValueError("Cron time its no valid")
+            raise ValueError("Cron time its no valid")
     return True
-
