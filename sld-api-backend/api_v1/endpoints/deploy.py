@@ -7,7 +7,8 @@ from crud import tasks as crud_tasks
 from security import deps
 from security import tokens
 from helpers.get_data import check_deploy_exist, check_deploy_state, check_cron_schedule
-from helpers.get_data import stack, deploy, deploy_squad, check_deploy_exist
+from helpers.get_data import stack, deploy, deploy_squad
+from helpers.get_data import check_deploy_exist, check_deploy_task_pending_state
 from helpers.push_task import async_deploy, async_destroy
 from helpers.push_task import async_output, async_unlock
 from helpers.push_task import async_schedule_delete, async_schedule_add
@@ -15,6 +16,7 @@ from helpers.push_task import async_show
 
 
 router = APIRouter()
+
 
 
 @router.post("/", status_code=202)
@@ -32,7 +34,8 @@ async def deploy_infra_by_stack_name(
     if not current_user.master:
         current_squad = current_user.squad
         if current_squad != squad:
-            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
+            raise HTTPException(
+                status_code=403, detail=f"Not enough permissions in {squad}")
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad)
@@ -48,6 +51,7 @@ async def deploy_infra_by_stack_name(
         deploy.environment,
         deploy.stack_name
     )
+    check_deploy_task_pending_state(deploy.name, squad)
     try:
         # check crontime
         check_cron_schedule(deploy.start_time)
@@ -124,6 +128,9 @@ async def update_deploy_by_id(
     branch = stack_data.branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
+
+    #check task pending state
+    check_deploy_task_pending_state(name, squad, deploy_data.task_id)
     try:
         # check crontime
         check_cron_schedule(deploy_update.start_time)
@@ -205,6 +212,8 @@ async def destroy_infra(
     branch = stack_data.branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
+    #check task pending state
+    check_deploy_task_pending_state(name, squad, deploy_data.task_id)
     try:
         # Check deploy state
         if not check_deploy_state(deploy_data.task_id):
