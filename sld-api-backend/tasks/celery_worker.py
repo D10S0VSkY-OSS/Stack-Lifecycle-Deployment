@@ -9,7 +9,7 @@ from helpers.schedule import request_url
 from config.api import settings
 
 
-r = redis.Redis(host='redis', port=6379, db=2,
+r = redis.Redis(host=settings.BACKEND_SERVER, port=6379, db=2,
                 charset="utf-8", decode_responses=True)
 
 
@@ -18,8 +18,8 @@ def pipeline_deploy(self, git_repo, name, stack_name, environment, squad, branch
     filter_kwargs = {key: value for (
         key, value) in kwargs.items() if "pass" not in key}
     try:
-        r.set(f"{name}-{squad}", "Locked")
-        r.expire(f"{name}-{squad}", settings.TASK_LOCKED_EXPIRED)
+        r.set(f"{name}-{squad}-{environment}", "Locked")
+        r.expire(f"{name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
         # Git clone repo
         result = tf.git_clone(git_repo, name, stack_name,
                               environment, squad, branch)
@@ -76,7 +76,7 @@ def pipeline_deploy(self, git_repo, name, stack_name, environment, squad, branch
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        r.delete(f"{name}-{squad}")
+        r.delete(f"{name}-{squad}-{environment}")
         if not settings.DEBUG:
             tf.delete_local_folder(dir_path)
 
@@ -86,8 +86,8 @@ def pipeline_destroy(self, git_repo, name, stack_name, environment, squad, branc
     filter_kwargs = {key: value for (
         key, value) in kwargs.items() if "pass" not in key}
     try:
-        r.set(f"{name}-{squad}", "Locked")
-        r.expire(f"{name}-{squad}", settings.TASK_LOCKED_EXPIRED)
+        r.set(f"{name}-{squad}-{environment}", "Locked")
+        r.expire(f"{name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
         # Git clone repo
         result = tf.git_clone(git_repo, name, stack_name,
                               environment, squad, branch)
@@ -126,7 +126,7 @@ def pipeline_destroy(self, git_repo, name, stack_name, environment, squad, branc
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
         tf.delete_local_folder(dir_path)
-        r.delete(f"{name}-{squad}")
+        r.delete(f"{name}-{squad}-{environment}")
 
 
 @celery_app.task(bind=True, acks_late=True, name='pipeline Plan')

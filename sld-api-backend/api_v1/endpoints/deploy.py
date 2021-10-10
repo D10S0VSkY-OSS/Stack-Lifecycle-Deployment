@@ -6,9 +6,9 @@ from crud import deploys as crud_deploys
 from crud import tasks as crud_tasks
 from security import deps
 from security import tokens
-from helpers.get_data import check_deploy_exist, check_deploy_state, check_cron_schedule
-from helpers.get_data import stack, deploy, deploy_squad
+from helpers.get_data import check_deploy_state, check_cron_schedule
 from helpers.get_data import check_deploy_exist, check_deploy_task_pending_state
+from helpers.get_data import stack, deploy, deploy_squad
 from helpers.push_task import async_deploy, async_destroy
 from helpers.push_task import async_output, async_unlock
 from helpers.push_task import async_schedule_delete, async_schedule_add
@@ -51,7 +51,7 @@ async def deploy_infra_by_stack_name(
         deploy.environment,
         deploy.stack_name
     )
-    check_deploy_task_pending_state(deploy.name, squad)
+    check_deploy_task_pending_state(deploy.name, squad, deploy.environment)
     try:
         # check crontime
         check_cron_schedule(deploy.start_time)
@@ -94,9 +94,12 @@ async def deploy_infra_by_stack_name(
             status_code=400,
             detail=f"{err}")
     finally:
-        result = async_schedule_delete(db_deploy.id, squad)
-        # Add schedule
-        async_schedule_add(db_deploy.id, squad)
+        try:
+            result = async_schedule_delete(db_deploy.id, squad)
+            # Add schedule
+            async_schedule_add(db_deploy.id, squad)
+        except Exception as err:
+            print(err)
 
 
 @router.patch("/{deploy_id}", status_code=202)
@@ -130,7 +133,7 @@ async def update_deploy_by_id(
     tf_ver = stack_data.tf_version
 
     #check task pending state
-    check_deploy_task_pending_state(name, squad, deploy_data.task_id)
+    check_deploy_task_pending_state(name, squad, environment, deploy_data.task_id)
     try:
         # check crontime
         check_cron_schedule(deploy_update.start_time)
@@ -213,7 +216,7 @@ async def destroy_infra(
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     #check task pending state
-    check_deploy_task_pending_state(name, squad, deploy_data.task_id)
+    check_deploy_task_pending_state(name, squad, environment, deploy_data.task_id)
     try:
         # Check deploy state
         if not check_deploy_state(deploy_data.task_id):

@@ -13,6 +13,10 @@ from config.api import settings
 from security.providers_credentials import secret, unsecret
 
 os.environ['ANSIBLE_NOCOLOR'] = "True"
+os.environ['ANSIBLE_DEPRECATION_WARNINGS'] = "False"
+os.environ['TF_IN_AUTOMATION'] = "off"
+os.environ['TF_INPUT'] = "0"
+os.environ['TF_LOG'] = "off"
 
 
 class TerraformActions(object):

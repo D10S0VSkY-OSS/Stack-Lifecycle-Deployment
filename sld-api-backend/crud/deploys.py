@@ -146,12 +146,13 @@ def get_deploy_by_id_squad(db: Session, deploy_id: int, squad: str):
         raise err
 
 
-def get_deploy_by_name_squad(db: Session, deploy_name: str, squad: str):
+def get_deploy_by_name_squad(db: Session, deploy_name: str, squad: str, environment: str):
     try:
         return db.query(
             models.Deploy).filter(
             models.Deploy.name == deploy_name).filter(
-            models.Deploy.squad == squad).first()
+            models.Deploy.squad == squad).filter(
+            models.Deploy.environment == environment).first()
     except Exception as err:
         raise err
 

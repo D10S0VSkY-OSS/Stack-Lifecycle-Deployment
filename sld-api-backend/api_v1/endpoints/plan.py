@@ -38,13 +38,13 @@ async def plan_infra_by_stack_name(
     branch = stack_data.branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
-    # Check if plan exist
-    plan = crud_deploys.get_deploy_by_name(
-        db, deploy_name=deploy.name)
-    if plan:
-        raise HTTPException(
-            status_code=409,
-            detail="Plan already exist")
+    print(check_deploy_exist(
+        db,
+        deploy.name,
+        squad,
+        deploy.environment,
+        deploy.stack_name
+    ))
     try:
         # push task Deploy to queue and return task_id
         pipeline_plan = async_plan(

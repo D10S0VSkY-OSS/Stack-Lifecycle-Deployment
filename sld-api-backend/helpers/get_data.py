@@ -86,9 +86,10 @@ def check_deploy_exist(db, deploy_name: str, squad: str, env: str, stack: str):
     data_source_check = f'{deploy_name}-{squad}-{env}-{stack}'
     try:
         db_data = crud_deploys.get_deploy_by_name_squad(
-            db=db, deploy_name=deploy_name, squad=squad)
+            db=db, deploy_name=deploy_name, squad=squad, environment=env)
         if db_data is not None:
             data_db_check = f'{db_data.name}-{db_data.squad}-{db_data.environment}-{db_data.stack_name}'
+            print("Soy get_Data linea 92 y no estoy NONE")
             if data_source_check == data_db_check:
                 raise Exception(
                     "The name of the deployment already exists in the current squad and with specified environment")
@@ -104,20 +105,20 @@ def check_deploy_state(task_id: str):
     return any(result.state == i for i in list_state)
 
 
-def check_deploy_task_pending_state(deploy_name, squad, task_id=None):
+def check_deploy_task_pending_state(deploy_name, squad, environment, task_id=None):
     if task_id:
         result = AsyncResult(str(task_id))
         list_state = ["REVOKED"]
         if any(result.state == i for i in list_state):
             return True
     try:
-        if r.exists(f"{deploy_name}-{squad}"):
+        if r.exists(f"{deploy_name}-{squad}-{environment}"):
             raise Exception("Task already exists in pending state waiting to be executed")
     except Exception as err:
         raise HTTPException(
             status_code=409, detail=f"{err}")
-    r.set(f"{deploy_name}-{squad}", "Locked")
-    r.expire(f"{deploy_name}-{squad}", settings.TASK_LOCKED_EXPIRED)
+    r.set(f"{deploy_name}-{squad}-{environment}", "Locked")
+    r.expire(f"{deploy_name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
 
 
 def check_providers(stack_name):
