@@ -70,6 +70,7 @@ def get_deploy_by_id(deploy_id):
             "deploy_id": deploy_id,
             "name": response['json']['name'],
             "squad": response['json']['squad'],
+            "environment": response['json']['environment'],
             "start": response['json']['start_time'],
             "destroy": response['json']['destroy_time'],
         }
@@ -217,7 +218,7 @@ def addCheckTask():
 def addDeployToSchedule(deploy_id: int):
     # Get data by deploy_id
     data = get_deploy_by_id(deploy_id)
-    name = f"{data['name']}_{data['squad']}"
+    name = f"{data['name']}_{data['squad']}_{data['environment']}"
     start_time = data['start']
     destroy_time = data['destroy']
     # Add start job to scheduler state pending

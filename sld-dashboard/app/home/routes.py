@@ -57,8 +57,13 @@ def list_deploys(limit):
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
         return render_template('deploys-list.html', name='Name', token=token, deploys=content, external_api_dns=external_api_dns)
-    except ValueError:
+    except TemplateNotFound:
+        return render_template('page-404.html'), 404
+    except TypeError:
         return redirect(url_for('base_blueprint.logout'))
+    except Exception as err:
+        return render_template('page-500.html'), 500
+
 
 
 @blueprint.route('/deploy/delete/<int:deploy_id>')
@@ -79,8 +84,13 @@ def delete_deploy(deploy_id):
         else:
             flash(response.get('json').get('detail'), 'error')
         return redirect(url_for('home_blueprint.route_template', template="deploys-list"))
-    except ValueError:
+    except TemplateNotFound:
+        return render_template('page-404.html'), 404
+    except TypeError:
         return redirect(url_for('base_blueprint.logout'))
+    except Exception as err:
+        return render_template('page-500.html'), 500
+
 
 
 @blueprint.route('/deploys/destroy/<int:deploy_id>')
@@ -101,8 +111,13 @@ def destroy_deploy(deploy_id):
         else:
             flash(response['json']['detail'], 'error')
         return redirect(url_for('home_blueprint.route_template', template="deploys-list"))
-    except ValueError:
+    except TemplateNotFound:
+        return render_template('page-404.html'), 404
+    except TypeError:
         return redirect(url_for('base_blueprint.logout'))
+    except Exception as err:
+        return render_template('page-500.html'), 500
+
 
 
 @blueprint.route('/deploys/unlock/<int:deploy_id>')
@@ -123,8 +138,13 @@ def unlock_deploy(deploy_id):
         else:
             flash(response['json']['detail'], 'error')
         return redirect(url_for('home_blueprint.route_template', template="deploys-list"))
-    except ValueError:
+    except TemplateNotFound:
+        return render_template('page-404.html'), 404
+    except TypeError:
         return redirect(url_for('base_blueprint.logout'))
+    except Exception as err:
+        return render_template('page-500.html'), 500
+
 
 
 @blueprint.route('/deploys/redeploy/<int:deploy_id>')
@@ -156,8 +176,12 @@ def relaunch_deploy(deploy_id):
         else:
             flash(response['json']['detail'], 'error')
         return redirect(url_for('home_blueprint.route_template', template="deploys-list"))
-    except ValueError:
+    except TemplateNotFound:
+        return render_template('page-404.html'), 404
+    except TypeError:
         return redirect(url_for('base_blueprint.logout'))
+    except Exception as err:
+        return render_template('page-500.html'), 500
 
 
 @blueprint.route('/edit-deploy', methods=['GET', 'POST'], defaults={'deploy_id': None})
@@ -184,14 +208,15 @@ def edit_deploy(deploy_id):
         # When user push data with POST verb
         if request.method == 'POST':
             # List for exclude in vars
-            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time', 'sld_key', 'sld_value']
+            form_vars = ["csrf_token", 'button', 'start_time',
+                         'destroy_time', 'sld_key', 'sld_value']
             # Clean exclude data vars
             data_raw = {key: value for key,
                         value in request.form.items() if key not in form_vars}
-            #Add custom variables from form
+            # Add custom variables from form
             key_list = request.values.getlist('sld_key')
             value_list = request.values.getlist('sld_value')
-            data_raw.update(dict(list(zip(key_list,value_list))))
+            data_raw.update(dict(list(zip(key_list, value_list))))
             # Set vars to json
             variables = json.dumps(convert_to_dict(data_raw))
             # Data dend to deploy
@@ -221,8 +246,12 @@ def edit_deploy(deploy_id):
                                deploy=deploy,
                                data_json=vars_json['json']
                                )
-    except ValueError:
+    except TemplateNotFound:
+        return render_template('page-404.html'), 404
+    except TypeError:
         return redirect(url_for('base_blueprint.logout'))
+    except Exception as err:
+        return render_template('page-500.html'), 500
 
 
 @blueprint.route('/deploy-plan', methods=['GET', 'POST'], defaults={'deploy_id': None})
@@ -451,6 +480,7 @@ def delete_stack(stack_name):
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
+
 @blueprint.route('/stack/resync/<stack_id>')
 @login_required
 def resync_stack(stack_id):
@@ -488,6 +518,7 @@ def resync_stack(stack_id):
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
+
 @blueprint.route('/stacks-deploy', methods=['GET', 'POST'], defaults={'stack_id': None})
 @blueprint.route('/stacks-deploy/<stack_id>', methods=['GET', 'POST'])
 @login_required
@@ -499,15 +530,15 @@ def deploy_stack(stack_id):
         form = DeployForm(request.form)
         # Get data from aws accounts
         aws_response = request_url(verb='GET', uri=f'accounts/aws/', headers={
-                               "Authorization": f"Bearer {token}"})
+            "Authorization": f"Bearer {token}"})
         aws_content = aws_response.get('json')
         # Get data from gcp accounts
         gcp_response = request_url(verb='GET', uri=f'accounts/gcp/', headers={
-                               "Authorization": f"Bearer {token}"})
+            "Authorization": f"Bearer {token}"})
         gcp_content = gcp_response.get('json')
         # Get data from azure accounts
         azure_response = request_url(verb='GET', uri=f'accounts/azure/', headers={
-                               "Authorization": f"Bearer {token}"})
+            "Authorization": f"Bearer {token}"})
         azure_content = azure_response.get('json')
         # Get data from stack
         stack = request_url(verb='GET', uri=f'stacks/{stack_id}', headers={
@@ -533,7 +564,7 @@ def deploy_stack(stack_id):
                 "stack_name": stack['json']['stack_name'],
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
-                "environment": request.form.get('environment') ,
+                "environment": request.form.get('environment'),
                 "variables": ast.literal_eval(variables)
             }
             endpoint = f'plan'
@@ -1088,3 +1119,24 @@ def get_segment(request):
         return segment
     except:
         return None
+# Errors
+
+
+@login_manager.unauthorized_handler
+def unauthorized_handler():
+    return render_template('page-403.html'), 403
+
+
+@blueprint.errorhandler(403)
+def access_forbidden(error):
+    return render_template('page-403.html'), 403
+
+
+@blueprint.errorhandler(404)
+def not_found_error(error):
+    return render_template('page-404.html'), 404
+
+
+@blueprint.errorhandler(500)
+def internal_error(error):
+    return render_template('page-500.html'), 500
