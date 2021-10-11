@@ -44,7 +44,6 @@
                                     <div class="form-group">
                                         {{ render_field(form.deploy_name, autocomplete="off", class='form-control', placeholder='Deploy name') }}
                                     </div>
-                                    {% if current_user.master %}
                                     {% set aws_squad_status_before = [] %}
                                     <!-- Specific AWS account  -->
                                     {% if "aws" in stack['json']['stack_name']  %}
@@ -134,7 +133,6 @@
                                         </select>
                                         </label>
                                     </div>
-                                    {% endif %}
                                     {% endif %}
 
 
