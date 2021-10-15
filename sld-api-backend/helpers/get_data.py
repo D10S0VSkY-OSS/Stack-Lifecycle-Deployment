@@ -89,7 +89,6 @@ def check_deploy_exist(db, deploy_name: str, squad: str, env: str, stack: str):
             db=db, deploy_name=deploy_name, squad=squad, environment=env)
         if db_data is not None:
             data_db_check = f'{db_data.name}-{db_data.squad}-{db_data.environment}-{db_data.stack_name}'
-            print("Soy get_Data linea 92 y no estoy NONE")
             if data_source_check == data_db_check:
                 raise Exception(
                     "The name of the deployment already exists in the current squad and with specified environment")

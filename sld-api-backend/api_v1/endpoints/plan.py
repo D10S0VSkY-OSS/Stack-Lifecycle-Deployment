@@ -38,13 +38,13 @@ async def plan_infra_by_stack_name(
     branch = stack_data.branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
-    print(check_deploy_exist(
+    check_deploy_exist(
         db,
         deploy.name,
         squad,
         deploy.environment,
         deploy.stack_name
-    ))
+    )
     try:
         # push task Deploy to queue and return task_id
         pipeline_plan = async_plan(
@@ -114,7 +114,7 @@ async def update_plan_by_id(
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:
-        #if not "Plan" in deploy_data.action:
+        # if not "Plan" in deploy_data.action:
         #    raise ValueError("The id does not correspond to a Plan")
         # check crontime
         check_cron_schedule(deploy_update.start_time)
@@ -134,7 +134,7 @@ async def update_plan_by_id(
             deploy_update.variables,
             secreto)
         # Push deploy task data
-        if  "Plan" in deploy_data.action:
+        if "Plan" in deploy_data.action:
             crud_deploys.update_deploy(
                 db=db,
                 deploy_id=plan_id,
@@ -145,11 +145,11 @@ async def update_plan_by_id(
                 start_time=deploy_update.start_time,
                 destroy_time=deploy_update.destroy_time,
                 username=current_user.username)
-            action="Plan"
+            action = "Plan"
         else:
             crud_deploys.update_plan(
-                db=db,deploy_id=plan_id,task_id=pipeline_plan,action="DryRun")
-            action="DryRun"
+                db=db, deploy_id=plan_id, task_id=pipeline_plan, action="DryRun")
+            action = "DryRun"
         # Push task data
         db_task = crud_tasks.create_task(
             db=db,
