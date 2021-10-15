@@ -74,7 +74,7 @@ services:
     entrypoint: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "celery,squad,squad1"]
     environment:
       BROKER_USER: admin
-      BROKER_PASSWD: admin123
+      BROKER_PASSWD: admin
     depends_on:
       - rabbit
       - redis
@@ -112,7 +112,7 @@ services:
       MYSQL_USER: adm
       MYSQL_PASSWORD: 123
       BROKER_USER: admin
-      BROKER_PASSWD: admin123
+      BROKER_PASSWD: admin
     depends_on:
       - db
       - redis
