@@ -9,9 +9,9 @@
 <main class="content">
 
     {% include 'includes/navigation.html' %}
-        <div class="preloader bg-soft flex-column justify-content-center align-items-center">
-            <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
-        </div>
+    <div class="preloader bg-soft flex-column justify-content-center align-items-center">
+        <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+    </div>
 
     <div class="py-4">
         <nav aria-label="breadcrumb">
@@ -40,7 +40,7 @@
                         <div class="col-lg-4 col-sm-6">
                             <!-- Form -->
                             <div class="col-md-12 col-md-offset-1">
-                                <form class="" method="post">
+                                <form class="" id="stackForm" method="post" onsubmit="return checkForm(this);">
                                     <div class="form-group">
                                         {{ render_field(form.name, autocomplete="off", class='form-control', placeholder='Stack name') }}
                                     </div>
@@ -65,12 +65,9 @@
                                         {{ render_field(form.description, autocomplete="off", class='form-control', placeholder='Description') }}
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary" name="button">
-                                        Create new Stack
-                                    </button>
-
+                                    <input class="btn btn-primary" type="submit" name="stackButton" value="Create Stack">
                                 </form>
-                            <!-- End Form -->
+                                <!-- End Form -->
 
                                 <div class="input-group">
                                 </div>
@@ -85,4 +82,16 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script type="text/javascript">
+
+    function checkForm(form) // Submit button clicked
+{
+
+    form.stackButton.disabled = true;
+    form.stackButton.value = "Please wait...";
+    return true;
+}
+
+</script>
+{% endblock javascripts %}
