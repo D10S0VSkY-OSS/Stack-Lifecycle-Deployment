@@ -121,8 +121,8 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.resync_stack', stack_id=stack.id)}}">
-                                    <input type="submit" value="Sync Repo" class="btn btn-danger">
+                                <form action="{{ url_for('.resync_stack', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
+                                    <input type="submit" value="Sync Repo" name="stackButton" class="btn btn-danger">
                                 </form>
                             </div>
                         </div>
@@ -191,6 +191,17 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script type="text/javascript">
+
+function checkForm(form) // Submit button clicked
+  {
+
+    form.stackButton.disabled = true;
+    form.stackButton.value = "Please wait...";
+    return true;
+  }
+
+</script>
 <script>
 function search() {
   var input, filter, table, tr, td, i, txtValue;
