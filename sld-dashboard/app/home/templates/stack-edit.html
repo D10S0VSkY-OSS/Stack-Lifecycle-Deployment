@@ -37,7 +37,7 @@
                             <!-- Form -->
                             <div class="col-md-12 col-md-offset-1">
                                 <h3>{{stack.stack_name}}</h3>
-                                <form class="" method="post">
+                                <form class="" id="stackForm" method="post" onsubmit="return checkForm(this);">
                                     <div class="form-group">
                                         {{ render_field(form.name, autocomplete="off", class='form-control', value=stack.stack_name) }}
                                     </div>
@@ -62,9 +62,7 @@
                                         {{ render_field(form.description_edit, autocomplete="off", class='form-control',value=stack.description) }}
                                     </div>
 
-                                    <button type="submit" class="btn btn-primary" name="button">
-                                        Update Stack
-                                    </button>
+                                    <input class="btn btn-primary" type="submit" name="stackButton" value="Update Stack">
 
                                 </form>
                             </div>
@@ -84,4 +82,16 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script type="text/javascript">
+
+    function checkForm(form) // Submit button clicked
+{
+
+    form.stackButton.disabled = true;
+    form.stackButton.value = "Please wait...";
+    return true;
+}
+
+</script>
+{% endblock javascripts %}
