@@ -21,14 +21,14 @@ router = APIRouter()
 
 
 @router.delete("/id/{task_id}")
-async def get_stack_Task_by_id(
+async def get_task_by_id(
         task_id: str,
         current_user: schemas.User = Depends(deps.get_current_active_user)):
         result = revoke(task_id, terminate=True)
         return {"result": f'REVOKE {task_id}'}
 
 @router.get("/id/{task_id}")
-async def get_stack_Task_by_id(
+async def get_task_by_id(
         task_id: str,
         current_user: schemas.User = Depends(deps.get_current_active_user)):
     a = AsyncResult(task_id)

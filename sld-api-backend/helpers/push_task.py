@@ -164,11 +164,13 @@ def sync_git(
             environment=environment,
             squad=squad,
             name=name).delay()
-        pipeline_git_result.get()
+        result = pipeline_git_result.get()
+        if result[4].get('rc') != 0:
+            raise ValueError(result[4].get('stdout')[0])
         return pipeline_git_result.task_id
     except Exception as err:
         raise HTTPException(status_code=408,
-                            detail=f"git TimeoutError {err}")
+                            detail=f"{err}")
 
 
 def sync_get_vars(
