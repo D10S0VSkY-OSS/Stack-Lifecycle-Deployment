@@ -51,12 +51,18 @@ def create_aws_profile(db: Session, aws: schemas.AwsAsumeProfile):
 
 
 def get_credentials_aws_profile(db: Session, environment: str, squad: str):
-    get_access_key = db.query(models.Aws_provider.access_key_id).filter(models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
-    get_secret_access_key = db.query(models.Aws_provider.secret_access_key).filter(models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
-    default_region = db.query(models.Aws_provider.default_region).filter(models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
-    profile_name = db.query(models.Aws_provider.profile_name).filter(models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
-    role_arn = db.query(models.Aws_provider.role_arn).filter(models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
-    source_profile = db.query(models.Aws_provider.source_profile).filter(models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
+    get_access_key = db.query(models.Aws_provider.access_key_id).filter(
+        models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
+    get_secret_access_key = db.query(models.Aws_provider.secret_access_key).filter(
+        models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
+    default_region = db.query(models.Aws_provider.default_region).filter(
+        models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
+    profile_name = db.query(models.Aws_provider.profile_name).filter(
+        models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
+    role_arn = db.query(models.Aws_provider.role_arn).filter(
+        models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
+    source_profile = db.query(models.Aws_provider.source_profile).filter(
+        models.Aws_provider.environment == environment).filter(models.Aws_provider.squad == squad).first()
     try:
         return {
             "access_key": decrypt(get_access_key[0]),
@@ -70,10 +76,10 @@ def get_credentials_aws_profile(db: Session, environment: str, squad: str):
         raise err
 
 
-def get_squad_aws_profile(db: Session, squad: str):
+def get_squad_aws_profile(db: Session, squad: str, environment: str):
     try:
         return db.query(models.Aws_provider).filter(
-            models.Aws_provider.squad == squad).all()
+            models.Aws_provider.squad == squad).filter(models.Aws_provider.environment == environment).first()
     except Exception as err:
         raise err
 
