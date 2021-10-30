@@ -62,10 +62,11 @@ def get_credentials_azure_profile(db: Session, environment:str, squad: str):
         raise err
 
 
-def get_squad_azure_profile(db: Session, squad: str):
+def get_squad_azure_profile(db: Session, squad: str, environment: str):
     try:
         return db.query(models.Azure_provider).filter(
-            models.Azure_provider.squad == squad).all()
+            models.Azure_provider.squad == squad).filter(
+            models.Azure_provider.environment == environment).first()
     except Exception as err:
         raise err
 
