@@ -12,7 +12,7 @@ def test_create_aws_account():
     response = request_url(verb='POST', uri='accounts/aws', headers={
                            "Authorization": f"Bearer {token}"}, json=data)
     result = response.get('status_code')
-    if result != 400:
+    if result != 409:
         assert result == 200
 
 
