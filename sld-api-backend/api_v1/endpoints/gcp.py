@@ -19,6 +19,16 @@ async def create_new_gcloud_profile(
         db: Session = Depends(deps.get_db)):
     if not current_user.master:
         raise HTTPException(status_code=400, detail="Not enough permissions")
+    if "string" in [gcp.squad, gcp.environment]:
+        raise HTTPException(
+            status_code=409,
+            detail="The squad or environment field must have a value that is not a string.")
+    db_gcp_account = crud_gcp.get_squad_gcloud_profile(
+        db=db, squad=gcp.squad, environment=gcp.environment)
+    if db_gcp_account:
+        raise HTTPException(
+            status_code=409,
+            detail="Account already exists")
     try:
         result = crud_gcp.create_gcloud_profile(
             db=db,
@@ -31,7 +41,7 @@ async def create_new_gcloud_profile(
             squad=current_user.squad,
             action=f'Create GCP account {result.id}'
         )
-        return result
+        return {"result": f'Create GCP account {gcp.squad} {gcp.environment}'}
     except Exception as err:
         raise HTTPException(status_code=400, detail=err)
 

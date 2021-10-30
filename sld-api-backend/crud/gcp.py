@@ -44,16 +44,18 @@ def create_gcloud_profile(
 
 def get_credentials_gcloud_profile(db: Session, environment: str, squad: str):
     try:
-        get_gcloud_keyfile = db.query(models.Gcloud_provider.gcloud_keyfile_json).filter(models.Gcloud_provider.environment == environment).filter(models.Gcloud_provider.squad == squad).first()
+        get_gcloud_keyfile = db.query(models.Gcloud_provider.gcloud_keyfile_json).filter(
+            models.Gcloud_provider.environment == environment).filter(models.Gcloud_provider.squad == squad).first()
         return {"gcloud_keyfile_json": decrypt(get_gcloud_keyfile[0])}
     except Exception as err:
         raise err
 
 
-def get_squad_gcloud_profile(db: Session, squad: str):
+def get_squad_gcloud_profile(db: Session, squad: str, environment: str):
     try:
         return db.query(models.Gcloud_provider).filter(
-            models.Gcloud_provider.squad == squad).all()
+            models.Gcloud_provider.squad == squad).filter(
+            models.Gcloud_provider.environment == environment).first()
     except Exception as err:
         raise err
 

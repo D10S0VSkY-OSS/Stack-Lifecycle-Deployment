@@ -20,6 +20,16 @@ async def create_new_azure_profile(
 
     if not crud_users.is_superuser(db, current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
+    if "string" in [azure.squad, azure.environment]:
+        raise HTTPException(
+            status_code=409,
+            detail="The squad or environment field must have a value that is not a string.")
+    db_azure_account = crud_azure.get_squad_azure_profile(
+        db=db, squad=azure.squad, environment=azure.environment)
+    if db_azure_account:
+        raise HTTPException(
+            status_code=409,
+            detail="Account already exists")
     try:
         result = crud_azure.create_azure_profile(db=db, azure=azure)
         crud_activity.create_activity_log(
@@ -28,7 +38,7 @@ async def create_new_azure_profile(
             squad=current_user.squad,
             action=f'Create Azure Account {azure.subscription_id}'
         )
-        return result
+        return {"result": f'Create Azure account {azure.squad} {azure.environment}'}
     except Exception as err:
         raise HTTPException(status_code=400, detail=str(err))
 
