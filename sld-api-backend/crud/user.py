@@ -1,6 +1,7 @@
 import bcrypt
 import sys
 from sqlalchemy.orm import Session
+from sqlalchemy import exc
 import datetime
 
 from security.vault import vault_encrypt, vault_decrypt
@@ -126,6 +127,8 @@ def create_user(db: Session, user: schemas.UserCreate, squad: str):
         db.commit()
         db.refresh(db_user)
         return db_user
+    except exc.IntegrityError as err:
+        raise ValueError(str(err.__dict__['orig']))
     except Exception as err:
         raise err
 

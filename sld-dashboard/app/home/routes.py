@@ -889,6 +889,8 @@ def new_aws_account():
             if response.get('status_code') == 200:
                 flash(
                     f"Created aws account for environment {form.environment.data} in {form.squad.data} ")
+            elif response.get('status_code') == 409:
+                flash(response['json'].get('detail'), 'error')
             else:
                 flash(response['json'], 'error')
 
@@ -954,6 +956,8 @@ def new_gcp_account():
             if response.get('status_code') == 200:
                 flash(
                     f"Created gcp account for environment {form.environment.data} in {form.squad.data} ")
+            elif response.get('status_code') == 409:
+                flash(response['json'].get('detail'), 'error')
             else:
                 flash(response['json'], 'error')
 
@@ -1021,6 +1025,8 @@ def new_azure_account():
             if response.get('status_code') == 200:
                 flash(
                     f"Created azure account for environment {form.environment.data} in {form.squad.data} ")
+            elif response.get('status_code') == 409:
+                flash(response['json'].get('detail'), 'error')
             else:
                 flash(response['json'], 'error')
 
