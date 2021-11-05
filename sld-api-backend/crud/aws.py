@@ -78,8 +78,11 @@ def get_credentials_aws_profile(db: Session, environment: str, squad: str):
 
 def get_squad_aws_profile(db: Session, squad: str, environment: str):
     try:
+        if environment != None:
+            return db.query(models.Aws_provider).filter(
+                models.Aws_provider.squad == squad).filter(models.Aws_provider.environment == environment).first()
         return db.query(models.Aws_provider).filter(
-            models.Aws_provider.squad == squad).filter(models.Aws_provider.environment == environment).first()
+            models.Aws_provider.squad == squad).first()
     except Exception as err:
         raise err
 

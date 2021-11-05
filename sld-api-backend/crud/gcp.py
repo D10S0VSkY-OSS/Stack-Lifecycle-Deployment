@@ -53,9 +53,12 @@ def get_credentials_gcloud_profile(db: Session, environment: str, squad: str):
 
 def get_squad_gcloud_profile(db: Session, squad: str, environment: str):
     try:
+        if environment != None:
+            return db.query(models.Gcloud_provider).filter(
+                models.Gcloud_provider.squad == squad).filter(
+                models.Gcloud_provider.environment == environment).first()
         return db.query(models.Gcloud_provider).filter(
-            models.Gcloud_provider.squad == squad).filter(
-            models.Gcloud_provider.environment == environment).first()
+            models.Gcloud_provider.squad == squad).first()
     except Exception as err:
         raise err
 

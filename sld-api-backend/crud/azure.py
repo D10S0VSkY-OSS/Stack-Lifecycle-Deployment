@@ -42,7 +42,7 @@ def create_azure_profile(db: Session, azure: schemas.AzureBase):
         raise err
 
 
-def get_credentials_azure_profile(db: Session, environment:str, squad: str):
+def get_credentials_azure_profile(db: Session, environment: str, squad: str):
     get_client_id = db.query(models.Azure_provider.client_id).filter(models.Azure_provider.environment == environment).filter(models.Azure_provider.squad == squad).first()
     get_client_secret = db.query(models.Azure_provider.client_secret).filter(
         models.Azure_provider.environment == environment).filter(models.Azure_provider.squad == squad).first()
@@ -64,9 +64,12 @@ def get_credentials_azure_profile(db: Session, environment:str, squad: str):
 
 def get_squad_azure_profile(db: Session, squad: str, environment: str):
     try:
+        if environment != None:
+            return db.query(models.Azure_provider).filter(
+                models.Azure_provider.squad == squad).filter(
+                models.Azure_provider.environment == environment).first()
         return db.query(models.Azure_provider).filter(
-            models.Azure_provider.squad == squad).filter(
-            models.Azure_provider.environment == environment).first()
+            models.Azure_provider.squad == squad).first()
     except Exception as err:
         raise err
 
