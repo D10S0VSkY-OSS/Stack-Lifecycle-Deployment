@@ -48,7 +48,7 @@ async def get_all_aws_accounts(
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
     if not current_user.master:
-        return crud_aws.get_squad_aws_profile(db=db, squad=current_user.squad)
+        return crud_aws.get_squad_aws_profile(db=db, squad=current_user.squad, environment=None )
     return crud_aws.get_all_aws_profile(db=db)
 
 

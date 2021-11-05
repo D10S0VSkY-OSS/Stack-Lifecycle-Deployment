@@ -47,10 +47,8 @@ async def create_new_azure_profile(
 async def get_all_azure_accounts(
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    if not crud_users.is_superuser(db, current_user):
-        raise HTTPException(status_code=400, detail="Not enough permissions")
     if not current_user.master:
-        return crud_azure.get_squad_azure_profile(db=db, squad=current_user.squad)
+        return crud_azure.get_squad_azure_profile(db=db, squad=current_user.squad, environment=None)
     return crud_azure.get_all_azure_profile(db=db)
 
 

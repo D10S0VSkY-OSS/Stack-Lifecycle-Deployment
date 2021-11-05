@@ -51,7 +51,7 @@ async def get_all_gcloud_accounts(
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
     if not current_user.master:
-        return crud_gcp.get_squad_gcloud_profile(db=db, squad=current_user.squad)
+        return crud_gcp.get_squad_gcloud_profile(db=db, squad=current_user.squad, environment=None)
     return crud_gcp.get_all_gcloud_profile(db=db)
 
 
