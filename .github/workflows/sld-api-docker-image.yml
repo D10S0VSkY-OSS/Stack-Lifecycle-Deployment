@@ -23,12 +23,6 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
-    - name: Build the Docker image
-      working-directory: ./sld-api-backend
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-api:latest
-      
-    - name: Docker Push
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:latest
 
     - name: Build the Docker image with tag
       working-directory: ./sld-api-backend
@@ -36,3 +30,11 @@ jobs:
       
     - name: Docker Push with tag
       run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:1.4.4
+
+    - name: Build the Docker image
+      working-directory: ./sld-api-backend
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-api:latest
+      
+    - name: Docker Push
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:latest
+
