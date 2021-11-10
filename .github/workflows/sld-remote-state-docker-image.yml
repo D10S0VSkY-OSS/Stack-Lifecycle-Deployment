@@ -23,12 +23,6 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
-    - name: Build the Docker image
-      working-directory: ./sld-remote-state
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:latest
-      
-    - name: Docker Push
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:latest
 
     - name: Build the Docker image with tags
       working-directory: ./sld-remote-state
@@ -36,3 +30,11 @@ jobs:
       
     - name: Docker Push with tags
       run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:1.4.4
+
+    - name: Build the Docker image
+      working-directory: ./sld-remote-state
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:latest
+      
+    - name: Docker Push
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:latest
+
