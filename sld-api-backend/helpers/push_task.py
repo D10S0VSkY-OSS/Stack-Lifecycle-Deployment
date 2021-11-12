@@ -5,7 +5,7 @@ from fastapi import HTTPException
 from tasks.celery_worker import (git, unlock, output, show)
 from tasks.celery_worker import (get_variable_list, get_variable_json)
 from tasks.celery_worker import (schedules_list, schedule_get, schedule_add, schedule_delete, schedule_update)
-from tasks.celery_worker import (pipeline_plan, pipeline_deploy, pipeline_destroy)
+from tasks.celery_worker import (pipeline_plan, pipeline_deploy, pipeline_destroy, pipeline_git_pull)
 from config.api import settings
 
 
@@ -157,14 +157,16 @@ def sync_git(
         squad: str,
         name: str):
     try:
-        pipeline_git_result = git.s(
+        pipeline_git_result = pipeline_git_pull.s(
             stack_name=stack_name,
             git_repo=git_repo,
             branch=branch,
             environment=environment,
             squad=squad,
-            name=name).delay()
-        result = pipeline_git_result.get()
+            name=name).apply_async(queue="squad")
+        task_id = pipeline_git_result.task_id
+        data = json.loads(pipeline_git_result.get())
+        return task_id, data
         if result[4].get('rc') != 0:
             raise ValueError(result[4].get('stdout')[0])
         return pipeline_git_result.task_id

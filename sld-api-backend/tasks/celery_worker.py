@@ -2,7 +2,7 @@ import logging
 import redis
 from config.celery_config import celery_app
 from celery import states
-from celery.exceptions import Ignore
+from celery.exceptions import Ignore, TimeLimitExceeded
 import traceback
 from core.providers.terraform import TerraformActions as tf
 from helpers.schedule import request_url
@@ -177,13 +177,33 @@ def pipeline_plan(self, git_repo, name, stack_name, environment, squad, branch, 
 @celery_app.task(bind=True,
                  acks_late=True,
                  time_limit=settings.GIT_TMOUT,
+                 name='pipeline git pull')
+def pipeline_git_pull(self, git_repo, name, stack_name, environment, squad, branch):
+    try:
+        self.update_state(state='GIT', meta={'done': "1 of 2"})
+        result = tf.git_clone(git_repo, name, stack_name,
+                              environment, squad, branch)
+        if result['rc'] != 0:
+            raise Exception(result)
+        self.update_state(state='GET_VARS_AS_JSON', meta={'done': "2 of 2"})
+        result = tf.get_vars_json(environment=environment, stack_name=stack_name, squad=squad, name=name)
+    except Exception as err:
+        self.retry(countdown=5, exc=err, max_retries=2)
+        self.update_state(state=states.FAILURE, meta={'exc': result})
+        raise Exception(err)
+    return result
+
+
+@celery_app.task(bind=True,
+                 acks_late=True,
+                 time_limit=settings.GIT_TMOUT,
                  name='download git repo')
 def git(self, git_repo, name, stack_name, environment, squad, branch):
     try:
         result = tf.git_clone(git_repo, name, stack_name,
                               environment, squad, branch)
     except Exception as err:
-        raise err
+        raise Exception(err)
     return stack_name, environment, squad, name, result
 
 
