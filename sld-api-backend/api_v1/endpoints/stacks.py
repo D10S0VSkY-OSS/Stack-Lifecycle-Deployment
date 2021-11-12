@@ -34,36 +34,22 @@ def create_new_stack(
             status_code=409,
             detail="The stack name already exist")
     # Push git task to queue squad, all workers are subscribed to this queue
-    task_id = sync_git(
+    task = sync_git(
         stack_name=stack.stack_name,
         git_repo=stack.git_repo,
         branch=branch,
         environment=environment,
         squad=squad,
         name=name)
-    # Get vars in json ans list format
-    variables_json = sync_get_vars(
-        stack_name=stack.stack_name,
-        environment=environment,
-        squad=squad,
-        name=name,
-        task_id=task_id,
-        otype="json")
-    variables_list = sync_get_vars(
-        stack_name=stack.stack_name,
-        environment=environment,
-        squad=squad,
-        name=name,
-        task_id=task_id,
-        otype="list")
+    variables_list = [i for i in task[1]['variable'].keys()]
     try:
         # pesrsist data in db
         result = crud_stacks.create_new_stack(
             db=db,
             stack=stack,
             user_id=current_user.id,
-            task_id=task_id,
-            var_json=variables_json,
+            task_id=task[0],
+            var_json=task[1],
             var_list=variables_list,
             squad_access=stack.squad_access
         )
@@ -97,28 +83,14 @@ def update_stack(
     # Check if stack exist
     db_stack = crud_stacks.get_stack_by_name(db, stack_name=stack.stack_name)
     # Push git task to queue squad, all workers are subscribed to this queue
-    task_id = sync_git(
+    task = sync_git(
         stack_name=stack.stack_name,
         git_repo=stack.git_repo,
         branch=branch,
         environment=environment,
         squad=squad,
         name=name)
-    # Get vars in json ans list format
-    variables_json = sync_get_vars(
-        stack_name=stack.stack_name,
-        environment=environment,
-        squad=squad,
-        name=name,
-        task_id=task_id,
-        otype="json")
-    variables_list = sync_get_vars(
-        stack_name=stack.stack_name,
-        environment=environment,
-        squad=squad,
-        name=name,
-        task_id=task_id,
-        otype="list")
+    variables_list = [i for i in task[1]['variable'].keys()]
     try:
         # pesrsist data in db
         result = crud_stacks.update_stack(
@@ -126,8 +98,8 @@ def update_stack(
             stack_id=stack_id,
             stack=stack,
             user_id=current_user.id,
-            task_id=task_id,
-            var_json=variables_json,
+            task_id=task[0],
+            var_json=task[1],
             var_list=variables_list,
             squad_access=stack.squad_access
         )
