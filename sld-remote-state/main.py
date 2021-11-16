@@ -16,6 +16,8 @@ if settings.SLD_STORE == "S3":
     from stores.bucket_s3 import S3Store as Store
 if settings.SLD_STORE == "local":
     from stores.local import LocalStore as Store
+if settings.SLD_STORE == "mongodb":
+    from stores.mongo_db import MongoDB as Store
 
 
 
