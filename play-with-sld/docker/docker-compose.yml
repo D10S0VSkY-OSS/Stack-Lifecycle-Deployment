@@ -42,7 +42,17 @@ services:
       - "5672:5672"  
       - "15672:15672"  # here, we can access rabbitmq management plugin
      
-  
+  mongodb:
+    image: mongo
+    hostname: mongodb 
+    environment:
+      - MONGO_INITDB_DATABASE=remote-state
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=admin
+    volumes:
+      - mongo-volume:/data/db
+    ports:
+      - 27017:27017  
 
   # sd-remote-state
   remote-state:
@@ -122,3 +132,4 @@ services:
 
 volumes:
   sld-db:
+  mongo-volume:

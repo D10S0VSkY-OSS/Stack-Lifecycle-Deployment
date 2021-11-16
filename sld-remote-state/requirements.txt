@@ -5,6 +5,7 @@ fastapi==0.65.2
 h11==0.11.0
 jmespath==0.10.0
 pydantic==1.7.4
+pymongo==3.12.1
 python-dateutil==2.8.1
 s3transfer==0.3.4
 six==1.15.0
