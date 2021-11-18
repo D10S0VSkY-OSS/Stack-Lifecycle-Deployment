@@ -39,7 +39,7 @@ def test_create_unprivilege_user():
     response = request_url(verb='POST', uri='users/', headers={
                            "Authorization": f"Bearer {token}"}, json=data)
     result = response.get('status_code')
-    if result != 400:
+    if result != 409:
         assert result == 200
 
 

@@ -57,10 +57,10 @@
                     <a class="nav-link pt-1 px-0" href="#" role="button" data-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
                         <div class="media d-flex align-items-center">
-                            {% if current_user.master %}
+                            {% if "yoda" in current_user.role %}
                             <img src="/static/assets/img/team/root.png" class="user-avatar md-avatar rounded-circle"
                                 alt="Image placeholder">
-                            {% elif current_user.privilege %}
+                            {% elif "darth_vader" in current_user.role %}
                             <img src="/static/assets/img/team/admin.png" class="user-avatar md-avatar rounded-circle"
                                 alt="Image placeholder">
                             {% else %}

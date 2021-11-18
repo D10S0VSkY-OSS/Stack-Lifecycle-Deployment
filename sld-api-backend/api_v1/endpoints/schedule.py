@@ -4,9 +4,10 @@ from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response
 from schemas import schemas
 from crud import deploys as crud_deploys
 from crud import tasks as crud_tasks
+from crud import user as crud_users
 from security import deps
 from security import tokens
-from helpers.get_data import check_cron_schedule
+from helpers.get_data import check_cron_schedule, check_squad_user
 from helpers.get_data import check_deploy_exist, check_deploy_state
 from helpers.get_data import stack, deploy, deploy_squad, check_deploy_exist
 from helpers.push_task import async_schedule_list, async_schedule_get, async_schedule_add, async_schedule_delete, async_schedule_update
@@ -34,14 +35,12 @@ async def get_schedule(
         db: Session = Depends(deps.get_db),
         current_user: schemas.User = Depends(deps.get_current_active_user)):
     # Get info from deploy data
-    if current_user.master:
-        deploy_data = deploy(db, deploy_id=deploy_id)
-        squad = deploy_data.squad
-    else:
-        # Get squad from current user
-        squad = current_user.squad
-        deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
+    deploy_data = deploy(db, deploy_id=deploy_id)
+    squad = deploy_data.squad
     deploy_name = deploy_data.id
+    if not crud_users.is_master(db, current_user):
+        if not check_squad_user(current_user.squad, [squad]):
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     try:
         return {"task_id": async_schedule_get(deploy_name=deploy_name, squad=squad)}
     except Exception as err:
@@ -56,14 +55,12 @@ async def add_schedule(
         db: Session = Depends(deps.get_db),
         current_user: schemas.User = Depends(deps.get_current_active_user)):
     # Get info from deploy data
-    if current_user.master:
-        deploy_data = deploy(db, deploy_id=deploy_id)
-        squad = deploy_data.squad
-    else:
-        # Get squad from current user
-        squad = current_user.squad
-        deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
+    deploy_data = deploy(db, deploy_id=deploy_id)
+    squad = deploy_data.squad
     deploy_name = deploy_data.id
+    if not crud_users.is_master(db, current_user):
+        if not check_squad_user(current_user.squad, [squad]):
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     try:
         return {"task_id":async_schedule_add(deploy_name=deploy_name, squad=squad)}
     except Exception as err:
@@ -78,7 +75,7 @@ async def delete_schedule(
         db: Session = Depends(deps.get_db),
         current_user: schemas.User = Depends(deps.get_current_active_user)):
     # Get info from deploy data
-    if current_user.master:
+    if crud_users.is_master(db, current_user):
         deploy_data = deploy(db, deploy_id=deploy_id)
         squad = deploy_data.squad
     else:
@@ -106,17 +103,14 @@ async def update_schedule(
     response.status_code = status.HTTP_202_ACCEPTED
 
     # Get info from deploy data
-    if current_user.master:
-        deploy_data = deploy(db, deploy_id=deploy_id)
-        squad = deploy_data.squad
-    else:
-        # Get squad from current user
-        squad = current_user.squad
-        deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
+    deploy_data = deploy(db, deploy_id=deploy_id)
+    squad = deploy_data.squad
     stack_name = deploy_data.stack_name
     environment = deploy_data.environment
-    squad = deploy_data.squad
     name = deploy_data.name
+    if not crud_users.is_master(db, current_user):
+        if not check_squad_user(current_user.squad, [squad]):
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     try:
         # check crontime
         check_cron_schedule(deploy_update.start_time)

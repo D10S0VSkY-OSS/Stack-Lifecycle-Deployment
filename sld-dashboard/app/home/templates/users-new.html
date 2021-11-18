@@ -53,11 +53,6 @@
                                     <div class="form-group">
                                         {{ render_field(form.email, autocomplete="off", class='form-control', placeholder='Email') }}
                                     </div>
-                                    {% if  current_user.master %}
-                                    <div class="form-group">
-                                        {{ render_field(form.squad, autocomplete="off", class='form-control', placeholder='squad') }}
-                                    </div>
-                                    {% endif %}
 
                                     <div class="form-group">
                                         {{ render_field(form.password, autocomplete="off", class='form-control', placeholder='password') }}
@@ -68,23 +63,35 @@
                                         {{ render_field(form.confirm_password, autocomplete="off",  class='form-control', placeholder='Confirm Password') }}
                                         </div>
                                     -->
-                                    {% if  current_user.master %}
-                                    <div class="form-group">
-                                        <h6><strong>Master Role</strong></h6>
-                                        <select class="form-control" name=master v-model="master">
-                                            <option value=false>No</option>
-                                            <option value=true>Yes</option>
+                                    {% if  "yoda" in current_user.role %}
+                                        <div class="form-group">
+                                        <h6><strong>Role</strong></h6>
+                                        <select class="form-control" name=role v-model="role">
+                                            <option value=stormtrooper>stormtrooper</option>
+                                            <option value=darth_vader>darth_vader</option>
+                                            <option value=yoda>yoda</option>
+                                            <option value=stormtrooper,R2-D2>bot stormtrooper</option>
+                                            <option value=darth_vader,"R2-D2">bot darth_vader</option>
+                                            <option value=yoda,R2-D2>bot yoda</option>
                                         </select>
-                                        </label>
-                                    </div>
+                                        </div>
+                                        <div class="form-group">
+                                            {{ render_field(form.squad, autocomplete="off", class='form-control', placeholder='squad') }}
+                                        </div>
+                                    {% elif  "darth_vader" in current_user.role %}
+                                        <div class="form-group">
+                                        <h6><strong>Role</strong></h6>
+                                        <select class="form-control" name=role v-model="role">
+                                            <option value=stormtrooper>stormtrooper</option>
+                                            <option value=darth_vader>darth_vader</option>
+                                            <option value=stormtrooper,R2-D2>bot stormtrooper</option>
+                                            <option value=darth_vader,"R2-D2">bot darth_vader</option>
+                                        </select>
+                                        </div>
+                                        <div class="form-group">
+                                            {{ render_field(form.squad, autocomplete="off", class='form-control', placeholder='squad') }}
+                                        </div>
                                     {% endif %}
-
-                                    <div class="form-group">
-                                    <h6><strong>Privilege</strong></h6>
-                                    <select class="form-control" name=privilege v-model="master">
-                                        <option value=false>No</option>
-                                        <option value=true>Yes</option>
-                                    </select>
                                     </div>
 
                                     <div class="form-group">

@@ -14,16 +14,28 @@ from config.api import settings
 r = redis.Redis(host=settings.BACKEND_SERVER, port=6379, db=2,
                 charset="utf-8", decode_responses=True)
 
+
+def check_squad_user(squad_owner: list, squad_add: list) -> bool:
+    return all(item in squad_owner for item in squad_add)
+
+
+def check_role_user(role_owner: list, role_add: list) -> bool:
+    less_roles = ['stormtrooper', 'R2-D2', 'grogu']
+    role = role_owner + less_roles
+    return all(item in role for item in role_add)
+
+
 def user_squad_scope(db, user, squad):
     try:
+        print(user)
+        print(squad)
         if user.isdigit():
             user_info = crud_users.get_user_by_id(db=db, id=user)
         else:
             user_info = crud_users.get_user_by_username(db=db, username=user)
         if user_info == None:
             raise ValueError(f"User {user} no exists")
-        if user_info.squad == squad:
-            return True
+        return bool(set(user_info.squad).intersection(squad))
     except Exception as err:
         raise HTTPException(
             status_code=400,

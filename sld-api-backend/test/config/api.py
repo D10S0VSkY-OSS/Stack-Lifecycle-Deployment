@@ -41,74 +41,67 @@ class Settings(BaseSettings):
         "password": PASS_USER
     }
     USER_PATCH: dict = {
-        "username": "string",
-        "fullname": "string",
+        "username": "",
+        "fullname": "",
         "password": PASS_ADM,
         "email": "admin@example.com",
-        "privilege": True,
-        "is_active": True,
-        "master": True,
-        "squad": "squad1"
+        "role": ["yoda"],
+        "squad": ["*"],
+        "is_active": True
     }
     USER_POST: dict = {
         "username": USER_TEST,
         "fullname": "test user",
         "password": PASS_USER,
         "email": "test01@example.com",
-        "privilege": False,
-        "master": True,
-        "squad": "squad1",
-        "is_active": True,
+        "role": ["stormtrooper", "R2-D2"],
+        "squad": ["squad1"],
+        "is_active": True
     }
     USER_POST_SQUAD1: dict = {
         "username": USER_01,
         "fullname": "user01",
         "password": PASS_USER,
         "email": "user01@example.com",
-        "squad": "squad1",
-        "privilege": False,
-        "is_active": True,
-        "master": False,
+        "role": ["stormtrooper"],
+        "squad": ["squad1"],
+        "is_active": True
     }
     USER_POST_SQUAD2: dict = {
         "username": USER_02,
         "fullname": "user02",
-        "password": "Password08@",
+        "password": PASS_USER,
         "email": "user02@example.com",
-        "squad": "squad2",
-        "privilege": False,
-        "is_active": True,
-        "master": False,
+        "role": ["stormtrooper"],
+        "squad": ["squad2"],
+        "is_active": True
     }
     USER_POST_PRIV: dict = {
         "username": USER_PRIV,
         "fullname": "admin by squad",
         "password": PASS_USER,
         "email": "admin_squad@example.com",
-        "squad": "squad1",
-        "privilege": True,
-        "is_active": True,
-        "master": False,
+        "role": ["darth_vader"],
+        "squad": ["squad1","squad2"],
+        "is_active": True
     }
     USER_POST_OFF: dict = {
         "username": USER_OFF,
         "fullname": "user disable",
         "password": "Password06@",
         "email": "user_off@example.com",
-        "squad": "squad1",
-        "privilege": False,
-        "is_active": False,
-        "master": False,
+        "role": ["darth_vader"],
+        "squad": ["squad1"],
+        "is_active": False
     }
     USER_SCHEDULE: dict = {
         "username": USER_SCHEDULE,
         "fullname": "bot schedule user",
         "password": USER_SCHEDULEC,
         "email": "schedule@example.com",
-        "squad": "bot",
-        "privilege": True,
-        "is_active": True,
-        "master": True,
+        "role": ["yoda", "R2-D2"],
+        "squad": ["*"],
+        "is_active": True
     }
     STACK_POST_AWS: dict = {
         "stack_name": STACK_NAME_AWS,
@@ -129,6 +122,36 @@ class Settings(BaseSettings):
     AWS_TEST_ACCOUNT: dict = {
         "squad": "squad1",
         "environment": "develop",
+        "access_key_id": os.getenv('AWS_ACCESS_KEY_ID'),
+        "secret_access_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
+        "default_region": "eu-west-1",
+        "profile_name": "string",
+        "role_arn": "string",
+        "source_profile": "string"
+    }
+    AWS_TEST_ACCOUNT_PRO: dict = {
+        "squad": "squad1",
+        "environment": "pro",
+        "access_key_id": os.getenv('AWS_ACCESS_KEY_ID'),
+        "secret_access_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
+        "default_region": "eu-west-1",
+        "profile_name": "string",
+        "role_arn": "string",
+        "source_profile": "string"
+    }
+    AWS_TEST_ACCOUNT_SQUAD2: dict = {
+        "squad": "squad2",
+        "environment": "develop",
+        "access_key_id": os.getenv('AWS_ACCESS_KEY_ID'),
+        "secret_access_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
+        "default_region": "eu-west-1",
+        "profile_name": "string",
+        "role_arn": "string",
+        "source_profile": "string"
+    }
+    AWS_TEST_ACCOUNT_SQUAD2_PRO: dict = {
+        "squad": "squad2",
+        "environment": "pro",
         "access_key_id": os.getenv('AWS_ACCESS_KEY_ID'),
         "secret_access_key": os.getenv('AWS_SECRET_ACCESS_KEY'),
         "default_region": "eu-west-1",

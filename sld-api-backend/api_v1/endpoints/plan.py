@@ -9,7 +9,9 @@ from helpers.get_data import deploy, deploy_squad, stack
 from helpers.push_task import async_plan
 from crud import deploys as crud_deploys
 from crud import tasks as crud_tasks
+from crud import user as crud_users
 from helpers.get_data import check_deploy_exist, check_deploy_state, check_cron_schedule
+from helpers.get_data import check_squad_user
 
 
 router = APIRouter()
@@ -26,9 +28,9 @@ async def plan_infra_by_stack_name(
 
     squad = deploy.squad
     # Get squad from current user
-    if not current_user.master:
+    if not crud_users.is_master(db, current_user):
         current_squad = current_user.squad
-        if current_squad != squad:
+        if not check_squad_user(current_user.squad, [deploy.squad]):
             raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
@@ -77,7 +79,7 @@ async def plan_infra_by_stack_name(
             squad=squad,
             action="Plan"
         )
-        return {"task_id": pipeline_plan}
+        return {"task": pipeline_plan}
     except Exception as err:
         raise HTTPException(
             status_code=400,
@@ -95,16 +97,14 @@ async def update_plan_by_id(
 
     response.status_code = status.HTTP_202_ACCEPTED
     # Get info from deploy data
-    if current_user.master:
-        deploy_data = deploy(db, deploy_id=plan_id)
-        squad = deploy_data.squad
-    else:
-        # Get squad from current user
-        squad = current_user.squad
-        deploy_data = deploy_squad(db, deploy_id=plan_id, squad=squad)
+    deploy_data = deploy(db, deploy_id=plan_id)
+    squad = deploy_data.squad
     stack_name = deploy_data.stack_name
     environment = deploy_data.environment
     name = deploy_data.name
+    if not crud_users.is_master(db, current_user):
+        if not check_squad_user(current_user.squad, [squad]):
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
         db, stack_name=stack_name, environment=environment, squad=squad)
@@ -161,7 +161,7 @@ async def update_plan_by_id(
             squad=squad,
             action=action)
 
-        return {"task_id": pipeline_plan}
+        return {"task": pipeline_plan}
     except Exception as err:
         raise HTTPException(
             status_code=400,
@@ -176,11 +176,10 @@ async def get_plan_by_id_deploy(
         db: Session = Depends(deps.get_db)):
 
     response.status_code = status.HTTP_202_ACCEPTED
-    if current_user.master:
-        deploy_data = deploy(db, deploy_id=deploy_id)
-    else:
-        squad = current_user.squad
-        deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
+    deploy_data = deploy(db, deploy_id=deploy_id)
+    if not crud_users.is_master(db, current_user):
+        if not check_squad_user(current_user.squad, [deploy_data.squad]):
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {deploy_data.squad}")
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
         db, stack_name=deploy_data.stack_name, environment=deploy_data.environment, squad=deploy_data.squad)
@@ -204,7 +203,7 @@ async def get_plan_by_id_deploy(
             tf_ver,
             deploy_data.variables,
             secreto)
-        return {"task_id": pipeline_plan}
+        return {"task": pipeline_plan}
     except Exception as err:
         raise HTTPException(
             status_code=400,

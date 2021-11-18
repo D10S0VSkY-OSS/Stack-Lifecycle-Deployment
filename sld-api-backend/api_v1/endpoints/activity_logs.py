@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from schemas import schemas
 from security import deps
 from crud import activityLogs as crud_activity
+from crud import user as crud_users
 
 #from fastapi_limiter import FastAPILimiter
 #from fastapi_limiter.depends import RateLimiter
@@ -22,9 +23,9 @@ async def get_activity_logs_by_username(
         username: str,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    if not current_user.privilege:
+    if not crud_users.is_superuser(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
-    if not current_user.master:
+    if not crud_users.is_master(db, current_user):
         squad = current_user.squad
         return crud_activity.get_activity_by_username_squad(db=db, username=username, squad=squad)
     return crud_activity.get_activity_by_username(db, username=username)
@@ -36,10 +37,10 @@ async def get_all_activity_logs(
         skip: int = 0,
         limit: int = 100,
         db: Session = Depends(deps.get_db)):
-    if not current_user.privilege:
+    if not crud_users.is_superuser(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     try:
-        if not current_user.master:
+        if not crud_users.is_master(db, current_user):
             squad = current_user.squad
             result = crud_activity.get_all_activity_by_squad(
                 db=db, squad=squad, skip=skip, limit=limit)

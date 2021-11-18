@@ -4,6 +4,7 @@ import datetime
 from security.vault import vault_encrypt, vault_decrypt
 import db.models as models
 import schemas.schemas as schemas
+from sqlalchemy import exc
 
 
 @vault_encrypt
@@ -38,6 +39,8 @@ def create_azure_profile(db: Session, azure: schemas.AzureBase):
         db.commit()
         db.refresh(db_azure)
         return db_azure
+    except exc.IntegrityError as err:
+        raise ValueError(str(err.__dict__['orig']))
     except Exception as err:
         raise err
 
@@ -68,8 +71,10 @@ def get_squad_azure_profile(db: Session, squad: str, environment: str):
             return db.query(models.Azure_provider).filter(
                 models.Azure_provider.squad == squad).filter(
                 models.Azure_provider.environment == environment).first()
-        return db.query(models.Azure_provider).filter(
-            models.Azure_provider.squad == squad).first()
+        result = []
+        for i in squad:
+            result.extend(db.query(models.Azure_provider).filter(models.Azure_provider.squad == i).all())
+        return set(result)
     except Exception as err:
         raise err
 

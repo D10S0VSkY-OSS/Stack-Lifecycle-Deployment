@@ -1,4 +1,5 @@
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 import datetime
 
 from security.vault import vault_encrypt, vault_decrypt
@@ -79,10 +80,12 @@ def get_credentials_aws_profile(db: Session, environment: str, squad: str):
 def get_squad_aws_profile(db: Session, squad: str, environment: str):
     try:
         if environment != None:
-            return db.query(models.Aws_provider).filter(
-                models.Aws_provider.squad == squad).filter(models.Aws_provider.environment == environment).first()
-        return db.query(models.Aws_provider).filter(
-            models.Aws_provider.squad == squad).first()
+            return db.query(models.Aws_provider).filter(models.Aws_provider.squad == squad).filter(
+                    models.Aws_provider.environment == environment).first()
+        result = []
+        for i in squad:
+            result.extend(db.query(models.Aws_provider).filter(models.Aws_provider.squad == i).all())
+        return set(result)
     except Exception as err:
         raise err
 

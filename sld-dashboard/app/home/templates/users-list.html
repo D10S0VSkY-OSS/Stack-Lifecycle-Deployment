@@ -63,31 +63,32 @@
         <table class="table table-hover" id="table">
             <thead>
                 <tr>
-                    <th>Role</th>
+                    <th></th>
                     <th>Id</th>
                     <th>User Name</th>
                     <th>Full Name</th>
                     <th>Email</th>
                     <th>Squad</th>
-                    <th>privilege</th>
+                    <th>Role</th>
                     <th>is_active</th>
-                    {% if current_user.master %}
+
+                    {% if "yoda" in current_user.role %}
                     <th>master</th>
                     {% endif %}
                 </tr>
             </thead>
             <tbody>
                 <!-- Item -->
-                {% for user in users %}
+                {% for user in users | sort(attribute='id') %}
                 <tr>
                     </td>
                     {% if not user.is_active %}
                     <td><span class="icon icon-sm text-danger w-30" ><span class="fas fa-user-alt-slash mr-2"></span></td>
-                    {% elif "bot" in user.fullname %}
+                    {% elif "R2-D2" in user.role %}
                     <td><span class="icon icon-sm w-30" ><img src="/static/assets/img/team/bot.png"</span></td>
-                    {% elif user.master %}
+                    {% elif "yoda" in user.role %}
                     <td><span class="icon icon-sm w-30" ><img src="/static/assets/img/team/root.png"</span></td>
-                    {% elif user.privilege %}
+                    {% elif "darth_vader" in user.role  %}
                     <td><span class="icon icon-sm w-30" ><img src="/static/assets/img/team/admin.png"</span></td>
                     {% else %}
                     <td><span class="icon icon-sm w-30" ><img src="/static/assets/img/team/user.png"</span></td>
@@ -97,7 +98,7 @@
                     <td><span class="font-weight-normal">{{ user.fullname }}</span></td>
                     <td><span class="font-weight-normal">{{ user.email }}</span></td>
                     <td><span class="font-weight-normal">{{ user.squad }}</span></td>
-                    <td><span class="font-weight-normal">{{ user.privilege }}</span></td>
+                    <td><span class="font-weight-normal">{{ user.role }}</span></td>
                     <td><span class="font-weight-normal">{{ user.is_active }}</span></td>
                     {% if current_user.master %}
                     <td><span class="font-weight-normal">{{ user.master }}</span></td>

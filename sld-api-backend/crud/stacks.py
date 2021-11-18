@@ -77,8 +77,13 @@ def update_stack(
 def get_all_stacks_by_squad(db: Session, squad_access: str, skip: int = 0, limit: int = 100):
     try:
         filter_all = db.query(models.Stack).filter(models.Stack.squad_access.contains("*")).offset(skip).limit(limit).all()
-        filter_squad = db.query(models.Stack).filter(models.Stack.squad_access.contains(squad_access)).offset(skip).limit(limit).all()
-        return filter_all + filter_squad
+        from sqlalchemy import func
+        result = []
+        for i in squad_access:
+            a = f'["{i}"]'
+            result.extend(db.query(models.Stack).filter(func.json_contains(models.Stack.squad_access, a) == 1).all())
+        merge_query = result + filter_all
+        return set(merge_query)
     except Exception as err:
         raise err
 

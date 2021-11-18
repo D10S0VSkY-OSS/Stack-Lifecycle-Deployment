@@ -18,7 +18,7 @@
                 <span class="fas fa-plus mr-2"></span>New Task
             </button>
             <div class="dropdown-menu dashboard-dropdown dropdown-menu-left mt-2">
-                {% if current_user.master or current_user.privilege %}
+                {% if "yoda" in current_user.role or "darth_vader" in current_user.role %}
                 <a class="dropdown-item font-weight-bold" href="users-new"><span class="fas fa-user-shield"></span>New
                     user account</a>
                 <a class="dropdown-item font-weight-bold" href="stacks-new"><span class="fas fa-box-open"></span>New

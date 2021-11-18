@@ -33,13 +33,12 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <div>
+                                <label for="name">Username</label>
+                                <input type="text" value="{{ current_user.username }}" name=username  autocomplete="off" class='form-control' readonly>
+                            </div>
+                            <div>
                                 <label for="last_name">Fullname</label>
-                                {% if current_user.master %}
-                                <input type="text" value="{{ current_user.fullname }}" name=fullname autocomplete="off" class='form-control'>
-                                {% else %}
                                 <input type="text" value="{{ current_user.fullname }}" name=fullname  autocomplete="off" class='form-control' readonly>
-                                {% endif %}
-
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -51,11 +50,15 @@
                         <div class="col-md-6 mb-3">
                             <label for="email">Email</label>
                             <div class="input-group">
-                                {% if current_user.master %}
-                                <input type="text" value="{{ current_user.email }}" name=email autocomplete="off" class='form-control'>
-                                {% else %}
                                 <input type="text" value="{{ current_user.email }}" name=email autocomplete="off" class='form-control' readonly>
-                                {% endif %}
+                            </div>
+                            <div>
+                                <label for="name">Role</label>
+                                <input type="text" value="{{ current_user.role|join(",") }}" name=role  autocomplete="off" class='form-control' readonly>
+                            </div>
+                            <div>
+                                <label for="name">Squad</label>
+                                <input type="text" value="{{ current_user.squad|join(",") }}" name=squad  autocomplete="off" class='form-control' readonly>
                             </div>
                         </div>
                         <div class="col-md-6 mb-3">
@@ -108,9 +111,9 @@
                     <div class="card border-light text-center p-0">
                         <div class="profile-cover rounded-top" data-background="/static/assets/img/profile-cover.jpg"></div>
                         <div class="card-body pb-5">
-                            {% if current_user.master %}
+                            {% if "yoda" in current_user.role %}
                             <img src="/static/assets/img/team/root.png" class="user-avatar large-avatar rounded-circle mx-auto mt-n7 mb-4" alt="">
-                            {% elif current_user.privilege %}
+                            {% elif "darth_vader" in current_user.role %}
                             <img src="/static/assets/img/team/admin.png" class="user-avatar large-avatar rounded-circle mx-auto mt-n7 mb-4" alt="">
                             {% else %}
                             <img src="/static/assets/img/team/user.png" class="user-avatar large-avatar rounded-circle mx-auto mt-n7 mb-4" alt="Image placeholder">
@@ -125,9 +128,9 @@
                                 <h4 class="h3">
                                     {{current_user.squad}}
                                 </h4>
-                            {% if current_user.master %}
+                            {% if "yoda" in current_user.role %}
                                 <p class="text-gray mb-4">Always pass on what you have learned</p>
-                            {% elif current_user.privilege %}
+                            {% elif "darth_vader" in current_user.role %}
                                 <p class="text-gray mb-4">I am  your father</p>
                             {% else %}
                                 <p class="text-gray mb-4">Let me see your identification</p>
