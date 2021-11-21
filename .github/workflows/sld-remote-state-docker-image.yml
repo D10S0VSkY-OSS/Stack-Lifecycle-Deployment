@@ -26,10 +26,10 @@ jobs:
 
     - name: Build the Docker image with tags
       working-directory: ./sld-remote-state
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:1.4.5
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:1.4.6
       
     - name: Docker Push with tags
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:1.4.5
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:1.4.6
 
     - name: Build the Docker image
       working-directory: ./sld-remote-state
