@@ -43,9 +43,17 @@ async def create_user(
     '''
     Create user and define squad and privilege
     '''
+
     # Check if the user has privileges
     if not crud_users.is_superuser(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
+    # Check role
+    roles = ['yoda', 'darth_vader', 'stormtrooper', 'R2-D2']
+    if not all(item in roles for item in user.role):
+        raise HTTPException(status_code=403, detail='Only supported roles "yoda", "darth_vader", "stormtrooper".If the user is a bot you can pass R2-D2 together to a role like this ["yoda", "R2-D2"]')
+    # Check if the user with squad * not have role yoda
+    if "*" in user.squad and "yoda" not in user.role:
+        raise HTTPException(status_code=403, detail="It is not possible to use * squad when role is not yoda")
     # Get squad from current user
     if not crud_users.is_master(db, current_user):
         if not check_squad_user(current_user.squad, user.squad):
@@ -86,6 +94,13 @@ async def update_user(
     # Check if the user has privileges
     if not crud_users.is_superuser(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
+    # Check role
+    roles = ['yoda', 'darth_vader', 'stormtrooper', 'R2-D2']
+    if not all(item in roles for item in user.role):
+        raise HTTPException(status_code=403, detail='Only supported roles "yoda", "darth_vader", "stormtrooper".If the user is a bot you can pass R2-D2 together to a role like this ["yoda", "R2-D2"]')
+    # Check if the user with squad * not have role yoda
+    if "*" in user.squad and "yoda" not in user.role:
+        raise HTTPException(status_code=403, detail="It is not possible to use * squad when role is not yoda")
     # Get squad from current user
     if not crud_users.is_master(db, current_user):
         current_squad = current_user.squad
