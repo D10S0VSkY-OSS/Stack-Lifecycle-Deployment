@@ -165,11 +165,12 @@ def sync_git(
             squad=squad,
             name=name).apply_async(queue="squad")
         task_id = pipeline_git_result.task_id
-        data = json.loads(pipeline_git_result.get())
+        get_data = pipeline_git_result.get()
+        try:
+            data = json.loads(get_data.get('stdout'))
+        except Exception as err:
+            raise ValueError(get_data.get('result'))
         return task_id, data
-        if result[4].get('rc') != 0:
-            raise ValueError(result[4].get('stdout')[0])
-        return pipeline_git_result.task_id
     except Exception as err:
         raise HTTPException(status_code=408,
                             detail=f"{err}")
