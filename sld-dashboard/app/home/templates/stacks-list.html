@@ -46,7 +46,7 @@
                     <th></th>
                     <th>Stack id</th>
                     <th>Stack Name</th>
-                    {% if current_user.privilege %}
+                    {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                     <th>Stack Repo</th>
                     <th>Branch</th>
                     <th>Tf version</th>
@@ -71,7 +71,7 @@
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.id }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.stack_name }}</span></td>
-                    {% if current_user.privilege %}
+                    {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                     <td><span class="font-weight-normal">{{ stack.git_repo }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.branch }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.tf_version }}</span></td>
@@ -79,7 +79,7 @@
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.description}}</span></td>
                     <td>
-                    {% if current_user.master %}
+                    {% if "yoda" in  current_user.role %}
                         <div class="btn-group">
                             <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="icon icon-sm">

@@ -17,8 +17,8 @@ async def create_new_aws_profile(
         response: Response,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-
-    if not current_user.master:
+    # Check if the user has privileges
+    if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     if "string" in [aws.squad, aws.environment]:
         raise HTTPException(
@@ -47,7 +47,8 @@ async def create_new_aws_profile(
 async def get_all_aws_accounts(
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    if not current_user.master:
+    # Check if the user has privileges
+    if not crud_users.is_master(db, current_user):
         return crud_aws.get_squad_aws_profile(db=db, squad=current_user.squad, environment=None )
     return crud_aws.get_all_aws_profile(db=db)
 
@@ -58,7 +59,7 @@ async def delete_aws_account_by_id(
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
 
-    if not current_user.master:
+    if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     result = crud_aws.delete_aws_profile_by_id(
         db=db, aws_profile_id=aws_account_id)

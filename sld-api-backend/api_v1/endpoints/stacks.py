@@ -7,7 +7,7 @@ from crud import user as crud_users
 from crud import stacks as crud_stacks
 from crud import activityLogs as crud_activity
 from helpers.push_task import sync_git, sync_get_vars
-from helpers.get_data import check_providers
+from helpers.get_data import check_providers, check_squad_user
 
 router = APIRouter()
 
@@ -18,7 +18,7 @@ def create_new_stack(
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
 
-    if not crud_users.is_superuser(db, current_user):
+    if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     name = "default"
     environment = "default"
@@ -71,7 +71,7 @@ def update_stack(
         stack: schemas.StackCreate,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    if not current_user.master:
+    if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     name = "default"
     environment = "default"
@@ -121,7 +121,7 @@ async def get_all_stacks(
         skip: int = 0,
         limit: int = 100,
         db: Session = Depends(deps.get_db)):
-    if not current_user.master:
+    if not crud_users.is_master(db, current_user):
         return crud_stacks.get_all_stacks_by_squad(db=db, squad_access=current_user.squad, skip=skip, limit=limit)
     return crud_stacks.get_all_stacks(db=db, squad_access=current_user.squad, skip=skip, limit=limit)
 
@@ -134,17 +134,19 @@ async def get_stack_by_id_or_name(
 
     if not stack.isdigit():
         result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
-        if result is None:
-            raise HTTPException(status_code=404, detail="stack id not found")
-        if not current_user.squad in result.squad_access and not current_user.master and not "*" in result.squad_access:
-            raise HTTPException(
-                status_code=403, detail="Not enough permissions")
+        if not crud_users.is_master(db, current_user):
+            if result is None:
+                raise HTTPException(status_code=404, detail="stack id not found")
+            if not check_squad_user(current_user.squad, result.squad_access) and not "*" in result.squad_access:
+                raise HTTPException(status_code=403, detail=f"Not enough permissions in {result.squad_access}")
         return result
+
     result = crud_stacks.get_stack_by_id(db=db, stack_id=stack)
     if result is None:
         raise HTTPException(status_code=404, detail="stack id not found")
-    if not current_user.squad in result.squad_access and not current_user.master and not "*" in result.squad_access:
-        raise HTTPException(status_code=403, detail="Not enough permissions")
+        if not crud_users.is_master(db, current_user):
+            if not check_squad_user(current_user.squad, result.squad_access) and not "*" in result.squad_access:
+                raise HTTPException(status_code=403, detail=f"Not enough permissions in {result.squad_access}")
     return result
 
 
@@ -153,7 +155,7 @@ async def delete_stack_by_id_or_name(
         stack,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    if not current_user.privilege:
+    if not crud_users.is_master(db, current_user):
         raise HTTPException(
             status_code=403, detail="Not enough permissions")
     try:
@@ -161,7 +163,7 @@ async def delete_stack_by_id_or_name(
             result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
             if result is None:
                 raise HTTPException(status_code=404, detail="stack id not found")
-            if not current_user.squad in result.squad_access and not current_user.master and not "*" in result.squad_access:
+            if not current_user.squad in result.squad_access and not crud_users.is_master(db, current_user) and not "*" in result.squad_access:
                 raise HTTPException(
                     status_code=403, detail="Not enough permissions")
             crud_activity.create_activity_log(
@@ -174,7 +176,7 @@ async def delete_stack_by_id_or_name(
         result = crud_stacks.get_stack_by_id(db=db, stack_id=stack)
         if result is None:
             raise HTTPException(status_code=404, detail="stack id not found")
-        if not current_user.squad in result.squad_access and not current_user.master and not "*" in result.squad_access:
+        if not current_user.squad in result.squad_access and not crud_users.is_master(db, current_user) and not "*" in result.squad_access:
             raise HTTPException(status_code=403, detail="Not enough permissions")
         crud_activity.create_activity_log(
             db=db,

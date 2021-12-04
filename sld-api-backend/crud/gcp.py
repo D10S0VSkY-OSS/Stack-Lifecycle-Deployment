@@ -3,6 +3,7 @@ import datetime
 
 from security.vault import vault_encrypt, vault_decrypt
 import db.models as models
+from sqlalchemy import exc
 
 
 @vault_encrypt
@@ -38,6 +39,8 @@ def create_gcloud_profile(
         db.commit()
         db.refresh(db_gcloud)
         return db_gcloud
+    except exc.IntegrityError as err:
+        raise ValueError(str(err.__dict__['orig']))
     except Exception as err:
         raise err
 
@@ -57,8 +60,10 @@ def get_squad_gcloud_profile(db: Session, squad: str, environment: str):
             return db.query(models.Gcloud_provider).filter(
                 models.Gcloud_provider.squad == squad).filter(
                 models.Gcloud_provider.environment == environment).first()
-        return db.query(models.Gcloud_provider).filter(
-            models.Gcloud_provider.squad == squad).first()
+        result = []
+        for i in squad:
+            result.extend(db.query(models.Gcloud_provider).filter(models.Gcloud_provider.squad == i).all())
+        return set(result)
     except Exception as err:
         raise err
 

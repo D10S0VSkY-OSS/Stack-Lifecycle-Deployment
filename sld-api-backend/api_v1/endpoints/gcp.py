@@ -17,8 +17,8 @@ async def create_new_gcloud_profile(
         response: Response,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    if not current_user.master:
-        raise HTTPException(status_code=400, detail="Not enough permissions")
+    if not crud_users.is_master(db, current_user):
+        raise HTTPException(status_code=403, detail="Not enough permissions")
     if "string" in [gcp.squad, gcp.environment]:
         raise HTTPException(
             status_code=409,
@@ -50,7 +50,7 @@ async def create_new_gcloud_profile(
 async def get_all_gcloud_accounts(
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    if not current_user.master:
+    if not crud_users.is_master(db, current_user):
         return crud_gcp.get_squad_gcloud_profile(db=db, squad=current_user.squad, environment=None)
     return crud_gcp.get_all_gcloud_profile(db=db)
 
@@ -60,7 +60,7 @@ async def delete_gcloud_account_by_id(
         gcloud_account_id,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
-    if not current_user.master:
+    if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
     result = crud_gcp.delete_gcloud_profile_by_id(
         db=db, gcloud_profile_id=gcloud_account_id)

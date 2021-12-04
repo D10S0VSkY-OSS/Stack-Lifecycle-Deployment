@@ -5,7 +5,9 @@ from fastapi import APIRouter, Depends, HTTPException
 from schemas import schemas
 from crud import stacks as crud_stacks
 from crud import deploys as crud_deploys
+from crud import user as crud_users
 from security import deps
+from helpers.get_data import check_squad_user
 
 
 router = APIRouter()
@@ -13,7 +15,7 @@ router = APIRouter()
 
 @router.get("/json")
 async def get_json(
-        stack, 
+        stack,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
     '''
@@ -52,17 +54,18 @@ async def get_list(
             status_code=404,
             detail=f"{err}")
 
+
 @router.get("/deploy/{deploy_id}")
 async def get_deploy_by_id(
         deploy_id: int,
         current_user: schemas.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)):
+
+    result = crud_deploys.get_deploy_by_id(db=db, deploy_id=deploy_id)
+    if not crud_users.is_master(db, current_user):
+        if not check_squad_user(current_user.squad, [result.squad]):
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     try:
-        if current_user.master:
-            result = crud_deploys.get_deploy_by_id(db=db, deploy_id=deploy_id)
-        else:
-            squad = current_user.squad
-            result = crud_deploys.get_deploy_by_id_squad(db=db, deploy_id=deploy_id, squad=squad)
         if result is None:
             raise Exception("Deploy id Not Found")
         return result.variables
@@ -70,4 +73,3 @@ async def get_deploy_by_id(
         raise HTTPException(
             status_code=404,
             detail=f"{err}")
-

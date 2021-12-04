@@ -180,18 +180,25 @@ def pipeline_plan(self, git_repo, name, stack_name, environment, squad, branch, 
                  name='pipeline git pull')
 def pipeline_git_pull(self, git_repo, name, stack_name, environment, squad, branch):
     try:
-        self.update_state(state='GIT', meta={'done': "1 of 2"})
         result = tf.git_clone(git_repo, name, stack_name,
                               environment, squad, branch)
         if result['rc'] != 0:
-            raise Exception(result)
+            raise Exception(result.get('stdout'))
+
         self.update_state(state='GET_VARS_AS_JSON', meta={'done': "2 of 2"})
-        result = tf.get_vars_json(environment=environment, stack_name=stack_name, squad=squad, name=name)
+        del result
+        result = tf.get_vars_json(
+            environment=environment, stack_name=stack_name, squad=squad, name=name)
+        if result['rc'] != 0:
+            raise Exception(result)
+        return result
     except Exception as err:
-        self.retry(countdown=5, exc=err, max_retries=2)
+        self.retry(countdown=5, exc=err, max_retries=1)
         self.update_state(state=states.FAILURE, meta={'exc': result})
-        raise Exception(err)
-    return result
+        raise Ignore()
+    finally:
+        dir_path = f"/tmp/artifacts"
+        tf.delete_local_folder(dir_path)
 
 
 @celery_app.task(bind=True,

@@ -1,5 +1,7 @@
-from sqlalchemy.orm import Session
 import datetime
+
+from sqlalchemy.orm import Session
+from sqlalchemy import func
 
 import db.models as models
 import schemas.schemas as schemas
@@ -166,8 +168,9 @@ def get_all_deploys(db: Session, skip: int = 0, limit: int = 100):
 
 def get_all_deploys_by_squad(db: Session, squad: str, skip: int = 0, limit: int = 100):
     try:
-        return db.query(
-            models.Deploy).filter(
-            models.Deploy.squad == squad).offset(skip).limit(limit).all()
+        result = []
+        for i in squad:
+            result.extend(db.query(models.Deploy).filter(models.Deploy.squad == i).all())
+        return set(result)
     except Exception as err:
         raise err

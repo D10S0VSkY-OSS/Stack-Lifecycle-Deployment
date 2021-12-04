@@ -67,8 +67,8 @@
             <thead>
                 <tr>
                     <th></th>
-                    <th>Environment</th>
                     <th>Squad</th>
+                    <th>Environment</th>
                     <th>Client id</th>
                     <th>Subscription id</th>
                     <th>Tenant id</th>
@@ -80,13 +80,13 @@
                 <tr>
                     </td>
                     <td><span class="font-weight-normal">{{ azure_account.id }}</span></td>
-                    <td><span class="font-weight-normal">{{ azure_account.environment }}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.squad }}</span></td>
+                    <td><span class="font-weight-normal">{{ azure_account.environment }}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.client_id }}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.subscription_id }}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.tenant_id }}</span></td>
                     <td>
-                        {% if current_user.master %}
+                        {% if "yoda" in current_user.role %}
                         <div class="btn-group">
                             <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

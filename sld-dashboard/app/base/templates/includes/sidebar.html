@@ -4,10 +4,10 @@
             class="user-card d-flex d-md-none align-items-center justify-content-between justify-content-md-center pb-4">
             <div class="d-flex align-items-center">
                 <div class="user-avatar lg-avatar mr-4">
-                    {% if current_user.master %}
+                    {% if "yoda" in current_user.role %}
                     <img src="/static/assets/img/team/root.png" class="card-img-top rounded-circle border-white"
                         alt="root">
-                    {% elif current_user.privilege %}
+                    {% elif "darth_vader" in current_user.role %}
                     <img src="/static/assets/img/team/admin.png" class="card-img-top rounded-circle border-white"
                         alt="admin">
                     {% else %}
@@ -36,7 +36,7 @@
                 </a>
             </li>
 
-            {% if current_user.master or current_user.privilege %}
+           {% if "yoda" in current_user.role or "darth_vader" in current_user.role %}
             <li class="nav-item">
                 <span class="nav-link  collapsed  d-flex justify-content-between align-items-center"
                     data-toggle="collapse" data-target="#submenu-components-users">
@@ -72,7 +72,7 @@
                 </span>
                 <div class="multi-level collapse " role="list" id="submenu-components-stacks" aria-expanded="false">
                     <ul class="flex-column nav">
-                        {% if current_user.master or current_user.privilege %}
+                        {% if "yoda" in current_user.role %}
                         <li class="nav-item "><a class="nav-link" href="/stacks-new">
                                 <span class="sidebar-icon"><span class="fas fa-plus"></span>
                                     <span>New</span>
@@ -97,7 +97,7 @@
                     <span>Tasks</span>
                 </a>
             </li>
-            {% if current_user.master or current_user.privilege %}
+            {% if "yoda" in current_user.role or "darth_vader" in current_user.role %}
             <li class="nav-item  {% if 'settings' in segment %} active {% endif %}">
                 <a href="/activity-logs" class="nav-link">
                     <span class="sidebar-icon"><span class="fas fa-chart-line"></span></span>
@@ -111,7 +111,7 @@
                     <span>Settings</span>
                 </a>
             </li>
-            {% if current_user.master or current_user.privilege %}
+            {% if "yoda" in current_user.role or "darth_vader" in current_user.role %}
             <li role="separator" class="dropdown-divider mt-4 mb-3 border-black"></li>
             <a href="" class="nav-link">
                 <span class="sidebar-icon"><span class="fas fa-cloud"></span></span>
@@ -129,7 +129,7 @@
                 <div class="multi-level collapse " role="list" id="submenu-components-aws" aria-expanded="false">
                     <ul class="flex-column nav">
 
-                        {% if current_user.master %}
+                        {% if "yoda" in current_user.role %}
                         <li class="nav-item "><a class="nav-link" href="/aws-new">
                                 <span class="sidebar-icon"><span class="fas fa-plus"></span>
                                     <span>New</span>
@@ -153,7 +153,7 @@
                 </span>
                 <div class="multi-level collapse " role="list" id="submenu-components-gcp" aria-expanded="false">
                     <ul class="flex-column nav">
-                        {% if current_user.master %}
+                        {% if "yoda" in current_user.role %}
                         <li class="nav-item "><a class="nav-link" href="/gcp-new">
                                 <span class="sidebar-icon"><span class="fas fa-plus"></span>
                                     <span>New</span>
@@ -176,7 +176,7 @@
                 </span>
                 <div class="multi-level collapse " role="list" id="submenu-components-azure" aria-expanded="false">
                     <ul class="flex-column nav">
-                        {% if current_user.master %}
+                        {% if "yoda" in current_user.role %}
                         <li class="nav-item "><a class="nav-link" href="/azure-new">
                                 <span class="sidebar-icon"><span class="fas fa-plus"></span>
                                     <span>New</span>

@@ -74,21 +74,65 @@
                                             </span>
                                             <input type="password" name={{ key }} class='form-control' placeholder={{key}} autocomplete="off">
                                         </div>
-                                        <!--Privilege-->
-                                        {% elif key == "privilege" %}
+                                        <!--Role-->
+                                    {% elif key == "role" %}
+                                    {% if  "yoda" in current_user.role %}
                                         <div class="form-group">
-                                            <span style="text-transform:capitalize">
-                                                <h6><strong>{{key}}</strong></h6>
-                                            </span>
-                                            <select class="form-control" name={{key}} v-model="privilege">
-                                            {% if data_json.privilege %}
-                                                <option value=true>Yes</option>
-                                                <option value=false>No</option>
-                                            {% else %}
-                                                <option value=false>No</option>
-                                                <option value=true>Yes</option>
+                                        <h6><strong>Role</strong></h6>
+                                        <select class="form-control" value={{ value }} name=role v-model="role">
+                                            {%if value|length > 1 and "yoda" in value %}
+                                            <option value=yoda,R2-D2>bot yoda</option>
+                                            <option value=darth_vader,R2-D2>bot darth_vader</option>
+                                            <option value=stormtrooper,R2-D2>bot stormtrooper</option>
+                                            <option value=yoda>yoda</option>
+                                            <option value=darth_vader>darth_vader</option>
+                                            <option value=stormtrooper>stormtrooper</option>
+                                            {%elif value|length > 1 and "darth_vader" in value %}
+                                            <option value=darth_vader,R2-D2>bot darth_vader</option>
+                                            <option value=yoda,R2-D2>bot yoda</option>
+                                            <option value=stormtrooper,R2-D2>bot stormtrooper</option>
+                                            <option value=yoda>yoda</option>
+                                            <option value=darth_vader>darth_vader</option>
+                                            <option value=stormtrooper>stormtrooper</option>
+                                            {%elif value|length > 1 and "stormtrooper" in value %}
+                                            <option value=stormtrooper,R2-D2>bot stormtrooper</option>
+                                            <option value=darth_vader,R2-D2>bot darth_vader</option>
+                                            <option value=yoda,R2-D2>bot yoda</option>
+                                            <option value=yoda>yoda</option>
+                                            <option value=darth_vader>darth_vader</option>
+                                            <option value=stormtrooper>stormtrooper</option>
+                                            {%elif "yoda" in value %}
+                                            <option value=yoda>yoda</option>
+                                            <option value=darth_vader>darth_vader</option>
+                                            <option value=stormtrooper>stormtrooper</option>
+                                            <option value=stormtrooper,R2-D2>bot stormtrooper</option>
+                                            <option value=darth_vader,R2-D2>bot darth_vader</option>
+                                            <option value=yoda,R2-D2>bot yoda</option>
+                                            {%elif "darth_vader" in value %}
+                                            <option value=darth_vader>darth_vader</option>
+                                            <option value=yoda>yoda</option>
+                                            <option value=stormtrooper>stormtrooper</option>
+                                            <option value=stormtrooper,R2-D2>bot stormtrooper</option>
+                                            <option value=darth_vader,R2-D2>bot darth_vader</option>
+                                            <option value=yoda,R2-D2>bot yoda</option>
+                                            {%elif "stormtrooper" in value %}
+                                            <option value=stormtrooper>stormtrooper</option>
+                                            <option value=darth_vader>darth_vader</option>
+                                            <option value=yoda>yoda</option>
+                                            <option value=stormtrooper,R2-D2>bot stormtrooper</option>
+                                            <option value=darth_vader,R2-D2>bot darth_vader</option>
+                                            <option value=yoda,R2-D2>bot yoda</option>
                                             {% endif %}
-                                            </select>
+                                        </select>
+                                        </div>
+                                        <div class="form-group">
+                                    {% else %}
+                                        <div class="form-group">
+                                        <h6><strong>Role</strong></h6>
+                                        <input type="text" value="{{ value|join(",") }}"
+                                               name=role  autocomplete="off" class='form-control' readonly>
+                                        </div>
+                                    {% endif %}
                                         </div>
                                         <!--is-active-->
                                         {% elif key == "is_active" %}
@@ -106,29 +150,13 @@
                                             {% endif %}
                                             </select>
                                         </div>
-                                        <!--master-->
-                                        {% elif key == "master" and current_user.master %}
-                                        <div class="form-group">
-                                            <span style="text-transform:capitalize">
-                                                <h6><strong>{{key}}</strong></h6>
-                                            </span>
-                                            <select class="form-control" name={{key}} v-model="master">
-                                            {% if data_json.master %}
-                                                <option value=true>Yes</option>
-                                                <option value=false>No</option>
-                                            {% else %}
-                                                <option value=false>No</option>
-                                                <option value=true>Yes</option>
-                                            {% endif %}
-                                            </select>
-                                        </div>
                                         <!--squad-->
-                                        {% elif key == "squad" and current_user.master %}
+                                        {% elif key == "squad" %}
                                         <div class="form-group">
                                             <span style="text-transform:capitalize">
                                                 <h6><strong>{{key}}</strong></h6>
                                             </span>
-                                            <input type="text" value={{ value }} name={{ key }} class='form-control'  autocomplete="off">
+                                            <input type="text" value="{{ value |join(',')}}" name={{ key }} class='form-control'  autocomplete="off">
                                         </div>
                                         <!--squad-->
                                         {% endif %}

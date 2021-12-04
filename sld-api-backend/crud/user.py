@@ -43,14 +43,16 @@ def is_active(db: Session, user: schemas.UserCreate) -> bool:
 
 def is_superuser(db: Session, user: schemas.UserCreate) -> bool:
     try:
-        return user.privilege
+        super_role = ["yoda", "darth_vader"]
+        return bool(set(user.role).intersection(super_role))
     except Exception as err:
         raise err
 
 
 def is_master(db: Session, user: schemas.UserCreate) -> bool:
     try:
-        return user.master
+        master_role = ["yoda"]
+        return bool(set(user.role).intersection(master_role))
     except Exception as err:
         raise err
 
@@ -70,6 +72,7 @@ def get_user_by_id(db: Session, id: int):
     except Exception as err:
         raise err
 
+
 def get_user_by_username_squad(db: Session, username: str):
     try:
         return db.query(
@@ -88,9 +91,15 @@ def get_user_by_id_squad(db: Session, id: int):
 
 def get_users_by_squad(db: Session, squad: str, skip: int = 0, limit: int = 100):
     try:
-        return db.query(models.User).filter(models.User.squad == squad).offset(skip).limit(limit).all()
+        from sqlalchemy import func
+        result = []
+        for i in squad:
+            a = f'["{i}"]'
+            result.extend(db.query(models.User).filter(func.json_contains(models.User.squad, a) == 1).all())
+        return set(result)
     except Exception as err:
         raise err
+
 
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     try:
@@ -98,13 +107,13 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
     except Exception as err:
         raise err
 
+
 def create_init_user(db: Session, password: str):
     db_user = models.User(username=settings.INIT_USER.get("username"),
                           fullname=settings.INIT_USER.get("fullname"),
                           email=settings.INIT_USER.get("email"),
-                          squad="master",
-                          privilege=True,
-                          master=True,
+                          squad=["master"],
+                          role=["yoda", "R2-D2"],
                           is_active=True,
                           created_at=datetime.datetime.now(),
                           password=hashing_passwd(password))
@@ -117,11 +126,10 @@ def create_init_user(db: Session, password: str):
         raise err
 
 
-def create_user(db: Session, user: schemas.UserCreate, squad: str):
+def create_user(db: Session, user: schemas.UserCreate):
     db_user = models.User(**user.dict())
     db_user.password = hashing_passwd(user.password)
     db_user.created_at = datetime.datetime.now()
-    db_user.squad = squad
     try:
         db.add(db_user)
         db.commit()
@@ -148,12 +156,10 @@ def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
         db_user.fullname = user.fullname
     if user.squad not in check_None:
         db_user.squad = user.squad
-    if user.privilege not in check_None:
-        db_user.privilege = user.privilege
+    if user.role not in check_None:
+        db_user.role = user.role
     if user.is_active not in check_None:
         db_user.is_active = user.is_active
-    if user.master not in check_None:
-        db_user.master = user.master
     try:
         db.add(db_user)
         db.commit()
@@ -161,6 +167,7 @@ def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
         return db_user
     except Exception as err:
         raise err
+
 
 def password_reset(db: Session, user_id: int, password: schemas.PasswordReset):
     db_user = db.query(models.User).filter(

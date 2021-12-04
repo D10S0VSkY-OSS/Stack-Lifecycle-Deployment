@@ -30,11 +30,16 @@ def get_all_activity(db: Session, skip: int = 0, limit: int = 100):
     except Exception as err:
         raise err
 
+
 def get_all_activity_by_squad(db: Session, squad: str, skip: int = 0, limit: int = 100):
     try:
-        db_query = db.query(models.ActivityLogs).filter(models.ActivityLogs.squad == squad)
-
-        return db_query.order_by(models.ActivityLogs.created_at.desc()).offset(skip).limit(limit).all()
+        from sqlalchemy import func
+        result=[]
+        for i in squad:
+            a=f'["{i}"]'
+            result.extend(db.query(models.ActivityLogs).filter(func.json_contains(
+                models.ActivityLogs.squad, a) == 1).order_by(models.ActivityLogs.created_at.desc()).offset(skip).limit(limit).all())
+        return set(result)
     except Exception as err:
         raise err
 
@@ -46,6 +51,7 @@ def get_activity_by_username(db: Session, username: int):
             models.ActivityLogs.username == username).all()
     except Exception as err:
         raise err
+
 
 def get_activity_by_username_squad(db: Session, username: int, squad: str):
     try:

@@ -178,10 +178,31 @@ class TerraformActions(object):
             rc = runner_response.rc
             # check result
             if rc != 0:
-                return {"command": "plan", "rc": rc, "stdout": plan_stderr}
-            return {"command": "plan", "rc": rc, "stdout": plan_stdout}
+                return {
+                    "command": "plan",
+                    "deploy": name,
+                    "squad": squad,
+                    "environment": environment,
+                    "rc": rc,
+                    "stdout": plan_stderr
+                }
+            return {
+                "command": "plan",
+                "deploy": name,
+                "squad": squad,
+                "environment": environment,
+                "rc": rc,
+                "stdout": plan_stdout
+            }
         except Exception as err:
-            return {"command": "plan", "rc": 1, "stdout": f'{err}'}
+            return {
+                "command": "plan",
+                "deploy": name,
+                "squad": squad,
+                "environment": environment,
+                "rc": 1,
+                "stdout": f'{err}'
+            }
 
     @staticmethod
     def apply_execute(
@@ -212,10 +233,31 @@ class TerraformActions(object):
             rc = runner_response.rc
             # check result
             if rc != 0:
-                return {"command": "apply", "rc": rc, "stdout": apply_stderr}
-            return {"command": "apply", "rc": rc, "stdout": apply_stdout}
+                return {
+                    "command": "apply",
+                    "deploy": name,
+                    "squad": squad,
+                    "environment": environment,
+                    "rc": rc,
+                    "stdout": apply_stderr
+                }
+            return {
+                "command": "apply",
+                "deploy": name,
+                "squad": squad,
+                "environment": environment,
+                "rc": rc,
+                "stdout": apply_stdout
+            }
         except Exception as err:
-            return {"command": "apply", "rc": 1, "stdout": f'{err}'}
+            return {
+                "command": "apply",
+                "deploy": name,
+                "squad": squad,
+                "environment": environment,
+                "rc": 1,
+                "stdout": f'{err}'
+            }
 
     @staticmethod
     def destroy_execute(
@@ -244,10 +286,31 @@ class TerraformActions(object):
                 '[*].event_data.res.msg', destroy_logs)
             rc = runner_response.rc
             if rc != 0:
-                return {"command": "destroy", "rc": rc, "stdout": destroy_stderr}
-            return {"command": "destroy", "rc": rc, "stdout": destroy_stdout}
+                return {
+                    "command": "destroy",
+                    "deploy": name,
+                    "squad": squad,
+                    "environment": environment,
+                    "rc": rc,
+                    "stdout": destroy_stderr
+                }
+            return {
+                "command": "destroy",
+                "deploy": name,
+                "squad": squad,
+                "environment": environment,
+                "rc": rc,
+                "stdout": destroy_stdout
+            }
         except Exception as err:
-            return {"command": "destroy", "rc": 1, "stdout": f'{err}'}
+            return {
+                "command": "destroy",
+                "deploy": name,
+                "squad": squad,
+                "environment": environment,
+                "rc": 1,
+                "stdout": f'{err}'
+            }
 
     @staticmethod
     def output_execute(
@@ -258,7 +321,8 @@ class TerraformActions(object):
         try:
             import requests
             get_path = f'{stack_name}-{squad}-{environment}-{name}'
-            response = requests.get(f'{settings.REMOTE_STATE}/terraform_state/{get_path}')
+            response = requests.get(
+                f'{settings.REMOTE_STATE}/terraform_state/{get_path}')
             json_data = response.json()
             result = json_data.get('outputs')
             if not result:
@@ -276,7 +340,8 @@ class TerraformActions(object):
         try:
             import requests
             get_path = f'{stack_name}-{squad}-{environment}-{name}'
-            response = requests.delete(f'{settings.REMOTE_STATE}/terraform_lock/{get_path}', json={})
+            response = requests.delete(
+                f'{settings.REMOTE_STATE}/terraform_lock/{get_path}', json={})
             json_data = response.json()
             result = json_data
             return result
@@ -292,7 +357,8 @@ class TerraformActions(object):
         try:
             import requests
             get_path = f'{stack_name}-{squad}-{environment}-{name}'
-            response = requests.get(f'{settings.REMOTE_STATE}/terraform_state/{get_path}')
+            response = requests.get(
+                f'{settings.REMOTE_STATE}/terraform_state/{get_path}')
             json_data = response.json()
             return json_data
         except Exception as err:
@@ -326,13 +392,15 @@ class TerraformActions(object):
                 obj = hcl.load(fp)
             if obj.get('variable'):
                 lista = [i for i in obj.get('variable')]
-                return lista
+                return {"command": "get_vars_list", "rc": 0, "stdout": lista}
             else:
-                raise Exception('Variable file is empty, not iterable')
+                error_msg = 'Variable file is empty, not iterable'
+                return {"command": "get_vars_list", "rc": 1, "stdout": error_msg}
         except IOError:
-            return {"result": "Variable file not accessible"}
-        except Exception:
-            return {"result": "Variable file is empty, not iterable"}
+            error_msg = "Variable file not accessible"
+            return {"command": "get_vars_list", "rc": 1, "stdout": error_msg}
+        except Exception as err:
+            return {"command": "get_vars_list", "rc": 1, "stdout": err}
 
     @staticmethod
     def get_vars_json(
@@ -345,13 +413,15 @@ class TerraformActions(object):
             with open(file_hcl, 'r') as fp:
                 obj = hcl.load(fp)
             if obj.get('variable'):
-                return json.dumps(obj)
+                return {"command": "get_vars_json", "rc": 0, "stdout": json.dumps(obj)}
             else:
-                raise Exception('Variable file is empty, not iterable')
+                error_msg = 'Variable file is empty, not iterable'
+                return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
         except IOError:
-            return {"result": "Variable file not accessible"}
-        except Exception:
-            return {"result": "Variable file is empty, not iterable"}
+            error_msg = "Variable file not accessible"
+            return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
+        except Exception as err:
+            return {"command": "get_vars_json", "rc": 1, "stdout": err}
 
     @staticmethod
     def delete_local_folder(dir_path: str) -> dict:

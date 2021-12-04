@@ -564,16 +564,13 @@ def deploy_stack(stack_id):
                 "stack_name": stack['json']['stack_name'],
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
+                "squad": request.form.get('squad'),
                 "environment": request.form.get('environment'),
                 "variables": ast.literal_eval(variables)
             }
             endpoint = f'plan'
             if not "plan" in request.form.get('button'):
                 endpoint = f'deploy'
-            if current_user.master:
-                data['squad'] = request.form.get('squad')
-            else:
-                data['squad'] = current_user.squad
 
             # Deploy
             response = request_url(
@@ -698,14 +695,12 @@ def new_user():
                 "fullname": form.fullname.data,
                 "password": form.password.data,
                 "email": form.email.data,
-                "privilege": form.privilege.data,
+                "squad": form.squad.data.split(","),
+                "role": request.form.get('role').split(","),
                 "is_active": form.is_active.data,
-                "master": form.master.data,
             }
-            if current_user.master:
-                new_user['squad'] = form.squad.data
-            else:
-                new_user['squad'] = current_user.squad
+            print(request.form)
+            print(new_user)
             endpoint = f'users/'
             response = request_url(
                 verb='POST',
@@ -777,13 +772,15 @@ def edit_user(user_id):
         vars_json = response['json']
         vars_json['password'] = "string"
         if request.method == 'POST':
-            form_vars = ["csrf_token", 'button']
-            data_raw = {key: value for key,
-                        value in request.form.items() if key not in form_vars}
-            variables = json.dumps(convert_to_dict(data_raw))
-            data = ast.literal_eval(variables)
-            if not current_user.master:
-                data['squad'] = current_user.squad
+            data: dict = {
+                "username": request.form.get('username'),
+                "fullname": request.form.get('fullname'),
+                "password": request.form.get('password'),
+                "email": request.form.get('email'),
+                "squad": request.form.get('squad').split(","),
+                "role": request.form.get('role').split(","),
+                "is_active": request.form.get('is_active')
+            }
         # Apply user change
             endpoint = f'users/{user_id}'
             response = request_url(
@@ -795,7 +792,7 @@ def edit_user(user_id):
             if response.get('status_code') == 200:
                 flash(f"User Updated ")
             else:
-                flash(response['json'], 'error')
+                flash(response['json'].get('detail'), 'error')
             return redirect(url_for('home_blueprint.route_template', template="users-list"))
         return render_template('users-edit.html',
                                name='Edit User',
@@ -815,37 +812,17 @@ def setting_user():
         # Check if token no expired
         check_unauthorized_token(token)
         if request.method == 'POST':
-            # Deploy
-
-            if current_user.privilege:
-                user_data: dict = {
-                    "username": "string",
-                    "fullname": form.fullname.data,
-                    "email": form.email.data,
-                    "password": form.password.data,
-                    "privilege": current_user.privilege,
-                    "is_active": current_user.is_active,
-                    "master": current_user.master,
-                    "squad": current_user.squad
-                }
-                response = request_url(
-                    verb='PATCH',
-                    uri=f'users/{current_user.id}',
-                    headers={
-                        "Authorization": f"Bearer {token}"},
-                    json=user_data)
-            else:
-                user_data: dict = {
-                    "passwd": form.password.data,
-                }
-                response = request_url(
-                    verb='PATCH',
-                    uri=f'users/reset/',
-                    headers={
-                        "Authorization": f"Bearer {token}"},
-                    json=user_data)
+            user_data: dict = {
+                "passwd": form.password.data,
+            }
+            response = request_url(
+                verb='PATCH',
+                uri=f'users/reset/',
+                headers={
+                    "Authorization": f"Bearer {token}"},
+                json=user_data)
             if response.get('status_code') == 200:
-                flash(f"User Updated ")
+                flash(f"Password Updated ")
             else:
                 flash(response.get('json').get('detail'), 'error')
             return redirect(url_for('home_blueprint.route_template', template="user-setting"))

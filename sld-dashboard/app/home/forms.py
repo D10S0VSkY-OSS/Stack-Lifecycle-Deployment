@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 -*-
 from flask_wtf import FlaskForm
 from wtforms import validators
-from wtforms import StringField, BooleanField, TextAreaField, TextField, PasswordField, FieldList, FormField
+from wtforms import StringField, BooleanField, TextAreaField, TextField, PasswordField, FieldList, FormField, SelectMultipleField
 from wtforms.fields.html5 import EmailField
 from wtforms.validators import InputRequired, Email, DataRequired
 
@@ -66,13 +66,11 @@ class DeployForm(FlaskForm):
 
 
 class UserForm(FlaskForm):
+    role = ['yoda', 'darth_vader', 'stormtrooper', 'R2-D2', 'grogu']
     username = StringField('Username', [
         validators.length(min=4, max=50),
     ])
     fullname = StringField('Fullname', [
-        validators.length(min=4, max=50),
-    ])
-    privilege = StringField('Privilege', [
         validators.length(min=4, max=50),
     ])
     email = EmailField('Email', [

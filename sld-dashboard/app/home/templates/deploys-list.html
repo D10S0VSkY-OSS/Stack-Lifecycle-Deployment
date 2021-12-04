@@ -180,7 +180,7 @@
                                 <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
                                     <span class="far fa-clock mr-0"></span></a>
                             </span>
-                            {% if current_user.privilege %}
+                            {% if "yoda" in current_user.role or  "darth_vader" in current_user.role %}
                             <!-- Unlock-->
                             <span class="icon icon-sm">
                                 <a title="Unlock Deploy" class="nav-link icon-notifications text-dark" data-toggle="modal"

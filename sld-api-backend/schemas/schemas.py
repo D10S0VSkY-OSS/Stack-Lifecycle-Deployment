@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, ValidationError, validator
 from typing import Optional, List
 
 
@@ -10,20 +10,18 @@ class UserCreate(UserBase):
     fullname: str
     password: str
     email: EmailStr = None
-    squad: str
+    squad: List[str] = []
+    role: List[str] = []
     is_active: bool = True
-    privilege: bool = False
-    master: bool = False
 
 
 class UserCreateMaster(UserBase):
     fullname: str
     password: str
     email: EmailStr = None
-    privilege: bool = False
     is_active: bool = True
-    master: bool = False
-    squad: str
+    squad: List[str] = []
+    role: List[str] = []
 
 
 class UserUpdate(UserCreate):
