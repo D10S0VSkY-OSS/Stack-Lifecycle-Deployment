@@ -26,10 +26,10 @@ jobs:
 
     - name: Build the Docker image with tags
       working-directory: ./sld-schedule
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-schedule:2.0.1
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-schedule:2.1.1
       
     - name: Docker Push with tags
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-schedule:2.0.1
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-schedule:2.1.1
 
     - name: Build the Docker image
       working-directory: ./sld-schedule
