@@ -47,6 +47,8 @@ class Settings(BaseSettings):
     TASK_LOCKED_EXPIRED = os.getenv('SLD_TASK_LOCKED_EXPIRED', 3600)
     TERRAFORM_BIN_REPO: str = os.getenv('SLD_TERRAFORM_BIN_REPO', "https://releases.hashicorp.com/terraform")
     REMOTE_STATE: str = os.getenv('SLD_REMOTE_STATE', "http://remote-state:8080")
+    BOT: str = os.getenv('SLD_API_SERVER_USER', 'schedule')
+    BOTC: str = os.getenv('SLD_API_SERVER_PASSWORD', 'Schedule1@local')
 
 
 settings = Settings()
