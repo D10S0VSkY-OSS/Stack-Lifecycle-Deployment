@@ -40,19 +40,19 @@ start_frontend() {
 
 
 start_init_credentials() {
-    curl -X POST "http://0.0.0.0:8000/api/v1/users/start" \
+    curl -X POST "http://localhost:8000/api/v1/users/start" \
         -H  "accept: application/json" \
         -H  "Content-Type: application/json" \
         -d "{\"password\":\"Password08@\"}" \
         -s -o /dev/null
 
     token=$(curl -X POST \
-        -s "http://0.0.0.0:8000/api/v1/authenticate/access-token-json" \
+        -s "http://localhost:8000/api/v1/authenticate/access-token-json" \
         -H  "accept: application/json" \
         -H  "Content-Type: application/json" \
         -d "{\"username\":\"admin\",\"password\":\"Password08@\"}"|jq .access_token|tr -d '"')
 
-    curl -X POST "http://0.0.0.0:8000/api/v1/users/" \
+    curl -X POST "http://localhost:8000/api/v1/users/" \
         -H  "accept: application/json" \
         -H  "Authorization: Bearer ${token}" \
         -H  "Content-Type: application/json" \
@@ -61,8 +61,8 @@ start_init_credentials() {
             echo '#################################################'
             echo '#  Now, you can play with SLD 🕹️                #'
             echo '#################################################'
-            echo "API: http://0.0.0.0:8000/docs"
-            echo "DASHBOARD: http://0.0.0.0:5000/"
+            echo "API: http://localhost:8000/docs"
+            echo "DASHBOARD: http://localhost:5000/"
             echo '---------------------------------------------'
             echo "username: admin"
             echo "password: Password08@"
