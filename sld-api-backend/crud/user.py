@@ -109,17 +109,32 @@ def get_users(db: Session, skip: int = 0, limit: int = 100):
 
 
 def create_init_user(db: Session, password: str):
-    db_user = models.User(username=settings.INIT_USER.get("username"),
-                          fullname=settings.INIT_USER.get("fullname"),
-                          email=settings.INIT_USER.get("email"),
-                          squad=["master"],
-                          role=["yoda", "R2-D2"],
-                          is_active=True,
-                          created_at=datetime.datetime.now(),
-                          password=hashing_passwd(password))
+    db_user_schedule = models.User(
+        username=settings.BOT,
+        fullname="Bot sld-schedule service",
+        email=f'{settings.BOT}@internal.local',
+        squad=["*"],
+        role=["yoda", "R2-D2"],
+        is_active=True,
+        created_at=datetime.datetime.now(),
+        password=hashing_passwd(settings.BOTC)
+    )
+
+    db_user = models.User(
+        username=settings.INIT_USER.get("username"),
+        fullname=settings.INIT_USER.get("fullname"),
+        email=settings.INIT_USER.get("email"),
+        squad=["*"],
+        role=["yoda"],
+        is_active=True,
+        created_at=datetime.datetime.now(),
+        password=hashing_passwd(password)
+    )
     try:
+        db.add(db_user_schedule)
         db.add(db_user)
         db.commit()
+        db.refresh(db_user_schedule)
         db.refresh(db_user)
         return db_user
     except Exception as err:
