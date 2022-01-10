@@ -2,7 +2,7 @@ import ast
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, HTTPException
 from celery.result import AsyncResult
-from celery.task.control import revoke
+from config.celery_config import celery_app 
 
 from schemas import schemas
 from security import deps
@@ -25,7 +25,7 @@ router = APIRouter()
 async def get_task_by_id(
         task_id: str,
         current_user: schemas.User = Depends(deps.get_current_active_user)):
-    result = revoke(task_id, terminate=True)
+    result = celery_app.control.revoke(task_id, terminate=True)
     return {"result": f'REVOKE {task_id}'}
 
 
