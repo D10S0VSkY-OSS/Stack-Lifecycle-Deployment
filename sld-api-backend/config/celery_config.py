@@ -14,12 +14,13 @@ BACKEND_USER = os.getenv('BACKEND_USER', "")
 BACKEND_PASSWD = os.getenv('BACKEND_PASSWD', "")
 BACKEND_SERVER = os.getenv('BACKEND_SERVER', "redis")
 BACKEND_DB = os.getenv('BACKEND_DB', "0")
+BROKER_DB = os.getenv('BACKEND_DB', "3")
 
 if not bool(os.getenv('DOCKER')):  # if running example without docker
     celery_app = Celery(
         "worker",
         backend = f"{BACKEND_TYPE}://{BACKEND_USER}:{BACKEND_PASSWD}@{BACKEND_SERVER}/{BACKEND_DB}",
-        broker = f"amqp://{BROKER_USER}:{BROKER_PASSWD}@{BROKER_SERVER}:{BROKER_SERVER_PORT}//"
+        broker = f"{BACKEND_TYPE}://{BACKEND_USER}:{BACKEND_PASSWD}@{BACKEND_SERVER}/{BROKER_DB}"
     )
     celery_app.conf.task_routes={
         "app.worker.celery_worker.test_celery": "api-queue"}
@@ -27,10 +28,11 @@ else:  # running example with docker
     celery_app = Celery(
         "worker",
         backend = f"{BACKEND_TYPE}://{BACKEND_USER}:{BACKEND_PASSWD}@{BACKEND_SERVER}/{BACKEND_DB}",
-        broker=f"amqp://{BROKER_USER}:{BROKER_PASSWD}@{BROKER_SERVER}:{BROKER_SERVER_PORT}//"
+        broker = f"{BACKEND_TYPE}://{BACKEND_USER}:{BACKEND_PASSWD}@{BACKEND_SERVER}/{BACKEND_DB}"
     )
     celery_app.conf.task_routes={
         "app.app.worker.celery_worker.test_celery": "api-queue"}
 
 celery_app.conf.update(task_track_started=True)
 celery_app.conf.result_expires = os.getenv('SLD_RESULT_EXPIRE', "259200")
+celery_app.conf.broker_transport_options = {'visibility_timeout': 43200}

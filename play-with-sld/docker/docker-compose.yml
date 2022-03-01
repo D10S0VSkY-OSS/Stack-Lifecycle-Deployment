@@ -29,19 +29,6 @@ services:
     hostname: redis
     ports:
       - 6379:6379
-
-
-  # RabbitMQ - queue
-  rabbit:
-    hostname: rabbit
-    image: rabbitmq:3.8-management
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=admin
-    ports:
-      - "5672:5672"  
-      - "15672:15672"  # here, we can access rabbitmq management plugin
-     
   mongodb:
     image: mongo
     hostname: mongodb 
@@ -78,7 +65,6 @@ services:
       - redis
       - remote-state
       - worker
-      - rabbit
 
 
   # Celery worker
@@ -89,7 +75,6 @@ services:
       BROKER_USER: admin
       BROKER_PASSWD: admin
     depends_on:
-      - rabbit
       - redis
       - db
       - remote-state
@@ -109,8 +94,6 @@ services:
       - redis
       - remote-state
         #    - worker
-      - rabbit
-        #- schedule
 
 
 
@@ -131,7 +114,6 @@ services:
       - redis
       - remote-state
       - worker
-      - rabbit
 
 volumes:
   sld-db:

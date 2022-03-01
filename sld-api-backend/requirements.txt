@@ -9,7 +9,7 @@ attrs==20.3.0
 bcrypt==3.2.0
 billiard==3.6.3.0
 cached-property==1.5.2
-celery==5.2.2
+celery[redis]==5.2.2
 certifi==2020.12.5
 cffi==1.14.3
 chardet==4.0.0

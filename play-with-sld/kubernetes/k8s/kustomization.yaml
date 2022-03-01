@@ -10,8 +10,6 @@ commonLabels:
 resources:
  - mysql-service.yml
  - mysql.yml
- - rabbitmq.yml
- - rabbit-service.yml
  - redis-service.yml
  - redis.yml
  - sld-api-backend-service.yml
@@ -27,4 +25,3 @@ resources:
  - sld-schedule-service.yml
  - db-secret.yml
  - dashboard-secret.yml
- - rabbit-secret.yml

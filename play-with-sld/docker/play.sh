@@ -23,7 +23,7 @@ check_docker () {
 
 
 start_db_redis_rabbit() {
-    docker-compose up -d  db redis rabbit
+    docker-compose up -d  db redis
     sleep 15
 }
 

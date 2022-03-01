@@ -17,7 +17,7 @@ spec:
       subdomain: primary
       containers:
         - name: api-backend
-          image: d10s0vsky/sld-api:latest
+          image: nabilm/sld-api:2.1.2
           resources:
             limits:
               memory: 600Mi
