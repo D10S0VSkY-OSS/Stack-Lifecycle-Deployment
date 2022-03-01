@@ -28,11 +28,12 @@ else:  # running example with docker
     celery_app = Celery(
         "worker",
         backend = f"{BACKEND_TYPE}://{BACKEND_USER}:{BACKEND_PASSWD}@{BACKEND_SERVER}/{BACKEND_DB}",
-        broker = f"{BACKEND_TYPE}://{BACKEND_USER}:{BACKEND_PASSWD}@{BACKEND_SERVER}/{BACKEND_DB}"
+        broker = f"{BACKEND_TYPE}://{BACKEND_USER}:{BACKEND_PASSWD}@{BACKEND_SERVER}/{BROKER_DB}"
     )
     celery_app.conf.task_routes={
         "app.app.worker.celery_worker.test_celery": "api-queue"}
 
 celery_app.conf.update(task_track_started=True)
 celery_app.conf.result_expires = os.getenv('SLD_RESULT_EXPIRE', "259200")
+# see : https://docs.celeryproject.org/en/stable/getting-started/backends-and-brokers/redis.html#redis-caveats
 celery_app.conf.broker_transport_options = {'visibility_timeout': 43200}
