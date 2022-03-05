@@ -26,10 +26,10 @@ jobs:
 
     - name: Build the Docker image with tag
       working-directory: ./sld-api-backend
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-api:2.1.2
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-api:2.1.3
       
     - name: Docker Push with tag
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:2.1.2
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:2.1.3
 
     - name: Build the Docker image
       working-directory: ./sld-api-backend
