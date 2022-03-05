@@ -58,6 +58,7 @@ kubectl apply -f k8s/istio/istio-tls.yaml
 ### 7-Finally Add EXTERNAL-IP in /etc/hosts
 
 ```
+
 # kubectl -n istio-system get service istio-ingressgateway
 NAME                   TYPE           CLUSTER-IP       EXTERNAL-IP       PORT(S)                                                                     AGE
 istio-ingressgateway   LoadBalancer   10.96.218.227   172.19.255.200  
