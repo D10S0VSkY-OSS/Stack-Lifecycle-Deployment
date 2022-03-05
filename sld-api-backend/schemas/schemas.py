@@ -1,13 +1,13 @@
-from pydantic import BaseModel, EmailStr, Field, ValidationError, validator
+from pydantic import BaseModel, EmailStr, Field, ValidationError, validator, SecretStr, constr
 from typing import Optional, List
 
 
 class UserBase(BaseModel):
-    username: str
+    username: constr(strip_whitespace=True)
 
 
 class UserCreate(UserBase):
-    fullname: str
+    fullname: constr(strip_whitespace=True)
     password: str
     email: EmailStr = None
     squad: List[str] = []
@@ -16,7 +16,7 @@ class UserCreate(UserBase):
 
 
 class UserCreateMaster(UserBase):
-    fullname: str
+    fullname: constr(strip_whitespace=True)
     password: str
     email: EmailStr = None
     is_active: bool = True
@@ -64,12 +64,12 @@ class TokenData(BaseModel):
 
 
 class StackBase(BaseModel):
-    stack_name: str
-    git_repo: str
-    branch: str = "master"
+    stack_name: constr(strip_whitespace=True)
+    git_repo: constr(strip_whitespace=True)
+    branch: constr(strip_whitespace=True)  = "master"
     squad_access: List[str] = ["*"]
-    tf_version: str = "1.0.0"
-    description: str
+    tf_version: constr(strip_whitespace=True) = "1.1.7"
+    description: constr(strip_whitespace=True)
 
 
 class StackCreate(StackBase):
@@ -78,7 +78,7 @@ class StackCreate(StackBase):
 
 class Stack(StackBase):
     id: int
-    task_id: str
+    task_id: constr(strip_whitespace=True)
     user_id: int
 
     class Config:
@@ -86,17 +86,17 @@ class Stack(StackBase):
 
 
 class AwsBase(BaseModel):
-    squad: str
-    environment: str
-    access_key_id: str
-    secret_access_key: Optional[str] = Field(None, example="string")
-    default_region: str
+    squad: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
+    access_key_id: constr(strip_whitespace=True)
+    secret_access_key: Optional[constr(strip_whitespace=True)] = Field(None, example="string")
+    default_region: constr(strip_whitespace=True)
 
 
 class AwsAsumeProfile(AwsBase):
-    profile_name: Optional[str] = None
-    role_arn: Optional[str] = None
-    source_profile: Optional[str] = None
+    profile_name: Optional[constr(strip_whitespace=True)] = None
+    role_arn: Optional[constr(strip_whitespace=True)] = None
+    source_profile: Optional[constr(strip_whitespace=True)] = None
 
 
 class Aws(AwsBase):
@@ -107,8 +107,8 @@ class Aws(AwsBase):
 
 
 class GcloudBase(BaseModel):
-    squad: str
-    environment: str
+    squad: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
     gcloud_keyfile_json: dict
 
 
@@ -120,12 +120,12 @@ class Gcloud(GcloudBase):
 
 
 class AzureBase(BaseModel):
-    squad: str
-    environment: str
-    subscription_id: str
-    client_id: str
-    client_secret: str
-    tenant_id: str
+    squad: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
+    subscription_id: constr(strip_whitespace=True)
+    client_id: constr(strip_whitespace=True)
+    client_secret: constr(strip_whitespace=True)
+    tenant_id: constr(strip_whitespace=True)
 
 
 class Azure(AwsBase):
@@ -136,41 +136,41 @@ class Azure(AwsBase):
 
 
 class DeployBase(BaseModel):
-    name: str
-    stack_name: str
-    username: str
-    squad: str
-    environment: str
-    variables: str
+    name: constr(strip_whitespace=True)
+    stack_name: constr(strip_whitespace=True)
+    username: constr(strip_whitespace=True)
+    squad: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
+    variables: constr(strip_whitespace=True)
 
 
 class DeployCreate(BaseModel):
-    name: str
-    squad: str
-    stack_name: str
-    environment: str
-    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
-    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")
+    name: constr(strip_whitespace=True)
+    squad: constr(strip_whitespace=True)
+    stack_name: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
+    start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
     variables: dict
 
 
 class DeployCreateMaster(DeployCreate):
-    squad: str
+    squad: constr(strip_whitespace=True)
 
 
 class DeployDeleteMaster(BaseModel):
-    squad: str
+    squad: constr(strip_whitespace=True)
 
 
 class DeployUpdate(BaseModel):
-    start_time: str
-    destroy_time: str
+    start_time: constr(strip_whitespace=True)
+    destroy_time: constr(strip_whitespace=True)
     variables: dict
 
 
 class Deploy(StackBase):
     id: int
-    task_id: str
+    task_id: constr(strip_whitespace=True)
     user_id: int
 
     class Config:
@@ -178,31 +178,31 @@ class Deploy(StackBase):
 
 
 class PlanCreate(BaseModel):
-    name: str
-    stack_name: str
-    squad: str
-    environment: str
-    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
-    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")
+    name: constr(strip_whitespace=True)
+    stack_name: constr(strip_whitespace=True)
+    squad: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
+    start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
     variables: dict
 
 
 class TasksBase(BaseModel):
     id: str
-    deploy_id: str
-    name: str
+    deploy_id: constr(strip_whitespace=True)
+    name: constr(strip_whitespace=True)
 
 
 class ActivityLogs(BaseModel):
     id: int
-    username: str
-    squad: str
-    action: str
+    username: constr(strip_whitespace=True)
+    squad: constr(strip_whitespace=True)
+    action: constr(strip_whitespace=True)
 
     class Config:
         orm_mode = True
 
 
 class ScheduleUpdate(BaseModel):
-    start_time: Optional[str] = Field(None, example="30 7 * * 0-4")
-    destroy_time: Optional[str] = Field(None, example="30 18 * * 0-4")
+    start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
+    destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
