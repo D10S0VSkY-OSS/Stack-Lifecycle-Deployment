@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
 from flask_wtf import FlaskForm
 from wtforms import validators
-from wtforms import StringField, BooleanField, TextAreaField, TextField, PasswordField, FieldList, FormField, SelectMultipleField
-from wtforms.fields.html5 import EmailField
+from wtforms import StringField, BooleanField, TextAreaField, StringField, PasswordField, FieldList, FormField, SelectMultipleField
+from wtforms.fields import EmailField
 from wtforms.validators import InputRequired, Email, DataRequired
 
 # login and registration
@@ -53,10 +53,10 @@ class DeployForm(FlaskForm):
         validators.DataRequired(message='Environment requerid.')
     ])
     start_time = StringField('Start Time', [
-        validators.length(min=3, max=5, message='Time out of reange.'),
+        validators.length(min=3, max=30, message='Time out of reange.'),
     ])
     destroy_time = StringField('Destroy Time', [
-        validators.length(min=3, max=5, message='Time out of reange.'),
+        validators.length(min=3, max=30, message='Time out of reange.'),
     ])
     environment = StringField('Environment', [
         validators.length(min=2, max=250, message='Branch out of reange.'),
@@ -75,17 +75,17 @@ class UserForm(FlaskForm):
     ])
     email = EmailField('Email', [
         validators.length(min=6, max=100),
-        validators.Required(message='The email is required.'),
+        validators.DataRequired(message='The email is required.'),
         validators.Email(message='Enter a valid email.')
     ])
     squad = StringField('Squad', [
         validators.length(min=4, max=50),
-        validators.Required('The squad name is required.'),
+        validators.DataRequired('The squad name is required.'),
     ])
     password = PasswordField(
         'Password', [
             validators.length(min=8, max=50),
-            validators.Required('The password is required.'),
+            validators.DataRequired('The password is required.'),
             validators.EqualTo(
                 'confirm_password',
                 message='The password does not match.'
