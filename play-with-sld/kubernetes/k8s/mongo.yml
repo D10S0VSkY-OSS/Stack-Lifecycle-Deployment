@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongo
+  labels:
+    name: mongo
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      name: mongo
+  template:
+    metadata:
+      labels:
+        name: mongo
+    spec:
+      subdomain: primary
+      containers:
+      - name: mongo
+        image: mongo
+        env:
+        - name: MONGO_INITDB_DATABASE
+          value: remote-state
+          # Use secret in real usage
+        - name: MONGO_INITDB_ROOT_USERNAME
+          value: admin
+        - name: MONGO_INITDB_ROOT_PASSWORD
+          value: admin
+        ports:
+        - containerPort: 27017
