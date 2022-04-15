@@ -1,4 +1,4 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 MAINTAINER D10S0VSkY
 
 ENV LC_ALL=C.UTF-8
@@ -17,8 +17,8 @@ ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && \
 apt-get update && \
 apt-get upgrade -yq && \
 apt-get -yq install \
-python3 python3-pip default-libmysqlclient-dev zip git tzdata && \
-pip3 install --no-cache-dir -r requirements.txt && \
+python3.10 pip default-libmysqlclient-dev zip git tzdata && \
+pip install --no-cache-dir -r requirements.txt && \
 apt-get clean autoclean && \
 apt-get autoremove -y && \
 rm -rf /var/lib/{apt,dpkg,cache,log}
