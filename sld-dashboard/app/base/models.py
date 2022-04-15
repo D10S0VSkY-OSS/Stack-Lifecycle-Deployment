@@ -4,7 +4,7 @@ from app import db, login_manager
 import datetime
 import bcrypt
 from flask_login import UserMixin
-from sqlalchemy import Binary, Column, Integer, String, JSON
+from sqlalchemy import Column, Integer, String, JSON
 from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
