@@ -5,15 +5,17 @@ kind: Kustomization
 commonLabels:
   app: stack-lifecycle-deploy
   environment: play
-  version: 1.0.2
+  version: 2.2.0
 
 resources:
  - mysql-service.yml
  - mysql.yml
  - rabbitmq.yml
  - rabbit-service.yml
- - redis-service.yml
  - redis.yml
+ - redis-service.yml
+ - mongo.yml
+ - mongo-service.yml
  - sld-api-backend-service.yml
  - sld-api-backend.yml
  - sld-worker-default.yml

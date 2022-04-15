@@ -17,7 +17,12 @@ spec:
       subdomain: primary
       containers:
         - name: remote-state
-          image: d10s0vsky/sld-remote-state:1.0.2
+          image: d10s0vsky/sld-remote-state:latest
+          env:
+          - name: SLD_STORE
+            value: mongodb
+          - name: SLD_MONGODB_URL
+            value: "mongodb:27017/"
           resources:
             limits:
               memory: 600Mi
