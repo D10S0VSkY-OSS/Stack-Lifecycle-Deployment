@@ -303,7 +303,7 @@ To configure S3 you can pass the access and secret keys of aws, in case SLD is r
     - name: AWS_SECRET_ACCESS_KEY
       value: ""
 ```
-## data remote state
+## Data remote state
 To be able to use the outputs of other stacks you can configure it as follows
 the key alwys is the same like "Task Name"
 | stack-name | squad account | env | deploy name |
@@ -317,7 +317,11 @@ data "terraform_remote_state" "vpc_core" {
   }
 }
 ```
-## workers
+Test example:
+```
+echo "data.terraform_remote_state.vpc_core.outputs"|terraform console
+```
+## Workers
 The workers in sld are responsible for executing the infrastructure deployment. You can use one or more workers for each account or several accounts at the same time. It all depends on the degree of parallelism and segregation that you consider
 
 ```
