@@ -255,6 +255,20 @@ You need docker and docker-compse or kind ( recomended ).
 
 # Custom settings
 ## Storage backend
+SLD uses its own remote backend, so you don't need to configure any backend in terraform.
+The following example shows a backend config
+```
+        terraform {
+          backend "http" {
+            address = "http://remote-state:8080/terraform_state/aws_vpc-squad1-develop-vpc_core"
+            lock_address = "http://remote-state:8080/terraform_lock/aws_vpc-squad1-develop-vpc_core"
+            lock_method = "PUT"
+            unlock_address = "http://remote-state:8080/terraform_lock/aws_vpc-squad1-develop-vpc_core"
+            unlock_method = "DELETE"
+          }
+        }
+        
+```
 At the moment SLD supports MongoDB, S3 and local backend (for testing purposes only)
 To configure MongoDB as a backend, you must pass the following variables as parameters to the remote-state service:
 ```
@@ -264,6 +278,8 @@ To configure MongoDB as a backend, you must pass the following variables as para
       SLD_MONGODB_URL: "mongodb:27017/"
       MONGODB_USER: admin
       MONGODB_PASSWD: admin
+```
+```
 # k8s yaml
     env:
     - name: SLD_STORE
