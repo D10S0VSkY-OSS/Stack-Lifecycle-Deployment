@@ -49,6 +49,7 @@
         <li><a href="#workers">Workers</a></li>
         <li><a href="#users-roles">Users roles</a></li>
       </ul>
+    <li><a href="#architecture">Architecture</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -389,6 +390,11 @@ SLD has three preconfigured roles for users to easily manage this.
 | darth_vader | one or many squad | Limit the scope of the squad, can see the assigned squads and you are a full manager of only those squads |
 | stormtrooper | one or many squad  | Limits squad range, can see assigned squads and can only deploy assigned deployment on belong squad |
 | R2-D2 | all, one or many squad  | This role is only for identification and must be associated with the previous ones, its use case is for bot users who access the api |
+
+<!-- Architecture -->
+## Architecture
+![sign-in](img/architecture.png)
+
 <!-- ROADMAP -->
 ## Roadmap
 
