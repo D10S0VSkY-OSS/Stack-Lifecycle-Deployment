@@ -42,6 +42,14 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#custom-settings">Custom settings</a></li>
+      <ul>
+        <li><a href="#storage-backend">Storage backend</a></li>
+        <li><a href="#data-remote-state">Data remote state</a></li>
+        <li><a href="#workers">Workers</a></li>
+        <li><a href="#users-roles">Users roles</a></li>
+      </ul>
+    <li><a href="#architecture">Architecture</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -140,8 +148,8 @@ You need docker and docker-compse or kind ( recomended ).
    #################################################
    #  Now, you can play with SLD 🕹️                #
    #################################################
-   API: http://0.0.0.0:5000/docs
-   DASHBOARD: http://0.0.0.0:5000/
+   API: http://localhost:5000/docs
+   DASHBOARD: http://localhost:5000/
    ---------------------------------------------
    username: admin
    password: Password08@
@@ -163,12 +171,12 @@ You need docker and docker-compse or kind ( recomended ).
    kubectl ok
 
    List endpoints
-   API: http://0.0.0.0:8000/docs
-   DASHBOARD: http://0.0.0.0:5000/
+   API: http://localhost:8000/docs
+   DASHBOARD: http://localhost:5000/
    ```
 <!-- USAGE EXAMPLES -->
 ## Usage
-1. Sign-in to [DASHBOARD:](http://0.0.0.0:5000/)
+1. Sign-in to [DASHBOARD:](http://localhost:5000/)
 
     ![sign-in](img/sign-in.png)
     
@@ -190,6 +198,10 @@ You need docker and docker-compse or kind ( recomended ).
     * Environment: develop
     
     > by default workers are running as squad1 and squad2 for play purpose, but you can change it and scale when you want
+
+
+    **When you add an account to a provider ( aws, gcp, azure ) one squad is created, you must create a worker for the name of the created squad, if you don't do it the deployment will remain in a "PENDING" state [Read Workers](#workers)**
+  
     
     finally add:
     * Access_key_id
@@ -242,11 +254,151 @@ You need docker and docker-compse or kind ( recomended ).
     ![sign-in](img/schedule.png)
 <!-- USAGE EXAMPLES -->
 
+# Custom settings
+## Storage backend
+SLD uses its own remote backend, so you don't need to configure any backend in terraform.
+The following example shows a backend config
+```
+        terraform {
+          backend "http" {
+            address = "http://remote-state:8080/terraform_state/aws_vpc-squad1-develop-vpc_core"
+            lock_address = "http://remote-state:8080/terraform_lock/aws_vpc-squad1-develop-vpc_core"
+            lock_method = "PUT"
+            unlock_address = "http://remote-state:8080/terraform_lock/aws_vpc-squad1-develop-vpc_core"
+            unlock_method = "DELETE"
+          }
+        }
+        
+```
+At the moment SLD supports MongoDB, S3 and local backend (for testing purposes only)
+To configure MongoDB as a backend, you must pass the following variables as parameters to the remote-state service:
+```
+# docker-compose.yaml
+    environment:                                                                                                     
+      SLD_STORE: mongodb                                                                                             
+      SLD_MONGODB_URL: "mongodb:27017/"
+      MONGODB_USER: admin
+      MONGODB_PASSWD: admin
+```
+```
+# k8s yaml
+    env:
+    - name: SLD_STORE
+      value: mongodb
+    - name: SLD_MONGODB_URL
+      value: "mongodb:27017/"
+    - name: MONGODB_USER
+      value: admin
+    - name: MONGODB_PASSWD
+      value: admin
+```
+To configure S3 you can pass the access and secret keys of aws, in case SLD is running in AWS it is recommended to use roles
+```
+    env:
+    - name: SLD_STORE
+      value: "S3"
+    - name: SLD_BUCKET
+      value: "s3-sld-backend-cloud-tf-state"
+    - name: AWS_ACCESS_KEY
+      value: ""
+    - name: AWS_SECRET_ACCESS_KEY
+      value: ""
+```
+## Data remote state
+To be able to use the outputs of other stacks you can configure it as follows
+the key alwys is the same like "Task Name"
+| stack-name | squad account | env | deploy name |
+| :---: | :---: | :---: | :---: |
+| aws_vpc | squad1 | develop | vpc_core |
+```
+data "terraform_remote_state" "vpc_core" {
+  backend = "http"
+  config = {
+    address = "http://remote-state:8080/terraform_state/aws_vpc-squad1-develop-vpc_core"
+  }
+}
+```
+Test example:
+```
+echo "data.terraform_remote_state.vpc_core.outputs"|terraform console
+```
+## Workers
+The workers in sld are responsible for executing the infrastructure deployment. You can use one or more workers for each account or several accounts at the same time. It all depends on the degree of parallelism and segregation that you consider
+
+```
+# Example k8s worker for account squad1, change this for each of your accounts
+# Stack-Lifecycle-Deployment/play-with-sld/kubernetes/k8s/sld-worker-squad1.yml
+# Add replicas for increment paralelism
+# Add more squad accounts if you want to group accounts in the same worker:
+# command: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "squad1,"another_squad_account"]
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: stack-deploy-worker-squad1
+  labels:
+    name: stack-deploy-worker-squad1
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      name: stack-deploy-worker-squad1
+  template:
+    metadata:
+      labels:
+        name: stack-deploy-worker-squad1
+    spec:
+      subdomain: primary
+      containers:
+        - name: stack-deploy-worker-squad1
+          image: d10s0vsky/sld-api:latest
+          imagePullPolicy: Always
+          env:
+          - name: TF_WARN_OUTPUT_ERRORS
+            value: "1"
+          resources:
+            limits:
+              memory: 600Mi
+              cpu: 1
+            requests:
+              memory: 300Mi
+              cpu: 500m
+          command: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "squad1"]
+
+```
+```
+  # Example docker-compose worker for account squad1, change this for each of your accounts
+  # Stack-Lifecycle-Deployment/play-with-sld/docker/docker-compose.yml
+
+  worker:
+    image: d10s0vsky/sld-api:latest
+    entrypoint: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "squad1"]
+    environment:
+      BROKER_USER: admin
+      BROKER_PASSWD: admin
+    depends_on:
+      - rabbit
+      - redis
+      - db
+      - remote-state
+```
+## Users roles
+SLD has three preconfigured roles for users to easily manage this.
+| roles | scope | description |
+| :---: | :---: | :---: |
+| yoda | global | Global scope, can see all squads and are full admin |
+| darth_vader | one or many squad | Limit the scope of the squad, can see the assigned squads and you are a full manager of only those squads |
+| stormtrooper | one or many squad  | Limits squad range, can see assigned squads and can only deploy assigned deployment on belong squad |
+| R2-D2 | all, one or many squad  | This role is only for identification and must be associated with the previous ones, its use case is for bot users who access the api |
+
+<!-- Architecture -->
+## Architecture
+![sign-in](img/architecture.png)
+
 <!-- ROADMAP -->
 ## Roadmap
 
-* Download deployment in local ( include terraform plan variables, and remote state code)
-* Add plan button in Dashboard
+* Support storage backend gcp cloud storage and azure blob storage
 * LDAP and SSO authentication
 * Slack integration
 * FluenD / elasticSearch integration
