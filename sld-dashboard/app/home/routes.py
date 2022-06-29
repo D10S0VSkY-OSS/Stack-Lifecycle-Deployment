@@ -162,6 +162,7 @@ def relaunch_deploy(deploy_id):
         data = {
             "start_time": content['start_time'],
             "destroy_time": content['destroy_time'],
+            "tfvar_file"  : content['tfvar_file'],
             "variables": content['variables']
         }
         response = request_url(
@@ -204,12 +205,13 @@ def edit_deploy(deploy_id):
         response = request_url(verb='GET', uri=f'{endpoint}', headers={
                                "Authorization": f"Bearer {token}"})
         deploy = response.get('json')
+        tfvar_file = deploy.get('tfvar_file')
 
         # When user push data with POST verb
         if request.method == 'POST':
             # List for exclude in vars
             form_vars = ["csrf_token", 'button', 'start_time',
-                         'destroy_time', 'sld_key', 'sld_value']
+                         'destroy_time', 'sld_key', 'sld_value', 'tfvar_file']
             # Clean exclude data vars
             data_raw = {key: value for key,
                         value in request.form.items() if key not in form_vars}
@@ -223,6 +225,7 @@ def edit_deploy(deploy_id):
             data = {
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
+                "tfvar_file"  : form.tfvar_file.data,
                 "variables": ast.literal_eval(variables)
             }
             if not "deploy" in request.form.get('button'):
@@ -278,7 +281,7 @@ def get_plan(deploy_id):
         # When user push data with POST verb
         if request.method == 'POST':
             # List for exclude in vars
-            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time']
+            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time', 'tfvar_file']
             # Clean exclude data vars
             data_raw = {key: value for key,
                         value in request.form.items() if key not in form_vars}
@@ -290,6 +293,7 @@ def get_plan(deploy_id):
                 "environment": deploy['environment'],
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
+                "tfvar_file"  : form.tfvar_file.data,
                 "variables": ast.literal_eval(variables)
             }
             # Deploy
@@ -342,7 +346,7 @@ def edit_schedule(deploy_id):
         # When user push data with POST verb
         if request.method == 'POST':
             # List for exclude in vars
-            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time']
+            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time', 'tfvar_file']
             data = {
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
@@ -555,10 +559,12 @@ def deploy_stack(stack_id):
         if request.method == 'POST':
             # Define list for exclude vars in variables data
             form_vars = ["csrf_token", 'environment', 'deploy_name',
-                         'button', 'start_time', 'destroy_time', 'squad']
-            data_raw = {key: value for key,
-                        value in request.form.items() if key not in form_vars}
-            variables = json.dumps(convert_to_dict(data_raw))
+                         'button', 'start_time', 'destroy_time', 'squad', 'tfvar_file']
+            variables = {}
+            if request.form.get('tfvar_file') == "":
+                data_raw = {key: value for key,
+                            value in request.form.items() if key not in form_vars}
+                variables = ast.literal_eval(json.dumps(convert_to_dict(data_raw)))
             data = {
                 "name": form.deploy_name.data,
                 "stack_name": stack['json']['stack_name'],
@@ -566,7 +572,8 @@ def deploy_stack(stack_id):
                 "destroy_time": form.destroy_time.data,
                 "squad": request.form.get('squad'),
                 "environment": request.form.get('environment'),
-                "variables": ast.literal_eval(variables)
+                "tfvar_file": request.form.get('tfvar_file'),
+                "variables": variables
             }
             endpoint = f'plan'
             if not "plan" in request.form.get('button'):
@@ -582,7 +589,7 @@ def deploy_stack(stack_id):
                 json=data
             )
             if response.get('status_code') == 202:
-                flash(f"Deploying stack {form.stack_name.data}")
+                flash(f"Deploying stack {stack['json']['stack_name']}")
             else:
                 flash(response['json']['detail'], 'error')
             return redirect(url_for('home_blueprint.route_template', template="deploys-list"))

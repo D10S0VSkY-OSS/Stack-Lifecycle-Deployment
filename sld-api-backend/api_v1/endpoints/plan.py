@@ -58,7 +58,8 @@ async def plan_infra_by_stack_name(
             branch,
             tf_ver,
             deploy.variables,
-            secreto)
+            secreto,
+            deploy.tfvar_file)
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
             db=db,
@@ -132,7 +133,9 @@ async def update_plan_by_id(
             branch,
             tf_ver,
             deploy_update.variables,
-            secreto)
+            secreto,
+            deploy_update.tfvar_file 
+            )
         # Push deploy task data
         if "Plan" in deploy_data.action:
             crud_deploys.update_deploy(
@@ -141,6 +144,7 @@ async def update_plan_by_id(
                 task_id=pipeline_plan,
                 action="Plan",
                 user_id=current_user.id,
+                tfvar_file=deploy_update.tfvar_file,
                 variables=deploy_update.variables,
                 start_time=deploy_update.start_time,
                 destroy_time=deploy_update.destroy_time,
@@ -202,7 +206,8 @@ async def get_plan_by_id_deploy(
             branch,
             tf_ver,
             deploy_data.variables,
-            secreto)
+            secreto,
+            deploy_data.tfvar_file)
         return {"task": pipeline_plan}
     except Exception as err:
         raise HTTPException(

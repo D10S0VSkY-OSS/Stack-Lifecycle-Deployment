@@ -145,6 +145,9 @@
                                         {{ render_field(form.destroy_time, autocomplete="off", class='form-control', value='30 18 * * 0-4') }}
                                     </div>
 
+                                    <div class="form-group">
+                                        {{ render_field(form.tfvar_file, autocomplete="off", class='form-control', value='') }}
+                                    </div>
                                     <!-- start SLD_SORT False -->
                                     {% if not sort_form %}
                                     {% for key, value in data_json.items()%}
