@@ -10,15 +10,16 @@ import schemas.schemas as schemas
 def create_new_deploy(
         db: Session,
         deploy: schemas.DeployCreate,
+        stack_branch: str,
         action: str,
         user_id: int,
         squad: str,
         task_id: str,
         username: str):
-
     db_deploy = models.Deploy(
         name=deploy.name,
         stack_name=deploy.stack_name,
+        stack_branch=stack_branch,
         environment=deploy.environment,
         tfvar_file=deploy.tfvar_file,
         variables=deploy.variables,
@@ -49,6 +50,7 @@ def update_deploy(
         task_id: str,
         start_time: str,
         destroy_time: str,
+        stack_branch: str,
         tfvar_file: str,
         variables: dict):
     db_deploy = db.query(models.Deploy).filter(
@@ -58,6 +60,7 @@ def update_deploy(
     db_deploy.task_id = task_id
     db_deploy.username = username
     db_deploy.user_id = user_id
+    db_deploy.stack_branch = stack_branch
     db_deploy.tfvar_file = tfvar_file
     db_deploy.variables = variables
     db_deploy.updated_at = datetime.datetime.now()

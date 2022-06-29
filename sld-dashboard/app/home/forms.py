@@ -35,6 +35,9 @@ class StackForm(FlaskForm):
     tfvar_file = StringField('tfvar_file', [
         validators.length(min=5, max=30, message='Tfvars file name.'),
     ])
+    branch = StringField('branch', [
+        validators.length(min=5, max=30, message='Custom branch if empty use stack default branch'),
+    ])
     description_edit = StringField('Description', render_kw={'rows': 1})
 
 
@@ -60,6 +63,9 @@ class DeployForm(FlaskForm):
     ])
     destroy_time = StringField('Destroy Time', [
         validators.length(min=3, max=30, message='Time out of reange.'),
+    ])
+    branch = StringField('branch', [
+        validators.length(min=5, max=30, message='Custom branch if empty use stack default branch'),
     ])
     tfvar_file = StringField('tfvar_file', [
         validators.length(min=5, max=30, message='Tfvars file name.'),
