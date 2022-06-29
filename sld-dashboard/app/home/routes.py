@@ -52,11 +52,17 @@ def list_deploys(limit):
         token = decrypt(r.get(current_user.id))
         # Check if token no expired
         check_unauthorized_token(token)
+        #get stack info
+        endpoint = f'stacks/?limit={limit}'
+        stack_response = request_url(verb='GET', uri=f'{endpoint}', headers={
+                               "Authorization": f"Bearer {token}"})
+        stack = stack_response.get('json')
+        # Get deploy data vars and set var for render
         endpoint = f'deploy/?limit={limit}'
         response = request_url(verb='GET', uri=f'{endpoint}', headers={
                                "Authorization": f"Bearer {token}"})
         content = response.get('json')
-        return render_template('deploys-list.html', name='Name', token=token, deploys=content, external_api_dns=external_api_dns)
+        return render_template('deploys-list.html', name='Name', token=token, deploys=content, stacks=stack, external_api_dns=external_api_dns)
     except TemplateNotFound:
         return render_template('page-404.html'), 404
     except TypeError:
@@ -166,7 +172,6 @@ def relaunch_deploy(deploy_id):
             "tfvar_file": content['tfvar_file'],
             "variables": content['variables']
         }
-        print(data)
         response = request_url(
             verb='PATCH',
             uri=f'{endpoint}',
@@ -711,8 +716,6 @@ def new_user():
                 "role": request.form.get('role').split(","),
                 "is_active": form.is_active.data,
             }
-            print(request.form)
-            print(new_user)
             endpoint = f'users/'
             response = request_url(
                 verb='POST',

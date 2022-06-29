@@ -102,6 +102,10 @@
             <tbody>
                 <!-- Item -->
                 {% for deploy in deploys| sort(attribute='id') %}
+
+                {% for stack in stacks| sort(attribute='id') %}
+                {% if deploy.stack_name in stack.stack_name %}
+
                 <tr>
                     <td>
                         <a href="" class="font-weight-bold">
@@ -111,7 +115,11 @@
                     <td>
                         <span class="font-weight-normal">{{ deploy.name }}</span>
                     </td>
-                    <td><span class="font-weight-normal">{{ deploy.stack_name }}</span></td>
+                    <td><span class="font-weight-normal">
+                            <a href="{{stack.get("git_repo")}}" title="branch {{deploy.get('stack_branch')}}"  target="_blank">
+                                {{ deploy.stack_name }}</a></span></td>
+                {% endif %}
+                {% endfor %}
                     <td><span class="font-weight-normal">{{ deploy.squad}}</span></td>
                     <td><span class="font-weight-normal">{{ deploy.environment}}</span></td>
                     <td><span class="font-weight-normal">{{ deploy.username}}</span></td>

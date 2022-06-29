@@ -87,18 +87,18 @@
                                     <div class="border-top my-4"></div>
                                 <!-- End Add custom variables -->
                                 {% endif %}
-                                    {% if deploy.action == "Plan"%}
+                                    {% if deploy.action == "DryRun"%}
                                     <button type="submit" class="btn btn-success" name="button" value=plan
                                         action="{{url_for('.list_deploys')}}">
-                                        Plan
+                                        DryRun
                                     </button>
                                     {% else %}
                                     <button type="submit" class="btn btn-success" name="button" value=plan
                                         action="{{url_for('.list_deploys')}}">
-                                        DryRun 
+                                        Plan
                                     </button>
                                     {% endif %}
-                                    <button type="submit" class="btn btn-primary" name="button" value=deploy
+                                    <button type="submit" class="btn btn-dark" name="button" value=deploy
                                         action="{{url_for('.list_deploys')}}">
                                         Deploy
                                     </button>
