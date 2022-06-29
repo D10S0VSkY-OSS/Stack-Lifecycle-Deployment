@@ -151,6 +151,7 @@ class DeployCreate(BaseModel):
     environment: constr(strip_whitespace=True)
     start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
     destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
     variables: dict
 
 
@@ -165,6 +166,7 @@ class DeployDeleteMaster(BaseModel):
 class DeployUpdate(BaseModel):
     start_time: constr(strip_whitespace=True)
     destroy_time: constr(strip_whitespace=True)
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
     variables: dict
 
 
@@ -184,6 +186,7 @@ class PlanCreate(BaseModel):
     environment: constr(strip_whitespace=True)
     start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
     destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
     variables: dict
 
 

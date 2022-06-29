@@ -66,7 +66,8 @@ async def deploy_infra_by_stack_name(
             branch,
             tf_ver,
             deploy.variables,
-            secreto)
+            secreto,
+            deploy.tfvar_file)
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
             db=db,
@@ -149,7 +150,8 @@ async def update_deploy_by_id(
             branch,
             tf_ver,
             deploy_update.variables,
-            secreto)
+            secreto,
+            deploy_update.tfvar_file)
         # Push deploy task data
         crud_deploys.update_deploy(
             db=db,
@@ -157,6 +159,7 @@ async def update_deploy_by_id(
             task_id=pipeline_deploy,
             action="Update",
             user_id=current_user.id,
+            tfvar_file=deploy_update.tfvar_file,
             variables=deploy_update.variables,
             start_time=deploy_update.start_time,
             destroy_time=deploy_update.destroy_time,
@@ -202,6 +205,7 @@ async def destroy_infra(
     start_time = deploy_data.start_time
     destroy_time = deploy_data.destroy_time
     variables = deploy_data.variables
+    tfvar_file = deploy_data.tfvar_file
     name = deploy_data.name
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
@@ -227,7 +231,8 @@ async def destroy_infra(
             branch,
             tf_ver,
             variables,
-            secreto
+            secreto,
+            tfvar_file
         )
         # Push deploy task data
         crud_deploys.update_deploy(
@@ -238,6 +243,7 @@ async def destroy_infra(
             user_id=current_user.id,
             start_time=start_time,
             destroy_time=destroy_time,
+            tfvar_file=tfvar_file,
             variables=variables,
             username=current_user.username)
         # Push task data
@@ -312,6 +318,7 @@ async def delete_infra_by_id(
     stack_name = deploy_data.stack_name
     environment = deploy_data.environment
     name = deploy_data.name
+    tfvar_file = deploy_data.tfvar_file
     variables = deploy_data.variables
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
@@ -341,7 +348,8 @@ async def delete_infra_by_id(
             branch,
             tf_ver,
             variables,
-            secreto
+            secreto,
+            tfvar_file
         )
         # Push task data
         db_task = crud_tasks.create_task(

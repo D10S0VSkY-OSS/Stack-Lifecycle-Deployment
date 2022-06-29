@@ -20,6 +20,7 @@ def create_new_deploy(
         name=deploy.name,
         stack_name=deploy.stack_name,
         environment=deploy.environment,
+        tfvar_file=deploy.tfvar_file,
         variables=deploy.variables,
         action=action,
         username=username,
@@ -48,6 +49,7 @@ def update_deploy(
         task_id: str,
         start_time: str,
         destroy_time: str,
+        tfvar_file: str,
         variables: dict):
     db_deploy = db.query(models.Deploy).filter(
         models.Deploy.id == deploy_id).first()
@@ -56,6 +58,7 @@ def update_deploy(
     db_deploy.task_id = task_id
     db_deploy.username = username
     db_deploy.user_id = user_id
+    db_deploy.tfvar_file = tfvar_file
     db_deploy.variables = variables
     db_deploy.updated_at = datetime.datetime.now()
     check_None = ["string"]

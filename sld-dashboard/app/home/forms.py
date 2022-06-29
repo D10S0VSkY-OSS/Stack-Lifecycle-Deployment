@@ -32,6 +32,9 @@ class StackForm(FlaskForm):
         validators.DataRequired(message='The description is required.')
     ], render_kw={'rows': 5})
     squad_access_edit = StringField('Squad Access (* share with everyone or pass a list: squad1, squad2)', render_kw={'rows': 1})
+    tfvar_file = StringField('tfvar_file', [
+        validators.length(min=5, max=30, message='Tfvars file name.'),
+    ])
     description_edit = StringField('Description', render_kw={'rows': 1})
 
 
@@ -57,6 +60,9 @@ class DeployForm(FlaskForm):
     ])
     destroy_time = StringField('Destroy Time', [
         validators.length(min=3, max=30, message='Time out of reange.'),
+    ])
+    tfvar_file = StringField('tfvar_file', [
+        validators.length(min=5, max=30, message='Tfvars file name.'),
     ])
     environment = StringField('Environment', [
         validators.length(min=2, max=250, message='Branch out of reange.'),
