@@ -72,6 +72,7 @@ async def deploy_infra_by_stack_name(
         db_deploy = crud_deploys.create_new_deploy(
                 db=db,
                 deploy=deploy,
+                stack_branch=branch,
                 task_id=pipeline_deploy,
                 action="Apply",
                 squad=squad,
@@ -128,7 +129,6 @@ async def update_deploy_by_id(
     # Get info from stack data
     stack_data = stack(db, stack_name=stack_name)
     branch = stack_data.branch if deploy_update.stack_branch == "" or deploy_update.stack_branch == None else deploy_update.stack_branch
-    print(branch)
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
 
@@ -328,7 +328,7 @@ async def delete_infra_by_id(
             db, stack_name=stack_name, environment=environment, squad=squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=stack_name)
-    branch = deploy_data.stack_branch
+    branch = stack_data.branch if deploy_data.stack_branch == "" or deploy_data.stack_branch == None else deploy_data.stack_branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:

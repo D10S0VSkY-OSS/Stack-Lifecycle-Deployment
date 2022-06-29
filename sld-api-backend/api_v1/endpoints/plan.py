@@ -64,6 +64,7 @@ async def plan_infra_by_stack_name(
         db_deploy = crud_deploys.create_new_deploy(
             db=db,
             deploy=deploy,
+            stack_branch=branch,
             task_id=pipeline_plan,
             action="Plan",
             squad=squad,
@@ -141,8 +142,9 @@ async def update_plan_by_id(
             secreto,
             deploy_update.tfvar_file 
             )
+        print(deploy_data.action)
         # Push deploy task data
-        if "Plan" in deploy_data.action:
+        if deploy_data.action in ["Plan", "Update", "Apply"]:
             crud_deploys.update_deploy(
                 db=db,
                 deploy_id=plan_id,

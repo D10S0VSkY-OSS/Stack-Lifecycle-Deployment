@@ -10,16 +10,16 @@ import schemas.schemas as schemas
 def create_new_deploy(
         db: Session,
         deploy: schemas.DeployCreate,
+        stack_branch: str,
         action: str,
         user_id: int,
         squad: str,
         task_id: str,
         username: str):
-
     db_deploy = models.Deploy(
         name=deploy.name,
         stack_name=deploy.stack_name,
-        stack_branch=deploy.stack_branch,
+        stack_branch=stack_branch,
         environment=deploy.environment,
         tfvar_file=deploy.tfvar_file,
         variables=deploy.variables,
