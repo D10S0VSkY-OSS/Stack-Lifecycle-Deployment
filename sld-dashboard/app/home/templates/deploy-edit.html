@@ -50,6 +50,10 @@
                                         value=deploy.destroy_time) }}
                                     </div>
                                     <div class="form-group">
+                                        {{ render_field(form.branch, autocomplete="off", class='form-control',
+                                        value=deploy.stack_branch) }}
+                                    </div>
+                                    <div class="form-group">
                                         {{ render_field(form.tfvar_file, autocomplete="off", class='form-control',
                                         value=deploy.tfvar_file) }}
                                     </div>

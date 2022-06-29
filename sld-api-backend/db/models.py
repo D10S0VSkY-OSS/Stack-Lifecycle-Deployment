@@ -83,6 +83,7 @@ class Deploy(Base):
     start_time = Column(String(100))
     destroy_time = Column(String(100))
     stack_name = Column(String(100))
+    stack_branch = Column(String(100))
     created_at = Column(DateTime, default=datetime.datetime.now())
     updated_at = Column(DateTime)
     user_id = Column(Integer)

@@ -162,9 +162,11 @@ def relaunch_deploy(deploy_id):
         data = {
             "start_time": content['start_time'],
             "destroy_time": content['destroy_time'],
-            "tfvar_file"  : content['tfvar_file'],
+            "stack_branch": content['stack_branch'],
+            "tfvar_file": content['tfvar_file'],
             "variables": content['variables']
         }
+        print(data)
         response = request_url(
             verb='PATCH',
             uri=f'{endpoint}',
@@ -211,7 +213,7 @@ def edit_deploy(deploy_id):
         if request.method == 'POST':
             # List for exclude in vars
             form_vars = ["csrf_token", 'button', 'start_time',
-                         'destroy_time', 'sld_key', 'sld_value', 'tfvar_file']
+                         'destroy_time', 'sld_key', 'sld_value', 'branch', 'tfvar_file']
             # Clean exclude data vars
             data_raw = {key: value for key,
                         value in request.form.items() if key not in form_vars}
@@ -225,6 +227,7 @@ def edit_deploy(deploy_id):
             data = {
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
+                "stack_branch"  : form.branch.data,
                 "tfvar_file"  : form.tfvar_file.data,
                 "variables": ast.literal_eval(variables)
             }
@@ -281,7 +284,7 @@ def get_plan(deploy_id):
         # When user push data with POST verb
         if request.method == 'POST':
             # List for exclude in vars
-            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time', 'tfvar_file']
+            form_vars = ["csrf_token", 'button', 'start_time', 'destroy_time', 'branch', 'tfvar_file']
             # Clean exclude data vars
             data_raw = {key: value for key,
                         value in request.form.items() if key not in form_vars}
@@ -293,6 +296,7 @@ def get_plan(deploy_id):
                 "environment": deploy['environment'],
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
+                "stack_branch"  : form.branch.data,
                 "tfvar_file"  : form.tfvar_file.data,
                 "variables": ast.literal_eval(variables)
             }
@@ -392,7 +396,7 @@ def new_stack():
             new_stack: dict = {
                 "stack_name": form.name.data,
                 "git_repo": form.git.data,
-                "branch": form.branch.data,
+                "stack_branch": form.branch.data,
                 "squad_access": squad_acces_form_to_list,
                 "tf_version": form.tf_version.data,
                 "description": form.description.data
@@ -436,7 +440,7 @@ def edit_stack(stack_id):
             update_stack = {
                 "stack_name": form.name.data,
                 "git_repo": form.git.data,
-                "branch": form.branch.data,
+                "stack_branch": form.branch.data,
                 "squad_access": squad_acces_form_to_list,
                 "tf_version": form.tf_version.data,
                 "description": form.description_edit.data
@@ -559,7 +563,7 @@ def deploy_stack(stack_id):
         if request.method == 'POST':
             # Define list for exclude vars in variables data
             form_vars = ["csrf_token", 'environment', 'deploy_name',
-                         'button', 'start_time', 'destroy_time', 'squad', 'tfvar_file']
+                         'button', 'start_time', 'destroy_time', 'squad', 'branch', 'tfvar_file']
             variables = {}
             if request.form.get('tfvar_file') == "":
                 data_raw = {key: value for key,
@@ -572,6 +576,7 @@ def deploy_stack(stack_id):
                 "destroy_time": form.destroy_time.data,
                 "squad": request.form.get('squad'),
                 "environment": request.form.get('environment'),
+                "stack_branch": request.form.get('branch'),
                 "tfvar_file": request.form.get('tfvar_file'),
                 "variables": variables
             }

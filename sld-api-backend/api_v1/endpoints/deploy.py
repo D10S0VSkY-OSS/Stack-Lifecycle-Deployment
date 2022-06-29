@@ -38,19 +38,19 @@ async def deploy_infra_by_stack_name(
             raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
-        db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad)
+            db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=deploy.stack_name)
-    branch = stack_data.branch
+    branch = stack_data.branch if deploy.stack_branch == "" or deploy.stack_branch == None else deploy.stack_branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     check_deploy_exist(
-        db,
-        deploy.name,
-        squad,
-        deploy.environment,
-        deploy.stack_name
-    )
+            db,
+            deploy.name,
+            squad,
+            deploy.environment,
+            deploy.stack_name
+            )
     check_deploy_task_pending_state(deploy.name, squad, deploy.environment)
     try:
         # check crontime
@@ -58,42 +58,42 @@ async def deploy_infra_by_stack_name(
         check_cron_schedule(deploy.destroy_time)
         # push task Deploy to queue and return task_id
         pipeline_deploy = async_deploy(
-            git_repo,
-            deploy.name,
-            deploy.stack_name,
-            deploy.environment,
-            squad,
-            branch,
-            tf_ver,
-            deploy.variables,
-            secreto,
-            deploy.tfvar_file)
+                git_repo,
+                deploy.name,
+                deploy.stack_name,
+                deploy.environment,
+                squad,
+                branch,
+                tf_ver,
+                deploy.variables,
+                secreto,
+                deploy.tfvar_file)
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
-            db=db,
-            deploy=deploy,
-            task_id=pipeline_deploy,
-            action="Apply",
-            squad=squad,
-            user_id=current_user.id,
-            username=current_user.username)
+                db=db,
+                deploy=deploy,
+                task_id=pipeline_deploy,
+                action="Apply",
+                squad=squad,
+                user_id=current_user.id,
+                username=current_user.username)
         # Push task data
         db_task = crud_tasks.create_task(
-            db=db,
-            task_id=pipeline_deploy,
-            task_name=f"{deploy.stack_name}-{squad}-{deploy.environment}-{deploy.name}",
-            user_id=current_user.id,
-            deploy_id=db_deploy.id,
-            username=current_user.username,
-            squad=squad,
-            action="Apply"
-        )
+                db=db,
+                task_id=pipeline_deploy,
+                task_name=f"{deploy.stack_name}-{squad}-{deploy.environment}-{deploy.name}",
+                user_id=current_user.id,
+                deploy_id=db_deploy.id,
+                username=current_user.username,
+                squad=squad,
+                action="Apply"
+                )
 
         return {"task": db_task}
     except Exception as err:
         raise HTTPException(
-            status_code=400,
-            detail=f"{err}")
+                status_code=400,
+                detail=f"{err}")
     finally:
         try:
             result = async_schedule_delete(db_deploy.id, squad)
@@ -124,10 +124,11 @@ async def update_deploy_by_id(
     name = deploy_data.name
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
-        db, stack_name=stack_name, environment=environment, squad=squad)
+            db, stack_name=stack_name, environment=environment, squad=squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=stack_name)
-    branch = stack_data.branch
+    branch = stack_data.branch if deploy_update.stack_branch == "" or deploy_update.stack_branch == None else deploy_update.stack_branch
+    print(branch)
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
 
@@ -142,44 +143,45 @@ async def update_deploy_by_id(
             raise ValueError("Deploy state running, cannot upgrade")
         # push task Deploy Update to queue and return task_id
         pipeline_deploy = async_deploy(
-            git_repo,
-            name,
-            stack_name,
-            environment,
-            squad,
-            branch,
-            tf_ver,
-            deploy_update.variables,
-            secreto,
-            deploy_update.tfvar_file)
+                git_repo,
+                name,
+                stack_name,
+                environment,
+                squad,
+                branch,
+                tf_ver,
+                deploy_update.variables,
+                secreto,
+                deploy_update.tfvar_file)
         # Push deploy task data
         crud_deploys.update_deploy(
-            db=db,
-            deploy_id=deploy_id,
-            task_id=pipeline_deploy,
-            action="Update",
-            user_id=current_user.id,
-            tfvar_file=deploy_update.tfvar_file,
-            variables=deploy_update.variables,
-            start_time=deploy_update.start_time,
-            destroy_time=deploy_update.destroy_time,
-            username=current_user.username)
+                db=db,
+                deploy_id=deploy_id,
+                task_id=pipeline_deploy,
+                action="Update",
+                user_id=current_user.id,
+                tfvar_file=deploy_update.tfvar_file,
+                stack_branch=branch,
+                variables=deploy_update.variables,
+                start_time=deploy_update.start_time,
+                destroy_time=deploy_update.destroy_time,
+                username=current_user.username)
         # Push task data
         db_task = crud_tasks.create_task(
-            db=db,
-            task_id=pipeline_deploy,
-            task_name=f"{stack_name}-{squad}-{environment}-{name}",
-            user_id=current_user.id,
-            deploy_id=deploy_id,
-            username=current_user.username,
-            squad=squad,
-            action="Update")
+                db=db,
+                task_id=pipeline_deploy,
+                task_name=f"{stack_name}-{squad}-{environment}-{name}",
+                user_id=current_user.id,
+                deploy_id=deploy_id,
+                username=current_user.username,
+                squad=squad,
+                action="Update")
 
         return {"task": db_task}
     except Exception as err:
         raise HTTPException(
-            status_code=400,
-            detail=f"{err}")
+                status_code=400,
+                detail=f"{err}")
     finally:
         result = async_schedule_delete(deploy_id, squad)
         # Add schedule
@@ -209,10 +211,10 @@ async def destroy_infra(
     name = deploy_data.name
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
-        db, stack_name=stack_name, environment=environment, squad=squad)
+            db, stack_name=stack_name, environment=environment, squad=squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=stack_name)
-    branch = stack_data.branch
+    branch = stack_data.branch if deploy_data.stack_branch == "" or deploy_data.stack_branch == None else deploy_data.stack_branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     # check task pending state
@@ -223,45 +225,46 @@ async def destroy_infra(
             raise ValueError("Deploy state running, cannot upgrade")
         # push task destroy to queue and return task_id
         pipeline_destroy = async_destroy(
-            git_repo,
-            name,
-            stack_name,
-            environment,
-            squad,
-            branch,
-            tf_ver,
-            variables,
-            secreto,
-            tfvar_file
-        )
+                git_repo,
+                name,
+                stack_name,
+                environment,
+                squad,
+                branch,
+                tf_ver,
+                variables,
+                secreto,
+                tfvar_file
+                )
         # Push deploy task data
         crud_deploys.update_deploy(
-            db=db,
-            deploy_id=deploy_id,
-            task_id=pipeline_destroy,
-            action="Destroy",
-            user_id=current_user.id,
-            start_time=start_time,
-            destroy_time=destroy_time,
-            tfvar_file=tfvar_file,
-            variables=variables,
-            username=current_user.username)
+                db=db,
+                deploy_id=deploy_id,
+                task_id=pipeline_destroy,
+                action="Destroy",
+                user_id=current_user.id,
+                start_time=start_time,
+                destroy_time=destroy_time,
+                stack_branch=branch,
+                tfvar_file=tfvar_file,
+                variables=variables,
+                username=current_user.username)
         # Push task data
         db_task = crud_tasks.create_task(
-            db=db,
-            task_id=pipeline_destroy,
-            task_name=f"{stack_name}-{squad}-{environment}-{name}",
-            user_id=current_user.id,
-            deploy_id=deploy_id,
-            username=current_user.username,
-            squad=squad,
-            action="Destroy")
+                db=db,
+                task_id=pipeline_destroy,
+                task_name=f"{stack_name}-{squad}-{environment}-{name}",
+                user_id=current_user.id,
+                deploy_id=deploy_id,
+                username=current_user.username,
+                squad=squad,
+                action="Destroy")
 
         return {"task": db_task}
     except Exception as err:
         raise HTTPException(
-            status_code=400,
-            detail=f"{err}")
+                status_code=400,
+                detail=f"{err}")
 
 
 @router.get("/")
@@ -277,8 +280,8 @@ async def get_all_deploys(
         return crud_deploys.get_all_deploys(db=db, skip=skip, limit=limit)
     except Exception as err:
         raise HTTPException(
-            status_code=400,
-            detail=f"{err}")
+                status_code=400,
+                detail=f"{err}")
 
 
 @router.get("/{deploy_id}")
@@ -288,7 +291,7 @@ async def get_deploy_by_id(
         db: Session = Depends(deps.get_db)):
 
     result = crud_deploys.get_deploy_by_id(
-        db=db, deploy_id=deploy_id)
+            db=db, deploy_id=deploy_id)
     if not crud_users.is_master(db, current_user):
         if not check_squad_user(current_user.squad, [result.squad]):
             raise HTTPException(status_code=403, detail=f"Not enough permissions in {result.squad}")
@@ -299,8 +302,8 @@ async def get_deploy_by_id(
     except Exception as err:
         print(err)
         raise HTTPException(
-            status_code=404,
-            detail=f"{err}")
+                status_code=404,
+                detail=f"{err}")
 
 
 @router.delete("/{deploy_id}")
@@ -322,10 +325,10 @@ async def delete_infra_by_id(
     variables = deploy_data.variables
     # Get  credentials by providers supported
     secreto = tokens.check_prefix(
-        db, stack_name=stack_name, environment=environment, squad=squad)
+            db, stack_name=stack_name, environment=environment, squad=squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=stack_name)
-    branch = stack_data.branch
+    branch = deploy_data.stack_branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:
@@ -334,39 +337,39 @@ async def delete_infra_by_id(
             raise ValueError("Deploy state running, cannot upgrade")
         # Delete deploy db by id
         crud_deploys.delete_deploy_by_id(
-            db=db,
-            deploy_id=deploy_id,
-            squad=squad
-        )
+                db=db,
+                deploy_id=deploy_id,
+                squad=squad
+                )
         # push task destroy to queue and return task_id
         pipeline_destroy = async_destroy(
-            git_repo,
-            name,
-            stack_name,
-            environment,
-            squad,
-            branch,
-            tf_ver,
-            variables,
-            secreto,
-            tfvar_file
-        )
+                git_repo,
+                name,
+                stack_name,
+                environment,
+                squad,
+                branch,
+                tf_ver,
+                variables,
+                secreto,
+                tfvar_file
+                )
         # Push task data
         db_task = crud_tasks.create_task(
-            db=db,
-            task_id=pipeline_destroy,
-            task_name=f"{deploy_data.stack_name}-{squad}-{deploy_data.environment}-{deploy_data.name}",
-            user_id=current_user.id,
-            deploy_id=deploy_id,
-            username=current_user.username,
-            squad=squad,
-            action="Delete")
+                db=db,
+                task_id=pipeline_destroy,
+                task_name=f"{deploy_data.stack_name}-{squad}-{deploy_data.environment}-{deploy_data.name}",
+                user_id=current_user.id,
+                deploy_id=deploy_id,
+                username=current_user.username,
+                squad=squad,
+                action="Delete")
         return {"task": db_task}
 
     except Exception as err:
         raise HTTPException(
-            status_code=400,
-            detail=f"{err}")
+                status_code=400,
+                detail=f"{err}")
     finally:
         result = async_schedule_delete(deploy_id, squad)
 
@@ -390,8 +393,8 @@ async def get_output(
         return {"task": async_output(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
-            status_code=400,
-            detail=f"{err}")
+                status_code=400,
+                detail=f"{err}")
 
 
 @router.put("/unlock/{deploy_id}", status_code=200)
@@ -413,8 +416,8 @@ async def unlock_deploy(
         return {"task": async_unlock(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
-            status_code=400,
-            detail=f"{err}")
+                status_code=400,
+                detail=f"{err}")
 
 
 @router.get("/show/{deploy_id}", status_code=202)
@@ -437,5 +440,5 @@ async def get_show(
         return {"task": async_show(stack_name, environment, squad, name)}
     except Exception as err:
         raise HTTPException(
-            status_code=400,
-            detail=f"{err}")
+                status_code=400,
+                detail=f"{err}")

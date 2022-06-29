@@ -68,7 +68,7 @@ def pipeline_deploy(
         # Apply execute
         self.update_state(state='APPLYING', meta={'done': "6 of 6"})
         result = tf.apply_execute(
-                stack_name, environment, squad, name, version, variables_file, data=secreto)
+                stack_name, branch, environment, squad, name, version, variables_file, data=secreto)
         if result['rc'] != 0:
             raise Exception(result)
         return result
@@ -139,7 +139,7 @@ def pipeline_destroy(
 
         self.update_state(state='DESTROYING', meta={'done': "6 of 6"})
         result = tf.destroy_execute(
-                stack_name, environment, squad, name, version, variables_file, data=secreto)
+                stack_name, branch, environment, squad, name, version, variables_file, data=secreto)
         if result['rc'] != 0:
             raise Exception(result)
         return result
