@@ -72,7 +72,7 @@ class TerraformActions(object):
                 host_pattern='localhost',
                 verbosity=0,
                 module='git',
-                module_args=f'repo={git_repo} dest={stack_name}/{environment}/{squad}/{name} version={branch} force=yes',
+                module_args=f'repo={git_repo} dest={stack_name}/{environment}/{squad}/{name} version={branch} force=yes recursive=yes',
             )
             path_tfvars = f'/tmp/{stack_name}/{environment}/{squad}/{name}'
             tfvars_files = [f for f in listdir(path_tfvars) if f.endswith('.tfvars') and isfile(join(path_tfvars, f))]
