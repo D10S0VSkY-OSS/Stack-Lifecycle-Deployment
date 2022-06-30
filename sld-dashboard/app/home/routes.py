@@ -401,7 +401,7 @@ def new_stack():
             new_stack: dict = {
                 "stack_name": form.name.data,
                 "git_repo": form.git.data,
-                "stack_branch": form.branch.data,
+                "branch": form.branch.data,
                 "squad_access": squad_acces_form_to_list,
                 "tf_version": form.tf_version.data,
                 "description": form.description.data
@@ -445,7 +445,7 @@ def edit_stack(stack_id):
             update_stack = {
                 "stack_name": form.name.data,
                 "git_repo": form.git.data,
-                "stack_branch": form.branch.data,
+                "branch": form.branch.data,
                 "squad_access": squad_acces_form_to_list,
                 "tf_version": form.tf_version.data,
                 "description": form.description_edit.data
