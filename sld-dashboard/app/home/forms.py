@@ -33,10 +33,10 @@ class StackForm(FlaskForm):
     ], render_kw={'rows': 5})
     squad_access_edit = StringField('Squad Access (* share with everyone or pass a list: squad1, squad2)', render_kw={'rows': 1})
     tfvar_file = StringField('tfvar_file', [
-        validators.length(min=5, max=30, message='Tfvars file name.'),
+        validators.length(min=2, max=30, message='Tfvars file name.'),
     ])
     branch = StringField('branch', [
-        validators.length(min=5, max=30, message='Custom branch if empty use stack default branch'),
+        validators.length(min=2, max=30, message='Custom branch if empty use stack default branch'),
     ])
     description_edit = StringField('Description', render_kw={'rows': 1})
 
@@ -65,10 +65,10 @@ class DeployForm(FlaskForm):
         validators.length(min=3, max=30, message='Time out of reange.'),
     ])
     branch = StringField('branch', [
-        validators.length(min=5, max=30, message='Custom branch if empty use stack default branch'),
+        validators.length(min=2, max=30, message='Custom branch if empty use stack default branch'),
     ])
     tfvar_file = StringField('tfvar_file', [
-        validators.length(min=5, max=30, message='Tfvars file name.'),
+        validators.length(min=2, max=30, message='Tfvars file name.'),
     ])
     environment = StringField('Environment', [
         validators.length(min=2, max=250, message='Branch out of reange.'),

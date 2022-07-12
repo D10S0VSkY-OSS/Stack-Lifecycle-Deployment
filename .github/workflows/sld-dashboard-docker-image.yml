@@ -26,10 +26,10 @@ jobs:
 
     - name: Build the Docker image with tags
       working-directory: ./sld-dashboard
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-dashboard:2.4.0
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-dashboard:2.4.1
       
     - name: Docker Push with tags
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-dashboard:2.4.0
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-dashboard:2.4.1
 
     - name: Build the Docker image
       working-directory: ./sld-dashboard
