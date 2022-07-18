@@ -29,6 +29,7 @@ jobs:
       run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-schedule:2.2.0
       
     - name: Docker Push with tags
+      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
       run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-schedule:2.2.0
 
     - name: Build the Docker image
@@ -36,5 +37,6 @@ jobs:
       run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-schedule:latest
       
     - name: Docker Push
+      if: github.event_name == 'pull_request' && github.event.action == 'closed' && github.event.pull_request.merged == true
       run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-schedule:latest
 
