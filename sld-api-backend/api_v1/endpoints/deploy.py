@@ -359,7 +359,8 @@ async def delete_infra_by_id(
                 tf_ver,
                 variables,
                 secreto,
-                tfvar_file
+                tfvar_file,
+                project_path
                 )
         # Push task data
         db_task = crud_tasks.create_task(
