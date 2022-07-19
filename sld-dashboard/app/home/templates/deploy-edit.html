@@ -54,6 +54,11 @@
                                         value=deploy.stack_branch) }}
                                     </div>
                                     <div class="form-group">
+                                        {{ render_field(form.project_path,
+                                           autocomplete="off", class='form-control',
+                                           value=deploy.project_path) }}
+                                    </div>
+                                    <div class="form-group">
                                         {{ render_field(form.tfvar_file, autocomplete="off", class='form-control',
                                         value=deploy.tfvar_file) }}
                                     </div>

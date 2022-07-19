@@ -92,6 +92,7 @@ class Deploy(Base):
     variables = Column(JSON)
     environment = Column(String(50))
     tfvar_file = Column(String(50))
+    project_path = Column(String(50))
     __table_args__ = (UniqueConstraint(
         'squad', 'environment', 'name', 'stack_name'),)
 

@@ -25,7 +25,8 @@ def pipeline_deploy(
         version: str,
         kwargs: any,
         secreto: str,
-        variables_file: str = ""
+        variables_file: str = "",
+        project_path: str = ""
         ):
     filter_kwargs = {key: value for (
         key, value) in kwargs.items() if "pass" not in key}
@@ -48,18 +49,18 @@ def pipeline_deploy(
             raise Exception(result)
         # Create tf to use the custom artifactory as config
         self.update_state(state='REMOTECONF', meta={'done': "3 of 6"})
-        result = tf.tfstate_render(stack_name, environment, squad, name)
+        result = tf.tfstate_render(stack_name, environment, squad, project_path, name)
         if result['rc'] != 0:
             raise Exception(result)
         # Create tfvar serialize with json
         self.update_state(state='SETVARS', meta={'done': "4 of 6"})
-        result = tf.tfvars(stack_name, environment, squad, name, vars=kwargs)
+        result = tf.tfvars(stack_name, environment, squad, name, project_path, vars=kwargs)
         if result['rc'] != 0:
             raise Exception(result)
         # Plan execute
         self.update_state(state='PLANNING', meta={'done': "5 of 6"})
         result = tf.plan_execute(stack_name, environment,
-                squad, name, version, variables_file, data=secreto)
+                squad, name, version, variables_file, project_path, data=secreto)
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
         tf.delete_local_folder(dir_path)
@@ -68,7 +69,7 @@ def pipeline_deploy(
         # Apply execute
         self.update_state(state='APPLYING', meta={'done': "6 of 6"})
         result = tf.apply_execute(
-                stack_name, branch, environment, squad, name, version, variables_file, data=secreto)
+                stack_name, branch, environment, squad, name, version, variables_file, project_path, data=secreto)
         if result['rc'] != 0:
             raise Exception(result)
         return result
@@ -80,7 +81,7 @@ def pipeline_deploy(
             raise Ignore()
         self.update_state(state="ROLLBACK", meta={'done': "1 of 1"})
         destroy_eresult = tf.destroy_execute(
-                stack_name, environment, squad, name, version,variables_file, data=secreto)
+                stack_name, environment, squad, name, version,variables_file, project_path, data=secreto)
         self.update_state(state=states.FAILURE, meta={
             'exc_type': type(err).__name__,
             'exc_message': traceback.format_exc().split('\n')
@@ -105,7 +106,8 @@ def pipeline_destroy(
         version: str,
         kwargs: any,
         secreto: str,
-        variables_file: str = ""
+        variables_file: str = "",
+        project_path: str = ""
         ):
     filter_kwargs = {key: value for (
         key, value) in kwargs.items() if "pass" not in key}
@@ -128,18 +130,18 @@ def pipeline_destroy(
             raise Exception(result)
         # Create tf to use the custom artifactory as config
         self.update_state(state='REMOTECONF', meta={'done': "3 of 6"})
-        result = tf.tfstate_render(stack_name, environment, squad, name)
+        result = tf.tfstate_render(stack_name, environment, squad, project_path, name)
         if result['rc'] != 0:
             raise Exception(result)
         # Create tfvar serialize with json
         self.update_state(state='SETVARS', meta={'done': "4 of 6"})
-        result = tf.tfvars(stack_name, environment, squad, name, vars=kwargs)
+        result = tf.tfvars(stack_name, environment, squad, name, project_path, vars=kwargs)
         if result['rc'] != 0:
             raise Exception(result)
 
         self.update_state(state='DESTROYING', meta={'done': "6 of 6"})
         result = tf.destroy_execute(
-                stack_name, branch, environment, squad, name, version, variables_file, data=secreto)
+                stack_name, branch, environment, squad, name, version, variables_file, project_path, data=secreto)
         if result['rc'] != 0:
             raise Exception(result)
         return result
@@ -165,7 +167,8 @@ def pipeline_plan(
         version: str,
         kwargs: any,
         secreto: str,
-        variables_file: str = ""
+        variables_file: str = "",
+        project_path: str = ""
         ):
     filter_kwargs = {key: value for (
         key, value) in kwargs.items() if "pass" not in key}
@@ -183,18 +186,18 @@ def pipeline_plan(
             raise Exception(result)
 
         self.update_state(state='REMOTE', meta={'done': "3 of 5"})
-        result = tf.tfstate_render(stack_name, environment, squad, name)
+        result = tf.tfstate_render(stack_name, environment, squad, project_path, name)
         if result['rc'] != 0:
             raise Exception(result)
 
         self.update_state(state='VARS', meta={'done': "4 of 5"})
-        result = tf.tfvars(stack_name, environment, squad, name, vars=kwargs)
+        result = tf.tfvars(stack_name, environment, squad, name, project_path, vars=kwargs)
         if result['rc'] != 0:
             raise Exception(result)
 
         self.update_state(state='PLAN', meta={'done': "5 of 5"})
         result = tf.plan_execute(stack_name, environment,
-                squad, name, version, variables_file, data=secreto)
+                squad, name, version, variables_file, project_path, data=secreto)
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
         tf.delete_local_folder(dir_path)
         if result['rc'] != 0:

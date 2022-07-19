@@ -35,6 +35,9 @@ class StackForm(FlaskForm):
     tfvar_file = StringField('tfvar_file', [
         validators.length(min=2, max=30, message='Tfvars file name.'),
     ])
+    project_path = StringField('project_path', [
+        validators.length(min=2, max=30, message='Project path name'),
+    ])
     branch = StringField('branch', [
         validators.length(min=2, max=30, message='Custom branch if empty use stack default branch'),
     ])
@@ -69,6 +72,9 @@ class DeployForm(FlaskForm):
     ])
     tfvar_file = StringField('tfvar_file', [
         validators.length(min=2, max=30, message='Tfvars file name.'),
+    ])
+    project_path = StringField('project_path', [
+        validators.length(min=2, max=30, message='Project path name.'),
     ])
     environment = StringField('Environment', [
         validators.length(min=2, max=250, message='Branch out of reange.'),

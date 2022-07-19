@@ -19,7 +19,8 @@ def async_deploy(
         tf_ver: str,
         variables: dict,
         secreto: str,
-        variables_file: str = ""
+        variables_file: str = "",
+        project_path: str = ""
         ):
 
     pipeline_deploy_result = pipeline_deploy.s(
@@ -32,7 +33,8 @@ def async_deploy(
         version=tf_ver,
         kwargs=variables,
         secreto=secreto,
-        variables_file=variables_file
+        variables_file=variables_file,
+        project_path=project_path
     ).apply_async(queue=squad,
                   retry=True,
                   retry_policy={
@@ -54,7 +56,8 @@ def async_destroy(
         tf_ver: str,
         variables: dict,
         secreto: str,
-        variables_file: str = ""
+        variables_file: str = "",
+        project_path: str = ""
         ):
 
     pipeline_destroy_result = pipeline_destroy.s(
@@ -67,7 +70,8 @@ def async_destroy(
         version=tf_ver,
         kwargs=variables,
         secreto=secreto,
-        variables_file=variables_file
+        variables_file=variables_file,
+        project_path=project_path
     ).apply_async(
         queue=squad,
         retry=True,
@@ -90,7 +94,8 @@ def async_plan(
         tf_ver: str,
         variables: dict,
         secreto: str,
-        variables_file: str = ""
+        variables_file: str = "",
+        project_path: str = ""
         ):
 
     pipeline_plan_result = pipeline_plan.s(
@@ -103,7 +108,8 @@ def async_plan(
         version=tf_ver,
         kwargs=variables,
         secreto=secreto,
-        variables_file=variables_file
+        variables_file=variables_file,
+        project_path=project_path
     ).apply_async(queue=squad,
                   retry=True,
                   retry_policy={
