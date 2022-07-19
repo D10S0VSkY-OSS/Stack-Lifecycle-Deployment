@@ -22,10 +22,6 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
 
-    - name: Build the Docker image with tags
-      working-directory: ./sld-schedule
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-schedule:2.2.0
-      
     - name: Build the Docker image
       working-directory: ./sld-schedule
       run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-schedule:latest

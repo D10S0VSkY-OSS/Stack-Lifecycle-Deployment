@@ -92,6 +92,7 @@ class TerraformActions(object):
             stack_name: str,
             environment: str,
             squad: str,
+            project_path: str,
             name: str) -> dict:
         data = '''
         terraform {
@@ -108,7 +109,10 @@ class TerraformActions(object):
             tm = Template(data)
             provider_backend = tm.render(
                 deploy_state=f'{stack_name}-{squad}-{environment}-{name}')
-            with open(f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}-{name}-{environment}.tf', 'w') as tf_state:
+            file_path = f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}-{name}-{environment}.tf'
+            if project_path:
+                file_path = f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}/{stack_name}-{name}-{environment}.tf'
+            with open(file_path, 'w') as tf_state:
                 tf_state.write(provider_backend)
             return {"command": "tfserver", "rc": 0, "stdout": data}
         except Exception as err:
@@ -144,9 +148,13 @@ class TerraformActions(object):
             environment: str,
             squad: str,
             name: str,
+            project_path: str,
             **kwargs: dict) -> dict:
         try:
-            with open(f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfvars.json', 'w') as tfvars_json:
+            file_path = f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfvars.json'
+            if project_path:
+                file_path = f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}/{stack_name}.tfvars.json'
+            with open(file_path, 'w') as tfvars_json:
                 json.dump(kwargs.get("vars"), tfvars_json)
             return {"command": "tfvars", "rc": 0, "stdout": kwargs.get("vars")}
         except Exception as err:
@@ -160,6 +168,7 @@ class TerraformActions(object):
             name: str,
             version: str,
             variables_file: str = "",
+            project_path: str = "",
             **secreto: dict) -> dict:
         try:
             secret(stack_name, environment, squad, name, secreto)
@@ -171,7 +180,8 @@ class TerraformActions(object):
                 host_pattern='localhost',
                 module='terraform',
                 module_args=f'binary_path=/tmp/{version}/terraform '
-                            f'force_init=True project_path=/tmp/{stack_name}/{environment}/{squad}/{name} '
+                            f'force_init=True '
+                            f'project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} '
                             f'plan_file=/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfplan '
                             f'variables_files={variables_files} state=planned',
             )
@@ -194,6 +204,7 @@ class TerraformActions(object):
                     "rc": rc,
                     "tfvars_files": variables_file,
                     "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
+                    "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                     "stdout": plan_stderr
                 }
             return {
@@ -204,6 +215,7 @@ class TerraformActions(object):
                 "environment": environment,
                 "rc": rc,
                 "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                 "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": plan_stdout
             }
@@ -216,6 +228,7 @@ class TerraformActions(object):
                 "environment": environment,
                 "rc": 1,
                 "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                 "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": f'{err}'
             }
@@ -229,6 +242,7 @@ class TerraformActions(object):
             name: str,
             version: str,
             variables_file: str = "",
+            project_path: str = "",
             **secreto: dict) -> dict:
         try:
             secret(stack_name, environment, squad, name, secreto)
@@ -239,7 +253,8 @@ class TerraformActions(object):
                 private_data_dir=f'/tmp/{stack_name}/{environment}/{squad}/{name}',
                 host_pattern='localhost',
                 module='terraform',
-                module_args=f'binary_path=/tmp/{version}/terraform lock=True force_init=True project_path=/tmp/{stack_name}/{environment}/{squad}/{name} '
+                module_args=f'binary_path=/tmp/{version}/terraform lock=True force_init=True '
+                            f'project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} '
                             f'plan_file=/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfplan state=present '
                             f'variables_files={variables_files}',
             )
@@ -262,6 +277,7 @@ class TerraformActions(object):
                     "environment": environment,
                     "rc": rc,
                     "tfvars_files": variables_file,
+                    "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                     "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                     "stdout": apply_stderr
                 }
@@ -274,6 +290,7 @@ class TerraformActions(object):
                 "environment": environment,
                 "rc": rc,
                 "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                 "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": apply_stdout
             }
@@ -287,6 +304,7 @@ class TerraformActions(object):
                 "environment": environment,
                 "rc": 1,
                 "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                 "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": f'{err}'
             }
@@ -300,6 +318,7 @@ class TerraformActions(object):
             name: str,
             version: str,
             variables_file: str = "",
+            project_path: str = "",
             **secreto: dict) -> dict:
         try:
             secret(stack_name, environment, squad, name, secreto)
@@ -310,7 +329,8 @@ class TerraformActions(object):
                 private_data_dir=f'/tmp/{stack_name}/{environment}/{squad}/{name}',
                 host_pattern='localhost',
                 module='terraform',
-                module_args=f'binary_path=/tmp/{version}/terraform force_init=True project_path=/tmp/{stack_name}/{environment}/{squad}/{name} '
+                module_args=f'binary_path=/tmp/{version}/terraform force_init=True '
+                            f'project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} '
                             f'variables_files={variables_files} state=absent',
             )
             unsecret(stack_name, environment, squad, name, secreto)
@@ -331,6 +351,7 @@ class TerraformActions(object):
                     "environment": environment,
                     "rc": rc,
                     "tfvars_files": variables_file,
+                    "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                     "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                     "stdout": destroy_stderr
                 }
@@ -343,6 +364,7 @@ class TerraformActions(object):
                 "environment": environment,
                 "rc": rc,
                 "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                 "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": destroy_stdout
             }
@@ -356,6 +378,7 @@ class TerraformActions(object):
                 "environment": environment,
                 "rc": 1,
                 "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                 "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": f'{err}'
             }

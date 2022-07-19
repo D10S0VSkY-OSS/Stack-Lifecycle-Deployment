@@ -59,7 +59,8 @@ async def plan_infra_by_stack_name(
             tf_ver,
             deploy.variables,
             secreto,
-            deploy.tfvar_file)
+            deploy.tfvar_file,
+            deploy.project_path)
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
             db=db,
@@ -140,28 +141,24 @@ async def update_plan_by_id(
             tf_ver,
             deploy_update.variables,
             secreto,
-            deploy_update.tfvar_file 
+            deploy_update.tfvar_file,
+            deploy_update.project_path
             )
-        print(deploy_data.action)
         # Push deploy task data
-        if deploy_data.action in ["Plan", "Update", "Apply"]:
-            crud_deploys.update_deploy(
-                db=db,
-                deploy_id=plan_id,
-                task_id=pipeline_plan,
-                action="Plan",
-                user_id=current_user.id,
-                stack_branch=deploy_update.stack_branch,
-                tfvar_file=deploy_update.tfvar_file,
-                variables=deploy_update.variables,
-                start_time=deploy_update.start_time,
-                destroy_time=deploy_update.destroy_time,
-                username=current_user.username)
-            action = "Plan"
-        else:
-            crud_deploys.update_plan(
-                db=db, deploy_id=plan_id, task_id=pipeline_plan, action="DryRun")
-            action = "DryRun"
+        crud_deploys.update_deploy(
+            db=db,
+            deploy_id=plan_id,
+            task_id=pipeline_plan,
+            action="Plan",
+            user_id=current_user.id,
+            stack_branch=deploy_update.stack_branch,
+            tfvar_file=deploy_update.tfvar_file,
+            project_path=deploy_update.project_path,
+            variables=deploy_update.variables,
+            start_time=deploy_update.start_time,
+            destroy_time=deploy_update.destroy_time,
+            username=current_user.username)
+        action = "Plan"
         # Push task data
         db_task = crud_tasks.create_task(
             db=db,
@@ -215,7 +212,8 @@ async def get_plan_by_id_deploy(
             tf_ver,
             deploy_data.variables,
             secreto,
-            deploy_data.tfvar_file)
+            deploy_data.tfvar_file,
+            deploy_data.project_path)
         return {"task": pipeline_plan}
     except Exception as err:
         raise HTTPException(
