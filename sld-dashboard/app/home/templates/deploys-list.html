@@ -123,14 +123,11 @@
                         <span class="font-weight-normal">{{ deploy.name }}</span>
                     </td>
                     <td><span class="font-weight-normal">
-                    {% for stack in stacks| sort(attribute='id') %}
-                        {% if deploy.stack_name in stack.stack_name %}
-                            <a href="{{stack.get("git_repo")}}"
-                               title="branch {{deploy.get('stack_branch')}}"  target="_blank">
+                            <a href="#" aria-disabled="true"
+                               title="branch {{deploy.get('stack_branch')}}">
                                {{ deploy.stack_name }}
-                        {% endif %}
-                    {% endfor %}
                             </a></span></td>
+                    <!--<td><span class="font-weight-normal">{{ deploy.stack_name}}</span></td>-->
                     <td><span class="font-weight-normal">{{ deploy.squad}}</span></td>
                     <td><span class="font-weight-normal">{{ deploy.environment}}</span></td>
                     <td><span class="font-weight-normal">{{ deploy.username}}</span></td>

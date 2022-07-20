@@ -45,6 +45,7 @@ class Settings(BaseSettings):
     TASK_MAX_RETRY: int = os.getenv('SLD_TASK_MAX_RETRY', 1)
     TASK_RETRY_INTERVAL: int = os.getenv('SLD_TASK_RETRY_INTERVAL', 20)
     TASK_LOCKED_EXPIRED = os.getenv('SLD_TASK_LOCKED_EXPIRED', 3600)
+    TASK_ROUTE: bool = os.getenv('SLD_TASK_ROUTE', False)
     TERRAFORM_BIN_REPO: str = os.getenv('SLD_TERRAFORM_BIN_REPO', "https://releases.hashicorp.com/terraform")
     REMOTE_STATE: str = os.getenv('SLD_REMOTE_STATE', "http://remote-state:8080")
     BOT: str = os.getenv('SLD_API_SERVER_USER', 'schedule')
