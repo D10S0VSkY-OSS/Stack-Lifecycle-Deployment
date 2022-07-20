@@ -138,13 +138,64 @@
 
 
                                     <div class="form-group">
-                                        {{ render_field(form.start_time, autocomplete="off", class='form-control', value='30 7 * * 0-4') }}
+                                        {{ render_field(form.start_time, autocomplete="off",
+                                        class='form-control', value='30 7 * * 0-4') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.destroy_time, autocomplete="off", class='form-control', value='30 18 * * 0-4') }}
+                                        {{ render_field(form.destroy_time, autocomplete="off",
+                                        class='form-control', value='30 18 * * 0-4') }}
                                     </div>
 
+                                    <div class="form-group">
+                                        {{ render_field(form.branch, autocomplete="off",
+                                        class='form-control', placeholder='Branch name',
+                                        value=stack['json']['branch']) }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ render_field(form.project_path, autocomplete="off",
+                                        class='form-control', placeholder='Project path name',
+                                        value="") }}
+                                <p>
+                                <a class="btn btn-primary" data-toggle="collapse"
+                                   data-target="#variables" href="#collapseExample"
+                                   role="button" aria-expanded="false" aria-controls="collapseExample">
+                                   Use Variables Form
+                                </a>
+                                <button class="btn btn-primary" type="button" data-toggle="collapse"
+                                 data-target="#tfvars" aria-expanded="false" aria-controls="collapseExample">
+                                   Use custom tfvars file
+                                </button>
+                                </p>
+                                    <!-- Collapse Tfvars -->
+                                <div class="collapse" id="tfvars">
+                                <h3>Tfvars</h3>
+                                <footer class="blockquote-footer">
+                                 Indicates the path and name of the tfvar file
+                                </footer>
+                                    <div class="border-top my-4"></div>
+                                    <div class="form-group">
+                                        {{ render_field(form.tfvar_file, autocomplete="off",
+                                        class='form-control', value='') }}
+                                    </div>
+                                <div class="border-top my-4"></div>
+                                <button type="submit" class="btn btn-success" name="button"
+                                 value=plan action="{{url_for('.list_deploys')}}">
+                                   Plan
+                                </button>
+                                <button type="submit" class="btn btn-primary" name="button" 
+                                 value=deploy action="{{url_for('.list_deploys')}}">
+                                   Deploy
+                                </button>
+                                </div>
+                                </div>
+                                    <!-- Collapse Variables -->
+                                <div class="collapse" id="variables">
+                                <h3>Variables</h3>
+                                <footer class="blockquote-footer">
+                                 Complete the form with the variables
+                                </footer>
+                                    <div class="border-top my-4"></div>
                                     <!-- start SLD_SORT False -->
                                     {% if not sort_form %}
                                     {% for key, value in data_json.items()%}
@@ -208,6 +259,7 @@
                     </form>
                     </div>
                             <!-- End Form -->
+                    </div>
 
                             <div class="input-group">
                             </div>
@@ -222,4 +274,5 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+{% endblock javascripts %}

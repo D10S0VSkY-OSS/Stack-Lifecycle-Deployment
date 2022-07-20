@@ -4,6 +4,8 @@ import logging
 import subprocess
 import jmespath
 from os import path
+from os.path import isfile, join
+from os import listdir
 
 import hcl
 import shutil
@@ -70,24 +72,27 @@ class TerraformActions(object):
                 host_pattern='localhost',
                 verbosity=0,
                 module='git',
-                module_args=f'repo={git_repo} dest={stack_name}/{environment}/{squad}/{name} version={branch} force=yes',
+                module_args=f'repo={git_repo} dest={stack_name}/{environment}/{squad}/{name} version={branch} force=yes recursive=yes',
             )
+            path_tfvars = f'/tmp/{stack_name}/{environment}/{squad}/{name}'
+            tfvars_files = [f for f in listdir(path_tfvars) if f.endswith('.tfvars') and isfile(join(path_tfvars, f))]
             logs = [i for i in runner_response.events]
             git_stdout = jmespath.search(
                 '[*].event_data.res.stdout_lines', logs)
             git_stderr = jmespath.search('[*].event_data.res.msg', logs)
             rc = runner_response.rc
             if rc != 0:
-                return {"command": "git", "rc": rc, "stdout": git_stderr}
-            return {"command": "git", "rc": rc, "stdout": git_stdout}
+                return {"command": "git", "rc": rc, "tfvars": tfvars_files, "stdout": git_stderr}
+            return {"command": "git", "rc": rc, "tfvars": tfvars_files, "stdout": git_stdout}
         except Exception as err:
-            return {"command": "git", "rc": 1, "stdout": err}
+            return {"command": "git", "rc": 1, "tfvars": tfvars_files, "stdout": err}
 
     @staticmethod
     def tfstate_render(
             stack_name: str,
             environment: str,
             squad: str,
+            project_path: str,
             name: str) -> dict:
         data = '''
         terraform {
@@ -104,7 +109,10 @@ class TerraformActions(object):
             tm = Template(data)
             provider_backend = tm.render(
                 deploy_state=f'{stack_name}-{squad}-{environment}-{name}')
-            with open(f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}-{name}-{environment}.tf', 'w') as tf_state:
+            file_path = f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}-{name}-{environment}.tf'
+            if project_path:
+                file_path = f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}/{stack_name}-{name}-{environment}.tf'
+            with open(file_path, 'w') as tf_state:
                 tf_state.write(provider_backend)
             return {"command": "tfserver", "rc": 0, "stdout": data}
         except Exception as err:
@@ -140,9 +148,13 @@ class TerraformActions(object):
             environment: str,
             squad: str,
             name: str,
+            project_path: str,
             **kwargs: dict) -> dict:
         try:
-            with open(f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfvars.json', 'w') as tfvars_json:
+            file_path = f'/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfvars.json'
+            if project_path:
+                file_path = f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}/{stack_name}.tfvars.json'
+            with open(file_path, 'w') as tfvars_json:
                 json.dump(kwargs.get("vars"), tfvars_json)
             return {"command": "tfvars", "rc": 0, "stdout": kwargs.get("vars")}
         except Exception as err:
@@ -155,18 +167,23 @@ class TerraformActions(object):
             squad: str,
             name: str,
             version: str,
+            variables_file: str = "",
+            project_path: str = "",
             **secreto: dict) -> dict:
         try:
             secret(stack_name, environment, squad, name, secreto)
+            deploy_state=f'{environment}_{stack_name}_{squad}_{name}'
             # Execute task
+            variables_files = f'{stack_name}.tfvars.json' if variables_file == "" or variables_file == None else variables_file
             runner_response = ansible_runner.run(
                 private_data_dir=f'/tmp/{stack_name}/{environment}/{squad}/{name}',
                 host_pattern='localhost',
                 module='terraform',
                 module_args=f'binary_path=/tmp/{version}/terraform '
-                            f'force_init=True project_path=/tmp/{stack_name}/{environment}/{squad}/{name} '
+                            f'force_init=True '
+                            f'project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} '
                             f'plan_file=/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfplan '
-                            f'variables_files={stack_name}.tfvars.json state=planned',
+                            f'variables_files={variables_files} state=planned',
             )
             unsecret(stack_name, environment, squad, name, secreto)
 
@@ -182,16 +199,24 @@ class TerraformActions(object):
                     "command": "plan",
                     "deploy": name,
                     "squad": squad,
+                    "stack_name": stack_name,
                     "environment": environment,
                     "rc": rc,
+                    "tfvars_files": variables_file,
+                    "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
+                    "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
                     "stdout": plan_stderr
                 }
             return {
                 "command": "plan",
                 "deploy": name,
                 "squad": squad,
+                "stack_name": stack_name,
                 "environment": environment,
                 "rc": rc,
+                "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
+                "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": plan_stdout
             }
         except Exception as err:
@@ -199,29 +224,39 @@ class TerraformActions(object):
                 "command": "plan",
                 "deploy": name,
                 "squad": squad,
+                "stack_name": stack_name,
                 "environment": environment,
                 "rc": 1,
+                "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
+                "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": f'{err}'
             }
 
     @staticmethod
     def apply_execute(
             stack_name: str,
+            branch: str,
             environment: str,
             squad: str,
             name: str,
             version: str,
+            variables_file: str = "",
+            project_path: str = "",
             **secreto: dict) -> dict:
         try:
             secret(stack_name, environment, squad, name, secreto)
+            deploy_state=f'{environment}_{stack_name}_{squad}_{name}'
             # Execute task
+            variables_files = f'{stack_name}.tfvars.json' if variables_file == "" or variables_file == None else variables_file
             runner_response = ansible_runner.run(
                 private_data_dir=f'/tmp/{stack_name}/{environment}/{squad}/{name}',
                 host_pattern='localhost',
                 module='terraform',
-                module_args=f'binary_path=/tmp/{version}/terraform lock=True force_init=True project_path=/tmp/{stack_name}/{environment}/{squad}/{name} '
+                module_args=f'binary_path=/tmp/{version}/terraform lock=True force_init=True '
+                            f'project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} '
                             f'plan_file=/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfplan state=present '
-                            f'variables_files={stack_name}.tfvars.json',
+                            f'variables_files={variables_files}',
             )
             unsecret(stack_name, environment, squad, name, secreto)
             # Capture events
@@ -237,16 +272,26 @@ class TerraformActions(object):
                     "command": "apply",
                     "deploy": name,
                     "squad": squad,
+                    "stack_name": stack_name,
+                    "branch": branch,
                     "environment": environment,
                     "rc": rc,
+                    "tfvars_files": variables_file,
+                    "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
+                    "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                     "stdout": apply_stderr
                 }
             return {
                 "command": "apply",
                 "deploy": name,
                 "squad": squad,
+                "stack_name": stack_name,
+                "branch": branch,
                 "environment": environment,
                 "rc": rc,
+                "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
+                "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": apply_stdout
             }
         except Exception as err:
@@ -254,28 +299,39 @@ class TerraformActions(object):
                 "command": "apply",
                 "deploy": name,
                 "squad": squad,
+                "stack_name": stack_name,
+                "branch": branch,
                 "environment": environment,
                 "rc": 1,
+                "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
+                "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": f'{err}'
             }
 
     @staticmethod
     def destroy_execute(
             stack_name: str,
+            branch: str,
             environment: str,
             squad: str,
             name: str,
             version: str,
+            variables_file: str = "",
+            project_path: str = "",
             **secreto: dict) -> dict:
         try:
             secret(stack_name, environment, squad, name, secreto)
+            deploy_state=f'{environment}_{stack_name}_{squad}_{name}'
             # Execute task
+            variables_files = f'{stack_name}.tfvars.json' if variables_file == "" or variables_file == None else variables_file
             runner_response = ansible_runner.run(
                 private_data_dir=f'/tmp/{stack_name}/{environment}/{squad}/{name}',
                 host_pattern='localhost',
                 module='terraform',
-                module_args=f'binary_path=/tmp/{version}/terraform force_init=True project_path=/tmp/{stack_name}/{environment}/{squad}/{name} '
-                            f'variables_files={stack_name}.tfvars.json state=absent',
+                module_args=f'binary_path=/tmp/{version}/terraform force_init=True '
+                            f'project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} '
+                            f'variables_files={variables_files} state=absent',
             )
             unsecret(stack_name, environment, squad, name, secreto)
             # Capture events
@@ -290,16 +346,26 @@ class TerraformActions(object):
                     "command": "destroy",
                     "deploy": name,
                     "squad": squad,
+                    "stack_name": stack_name,
+                    "branch": branch,
                     "environment": environment,
                     "rc": rc,
+                    "tfvars_files": variables_file,
+                    "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
+                    "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                     "stdout": destroy_stderr
                 }
             return {
                 "command": "destroy",
                 "deploy": name,
                 "squad": squad,
+                "stack_name": stack_name,
+                "branch": branch,
                 "environment": environment,
                 "rc": rc,
+                "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
+                "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": destroy_stdout
             }
         except Exception as err:
@@ -307,8 +373,13 @@ class TerraformActions(object):
                 "command": "destroy",
                 "deploy": name,
                 "squad": squad,
+                "stack_name": stack_name,
+                "branch": branch,
                 "environment": environment,
                 "rc": 1,
+                "tfvars_files": variables_file,
+                "project_path": f'/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}',
+                "remote_state": f'http://remote-state:8080/terraform_state/{deploy_state}',
                 "stdout": f'{err}'
             }
 

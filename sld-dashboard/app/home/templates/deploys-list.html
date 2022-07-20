@@ -83,9 +83,18 @@
             </div>
         </div>
     </div>
-    <div class="card card-body border-light shadow-sm table-wrapper table-responsive pt-0">
-        <table class="table table-hover" id="table">
-            <thead>
+    <div class="card card-body border-light shadow-sm table-wrapper table-fixed table-responsive-sm pt-0">
+        <table class="table table-striped"
+            id="table"
+	        data-toggle="table"
+	        autoRefresh="true"
+	        autoRefreshStatus="true"
+            data-show-refresh="true" 
+	        data-auto-refresh="true" 
+	        data-pagination="true"
+            autoRefreshInterval="3"
+            >
+            <thead class="thead-dark">
                 <tr>
                     <th>Id</th>
                     <th>Deploy Name</th>
@@ -97,11 +106,13 @@
                     <th>Destroy_time</th>
                     <th>Action</th>
                     <th>Status</th>
+                    <th></th>
                 </tr>
             </thead>
             <tbody>
                 <!-- Item -->
                 {% for deploy in deploys| sort(attribute='id') %}
+
                 <tr>
                     <td>
                         <a href="" class="font-weight-bold">
@@ -111,7 +122,12 @@
                     <td>
                         <span class="font-weight-normal">{{ deploy.name }}</span>
                     </td>
-                    <td><span class="font-weight-normal">{{ deploy.stack_name }}</span></td>
+                    <td><span class="font-weight-normal">
+                            <a href="#" aria-disabled="true"
+                               title="branch {{deploy.get('stack_branch')}}">
+                               {{ deploy.stack_name }}
+                            </a></span></td>
+                    <!--<td><span class="font-weight-normal">{{ deploy.stack_name}}</span></td>-->
                     <td><span class="font-weight-normal">{{ deploy.squad}}</span></td>
                     <td><span class="font-weight-normal">{{ deploy.environment}}</span></td>
                     <td><span class="font-weight-normal">{{ deploy.username}}</span></td>
@@ -358,5 +374,14 @@
             }
         })
     }
+</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script>
+function autoRefresh_div()
+{
+$("#result").load("load.html");// a function which will load data from other file after x seconds
+}
+
+setInterval('autoRefresh_div()', 5000); // refresh div after 5 secs
 </script>
 {% endblock javascripts %}

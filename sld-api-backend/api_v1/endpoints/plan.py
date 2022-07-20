@@ -37,7 +37,7 @@ async def plan_infra_by_stack_name(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=deploy.stack_name)
-    branch = stack_data.branch
+    branch = stack_data.branch if deploy.stack_branch == "" else deploy.stack_branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     check_deploy_exist(
@@ -58,11 +58,14 @@ async def plan_infra_by_stack_name(
             branch,
             tf_ver,
             deploy.variables,
-            secreto)
+            secreto,
+            deploy.tfvar_file,
+            deploy.project_path)
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
             db=db,
             deploy=deploy,
+            stack_branch=branch,
             task_id=pipeline_plan,
             action="Plan",
             squad=squad,
@@ -110,7 +113,12 @@ async def update_plan_by_id(
         db, stack_name=stack_name, environment=environment, squad=squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=stack_name)
-    branch = stack_data.branch
+    if not deploy_update.stack_branch:
+        branch = deploy_data.stack_branch
+        if not deploy_data.stack_branch:
+            branch = stack_data.branch
+    else:
+        branch = deploy_update.stack_branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:
@@ -132,24 +140,25 @@ async def update_plan_by_id(
             branch,
             tf_ver,
             deploy_update.variables,
-            secreto)
+            secreto,
+            deploy_update.tfvar_file,
+            deploy_update.project_path
+            )
         # Push deploy task data
-        if "Plan" in deploy_data.action:
-            crud_deploys.update_deploy(
-                db=db,
-                deploy_id=plan_id,
-                task_id=pipeline_plan,
-                action="Plan",
-                user_id=current_user.id,
-                variables=deploy_update.variables,
-                start_time=deploy_update.start_time,
-                destroy_time=deploy_update.destroy_time,
-                username=current_user.username)
-            action = "Plan"
-        else:
-            crud_deploys.update_plan(
-                db=db, deploy_id=plan_id, task_id=pipeline_plan, action="DryRun")
-            action = "DryRun"
+        crud_deploys.update_deploy(
+            db=db,
+            deploy_id=plan_id,
+            task_id=pipeline_plan,
+            action="Plan",
+            user_id=current_user.id,
+            stack_branch=deploy_update.stack_branch,
+            tfvar_file=deploy_update.tfvar_file,
+            project_path=deploy_update.project_path,
+            variables=deploy_update.variables,
+            start_time=deploy_update.start_time,
+            destroy_time=deploy_update.destroy_time,
+            username=current_user.username)
+        action = "Plan"
         # Push task data
         db_task = crud_tasks.create_task(
             db=db,
@@ -185,7 +194,7 @@ async def get_plan_by_id_deploy(
         db, stack_name=deploy_data.stack_name, environment=deploy_data.environment, squad=deploy_data.squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=deploy_data.stack_name)
-    branch = stack_data.branch
+    branch = deploy_data.stack_branch
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:
@@ -202,7 +211,9 @@ async def get_plan_by_id_deploy(
             branch,
             tf_ver,
             deploy_data.variables,
-            secreto)
+            secreto,
+            deploy_data.tfvar_file,
+            deploy_data.project_path)
         return {"task": pipeline_plan}
     except Exception as err:
         raise HTTPException(

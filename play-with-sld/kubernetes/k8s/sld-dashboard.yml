@@ -39,8 +39,6 @@ spec:
             value: "restapi"
           - name: DB_HOST
             value: "db"
-          - name: DB_NAME
-            value: "restapi"
           - name: DB_PORT
             value: "3306"
           - name: DB_USERNAME

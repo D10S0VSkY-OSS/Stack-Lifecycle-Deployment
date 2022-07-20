@@ -49,6 +49,20 @@
                                         {{ render_field(form.destroy_time, autocomplete="off", class='form-control',
                                         value=deploy.destroy_time) }}
                                     </div>
+                                    <div class="form-group">
+                                        {{ render_field(form.branch, autocomplete="off", class='form-control',
+                                        value=deploy.stack_branch) }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ render_field(form.project_path,
+                                           autocomplete="off", class='form-control',
+                                           value=deploy.project_path) }}
+                                    </div>
+                                    <div class="form-group">
+                                        {{ render_field(form.tfvar_file, autocomplete="off", class='form-control',
+                                        value=deploy.tfvar_file) }}
+                                    </div>
+                                {% if deploy.tfvar_file == "" %}
                                     <div class="border-top my-4"></div>
                                     {% for key, value in data_json.items()|sort %}
                                     <div class="form-group">
@@ -64,7 +78,6 @@
                                         {% endif %}
                                     </div>
                                     {% endfor %}
-
                                 <!-- Add custom variables -->
                                     <div class="border-top my-4"></div>
                                     <div class="row">
@@ -78,18 +91,19 @@
                                     </div>
                                     <div class="border-top my-4"></div>
                                 <!-- End Add custom variables -->
-                                    {% if deploy.action == "Plan"%}
+                                {% endif %}
+                                    {% if deploy.action == "DryRun"%}
+                                    <button type="submit" class="btn btn-success" name="button" value=plan
+                                        action="{{url_for('.list_deploys')}}">
+                                        DryRun
+                                    </button>
+                                    {% else %}
                                     <button type="submit" class="btn btn-success" name="button" value=plan
                                         action="{{url_for('.list_deploys')}}">
                                         Plan
                                     </button>
-                                    {% else %}
-                                    <button type="submit" class="btn btn-success" name="button" value=dryrun
-                                        action="{{url_for('.list_deploys')}}">
-                                        DryRun 
-                                    </button>
                                     {% endif %}
-                                    <button type="submit" class="btn btn-primary" name="button" value=deploy
+                                    <button type="submit" class="btn btn-dark" name="button" value=deploy
                                         action="{{url_for('.list_deploys')}}">
                                         Deploy
                                     </button>

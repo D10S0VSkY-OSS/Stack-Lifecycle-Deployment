@@ -68,7 +68,7 @@ class StackBase(BaseModel):
     git_repo: constr(strip_whitespace=True)
     branch: constr(strip_whitespace=True)  = "master"
     squad_access: List[str] = ["*"]
-    tf_version: constr(strip_whitespace=True) = "1.1.7"
+    tf_version: constr(strip_whitespace=True) = "1.2.3"
     description: constr(strip_whitespace=True)
 
 
@@ -138,6 +138,7 @@ class Azure(AwsBase):
 class DeployBase(BaseModel):
     name: constr(strip_whitespace=True)
     stack_name: constr(strip_whitespace=True)
+    stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
     username: constr(strip_whitespace=True)
     squad: constr(strip_whitespace=True)
     environment: constr(strip_whitespace=True)
@@ -148,9 +149,12 @@ class DeployCreate(BaseModel):
     name: constr(strip_whitespace=True)
     squad: constr(strip_whitespace=True)
     stack_name: constr(strip_whitespace=True)
+    stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
     environment: constr(strip_whitespace=True)
     start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
     destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
+    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
     variables: dict
 
 
@@ -165,6 +169,9 @@ class DeployDeleteMaster(BaseModel):
 class DeployUpdate(BaseModel):
     start_time: constr(strip_whitespace=True)
     destroy_time: constr(strip_whitespace=True)
+    stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
+    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
     variables: dict
 
 
@@ -180,10 +187,13 @@ class Deploy(StackBase):
 class PlanCreate(BaseModel):
     name: constr(strip_whitespace=True)
     stack_name: constr(strip_whitespace=True)
+    stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
     squad: constr(strip_whitespace=True)
     environment: constr(strip_whitespace=True)
     start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
     destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
+    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="s")
     variables: dict
 
 
