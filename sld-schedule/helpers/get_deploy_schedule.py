@@ -73,6 +73,9 @@ def get_deploy_by_id(deploy_id):
             "environment": response['json']['environment'],
             "start": response['json']['start_time'],
             "destroy": response['json']['destroy_time'],
+            "stack_branch": response['json']['stack_branch'],
+            "tfvar_file": response['json']['tfvar_file'],
+            "project_path": response['json']['project_path'],
         }
         return(data)
     except Exception as err:
@@ -93,6 +96,9 @@ def update_deploy(deploy_id):
     data = {
         "start_time": content['start_time'],
         "destroy_time": content['destroy_time'],
+        "stack_branch": response['json']['stack_branch'],
+        "tfvar_file": response['json']['tfvar_file'],
+        "project_path": response['json']['project_path'],
         "variables": content['variables']
     }
     response = request_url(
@@ -117,6 +123,9 @@ def destroy_deploy(deploy_id):
     data = {
         "start_time": content['start_time'],
         "destroy_time": content['destroy_time'],
+        "stack_branch": response['json']['stack_branch'],
+        "tfvar_file": response['json']['tfvar_file'],
+        "project_path": response['json']['project_path'],
         "variables": content['variables']
     }
     response = request_url(
