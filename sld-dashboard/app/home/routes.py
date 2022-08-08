@@ -19,7 +19,7 @@ from app.helpers.api_request import get_task_id
 from app.helpers.converter import convert_to_dict
 from app.helpers.config.api import settings
 from app.helpers.security import vault_decrypt
-from app.home.forms import StackForm, DeployForm, UserForm, AwsForm, GcpForm, AzureForm
+from app.home.forms import StackForm, DeployForm, UserForm, AwsForm, GcpForm, AzureForm, feForm
 
 
 @vault_decrypt
@@ -548,6 +548,10 @@ def deploy_stack(stack_id):
         aws_response = request_url(verb='GET', uri=f'accounts/aws/', headers={
             "Authorization": f"Bearer {token}"})
         aws_content = aws_response.get('json')
+        # Get data from fe accounts
+        fe_response = request_url(verb='GET', uri=f'accounts/fe/', headers={
+            "Authorization": f"Bearer {token}"})
+        fe_content = fe_response.get('json')
         # Get data from gcp accounts
         gcp_response = request_url(verb='GET', uri=f'accounts/gcp/', headers={
             "Authorization": f"Bearer {token}"})
@@ -612,6 +616,7 @@ def deploy_stack(stack_id):
             form=form, stack=stack,
             sort_form=settings.SORT_BY_DESC,
             aws_content=aws_content,
+            fe_content=fe_content,
             gcp_content=gcp_content,
             azure_content=azure_content,
             data_json=vars_json
@@ -855,9 +860,8 @@ def setting_user():
         return redirect(url_for('base_blueprint.logout'))
 
 # Accounts
+
 # AWS
-
-
 @blueprint.route('/aws-new', methods=['GET', 'POST'])
 @login_required
 def new_aws_account():
@@ -925,6 +929,77 @@ def delete_aws_account(aws_account_id):
             headers={"Authorization": f"Bearer {token}"}
         )
         return redirect(url_for('home_blueprint.route_template', template="aws-list"))
+    except ValueError:
+        return redirect(url_for('base_blueprint.logout'))
+
+# FE
+@blueprint.route('/fe-new', methods=['GET', 'POST'])
+@login_required
+def new_fe_account():
+    try:
+        form = feForm(request.form)
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        if request.method == 'POST':
+            new_user: dict = {
+                "squad": form.squad.data,
+                "environment": form.environment.data,
+                "access_key_id": form.access_key_id.data,
+                "secret_access_key": form.secret_access_key.data,
+                "default_region": form.default_region.data,
+                "profile_name": form.profile_name.data,
+                "role_arn": form.role_arn.data,
+                "source_profile": form.source_profile.data
+            }
+            response = request_url(
+                verb='POST',
+                uri='accounts/fe/',
+                headers={"Authorization": f"Bearer {token}"},
+                json=new_user)
+            if response.get('status_code') == 200:
+                flash(
+                    f"Created fe account for environment {form.environment.data} in {form.squad.data} ")
+            elif response.get('status_code') == 409:
+                flash(response['json'].get('detail'), 'error')
+            else:
+                flash(response['json'], 'error')
+
+        return render_template('/fe-new.html', title='New fe account',
+                               form=form, active='new_fe_account', external_api_dns=external_api_dns)
+    except ValueError:
+        return redirect(url_for('base_blueprint.logout'))
+
+
+@blueprint.route('/fe-list')
+@login_required
+def list_fe_account():
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        response = request_url(verb='GET', uri=f'accounts/fe/', headers={
+                               "Authorization": f"Bearer {token}"})
+        content = response.get('json')
+        return render_template('fe-list.html', name='Name', fe=content, external_api_dns=external_api_dns)
+
+    except ValueError:
+        return redirect(url_for('base_blueprint.logout'))
+
+
+@blueprint.route('/fe/delete/<int:fe_account_id>')
+@login_required
+def delete_fe_account(fe_account_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        response = request_url(
+            verb='DELETE',
+            uri=f'accounts/fe/{fe_account_id}',
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        return redirect(url_for('home_blueprint.route_template', template="fe-list"))
     except ValueError:
         return redirect(url_for('base_blueprint.logout'))
 
