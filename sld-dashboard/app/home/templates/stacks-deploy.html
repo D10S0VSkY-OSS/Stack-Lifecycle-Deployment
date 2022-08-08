@@ -44,8 +44,8 @@
                                     <div class="form-group">
                                         {{ render_field(form.deploy_name, autocomplete="off", class='form-control', placeholder='Deploy name') }}
                                     </div>
-                                    {% set aws_squad_status_before = [] %}
                                     <!-- Specific AWS account  -->
+                                    {% set aws_squad_status_before = [] %}
                                     {% if "aws" in stack['json']['stack_name']  %}
                                     {% for aws_account in aws_content %}
                                     {% set __ = aws_squad_status_before.append(aws_account.squad) %}
@@ -74,6 +74,37 @@
                                         </label>
                                     </div>
                                     {% endif %}
+
+                                   <!-- Specific FE account  -->
+                                   {% set fe_squad_status_before = [] %}
+                                   {% if "fe" in stack['json']['stack_name']  %}
+                                   {% for fe_account in fe_content %}
+                                   {% set __ = fe_squad_status_before.append(fe_account.squad) %}
+                                   {% endfor %}
+                                   <div class="form-group">
+                                       <h6><strong>Squad</strong></h6>
+                                       <select class="form-control" name=squad v-model="squad">
+                                           {% for fe_squad in fe_squad_status_before|unique %}
+                                           <option value={{ fe_squad }}>{{ fe_squad }}</option>
+                                           {% endfor %}
+                                       </select>
+                                       </label>
+                                   </div>
+
+                                   {% set fe_env_status_before = [] %}
+                                   {% for fe_account in fe_content %}
+                                   {% set __ = fe_env_status_before.append(fe_account.environment) %}
+                                   {% endfor %}
+                                   <div class="form-group">
+                                       <h6><strong>Environment</strong></h6>
+                                       <select class="form-control" name=environment v-model="environment">
+                                           {% for fe_env in fe_env_status_before|unique %}
+                                           <option value={{ fe_env }}>{{ fe_env }}</option>
+                                           {% endfor %}
+                                       </select>
+                                       </label>
+                                   </div>
+                                   {% endif %}
                                     <!-- Specific GCP account  -->
                                     {% set gcp_squad_status_before = [] %}
                                     {% if "gcp" in  stack['json']['stack_name'] %}
