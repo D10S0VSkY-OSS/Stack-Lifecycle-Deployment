@@ -117,7 +117,7 @@ def fe_credentials(secreto):
                 config.add_section(source_profile)
             config.set(source_profile, 'region',
                        secreto.get('data')['default_region'])
-            config.set(source_profile, 'fe_access_key_id',
+            config.set(source_profile, 'os_access_key',
                        secreto.get("data")["access_key"])
             config.set(source_profile, 'fe_secret_access_key',
                        secreto.get("data")["secret_access_key"])
@@ -155,7 +155,7 @@ def secret(
     elif any(i in stack_name.lower() for i in settings.FE_PREFIX):
         try:
             if not fe_config(secreto) or not fe_credentials(secreto):
-                os.environ["FE_ACCESS_KEY_ID"] = secreto.get("data")[
+                os.environ["OS_ACCESS_KEY"] = secreto.get("data")[
                     "access_key"]
                 os.environ["FE_SECRET_ACCESS_KEY"] = secreto.get("data")[
                     "secret_access_key"]
@@ -238,7 +238,7 @@ def unsecret(stack_name, environment, squad, name, secreto):
                 config.read(settings.FE_SHARED_CREDENTIALS_FILE)
                 source_profile = secreto.get('data')['source_profile']
                 config.remove_option(source_profile, 'region')
-                config.remove_option(source_profile, 'fe_access_key_id')
+                config.remove_option(source_profile, 'os_access_key')
                 config.remove_option(
                     source_profile, 'fe_secret_access_key')
                 config.remove_section(source_profile)
@@ -247,11 +247,11 @@ def unsecret(stack_name, environment, squad, name, secreto):
                 logging.info(f"remove credentials {source_profile} done")
                 del config
             else:
-                os.environ.pop("FE_ACCESS_KEY_ID")
+                os.environ.pop("OS_ACCESS_KEY")
                 os.environ.pop("FE_SECRET_ACCESS_KEY")
         except Exception as err:
             logging.warning(err)
-            
+
     elif any(i in stack_name.lower() for i in settings.GCLOUD_PREFIX):
         os.environ.pop("GOOGLE_CLOUD_KEYFILE_JSON")
     elif any(i in stack_name.lower() for i in settings.AZURE_PREFIX):
