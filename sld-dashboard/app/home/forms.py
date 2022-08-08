@@ -157,6 +157,43 @@ class AwsForm(FlaskForm):
     ])
 
 
+class feForm(FlaskForm):
+    squad = StringField('Squad *', [
+        validators.length(min=4, max=50, message='Squad out of reange.'),
+        validators.DataRequired(message='Squad Name requerid.')
+    ])
+    access_key_id = StringField('Access_key_id *', [
+        validators.length(
+            min=4, max=50, message='Access key id out of reange.'),
+        validators.DataRequired(message='Access_key_id requerid.')
+    ])
+    secret_access_key = StringField('Secret_access_key *', [
+        validators.length(
+            min=4, max=50, message='Secret Access Key out of reange.'),
+        validators.DataRequired(message='Secret_access_key.')
+    ])
+    default_region = StringField('Default_region *', [
+        validators.length(
+            min=4, max=50, message='Default Region out of reange.'),
+        validators.DataRequired(message='default_region.')
+    ])
+    profile_name = StringField('Profile_name', [
+        validators.length(
+            min=4, max=50, message='profile_name out of reange.'),
+    ])
+    role_arn = StringField('Role_arn', [
+        validators.length(
+            min=4, max=50, message='Role arn out of reange.'),
+    ])
+    source_profile = StringField('Source_profile', [
+        validators.length(
+            min=4, max=50, message='source_profile out of reange.'),
+    ])
+    environment = StringField('Environment *', [
+        validators.length(min=2, max=250, message='Branch out of reange.'),
+        validators.DataRequired(message='Environment requerid.')
+    ])
+
 class GcpForm(FlaskForm):
     squad = StringField('Squad', [
         validators.length(min=4, max=50, message='Squad out of reange.'),
