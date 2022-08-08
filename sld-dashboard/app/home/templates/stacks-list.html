@@ -63,8 +63,14 @@
                     </td>
                     {% if "aws" in stack.stack_name %}
                     <td><span class="icon icon-sm w-30" ><span class="fab fa-aws"></span></span></td>
+
+                    {% elif "fe" in stack.stack_name %}
+                    <td><span class="icon icon-sm w-30"><span class="fab fa-google"></span></span></td>
+                    <!-- <span class="sidebar-icon"><img src="/static/assets/img/favicon/orangecloud.png" width="16" height="16"></span> -->
+                    
                     {% elif "gcp" in stack.stack_name %}
                     <td><span class="icon icon-sm w-30"><span class="fab fa-google"></span></span></td>
+
                     {% elif "azure" in stack.stack_name %}
                     <td><span class="icon icon-sm w-30"><span class="fab fa-windows"></span></span></td>
                     {% else %}
