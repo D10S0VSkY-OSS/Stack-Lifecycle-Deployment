@@ -8,6 +8,7 @@ from fastapi import HTTPException
 from config.api import settings
 from crud import user as crud_users
 from crud import aws as crud_aws
+from crud import fe as crud_fe
 from crud import gcp as crud_gcp
 from crud import azure as crud_azure
 
@@ -73,6 +74,10 @@ def check_prefix(db, stack_name: str, environment: str, squad: str):
     try:
         if any(i in stack_name.lower() for i in settings.AWS_PREFIX):
             secreto = crud_aws.get_credentials_aws_profile(
+                db=db, environment=environment, squad=squad)
+            return secreto
+        elif any(i in stack_name.lower() for i in settings.FE_PREFIX):
+            secreto = crud_fe.get_credentials_fe_profile(
                 db=db, environment=environment, squad=squad)
             return secreto
         elif any(i in stack_name.lower() for i in settings.GCLOUD_PREFIX):
