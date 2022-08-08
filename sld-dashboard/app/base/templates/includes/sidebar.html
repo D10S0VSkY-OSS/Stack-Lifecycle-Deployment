@@ -144,6 +144,31 @@
 
             <li class="nav-item">
                 <span class="nav-link  collapsed  d-flex justify-content-between align-items-center"
+                    data-toggle="collapse" data-target="#submenu-components-fe">
+                    <span>
+                        <span class="sidebar-icon"><img src="/static/assets/img/favicon/orangecloud.png" width="16" height="16"></span>
+                        FlexibleEngine
+                    </span>
+                    <span class="link-arrow"><span class="fas fa-chevron-right"></span></span>
+                </span>
+                <div class="multi-level collapse " role="list" id="submenu-components-fe" aria-expanded="false">
+                    <ul class="flex-column nav">
+
+                        {% if "yoda" in current_user.role %}
+                        <li class="nav-item "><a class="nav-link" href="/fe-new">
+                                <span class="sidebar-icon"><span class="fas fa-plus"></span>
+                                    <span>New</span>
+                            </a>
+                            {% endif %}
+                        </li>
+                        <li class="nav-item "><a class="nav-link" href="/fe-list">
+                                <span class="sidebar-icon"><span class="fas fa-database"></span>
+                                    <span>List</span></a></li>
+                    </ul>
+                </div>
+
+            <li class="nav-item">
+                <span class="nav-link  collapsed  d-flex justify-content-between align-items-center"
                     data-toggle="collapse" data-target="#submenu-components-gcp">
                     <span>
                         <span class="sidebar-icon"><span class="fab fa-google"></span></span>
