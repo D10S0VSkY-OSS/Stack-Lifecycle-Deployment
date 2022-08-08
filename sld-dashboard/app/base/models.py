@@ -148,6 +148,16 @@ class Aws_provider(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.datetime.now())
     __table_args__ = (db.UniqueConstraint('squad', 'environment'),)
 
+class fe_provider(db.Model):
+    __tablename__ = "fe_provider"
+    id = db.Column(db.Integer, primary_key=True, index=True)
+    environment = db.Column(db.String(200), nullable=False)
+    squad = db.Column(db.String(200), nullable=False)
+    access_key_id = db.Column(db.String(200), nullable=False)
+    secret_access_key = db.Column(db.String(200), nullable=False)
+    default_region = db.Column(db.String(200))
+    created_at = db.Column(db.DateTime, default=datetime.datetime.now())
+    __table_args__ = (db.UniqueConstraint('squad', 'environment'),)
 
 class Gcloud_provider(db.Model):
     __tablename__ = "gcloud_provider"
