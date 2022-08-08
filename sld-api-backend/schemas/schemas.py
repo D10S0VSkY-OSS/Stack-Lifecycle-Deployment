@@ -106,6 +106,24 @@ class Aws(AwsBase):
         orm_mode = True
 
 
+class feBase(BaseModel):
+    squad: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
+    access_key_id: constr(strip_whitespace=True)
+    secret_access_key: Optional[constr(strip_whitespace=True)] = Field(None, example="string")
+    default_region: constr(strip_whitespace=True)
+
+class feAsumeProfile(feBase):
+    profile_name: Optional[constr(strip_whitespace=True)] = None
+    role_arn: Optional[constr(strip_whitespace=True)] = None
+    source_profile: Optional[constr(strip_whitespace=True)] = None
+
+class fe(feBase):
+    id: int
+    class Config:
+        orm_mode = True
+
+
 class GcloudBase(BaseModel):
     squad: constr(strip_whitespace=True)
     environment: constr(strip_whitespace=True)
