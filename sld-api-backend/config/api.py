@@ -17,7 +17,8 @@ class Settings(BaseSettings):
     AWS_PREFIX: List = ["aws"]
     GCLOUD_PREFIX: List = ["gcp"]
     AZURE_PREFIX: List = ["azure"]
-    PROVIDERS_SUPPORT: List = AWS_PREFIX + GCLOUD_PREFIX + AZURE_PREFIX
+    FE_PREFIX: List = ["fe"]
+    PROVIDERS_SUPPORT: List = AWS_PREFIX + GCLOUD_PREFIX + AZURE_PREFIX + FE_PREFIX
     SECRET_KEY: str = os.getenv('SLD_SECRET_KEY', "09d25e094faa6ca2556c818166b7a9563b93f7099f6f0f4caa6cf63b88e8d3e7")
     ALGORITHM = "HS256"
     # 60 minutes * 24 hours * 8 days = 8 days
@@ -39,9 +40,18 @@ class Settings(BaseSettings):
         "fullname": os.getenv('SLD_INIT_USER_FULLNAME', "Master of the universe user"),
         "email": os.getenv('SLD_INIT_USER_email', "admin@example.com")
     }
+
+    #AWS config
     AWS_CONGIG_DEFAULT_FOLDER: str = f"{os.environ['HOME']}/.aws"
     AWS_SHARED_CREDENTIALS_FILE: str = f"{AWS_CONGIG_DEFAULT_FOLDER}/credentials"
     AWS_SHARED_CONFIG_FILE: str = f"{AWS_CONGIG_DEFAULT_FOLDER}/config"
+
+    #FE config
+    FE_CONGIG_DEFAULT_FOLDER: str = f"{os.environ['HOME']}/.fe"
+    FE_SHARED_CREDENTIALS_FILE: str = f"{FE_CONGIG_DEFAULT_FOLDER}/credentials"
+    FE_SHARED_CONFIG_FILE: str = f"{FE_CONGIG_DEFAULT_FOLDER}/config"
+    
+
     TASK_MAX_RETRY: int = os.getenv('SLD_TASK_MAX_RETRY', 1)
     TASK_RETRY_INTERVAL: int = os.getenv('SLD_TASK_RETRY_INTERVAL', 20)
     TASK_LOCKED_EXPIRED = os.getenv('SLD_TASK_LOCKED_EXPIRED', 3600)
