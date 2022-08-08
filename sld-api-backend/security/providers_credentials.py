@@ -119,7 +119,7 @@ def fe_credentials(secreto):
                        secreto.get('data')['default_region'])
             config.set(source_profile, 'os_access_key',
                        secreto.get("data")["access_key"])
-            config.set(source_profile, 'fe_secret_access_key',
+            config.set(source_profile, 'os_secret_key',
                        secreto.get("data")["secret_access_key"])
             with open(settings.FE_SHARED_CREDENTIALS_FILE, 'w') as credentialsfile:
                 config.write(credentialsfile)
@@ -157,7 +157,7 @@ def secret(
             if not fe_config(secreto) or not fe_credentials(secreto):
                 os.environ["OS_ACCESS_KEY"] = secreto.get("data")[
                     "access_key"]
-                os.environ["FE_SECRET_ACCESS_KEY"] = secreto.get("data")[
+                os.environ["OS_SECRET_KEY"] = secreto.get("data")[
                     "secret_access_key"]
                 logging.info(f"Set fe account without asume role {squad}, {environment}, {stack_name}, {name}")
         except Exception as err:
@@ -240,7 +240,7 @@ def unsecret(stack_name, environment, squad, name, secreto):
                 config.remove_option(source_profile, 'region')
                 config.remove_option(source_profile, 'os_access_key')
                 config.remove_option(
-                    source_profile, 'fe_secret_access_key')
+                    source_profile, 'os_secret_key')
                 config.remove_section(source_profile)
                 with open(settings.FE_SHARED_CREDENTIALS_FILE, 'w') as credentialsfile:
                     config.write(credentialsfile)
@@ -248,7 +248,7 @@ def unsecret(stack_name, environment, squad, name, secreto):
                 del config
             else:
                 os.environ.pop("OS_ACCESS_KEY")
-                os.environ.pop("FE_SECRET_ACCESS_KEY")
+                os.environ.pop("OS_SECRET_KEY")
         except Exception as err:
             logging.warning(err)
 
