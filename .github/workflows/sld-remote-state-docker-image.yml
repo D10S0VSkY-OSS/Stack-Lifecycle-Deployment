@@ -24,11 +24,11 @@ jobs:
 
     - name: Build the Docker image with tags
       working-directory: ./sld-remote-state
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:2.2.0
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:2.3.0
       
     - name: Docker Push with tags
       #if: github.event.pull_request.merged == true
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:2.2.0
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-remote-state:2.3.0
 
     - name: Build the Docker image
       working-directory: ./sld-remote-state
