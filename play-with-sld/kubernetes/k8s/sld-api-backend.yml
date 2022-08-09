@@ -17,7 +17,7 @@ spec:
       subdomain: primary
       containers:
         - name: api-backend
-          image: d10s0vsky/sld-api:latest
+          image: sld-apii:latest
           resources:
             limits:
               memory: 600Mi
