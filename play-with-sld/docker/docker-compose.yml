@@ -83,7 +83,7 @@ services:
 
   # Celery worker
   worker:
-    image: sld-apii:latest
+    image: sld-api:latest
     entrypoint: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "celery,any,squad,squad1,squad2"]
     environment:
       BROKER_USER: admin
@@ -96,7 +96,7 @@ services:
 
   # SLD Dashboard - UI
   sld-dashboard:
-    image: sld-dashboardd:latest
+    image: sld-dashboard:latest
     hostname: sld-dashboard
     entrypoint: gunicorn --config gunicorn-cfg.py run:app
     restart: always
@@ -116,7 +116,7 @@ services:
 
   # FastApi Stack Deploy
   api-backend:
-    image: sld-apii:latest
+    image: sld-api:latest
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 
     hostname: api-backend
     ports:
