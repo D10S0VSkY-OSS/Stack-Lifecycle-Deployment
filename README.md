@@ -63,7 +63,8 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About SLD
-This Repository is a fork of the main project "SLD", By integrating Orange Cloud Provider "Flexible Engine" added to already integrated providers "Azure", "GCP", "AWS".
+This Repository is a fork from the main project "SLD", By integrating Orange Cloud Provider "Flexible Engine" added to the already integrated providers "Azure", "GCP", "AWS".
+<br/>
 SLD helps to accelerate deployment, weighting and making IaaC reusable, generating dynamic forms and maintaining different variables in each environment with the same code. With SLD you can schedule infrastructure deployments like its destruction, manage users by roles and separate stacks by squad and environment
 
 
