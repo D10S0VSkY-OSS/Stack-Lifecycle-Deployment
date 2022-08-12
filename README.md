@@ -63,7 +63,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About SLD
-
+This Repository is a fork of the main project "SLD", By integrating Orange Cloud Provider "Flexible Engine" added to already integrated providers "Azure", "GCP", "AWS".
 SLD helps to accelerate deployment, weighting and making IaaC reusable, generating dynamic forms and maintaining different variables in each environment with the same code. With SLD you can schedule infrastructure deployments like its destruction, manage users by roles and separate stacks by squad and environment
 
 
@@ -100,6 +100,14 @@ You need docker and docker-compse or kind ( recomended ).
 * [Docker-compose](https://docs.docker.com/compose/install/)
 * [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 * [kubectl](https://kubernetes.io/es/docs/tasks/tools/install-kubectl/)
+
+
+### Getting Docker images (Flexible Engine Integration)
+Flexible engine integration requires using altered "Docker images" from the root SLD.
+Note: just "sld-dashboard" and "sld-api" code sections have been modified from the root SLD, in order to add FlexibleEngine cloud provider.
+
+You can either rebuild these two images from source code and Dockerfile. Or just pull already existing ones in "Software Repository for Container" SWR service.
+Make sure to change images name also in "Docker Compose" configuration, or/and "Kubenetes" configuration under /play-with-sld.
 
 ### Installation
 
