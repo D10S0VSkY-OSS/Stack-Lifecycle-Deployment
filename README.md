@@ -10,7 +10,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <p align="center">
-  <a href="https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment">
+  <a href="https://github.com/flyflyinit/Stack-Lifecycle-Deployment">
     <img src="img/logo.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -19,7 +19,7 @@
   <p align="center">
     OpenSource solution that defines and manages the complete lifecycle of resources used and provisioned into a cloud!
     <br />
-    <a href="https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/flyflyinit/Stack-Lifecycle-Deployment"><strong>Explore the docs »</strong></a>
     <br />
     <br />
   </p>
@@ -64,6 +64,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About SLD
 This Repository is a fork from the main project "SLD", By integrating Orange Cloud Provider "Flexible Engine" added to the already integrated providers "Azure", "GCP", "AWS".
+<br/>
 <br/>
 SLD helps to accelerate deployment, weighting and making IaaC reusable, generating dynamic forms and maintaining different variables in each environment with the same code. With SLD you can schedule infrastructure deployments like its destruction, manage users by roles and separate stacks by squad and environment
 
@@ -114,7 +115,7 @@ Make sure to change images name also in "Docker Compose" configuration, or/and "
 
 1. Clone the SLD repo
    ```sh
-   git clone https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment.git
+   git clone https://github.com/flyflyinit/Stack-Lifecycle-Deployment.git
    ```
 2. Deploy SLD in k8s with kind
    ```sh
@@ -223,9 +224,9 @@ Make sure to change images name also in "Docker Compose" configuration, or/and "
     ![sign-in](img/add_stack.png)
 
     * Name: Add the name with a valid prefix according to the cloud provider. 
-    > Prefixs supported: aws_ , gcp_, azure_
-    * git: Add a valid git repository, like github, gitlab, bitbucket, etc. in our case to play we use (https://github.com/D10S0VSkY-OSS/aws_vpc_poc)
-    > You can pass user and  password as https://username:password@github.com/aws_vpc
+    > Prefixs supported: fe_ , aws_ , gcp_, azure_
+    * git: Add a valid git repository, like github, gitlab, bitbucket, etc. in our case to play we use (https://github.com/flyflyinit/fe_vpc) this terraform code deploys an RDS instance.
+    > If your Repo is Private, You can pass user and  password as https://username:password@github.com/flyflyinit/fe_vpc
     > For ssh you can pass it as a secret in the deployment to the user sld
     * Branch: Add the branch you want to deploy by default is master
     * Squad Access: Assign who you want to have access to this stack by squad
@@ -452,7 +453,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 lafalce.diego@gmail.com
 
-[Stack Lifecycle Deployment](https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment)
+[Stack Lifecycle Deployment](https://github.com/flyflyinit/Stack-Lifecycle-Deployment)
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
@@ -469,9 +470,9 @@ lafalce.diego@gmail.com
 [contributors-url]: https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/D10S0VSkY-OSS/Stack-Lifecycle-Deployment.svg?style=for-the-badge
 [forks-url]: https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment/network/members
-[stars-shield]: https://img.shields.io/github/stars/D10S0VSkY-OSS/Stack-Lifecycle-Deployment.svg?style=for-the-badge
+[stars-shield]: https://img.shields.io/github/stars/flyflyinit/Stack-Lifecycle-Deployment.svg?style=for-the-badge
 [stars-url]: https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment/stargazers
-[issues-shield]: https://img.shields.io/github/issues/D10S0VSkY-OSS/Stack-Lifecycle-Deployment?style=for-the-badge
+[issues-shield]: https://img.shields.io/github/issues/flyflyinit/Stack-Lifecycle-Deployment?style=for-the-badge
 [issues-url]: https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment/issues
 [license-shield]: https://img.shields.io/badge/licence-MIT-green?style=for-the-badge
 [license-url]: https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment/blob/main/LICENSE
