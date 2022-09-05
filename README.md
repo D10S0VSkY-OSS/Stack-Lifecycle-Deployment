@@ -305,6 +305,82 @@ To configure S3 you can pass the access and secret keys of aws, in case SLD is r
     - name: AWS_SECRET_ACCESS_KEY
       value: ""
 ```
+For Azure env you need set the next env
+```
+          env:                                                                                                                                    
+          - name: SLD_STORE
+            value: azure
+          - name: AZURE_STORAGE_CONNECTION_STRING
+            value: "DefaultEndpointsProtocol=https;AccountName=<YOUR ACCOUNT>;AccountKey=<YOUR ACCESS KEY>;EndpointSuffix=core.windows.net"
+```
+[See azure-storage-configure-connection-string](https://docs.microsoft.com/en-us/azure/storage/common/storage-configure-connection-string)
+
+For google cloud storage set:
+```
+SLD_STORE=gcp
+export GOOGLE_APPLICATION_CREDENTIALS="/app/sld-gcp-credentials.json"
+```
+**Import google service account key to k8s secret**
+```
+kubectl create secret generic gcp-storage --from-file=~/Downloads/storage.json
+```
+**Modify sld-remote-state.yml set gcp storage cloud backend and mount secret:**
+```
+apiVersion: apps/v1                                                                                                                               
+kind: Deployment                                                                                                                                  
+metadata:                                                                                                                                         
+  name: remote-state                                                                                                                              
+  labels:                                                                                                                                         
+    name: remote-state                                                                                                                            
+spec:                                                                                                                                             
+  replicas: 1                                                                                                                                     
+  selector:                                                                                                                                       
+    matchLabels:                                                                                                                                  
+      name: remote-state         
+  template:                                                                                                                                                                                                        
+    metadata:                                                                  
+      labels:                                                            
+        name: remote-state                                               
+    spec:                        
+      subdomain: primary                                                                                                                                                                                                                                                        
+      containers:                                                                              
+        - name: remote-state                                                                   
+          image: d10s0vsky/sld-remote-state:latest                                                                     
+          volumeMounts:                    
+          - name: gcp                                                                                                                                         
+            mountPath: "/app/gcp"                                                                                                                                            
+            readOnly: true                          
+          env:                                      
+          - name: SLD_STORE                         
+            value: gcp                              
+          - name: GOOGLE_APPLICATION_CREDENTIALS                                                                                                                                                                   
+            value: "/app/gcp/storage.json"                                                                             
+          resources:                                                
+            limits:                                                 
+              memory: 600Mi                                         
+              cpu: 1                                                                                                                                                                                                                                                            
+            requests:                                                          
+              memory: 300Mi                                                    
+              cpu: 500m                                                        
+          imagePullPolicy: Always                                              
+          command: ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]                                          
+          ports:                                                                               
+            - containerPort: 8080                                                              
+          livenessProbe:                                                                       
+            httpGet:                                                                           
+              path: /                                                                          
+              port: 8080                                                                                                                                                                      
+              httpHeaders:                                                                                             
+              - name: status                                                                                           
+                value: healthy                                                                                         
+            initialDelaySeconds: 60                                                                                    
+            periodSeconds: 60                                                                                          
+      volumes:                                                                                                         
+      - name: gcp                                                                                                      
+        secret:                                                                                                        
+          secretName: gcp-storage                                                    
+```
+
 ## Data remote state
 To be able to use the outputs of other stacks you can configure it as follows
 the key alwys is the same like "Task Name"
