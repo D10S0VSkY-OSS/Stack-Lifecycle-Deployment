@@ -18,6 +18,11 @@ if settings.SLD_STORE == "local":
     from stores.local import LocalStore as Store
 if settings.SLD_STORE == "mongodb":
     from stores.mongo_db import MongoDB as Store
+if settings.SLD_STORE == "azure":
+    from stores.azure_blob_storage import AzureBlobStorage as Store
+if settings.SLD_STORE == "gcp":
+    from stores.gcp_cloud_storage import GoogleCloudStorage as Store
+
 
 
 
