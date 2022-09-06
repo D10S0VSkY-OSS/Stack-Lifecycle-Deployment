@@ -1,21 +1,20 @@
 import datetime
 
-from sqlalchemy.orm import Session
-from sqlalchemy import func
-
 import db.models as models
 import schemas.schemas as schemas
+from sqlalchemy.orm import Session
 
 
 def create_new_deploy(
-        db: Session,
-        deploy: schemas.DeployCreate,
-        stack_branch: str,
-        action: str,
-        user_id: int,
-        squad: str,
-        task_id: str,
-        username: str):
+    db: Session,
+    deploy: schemas.DeployCreate,
+    stack_branch: str,
+    action: str,
+    user_id: int,
+    squad: str,
+    task_id: str,
+    username: str,
+):
     db_deploy = models.Deploy(
         name=deploy.name,
         stack_name=deploy.stack_name,
@@ -43,20 +42,20 @@ def create_new_deploy(
 
 
 def update_deploy(
-        db: Session,
-        deploy_id: int,
-        action: str,
-        username: str,
-        user_id: int,
-        task_id: str,
-        start_time: str,
-        destroy_time: str,
-        stack_branch: str,
-        tfvar_file: str,
-        project_path: str,
-        variables: dict):
-    db_deploy = db.query(models.Deploy).filter(
-        models.Deploy.id == deploy_id).first()
+    db: Session,
+    deploy_id: int,
+    action: str,
+    username: str,
+    user_id: int,
+    task_id: str,
+    start_time: str,
+    destroy_time: str,
+    stack_branch: str,
+    tfvar_file: str,
+    project_path: str,
+    variables: dict,
+):
+    db_deploy = db.query(models.Deploy).filter(models.Deploy.id == deploy_id).first()
 
     db_deploy.action = action
     db_deploy.task_id = task_id
@@ -81,14 +80,9 @@ def update_deploy(
         raise err
 
 
-def update_plan(
-        db: Session,
-        deploy_id: int,
-        action: str,
-        task_id: str):
+def update_plan(db: Session, deploy_id: int, action: str, task_id: str):
 
-    db_deploy = db.query(models.Deploy).filter(
-        models.Deploy.id == deploy_id).first()
+    db_deploy = db.query(models.Deploy).filter(models.Deploy.id == deploy_id).first()
 
     db_deploy.action = action
     db_deploy.task_id = task_id
@@ -101,14 +95,9 @@ def update_plan(
         raise err
 
 
-def update_schedule(
-        db: Session,
-        deploy_id: int,
-        start_time: str,
-        destroy_time: str):
+def update_schedule(db: Session, deploy_id: int, start_time: str, destroy_time: str):
 
-    db_deploy = db.query(models.Deploy).filter(
-        models.Deploy.id == deploy_id).first()
+    db_deploy = db.query(models.Deploy).filter(models.Deploy.id == deploy_id).first()
 
     db_deploy.start_time = start_time
     db_deploy.destroy_time = destroy_time
@@ -122,10 +111,9 @@ def update_schedule(
 
 
 def delete_deploy_by_id(db: Session, deploy_id: int, squad: str):
-    db.query(
-        models.Deploy).filter(
-        models.Deploy.id == deploy_id).filter(
-            models.Deploy.squad == squad).delete()
+    db.query(models.Deploy).filter(models.Deploy.id == deploy_id).filter(
+        models.Deploy.squad == squad
+    ).delete()
     try:
         db.commit()
         return {models.Deploy.id: "deleted", "Deploy_id": deploy_id}
@@ -149,21 +137,27 @@ def get_deploy_by_name(db: Session, deploy_name: str):
 
 def get_deploy_by_id_squad(db: Session, deploy_id: int, squad: str):
     try:
-        return db.query(
-            models.Deploy).filter(
-            models.Deploy.id == deploy_id).filter(
-            models.Deploy.squad == squad).first()
+        return (
+            db.query(models.Deploy)
+            .filter(models.Deploy.id == deploy_id)
+            .filter(models.Deploy.squad == squad)
+            .first()
+        )
     except Exception as err:
         raise err
 
 
-def get_deploy_by_name_squad(db: Session, deploy_name: str, squad: str, environment: str):
+def get_deploy_by_name_squad(
+    db: Session, deploy_name: str, squad: str, environment: str
+):
     try:
-        return db.query(
-            models.Deploy).filter(
-            models.Deploy.name == deploy_name).filter(
-            models.Deploy.squad == squad).filter(
-            models.Deploy.environment == environment).first()
+        return (
+            db.query(models.Deploy)
+            .filter(models.Deploy.name == deploy_name)
+            .filter(models.Deploy.squad == squad)
+            .filter(models.Deploy.environment == environment)
+            .first()
+        )
     except Exception as err:
         raise err
 
@@ -179,7 +173,9 @@ def get_all_deploys_by_squad(db: Session, squad: str, skip: int = 0, limit: int 
     try:
         result = []
         for i in squad:
-            result.extend(db.query(models.Deploy).filter(models.Deploy.squad == i).all())
+            result.extend(
+                db.query(models.Deploy).filter(models.Deploy.squad == i).all()
+            )
         return set(result)
     except Exception as err:
         raise err

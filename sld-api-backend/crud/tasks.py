@@ -1,18 +1,19 @@
-from sqlalchemy.orm import Session
 import datetime
 
 import db.models as models
+from sqlalchemy.orm import Session
 
 
 def create_task(
-        db: Session,
-        task_id: str,
-        task_name: str,
-        user_id: int,
-        deploy_id: int,
-        username: str,
-        squad: str,
-        action: str):
+    db: Session,
+    task_id: str,
+    task_name: str,
+    user_id: int,
+    deploy_id: int,
+    username: str,
+    squad: str,
+    action: str,
+):
     db_task = models.Tasks(
         task_id=task_id,
         task_name=task_name,
@@ -21,7 +22,8 @@ def create_task(
         username=username,
         squad=squad,
         created_at=datetime.datetime.now(),
-        action=action)
+        action=action,
+    )
     try:
         db.add(db_task)
         db.commit()
@@ -35,16 +37,28 @@ def get_all_tasks(db: Session, skip: int = 0, limit: int = 100):
     try:
         db_query = db.query(models.Tasks)
 
-        return db_query.order_by(models.Tasks.created_at.desc()).offset(skip).limit(limit).all()
+        return (
+            db_query.order_by(models.Tasks.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
     except Exception as err:
         raise err
 
+
 def get_all_tasks_by_squad(db: Session, squad: str, skip: int = 0, limit: int = 100):
     try:
-        from sqlalchemy import func
         result = []
         for i in squad:
-            result.extend(db.query(models.Tasks).filter(models.Tasks.squad == i).order_by(models.Tasks.created_at.desc()).offset(skip).limit(limit).all())
+            result.extend(
+                db.query(models.Tasks)
+                .filter(models.Tasks.squad == i)
+                .order_by(models.Tasks.created_at.desc())
+                .offset(skip)
+                .limit(limit)
+                .all()
+            )
         return result
     except Exception as err:
         raise err
@@ -52,8 +66,6 @@ def get_all_tasks_by_squad(db: Session, squad: str, skip: int = 0, limit: int = 
 
 def get_tasks_by_deploy_id(db: Session, deploy_id: int):
     try:
-        return db.query(
-            models.Tasks).filter(
-            models.Tasks.deploy_id == deploy_id).all()
+        return db.query(models.Tasks).filter(models.Tasks.deploy_id == deploy_id).all()
     except Exception as err:
         raise err

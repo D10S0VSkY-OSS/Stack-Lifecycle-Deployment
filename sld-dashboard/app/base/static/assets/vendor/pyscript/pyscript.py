@@ -364,7 +364,6 @@ class PyListTemplate:
 
     def child_appended(self, child):
         """Overwrite me to define logic"""
-        pass
 
 
 class OutputCtxManager:

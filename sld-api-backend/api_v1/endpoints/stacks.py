@@ -1,23 +1,23 @@
-from sqlalchemy.orm import Session
+from crud import activityLogs as crud_activity
+from crud import stacks as crud_stacks
+from crud import user as crud_users
 from fastapi import APIRouter, Depends, HTTPException
-
+from helpers.get_data import (check_providers, check_squad_stack,
+                              check_squad_user)
+from helpers.push_task import sync_git
 from schemas import schemas
 from security import deps
-from crud import user as crud_users
-from crud import stacks as crud_stacks
-from crud import activityLogs as crud_activity
-from helpers.push_task import sync_git, sync_get_vars
-from helpers.get_data import check_providers, check_squad_user
-from helpers.get_data import user_squad_scope, activity_log, check_squad_user, check_role_user, check_squad_stack
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
 
 @router.post("/", response_model=schemas.Stack)
 def create_new_stack(
-        stack: schemas.StackCreate,
-        current_user: schemas.User = Depends(deps.get_current_active_user),
-        db: Session = Depends(deps.get_db)):
+    stack: schemas.StackCreate,
+    current_user: schemas.User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db),
+):
 
     name = "default"
     environment = "default"
@@ -29,9 +29,7 @@ def create_new_stack(
     # Check if stack exist
     db_stack = crud_stacks.get_stack_by_name(db, stack_name=stack.stack_name)
     if db_stack:
-        raise HTTPException(
-            status_code=409,
-            detail="The stack name already exist")
+        raise HTTPException(status_code=409, detail="The stack name already exist")
     # Check if the user have permissions for create stack
     check_squad_stack(db, current_user, current_user.squad, stack.squad_access)
     # Push git task to queue squad, all workers are subscribed to this queue
@@ -41,8 +39,9 @@ def create_new_stack(
         branch=branch,
         environment=environment,
         squad=squad,
-        name=name)
-    variables_list = [i for i in task[1]['variable'].keys()]
+        name=name,
+    )
+    variables_list = [i for i in task[1]["variable"].keys()]
     try:
         # pesrsist data in db
         result = crud_stacks.create_new_stack(
@@ -52,14 +51,14 @@ def create_new_stack(
             task_id=task[0],
             var_json=task[1],
             var_list=variables_list,
-            squad_access=stack.squad_access
+            squad_access=stack.squad_access,
         )
 
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
-            action=f'Create Stack {stack.stack_name}'
+            action=f"Create Stack {stack.stack_name}",
         )
         return result
     except Exception as err:
@@ -68,10 +67,11 @@ def create_new_stack(
 
 @router.patch("/{stack_id}", response_model=schemas.Stack)
 def update_stack(
-        stack_id: int,
-        stack: schemas.StackCreate,
-        current_user: schemas.User = Depends(deps.get_current_active_user),
-        db: Session = Depends(deps.get_db)):
+    stack_id: int,
+    stack: schemas.StackCreate,
+    current_user: schemas.User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db),
+):
     name = "default"
     environment = "default"
     squad = "squad"
@@ -90,8 +90,9 @@ def update_stack(
         branch=branch,
         environment=environment,
         squad=squad,
-        name=name)
-    variables_list = [i for i in task[1]['variable'].keys()]
+        name=name,
+    )
+    variables_list = [i for i in task[1]["variable"].keys()]
     try:
         # pesrsist data in db
         result = crud_stacks.update_stack(
@@ -102,14 +103,14 @@ def update_stack(
             task_id=task[0],
             var_json=task[1],
             var_list=variables_list,
-            squad_access=stack.squad_access
+            squad_access=stack.squad_access,
         )
 
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
-            action=f'Update Stack {stack.stack_name}'
+            action=f"Update Stack {stack.stack_name}",
         )
         return result
     except Exception as err:
@@ -118,44 +119,63 @@ def update_stack(
 
 @router.get("/")
 async def get_all_stacks(
-        current_user: schemas.User = Depends(deps.get_current_active_user),
-        skip: int = 0,
-        limit: int = 100,
-        db: Session = Depends(deps.get_db)):
+    current_user: schemas.User = Depends(deps.get_current_active_user),
+    skip: int = 0,
+    limit: int = 100,
+    db: Session = Depends(deps.get_db),
+):
     if not crud_users.is_master(db, current_user):
-        return crud_stacks.get_all_stacks_by_squad(db=db, squad_access=current_user.squad, skip=skip, limit=limit)
-    return crud_stacks.get_all_stacks(db=db, squad_access=current_user.squad, skip=skip, limit=limit)
+        return crud_stacks.get_all_stacks_by_squad(
+            db=db, squad_access=current_user.squad, skip=skip, limit=limit
+        )
+    return crud_stacks.get_all_stacks(
+        db=db, squad_access=current_user.squad, skip=skip, limit=limit
+    )
 
 
 @router.get("/{stack}")
 async def get_stack_by_id_or_name(
-        stack,
-        current_user: schemas.User = Depends(deps.get_current_active_user),
-        db: Session = Depends(deps.get_db)):
+    stack,
+    current_user: schemas.User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db),
+):
 
     if not stack.isdigit():
         result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
         if not crud_users.is_master(db, current_user):
             if result is None:
                 raise HTTPException(status_code=404, detail="stack id not found")
-            if not check_squad_user(current_user.squad, result.squad_access) and not "*" in result.squad_access:
-                raise HTTPException(status_code=403, detail=f"Not enough permissions in {result.squad_access}")
+            if (
+                not check_squad_user(current_user.squad, result.squad_access)
+                and not "*" in result.squad_access
+            ):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Not enough permissions in {result.squad_access}",
+                )
         return result
 
     result = crud_stacks.get_stack_by_id(db=db, stack_id=stack)
     if result is None:
         raise HTTPException(status_code=404, detail="stack id not found")
         if not crud_users.is_master(db, current_user):
-            if not check_squad_user(current_user.squad, result.squad_access) and not "*" in result.squad_access:
-                raise HTTPException(status_code=403, detail=f"Not enough permissions in {result.squad_access}")
+            if (
+                not check_squad_user(current_user.squad, result.squad_access)
+                and not "*" in result.squad_access
+            ):
+                raise HTTPException(
+                    status_code=403,
+                    detail=f"Not enough permissions in {result.squad_access}",
+                )
     return result
 
 
 @router.delete("/{stack}")
 async def delete_stack_by_id_or_name(
-        stack,
-        current_user: schemas.User = Depends(deps.get_current_active_user),
-        db: Session = Depends(deps.get_db)):
+    stack,
+    current_user: schemas.User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db),
+):
     try:
         if not stack.isdigit():
             result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
@@ -168,7 +188,7 @@ async def delete_stack_by_id_or_name(
                 db=db,
                 username=current_user.username,
                 squad=current_user.squad,
-                action=f'Delete Stack {result.stack_name}'
+                action=f"Delete Stack {result.stack_name}",
             )
             return crud_stacks.delete_stack_by_name(db=db, stack_name=stack)
 
@@ -183,7 +203,7 @@ async def delete_stack_by_id_or_name(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
-            action=f'Delete Stack {result.id}'
+            action=f"Delete Stack {result.id}",
         )
         return crud_stacks.delete_stack_by_id(db=db, stack_id=stack)
     except Exception as err:
