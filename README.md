@@ -65,10 +65,8 @@
 
 SLD helps to accelerate deployment, weighting and making IaaC reusable, generating dynamic forms and maintaining different variables in each environment with the same code. With SLD you can schedule infrastructure deployments like its destruction, manage users by roles and separate stacks by squad and environment
 
-[SLD_review.webm](https://user-images.githubusercontent.com/79284025/180003540-a818e680-838c-44cb-b934-f29e3c9d4e01.webm)
 
-
-![Product Name Screen Shot](img/dashboard.png)
+[![Everything Is AWESOME](img/dashboard.png)](https://youtu.be/EThXrat-jsQ "Click me for DEMO")
 
 
 ![Product Name Screen Shot](img/api.png)
