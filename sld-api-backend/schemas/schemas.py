@@ -1,5 +1,6 @@
-from pydantic import BaseModel, EmailStr, Field, ValidationError, validator, SecretStr, constr
-from typing import Optional, List
+from typing import List, Optional
+
+from pydantic import BaseModel, EmailStr, Field, constr
 
 
 class UserBase(BaseModel):
@@ -66,7 +67,7 @@ class TokenData(BaseModel):
 class StackBase(BaseModel):
     stack_name: constr(strip_whitespace=True)
     git_repo: constr(strip_whitespace=True)
-    branch: constr(strip_whitespace=True)  = "master"
+    branch: constr(strip_whitespace=True) = "master"
     squad_access: List[str] = ["*"]
     tf_version: constr(strip_whitespace=True) = "1.2.3"
     description: constr(strip_whitespace=True)
@@ -89,7 +90,9 @@ class AwsBase(BaseModel):
     squad: constr(strip_whitespace=True)
     environment: constr(strip_whitespace=True)
     access_key_id: constr(strip_whitespace=True)
-    secret_access_key: Optional[constr(strip_whitespace=True)] = Field(None, example="string")
+    secret_access_key: Optional[constr(strip_whitespace=True)] = Field(
+        None, example="string"
+    )
     default_region: constr(strip_whitespace=True)
 
 
@@ -151,9 +154,15 @@ class DeployCreate(BaseModel):
     stack_name: constr(strip_whitespace=True)
     stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
     environment: constr(strip_whitespace=True)
-    start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
-    destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
-    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
+    start_time: Optional[constr(strip_whitespace=True)] = Field(
+        None, example="30 7 * * 0-4"
+    )
+    destroy_time: Optional[constr(strip_whitespace=True)] = Field(
+        None, example="30 18 * * 0-4"
+    )
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field(
+        "", example="terraform.tfvars"
+    )
     project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
     variables: dict
 
@@ -170,7 +179,9 @@ class DeployUpdate(BaseModel):
     start_time: constr(strip_whitespace=True)
     destroy_time: constr(strip_whitespace=True)
     stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
-    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field(
+        "", example="terraform.tfvars"
+    )
     project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
     variables: dict
 
@@ -190,9 +201,15 @@ class PlanCreate(BaseModel):
     stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
     squad: constr(strip_whitespace=True)
     environment: constr(strip_whitespace=True)
-    start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
-    destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
-    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
+    start_time: Optional[constr(strip_whitespace=True)] = Field(
+        None, example="30 7 * * 0-4"
+    )
+    destroy_time: Optional[constr(strip_whitespace=True)] = Field(
+        None, example="30 18 * * 0-4"
+    )
+    tfvar_file: Optional[constr(strip_whitespace=True)] = Field(
+        "", example="terraform.tfvars"
+    )
     project_path: Optional[constr(strip_whitespace=True)] = Field("", example="s")
     variables: dict
 
@@ -214,5 +231,9 @@ class ActivityLogs(BaseModel):
 
 
 class ScheduleUpdate(BaseModel):
-    start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
-    destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
+    start_time: Optional[constr(strip_whitespace=True)] = Field(
+        None, example="30 7 * * 0-4"
+    )
+    destroy_time: Optional[constr(strip_whitespace=True)] = Field(
+        None, example="30 18 * * 0-4"
+    )

@@ -1,15 +1,15 @@
-import bcrypt
-import sys
-from sqlalchemy.orm import Session
-from sqlalchemy import exc
 import datetime
+import logging
+import sys
 
-from security.vault import vault_encrypt, vault_decrypt
-from security.tokens import get_password_hash
-from config.api import settings
+import bcrypt
 import db.models as models
 import schemas.schemas as schemas
-import logging
+from config.api import settings
+from security.tokens import get_password_hash
+from security.vault import vault_decrypt, vault_encrypt
+from sqlalchemy import exc
+from sqlalchemy.orm import Session
 
 logging.getLogger("uvicorn.error").propagate = False
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
@@ -59,9 +59,7 @@ def is_master(db: Session, user: schemas.UserCreate) -> bool:
 
 def get_user_by_username(db: Session, username: str):
     try:
-        return db.query(
-            models.User).filter(
-            models.User.username == username).first()
+        return db.query(models.User).filter(models.User.username == username).first()
     except Exception as err:
         raise err
 
@@ -75,16 +73,24 @@ def get_user_by_id(db: Session, id: int):
 
 def get_user_by_username_squad(db: Session, username: str):
     try:
-        return db.query(
-            models.User).filter(
-            models.User.username == username).filter(models.User.squad == squad).first()
+        return (
+            db.query(models.User)
+            .filter(models.User.username == username)
+            .filter(models.User.squad == squad)
+            .first()
+        )
     except Exception as err:
         raise err
 
 
 def get_user_by_id_squad(db: Session, id: int):
     try:
-        return db.query(models.User).filter(models.User.id == id).filter(models.User.squad == squad).first()
+        return (
+            db.query(models.User)
+            .filter(models.User.id == id)
+            .filter(models.User.squad == squad)
+            .first()
+        )
     except Exception as err:
         raise err
 
@@ -92,10 +98,15 @@ def get_user_by_id_squad(db: Session, id: int):
 def get_users_by_squad(db: Session, squad: str, skip: int = 0, limit: int = 100):
     try:
         from sqlalchemy import func
+
         result = []
         for i in squad:
             a = f'["{i}"]'
-            result.extend(db.query(models.User).filter(func.json_contains(models.User.squad, a) == 1).all())
+            result.extend(
+                db.query(models.User)
+                .filter(func.json_contains(models.User.squad, a) == 1)
+                .all()
+            )
         return set(result)
     except Exception as err:
         raise err
@@ -112,12 +123,12 @@ def create_init_user(db: Session, password: str):
     db_user_schedule = models.User(
         username=settings.BOT,
         fullname="Bot sld-schedule service",
-        email=f'{settings.BOT}@internal.local',
+        email=f"{settings.BOT}@internal.local",
         squad=["*"],
         role=["yoda", "R2-D2"],
         is_active=True,
         created_at=datetime.datetime.now(),
-        password=hashing_passwd(settings.BOTC)
+        password=hashing_passwd(settings.BOTC),
     )
 
     db_user = models.User(
@@ -128,7 +139,7 @@ def create_init_user(db: Session, password: str):
         role=["yoda"],
         is_active=True,
         created_at=datetime.datetime.now(),
-        password=hashing_passwd(password)
+        password=hashing_passwd(password),
     )
     try:
         db.add(db_user_schedule)
@@ -151,14 +162,13 @@ def create_user(db: Session, user: schemas.UserCreate):
         db.refresh(db_user)
         return db_user
     except exc.IntegrityError as err:
-        raise ValueError(str(err.__dict__['orig']))
+        raise ValueError(str(err.__dict__["orig"]))
     except Exception as err:
         raise err
 
 
 def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
-    db_user = db.query(models.User).filter(
-        models.User.id == user_id).first()
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
     db_user.updated_at = datetime.datetime.now()
     check_None = [None, "", "string"]
     if user.password not in check_None:
@@ -185,8 +195,7 @@ def update_user(db: Session, user_id: int, user: schemas.UserUpdate):
 
 
 def password_reset(db: Session, user_id: int, password: schemas.PasswordReset):
-    db_user = db.query(models.User).filter(
-        models.User.id == user_id).first()
+    db_user = db.query(models.User).filter(models.User.id == user_id).first()
     db_user.updated_at = datetime.datetime.now()
 
     check_None = [None, "", "string"]
@@ -202,8 +211,7 @@ def password_reset(db: Session, user_id: int, password: schemas.PasswordReset):
 
 
 def delete_user_by_id(db: Session, id: int):
-    db.query(models.User).filter(
-        models.User.id == id).delete()
+    db.query(models.User).filter(models.User.id == id).delete()
     try:
         db.commit()
         return {id: "deleted"}
@@ -212,8 +220,7 @@ def delete_user_by_id(db: Session, id: int):
 
 
 def delete_user_by_name(db: Session, username: str):
-    db.query(models.User).filter(
-        models.User.username == username).delete()
+    db.query(models.User).filter(models.User.username == username).delete()
     try:
         db.commit()
         return {username: "deleted"}
@@ -222,11 +229,10 @@ def delete_user_by_name(db: Session, username: str):
 
 
 def check_username_password(db: Session, user: schemas.UserAuthenticate):
-    db_user_info: models.User = get_user_by_username(
-        db, username=user.username)
+    db_user_info: models.User = get_user_by_username(db, username=user.username)
     try:
         return bcrypt.checkpw(
-            user.password.encode('utf-8'),
-            db_user_info.password.encode('utf-8'))
+            user.password.encode("utf-8"), db_user_info.password.encode("utf-8")
+        )
     except Exception as err:
         raise err

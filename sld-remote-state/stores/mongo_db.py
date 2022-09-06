@@ -1,13 +1,9 @@
-import os
-import json
 import logging
-from datetime import datetime
 
 import pymongo
 from configs.mongo_db import settings
 
-
-logging.basicConfig(format='%(levelname)s:     %(message)s', level=logging.INFO)
+logging.basicConfig(format="%(levelname)s:     %(message)s", level=logging.INFO)
 
 connection_url = f"mongodb://{settings.MONGODB_USER}:{settings.MONGODB_PASSWD}@{settings.MONGODB_URL}"
 
@@ -50,7 +46,7 @@ class MongoDB(object):
             current_state = collection.find_one(query)
             if current_state:
                 # Update Terraform state
-                new_state = {'$set': info}
+                new_state = {"$set": info}
                 collection.update_one(current_state, new_state)
                 return True
             # Add new terraform state

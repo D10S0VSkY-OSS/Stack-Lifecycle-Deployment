@@ -1,7 +1,9 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey, Text, UniqueConstraint, JSON
-from config.database import Base
-from sqlalchemy.orm import relationship
 import datetime
+
+from config.database import Base
+from sqlalchemy import (JSON, Boolean, Column, DateTime, ForeignKey, Integer,
+                        String, Text, UniqueConstraint)
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -32,7 +34,7 @@ class Stack(Base):
     tf_version = Column(String(30))
     created_at = Column(DateTime, default=datetime.datetime.now())
     description = Column(Text())
-    user_id = Column(Integer, ForeignKey('users.id'))
+    user_id = Column(Integer, ForeignKey("users.id"))
     owner = relationship("User", back_populates="stacks")
 
 
@@ -48,7 +50,7 @@ class Aws_provider(Base):
     role_arn = Column(String(200), nullable=True)
     source_profile = Column(String(200), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.now())
-    __table_args__ = (UniqueConstraint('squad', 'environment'),)
+    __table_args__ = (UniqueConstraint("squad", "environment"),)
 
 
 class Gcloud_provider(Base):
@@ -58,7 +60,7 @@ class Gcloud_provider(Base):
     squad = Column(String(200), nullable=False)
     gcloud_keyfile_json = Column(String(5000), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now())
-    __table_args__ = (UniqueConstraint('squad', 'environment'),)
+    __table_args__ = (UniqueConstraint("squad", "environment"),)
 
 
 class Azure_provider(Base):
@@ -71,7 +73,7 @@ class Azure_provider(Base):
     subscription_id = Column(String(200), nullable=False)
     tenant_id = Column(String(200), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now())
-    __table_args__ = (UniqueConstraint('squad', 'environment'),)
+    __table_args__ = (UniqueConstraint("squad", "environment"),)
 
 
 class Deploy(Base):
@@ -93,8 +95,7 @@ class Deploy(Base):
     environment = Column(String(50))
     tfvar_file = Column(String(50))
     project_path = Column(String(50))
-    __table_args__ = (UniqueConstraint(
-        'squad', 'environment', 'name', 'stack_name'),)
+    __table_args__ = (UniqueConstraint("squad", "environment", "name", "stack_name"),)
 
 
 class Tasks(Base):

@@ -1,10 +1,12 @@
 import datetime
-#from dateutil import parser
+
+# from dateutil import parser
 import requests
-from fastapi import HTTPException
 from config.api import settings
+from fastapi import HTTPException
 
 server = settings.SCHEDULE_SERVER
+
 
 def resource_life_cycle(start_time: str, end_time: str) -> bool:
     if start_time == 0:
@@ -25,27 +27,19 @@ def resource_life_cycle(start_time: str, end_time: str) -> bool:
         return start <= now_param or now_param <= end
 
 
-
-
-def request_url(verb: str, headers: dict = '', uri: str = '', json: dict = ''):
-    response = requests.request(
-        verb,
-        headers=headers,
-        url=f'{server}/{uri}',
-        json=json
-    )
+def request_url(verb: str, headers: dict = "", uri: str = "", json: dict = ""):
+    response = requests.request(verb, headers=headers, url=f"{server}/{uri}", json=json)
     try:
-        result = {'status_code': response.status_code,
-                  'content': response.content.decode('utf-8'),
-                  'json': response.json()
-                  }
+        result = {
+            "status_code": response.status_code,
+            "content": response.content.decode("utf-8"),
+            "json": response.json(),
+        }
         return result
     except Exception as err:
-        raise HTTPException(
-            status_code=501,
-            detail=f"{err}")
+        raise HTTPException(status_code=501, detail=f"{err}")
 
 
 def check_status():
-    response = request_url(verb='GET')
+    response = request_url(verb="GET")
     return response

@@ -1,17 +1,16 @@
 from typing import Generator
 
+from config.api import settings
+from config.database import SessionLocal
+from crud import user as crud_users
+from db import models
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
-from sqlalchemy.orm import Session
-
-from crud import user as crud_users
-from db import models
 from schemas import schemas
 from security import tokens
-from config.api import settings
-from config.database import SessionLocal
+from sqlalchemy.orm import Session
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/authenticate/access-token"
@@ -27,8 +26,8 @@ def get_db() -> Generator:
 
 
 def get_current_user(
-        token: str = Depends(reusable_oauth2),
-        db: Session = Depends(get_db)):
+    token: str = Depends(reusable_oauth2), db: Session = Depends(get_db)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -68,23 +67,32 @@ def get_current_active_superuser(
 
 
 def validate_password(password: str):
-    SpecialSymbol = ['$', '@', '#', '%', '.', '!', '&', '"', '?']
+    SpecialSymbol = ["$", "@", "#", "%", ".", "!", "&", '"', "?"]
     if len(password) < settings.PASSWORD_LEN:
         raise HTTPException(
-            status_code=400, detail=f"Make sure your password is at lest {settings.PASSWORD_LEN} letters")
+            status_code=400,
+            detail=f"Make sure your password is at lest {settings.PASSWORD_LEN} letters",
+        )
     if len(password) > 20:
         raise HTTPException(
-            status_code=400, detail="length should be not be greater than 20")
+            status_code=400, detail="length should be not be greater than 20"
+        )
     if not any(char.isdigit() for char in password):
         raise HTTPException(
-            status_code=400, detail="Make sure your password has a number in it")
+            status_code=400, detail="Make sure your password has a number in it"
+        )
     if not any(char.isupper() for char in password):
         raise HTTPException(
-            status_code=400, detail="Make sure your password has a capital letter in it")
+            status_code=400, detail="Make sure your password has a capital letter in it"
+        )
     if not any(char.islower() for char in password):
         raise HTTPException(
-            status_code=400, detail="Make sure your password has a lowercase letter in it")
+            status_code=400,
+            detail="Make sure your password has a lowercase letter in it",
+        )
     if not any(char in SpecialSymbol for char in password):
         raise HTTPException(
-            status_code=400, detail="Make sure your password has a one of the symbols $@#% in it")
+            status_code=400,
+            detail="Make sure your password has a one of the symbols $@#% in it",
+        )
     return True

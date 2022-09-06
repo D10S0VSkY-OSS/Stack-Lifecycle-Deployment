@@ -72,7 +72,7 @@
                 </span>
                 <div class="multi-level collapse " role="list" id="submenu-components-stacks" aria-expanded="false">
                     <ul class="flex-column nav">
-                        {% if "yoda" in current_user.role %}
+                        {% if "yoda" in current_user.role or "darth_vader" in current_user.role %}
                         <li class="nav-item "><a class="nav-link" href="/stacks-new">
                                 <span class="sidebar-icon"><span class="fas fa-plus"></span>
                                     <span>New</span>
