@@ -68,6 +68,7 @@ async def deploy_infra_by_stack_name(
             secreto,
             deploy.tfvar_file,
             deploy.project_path,
+            current_user.username,
         )
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
@@ -162,6 +163,7 @@ async def update_deploy_by_id(
             secreto,
             deploy_update.tfvar_file,
             deploy_update.project_path,
+            current_user.username,
         )
         # Push deploy task data
         crud_deploys.update_deploy(
@@ -256,6 +258,7 @@ async def destroy_infra(
             secreto,
             tfvar_file,
             project_path,
+            current_user.username,
         )
         # Push deploy task data
         crud_deploys.update_deploy(
@@ -382,6 +385,7 @@ async def delete_infra_by_id(
             secreto,
             tfvar_file,
             project_path,
+            current_user.username,
         )
         # Push task data
         db_task = crud_tasks.create_task(

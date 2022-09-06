@@ -4,6 +4,7 @@ import traceback
 import redis
 from celery import states
 from celery.exceptions import Ignore
+from celery.utils.log import get_task_logger
 from config.api import settings
 from config.celery_config import celery_app
 from core.providers.terraform import TerraformActions as tf
@@ -16,6 +17,8 @@ r = redis.Redis(
     charset="utf-8",
     decode_responses=True,
 )
+
+logger = get_task_logger(__name__)
 
 
 @celery_app.task(
@@ -34,23 +37,43 @@ def pipeline_deploy(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    user: str = "",
 ):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     try:
+        logger.info(
+            f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment}"
+        )
         r.set(f"{name}-{squad}-{environment}", "Locked")
+        logger.info(f"lock sld {name}-{squad}-{environment}")
         r.expire(f"{name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
+        logger.info(
+            f"set sld {name}-{squad}-{environment} expire timeout {settings.TASK_LOCKED_EXPIRED}"
+        )
         # Git clone repo
+        logger.info(
+            f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
+        )
         result = tf.git_clone(git_repo, name, stack_name, environment, squad, branch)
         self.update_state(state="PULLING", meta={"done": "1 of 6"})
         if result["rc"] != 0:
+            logger.error(
+                f"Error when user {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
+            )
             raise Exception(result)
         # Download terrafom
+        logger.info(
+            f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
+        )
         result = tf.binary_download(stack_name, environment, squad, version)
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
         tf.delete_local_folder(dir_path)
         if result["rc"] != 0:
+            logger.error(
+                f"Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
+            )
             raise Exception(result)
         # Create tf to use the custom artifactory as config
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
@@ -65,6 +88,9 @@ def pipeline_deploy(
         if result["rc"] != 0:
             raise Exception(result)
         # Plan execute
+        logger.info(
+            f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform plan"
+        )
         self.update_state(state="PLANNING", meta={"done": "5 of 6"})
         result = tf.plan_execute(
             stack_name,
@@ -80,8 +106,14 @@ def pipeline_deploy(
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
         tf.delete_local_folder(dir_path)
         if result["rc"] != 0:
+            logger.error(
+                f"Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} execute terraform plan"
+            )
             raise Exception(result)
         # Apply execute
+        logger.info(
+            f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform apply with timeout deploy setting {settings.DEPLOY_TMOUT}"
+        )
         self.update_state(state="APPLYING", meta={"done": "6 of 6"})
         result = tf.apply_execute(
             stack_name,
@@ -95,10 +127,16 @@ def pipeline_deploy(
             data=secreto,
         )
         if result["rc"] != 0:
+            logger.error(
+                f"Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
+            )
             raise Exception(result)
         return result
     except Exception as err:
         if not settings.ROLLBACK:
+            logger.error(
+                f"Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version} execute Retry"
+            )
             self.retry(
                 countdown=settings.TASK_RETRY_INTERVAL,
                 exc=err,
@@ -106,9 +144,13 @@ def pipeline_deploy(
             )
             self.update_state(state=states.FAILURE, meta={"exc": result})
             raise Ignore()
+            logger.error(
+                f"Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version} execute RollBack"
+            )
         self.update_state(state="ROLLBACK", meta={"done": "1 of 1"})
-        destroy_eresult = tf.destroy_execute(
+        destroy_result = tf.destroy_execute(
             stack_name,
+            branch,
             environment,
             squad,
             name,
@@ -146,23 +188,40 @@ def pipeline_destroy(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    user: str = "",
 ):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     try:
+        logger.info(
+            f"User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment}"
+        )
         r.set(f"{name}-{squad}-{environment}", "Locked")
+        logger.info(f"lock sld {name}-{squad}-{environment}")
         r.expire(f"{name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
+        logger.info(
+            f"set sld {name}-{squad}-{environment} expire timeout {settings.TASK_LOCKED_EXPIRED}"
+        )
         # Git clone repo
+        logger.info(
+            f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
+        )
         result = tf.git_clone(git_repo, name, stack_name, environment, squad, branch)
         self.update_state(state="PULLING", meta={"done": "1 of 6"})
         if result["rc"] != 0:
             raise Exception(result)
         # Download terrafom
+        logger.info(
+            f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
+        )
         result = tf.binary_download(stack_name, environment, squad, version)
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
         tf.delete_local_folder(dir_path)
         if result["rc"] != 0:
+            logger.error(
+                f"Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
+            )
             raise Exception(result)
         # Create tf to use the custom artifactory as config
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
@@ -177,6 +236,9 @@ def pipeline_destroy(
         if result["rc"] != 0:
             raise Exception(result)
 
+        logger.info(
+            f"User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment} execute destroy"
+        )
         self.update_state(state="DESTROYING", meta={"done": "6 of 6"})
         result = tf.destroy_execute(
             stack_name,
@@ -216,18 +278,31 @@ def pipeline_plan(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    user: str = "",
 ):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     try:
+        logger.info(
+            f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment}"
+        )
         self.update_state(state="GIT", meta={"done": "1 of 5"})
         result = tf.git_clone(git_repo, name, stack_name, environment, squad, branch)
         if result["rc"] != 0:
+            logger.error(
+                f"Error when user {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
+            )
             raise Exception(result)
         self.update_state(state="BINARY", meta={"done": "2 of 5"})
+        logger.info(
+            f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
+        )
         result = tf.binary_download(stack_name, environment, squad, version)
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
         tf.delete_local_folder(dir_path)
         if result["rc"] != 0:
+            logger.error(
+                f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
+            )
             raise Exception(result)
 
         self.update_state(state="REMOTE", meta={"done": "3 of 5"})
@@ -256,6 +331,9 @@ def pipeline_plan(
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
         tf.delete_local_folder(dir_path)
         if result["rc"] != 0:
+            logger.error(
+                f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} execute terraform plan"
+            )
             raise Exception(result)
         return result
     except Exception as err:

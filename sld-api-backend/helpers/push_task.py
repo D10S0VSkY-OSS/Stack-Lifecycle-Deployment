@@ -21,6 +21,7 @@ def async_deploy(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    user: str = "",
 ):
 
     queue = "any" if not settings.TASK_ROUTE else squad
@@ -36,6 +37,7 @@ def async_deploy(
         secreto=secreto,
         variables_file=variables_file,
         project_path=project_path,
+        user=user,
     ).apply_async(
         queue=queue,
         retry=True,
@@ -60,6 +62,7 @@ def async_destroy(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    user: str = "",
 ):
 
     queue = "any" if not settings.TASK_ROUTE else squad
@@ -75,6 +78,7 @@ def async_destroy(
         secreto=secreto,
         variables_file=variables_file,
         project_path=project_path,
+        user=user,
     ).apply_async(
         queue=queue,
         retry=True,
@@ -99,6 +103,7 @@ def async_plan(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    user: str = "",
 ):
 
     queue = "any" if not settings.TASK_ROUTE else squad
@@ -114,6 +119,7 @@ def async_plan(
         secreto=secreto,
         variables_file=variables_file,
         project_path=project_path,
+        user=user,
     ).apply_async(
         queue=queue,
         retry=True,
