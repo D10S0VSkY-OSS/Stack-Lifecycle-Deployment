@@ -1,8 +1,10 @@
-from fastapi import FastAPI, HTTPException
 import json
-from configs.store import settings
 
-print(f'''
+from configs.store import settings
+from fastapi import FastAPI, HTTPException
+
+print(
+    f"""
 #####################################################################
 Stack LifeCycle Deployment RemoteState  {settings.SLD_RM_VER}       #
 #####################################################################
@@ -10,7 +12,8 @@ Stack LifeCycle Deployment RemoteState  {settings.SLD_RM_VER}       #
 ------------------------------------------------
 remote state = {settings.SLD_STORE}            
 ------------------------------------------------
-''')
+"""
+)
 
 if settings.SLD_STORE == "S3":
     from stores.bucket_s3 import S3Store as Store
@@ -24,11 +27,12 @@ if settings.SLD_STORE == "gcp":
     from stores.gcp_cloud_storage import GoogleCloudStorage as Store
 
 
-
-
-remote_state = Store('.remote_states')
-app = FastAPI(title=f"RemoteState Stack Lifecycle Deployment {settings.SLD_RM_VER} ", version=f"{settings.SLD_RM_VER}",
-              description="ARM - API RemoteState Mapping - Remote State for many backends, analogous to an ORM")
+remote_state = Store(".remote_states")
+app = FastAPI(
+    title=f"RemoteState Stack Lifecycle Deployment {settings.SLD_RM_VER} ",
+    version=f"{settings.SLD_RM_VER}",
+    description="ARM - API RemoteState Mapping - Remote State for many backends, analogous to an ORM",
+)
 
 
 tags_metadata = [
@@ -42,12 +46,13 @@ tags_metadata = [
     }
 ]
 
-@app.get('/', tags=["Remote_state"])
+
+@app.get("/", tags=["Remote_state"])
 async def health():
     return {"status": "healthy"}
 
 
-@app.get('/terraform_state/{id}', tags=["Remote_state"] )
+@app.get("/terraform_state/{id}", tags=["Remote_state"])
 async def get_tfstate(id: str):
     s = remote_state.get(id)
     if not s:
@@ -55,13 +60,13 @@ async def get_tfstate(id: str):
     return s
 
 
-@app.post('/terraform_state/{id}', tags=["Remote_state"])
+@app.post("/terraform_state/{id}", tags=["Remote_state"])
 async def post_tfstate(id: str, tfstate: dict):
     json.dumps(remote_state.put(id, tfstate))
     return {}
 
 
-@app.put('/terraform_lock/{id}', tags=["Remote_state"])
+@app.put("/terraform_lock/{id}", tags=["Remote_state"])
 async def put_tfstate(id: str, tfstate: dict):
     success, info = remote_state.lock(id, tfstate)
     if not success:
@@ -69,7 +74,7 @@ async def put_tfstate(id: str, tfstate: dict):
     return info
 
 
-@app.delete('/terraform_lock/{id}', tags=["Remote_state"])
+@app.delete("/terraform_lock/{id}", tags=["Remote_state"])
 async def delete_tfstate(id: str):
     tfstate = {}
     if not remote_state.unlock(id, tfstate):

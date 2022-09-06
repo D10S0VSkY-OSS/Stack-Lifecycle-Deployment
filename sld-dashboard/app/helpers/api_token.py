@@ -1,14 +1,13 @@
 from .api_request import request_url
-from .config.api import settings
 
 
 def get_token(data):
     response = request_url(
-        verb='POST',
-        headers={'Content-Type': 'application/json'},
-        uri='authenticate/access-token-json',
-        json=data
+        verb="POST",
+        headers={"Content-Type": "application/json"},
+        uri="authenticate/access-token-json",
+        json=data,
     )
-    if response.get('status_code') == 200:
-        result = response.get('json')
-        return result.get('access_token')
+    if response.get("status_code") == 200:
+        result = response.get("json")
+        return result.get("access_token")

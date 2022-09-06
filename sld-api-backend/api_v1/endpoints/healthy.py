@@ -1,7 +1,6 @@
-from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
-
 from security import deps
+from sqlalchemy.orm import Session
 
 router = APIRouter()
 
