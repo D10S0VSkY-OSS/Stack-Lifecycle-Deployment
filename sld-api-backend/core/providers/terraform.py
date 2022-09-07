@@ -49,6 +49,7 @@ class TerraformActions(object):
                     "command": "binaryDownload",
                     "rc": rc,
                     "stdout": binaryDownload_stderr,
+                    "stdout": list(dict.fromkeys(binaryDownload_stderr)),
                 }
             return {
                 "command": "binaryDownload",
@@ -56,7 +57,7 @@ class TerraformActions(object):
                 "stdout": binaryDownload_stdout,
             }
         except Exception as err:
-            return {"command": "binaryDownload", "rc": 1, "stdout": str(err)}
+            return {"command": "binaryDownload", "rc": 1, "stdout": err}
 
     @staticmethod
     def git_clone(
@@ -91,7 +92,7 @@ class TerraformActions(object):
                     "command": "git",
                     "rc": rc,
                     "tfvars": tfvars_files,
-                    "stdout": git_stderr,
+                    "stdout": list(dict.fromkeys(git_stderr)),
                 }
             return {
                 "command": "git",
@@ -225,7 +226,7 @@ class TerraformActions(object):
                     "tfvars_files": variables_file,
                     "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                     "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
-                    "stdout": plan_stderr,
+                    "stdout": list(dict.fromkeys(plan_stderr)),
                 }
             return {
                 "command": "plan",
@@ -304,7 +305,7 @@ class TerraformActions(object):
                     "tfvars_files": variables_file,
                     "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                     "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                    "stdout": apply_stderr,
+                    "stdout": list(dict.fromkeys(apply_stderr)),
                 }
             return {
                 "command": "apply",

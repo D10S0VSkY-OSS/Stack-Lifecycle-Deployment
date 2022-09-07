@@ -56,6 +56,7 @@ async def plan_infra_by_stack_name(
             secreto,
             deploy.tfvar_file,
             deploy.project_path,
+            current_user.username,
         )
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
@@ -112,12 +113,11 @@ async def update_plan_by_id(
     )
     # Get info from stack data
     stack_data = stack(db, stack_name=stack_name)
-    if not deploy_update.stack_branch:
-        branch = deploy_data.stack_branch
-        if not deploy_data.stack_branch:
-            branch = stack_data.branch
-    else:
-        branch = deploy_update.stack_branch
+    branch = (
+        stack_data.branch
+        if deploy_update.stack_branch == ""
+        else deploy_update.stack_branch
+    )
     git_repo = stack_data.git_repo
     tf_ver = stack_data.tf_version
     try:
@@ -142,6 +142,7 @@ async def update_plan_by_id(
             secreto,
             deploy_update.tfvar_file,
             deploy_update.project_path,
+            current_user.username,
         )
         # Push deploy task data
         crud_deploys.update_deploy(
