@@ -4,7 +4,7 @@ amqp==5.1.0
 ansible==5.5.0
 ansible-base==2.10.17
 ansible-core==2.12.4
-ansible-runner==1.4.7
+ansible-runner==2.2.1
 anyio==3.5.0
 asgiref==3.5.0
 async-timeout==4.0.2
