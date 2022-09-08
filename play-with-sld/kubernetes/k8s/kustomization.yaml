@@ -5,7 +5,7 @@ kind: Kustomization
 commonLabels:
   app: stack-lifecycle-deploy
   environment: play
-  version: 2.11.0
+  version: 2.12.1
 
 resources:
  - mysql-service.yml
