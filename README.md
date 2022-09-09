@@ -468,7 +468,7 @@ SLD has three preconfigured roles for users to easily manage this.
 
 <!-- Architecture -->
 ## Architecture
-![sign-in](img/architecture.png)
+![sign-in](img/architecture_v1.png)
 
 <!-- ROADMAP -->
 ## Roadmap
