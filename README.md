@@ -473,7 +473,6 @@ SLD has three preconfigured roles for users to easily manage this.
 <!-- ROADMAP -->
 ## Roadmap
 
-* Support storage backend gcp cloud storage and azure blob storage
 * LDAP and SSO authentication
 * Slack integration
 * FluenD / elasticSearch integration

@@ -25,6 +25,9 @@ RUN apt-get clean autoclean && \
 apt-get autoremove -y && \
 rm -rf /var/lib/{apt,dpkg,cache,log}/
 
+RUN mkdir /etc/ansible/ && \
+touch /etc/ansible/hosts
+
 ADD . /app/
 RUN chown -R sld /app
 
