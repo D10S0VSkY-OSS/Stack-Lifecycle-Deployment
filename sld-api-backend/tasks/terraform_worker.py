@@ -7,8 +7,11 @@ from celery.exceptions import Ignore
 from celery.utils.log import get_task_logger
 from config.api import settings
 from config.celery_config import celery_app
+from core.providers.sld import Providers, Terraform
 from core.providers.terraform import TerraformActions as tf
 from helpers.schedule import request_url
+from helpers.metrics import push_metric
+
 
 r = redis.Redis(
     host=settings.BACKEND_SERVER,
@@ -20,10 +23,14 @@ r = redis.Redis(
 
 logger = get_task_logger(__name__)
 
+terrafom = Terraform()
+provider = Providers(terrafom)
+
 
 @celery_app.task(
     bind=True, acks_late=True, time_limit=settings.DEPLOY_TMOUT, name="pipeline Deploy"
 )
+@push_metric()
 def pipeline_deploy(
     self,
     git_repo: str,
@@ -54,7 +61,10 @@ def pipeline_deploy(
         logger.info(
             f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
         )
-        result = tf.git_clone(git_repo, name, stack_name, environment, squad, branch)
+
+        result = provider.execute(
+            tf.git_clone(git_repo, name, stack_name, environment, squad, branch)
+        )
         self.update_state(state="PULLING", meta={"done": "1 of 6"})
         if result["rc"] != 0:
             logger.error(
@@ -65,7 +75,9 @@ def pipeline_deploy(
         logger.info(
             f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
-        result = tf.binary_download(stack_name, environment, squad, version)
+        result = provider.execute(
+            tf.binary_download(stack_name, environment, squad, version)
+        )
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
@@ -77,13 +89,15 @@ def pipeline_deploy(
             raise Exception(result)
         # Create tf to use the custom artifactory as config
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
-        result = tf.tfstate_render(stack_name, environment, squad, project_path, name)
+        result = provider.execute(
+            tf.tfstate_render(stack_name, environment, squad, project_path, name)
+        )
         if result["rc"] != 0:
             raise Exception(result)
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
-        result = tf.tfvars(
-            stack_name, environment, squad, name, project_path, vars=kwargs
+        result = provider.execute(
+            tf.tfvars(stack_name, environment, squad, name, project_path, vars=kwargs)
         )
         if result["rc"] != 0:
             raise Exception(result)
@@ -92,19 +106,21 @@ def pipeline_deploy(
             f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform plan"
         )
         self.update_state(state="PLANNING", meta={"done": "5 of 6"})
-        result = tf.plan_execute(
-            stack_name,
-            environment,
-            squad,
-            name,
-            version,
-            variables_file,
-            project_path,
-            data=secreto,
+        result = provider.execute(
+            tf.plan_execute(
+                stack_name,
+                environment,
+                squad,
+                name,
+                version,
+                variables_file,
+                project_path,
+                data=secreto,
+            )
         )
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
-        tf.delete_local_folder(dir_path)
+        provider.execute(tf.delete_local_folder(dir_path))
         if result["rc"] != 0:
             logger.error(
                 f"Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} execute terraform plan"
@@ -115,16 +131,18 @@ def pipeline_deploy(
             f"User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform apply with timeout deploy setting {settings.DEPLOY_TMOUT}"
         )
         self.update_state(state="APPLYING", meta={"done": "6 of 6"})
-        result = tf.apply_execute(
-            stack_name,
-            branch,
-            environment,
-            squad,
-            name,
-            version,
-            variables_file,
-            project_path,
-            data=secreto,
+        result = provider.execute(
+            tf.apply_execute(
+                stack_name,
+                branch,
+                environment,
+                squad,
+                name,
+                version,
+                variables_file,
+                project_path,
+                data=secreto,
+            )
         )
         if result["rc"] != 0:
             logger.error(
@@ -175,6 +193,7 @@ def pipeline_deploy(
 
 
 @celery_app.task(bind=True, acks_late=True, name="pipeline Destroy")
+@push_metric()
 def pipeline_destroy(
     self,
     git_repo: str,
@@ -265,6 +284,7 @@ def pipeline_destroy(
 
 
 @celery_app.task(bind=True, acks_late=True, name="pipeline Plan")
+@push_metric()
 def pipeline_plan(
     self,
     git_repo: str,

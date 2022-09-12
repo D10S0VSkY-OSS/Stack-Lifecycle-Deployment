@@ -2,7 +2,7 @@ import json
 
 from config.api import settings
 from fastapi import HTTPException
-from tasks.celery_worker import (get_variable_json, get_variable_list, output,
+from tasks.terraform_worker import (get_variable_json, get_variable_list, output,
                                  pipeline_deploy, pipeline_destroy,
                                  pipeline_git_pull, pipeline_plan,
                                  schedule_add, schedule_delete, schedule_get,

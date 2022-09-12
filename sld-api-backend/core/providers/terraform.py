@@ -14,9 +14,12 @@ from security.providers_credentials import secret, unsecret
 
 os.environ["ANSIBLE_NOCOLOR"] = "True"
 os.environ["ANSIBLE_DEPRECATION_WARNINGS"] = "False"
+os.environ["ANSIBLE_ACTION_WARNINGS"] = "False"
+os.environ["ANSIBLE_DEVEL_WARNING"] = "False"
+os.environ["TF_WORKSPACE"] = "default"
 
 
-class TerraformActions(object):
+class TerraformActions():
     @staticmethod
     def binary_download(
         stack_name: str, environment: str, squad: str, version: str
@@ -278,6 +281,7 @@ class TerraformActions(object):
             runner_response = ansible_runner.run(
                 private_data_dir=f"/tmp/{stack_name}/{environment}/{squad}/{name}",
                 host_pattern="localhost",
+                quiet=True,
                 module="terraform",
                 module_args=f"binary_path=/tmp/{version}/terraform lock=True force_init=True "
                 f"project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} "
