@@ -651,6 +651,7 @@ def deploy_stack(stack_id):
                 "squad",
                 "branch",
                 "tfvar_file",
+                "project_path",
             ]
             variables = {}
             if request.form.get("tfvar_file") == "":
