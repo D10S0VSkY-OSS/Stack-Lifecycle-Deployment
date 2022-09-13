@@ -18,13 +18,6 @@ spec:
       containers:
         - name: api-backend
           image: d10s0vsky/sld-api:latest
-          resources:
-            limits:
-              memory: 600Mi
-              cpu: 1
-            requests:
-              memory: 300Mi
-              cpu: 500m
           imagePullPolicy: Always
           command: ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
           ports:
