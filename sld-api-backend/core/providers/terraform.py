@@ -2,63 +2,42 @@ import json
 import logging
 import os
 import shutil
+import stat
+import subprocess
+import zipfile
+from io import BytesIO
 from os import listdir, path
 from os.path import isfile, join
 
-import ansible_runner
 import hcl
 import jmespath
+import requests
 from config.api import settings
 from jinja2 import Template
 from security.providers_credentials import secret, unsecret
 
-os.environ["ANSIBLE_NOCOLOR"] = "True"
-os.environ["ANSIBLE_DEPRECATION_WARNINGS"] = "False"
-os.environ["ANSIBLE_ACTION_WARNINGS"] = "False"
-os.environ["ANSIBLE_DEVEL_WARNING"] = "False"
-os.environ["TF_WORKSPACE"] = "default"
 
-
-class TerraformActions():
+class TerraformActions:
     @staticmethod
     def binary_download(
         stack_name: str, environment: str, squad: str, version: str
     ) -> dict:
         binary = f"{settings.TERRAFORM_BIN_REPO}/{version}/terraform_{version}_linux_amd64.zip"
         try:
-            runner_response = ansible_runner.run(
-                rotate_artifacts=1,
-                private_data_dir=f"/tmp/{stack_name}/{environment}/{squad}",
-                host_pattern="localhost",
-                module="file",
-                module_args=f"path=/tmp/{version} state=directory",
-            )
-            runner_response = ansible_runner.run(
-                rotate_artifacts=1,
-                private_data_dir=f"/tmp/{stack_name}/{environment}/{squad}",
-                host_pattern="localhost",
-                module="unarchive",
-                module_args=f"src={binary} dest=/tmp/{version} remote_src=True",
-            )
-            logs = [i for i in runner_response.events]
-            binaryDownload_stdout = jmespath.search(
-                "[*].event_data.res.stdout_lines", logs
-            )
-            binaryDownload_stderr = jmespath.search("[*].event_data.res.msg", logs)
-            rc = runner_response.rc
-            # check result
-            if rc != 0:
-                return {
-                    "command": "binaryDownload",
-                    "rc": rc,
-                    "stdout": binaryDownload_stderr,
-                    "stdout": list(dict.fromkeys(binaryDownload_stderr)),
-                }
+            if not os.path.exists(f"/tmp/{version}"):
+                os.mkdir(f"/tmp/{version}")
+            if not os.path.isfile(f"/tmp/{version}/terraform"):
+                req = requests.get(binary)
+                _zipfile = zipfile.ZipFile(BytesIO(req.content))
+                _zipfile.extractall(f"/tmp/{version}")
+                st = os.stat(f"/tmp/{version}/terraform")
+                os.chmod(f"/tmp/{version}/terraform", st.st_mode | stat.S_IEXEC)
             return {
                 "command": "binaryDownload",
-                "rc": rc,
-                "stdout": binaryDownload_stdout,
+                "rc": 0,
+                "stdout": "Download Binary file",
             }
+
         except Exception as err:
             return {"command": "binaryDownload", "rc": 1, "stdout": err}
 
@@ -72,36 +51,41 @@ class TerraformActions():
         branch: str,
     ) -> dict:
         try:
+            directory = f"/tmp/{stack_name}/{environment}/{squad}/"
+            os.makedirs(directory, exist_ok=True)
+            logging.info(f"Directory {directory} created successfully")
+        except OSError:
+            logging.info(f"Directory {directory} can not be created")
+        try:
+            if os.path.exists(f"{directory}/{name}"):
+                shutil.rmtree(f"{directory}/{name}")
             logging.info(f"Download git repo {git_repo} branch {branch}")
-            runner_response = ansible_runner.run(
-                private_data_dir="/tmp/",
-                host_pattern="localhost",
-                verbosity=0,
-                module="git",
-                module_args=f"repo={git_repo} dest={stack_name}/{environment}/{squad}/{name} version={branch} force=yes recursive=yes",
+            os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/")
+            result = subprocess.run(
+                f"git clone --recurse-submodules --branch {branch} {git_repo} {name}",
+                shell=True,
+                capture_output=True,
+                encoding="utf8",
             )
-            path_tfvars = f"/tmp/{stack_name}/{environment}/{squad}/{name}"
+            logging.info(f"Check if variable.tf file exist")
             tfvars_files = [
                 f
-                for f in listdir(path_tfvars)
-                if f.endswith(".tfvars") and isfile(join(path_tfvars, f))
+                for f in listdir(directory)
+                if f.endswith(".tfvars") and isfile(join(directory, f))
             ]
-            logs = [i for i in runner_response.events]
-            git_stdout = jmespath.search("[*].event_data.res.stdout_lines", logs)
-            git_stderr = jmespath.search("[*].event_data.res.msg", logs)
-            rc = runner_response.rc
+            rc = result.returncode
             if rc != 0:
                 return {
                     "command": "git",
                     "rc": rc,
                     "tfvars": tfvars_files,
-                    "stdout": list(dict.fromkeys(git_stderr)),
+                    "stdout": result.stderr,
                 }
             return {
                 "command": "git",
                 "rc": rc,
                 "tfvars": tfvars_files,
-                "stdout": git_stdout,
+                "stdout": result.stdout,
             }
         except Exception as err:
             return {"command": "git", "rc": 1, "tfvars": tfvars_files, "stdout": err}
@@ -200,23 +184,27 @@ class TerraformActions():
                 if variables_file == "" or variables_file == None
                 else variables_file
             )
-            runner_response = ansible_runner.run(
-                private_data_dir=f"/tmp/{stack_name}/{environment}/{squad}/{name}",
-                host_pattern="localhost",
-                module="terraform",
-                module_args=f"binary_path=/tmp/{version}/terraform "
-                f"force_init=True "
-                f"project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} "
-                f"plan_file=/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfplan "
-                f"variables_files={variables_files} state=planned",
+
+            if not project_path:
+                os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/{name}")
+            os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}")
+
+            result = subprocess.run(
+                f"/tmp/{version}/terraform init -input=false --upgrade",
+                shell=True,
+                capture_output=True,
+                encoding="utf8",
+            )
+            result = subprocess.run(
+                f"/tmp/{version}/terraform plan -input=false -refresh -no-color -var-file={variables_files} -out={stack_name}.tfplan",
+                shell=True,
+                capture_output=True,
+                encoding="utf8",
             )
             unsecret(stack_name, environment, squad, name, secreto)
 
             # Capture events
-            logs = [i for i in runner_response.events]
-            plan_stdout = jmespath.search("[*].event_data.res.stdout_lines", logs)
-            plan_stderr = jmespath.search("[*].event_data.res.msg", logs)
-            rc = runner_response.rc
+            rc = result.returncode
             # check result
             if rc != 0:
                 return {
@@ -229,7 +217,7 @@ class TerraformActions():
                     "tfvars_files": variables_file,
                     "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                     "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
-                    "stdout": list(dict.fromkeys(plan_stderr)),
+                    "stdout": [result.stderr.split("\n")],
                 }
             return {
                 "command": "plan",
@@ -241,9 +229,9 @@ class TerraformActions():
                 "tfvars_files": variables_file,
                 "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": plan_stdout,
+                "stdout": [result.stdout.split("\n")],
             }
-        except Exception as err:
+        except Exception:
             return {
                 "command": "plan",
                 "deploy": name,
@@ -254,7 +242,7 @@ class TerraformActions():
                 "tfvars_files": variables_file,
                 "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": f"{err}",
+                "stdout": [result.stderr.split("\n")],
             }
 
     @staticmethod
@@ -278,24 +266,27 @@ class TerraformActions():
                 if variables_file == "" or variables_file == None
                 else variables_file
             )
-            runner_response = ansible_runner.run(
-                private_data_dir=f"/tmp/{stack_name}/{environment}/{squad}/{name}",
-                host_pattern="localhost",
-                quiet=True,
-                module="terraform",
-                module_args=f"binary_path=/tmp/{version}/terraform lock=True force_init=True "
-                f"project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} "
-                f"plan_file=/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfplan state=present "
-                f"variables_files={variables_files}",
+
+            if not project_path:
+                os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/{name}")
+            os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}")
+
+            result = subprocess.run(
+                f"/tmp/{version}/terraform init -input=false --upgrade",
+                shell=True,
+                capture_output=True,
+                encoding="utf8",
+            )
+            result = subprocess.run(
+                f"/tmp/{version}/terraform apply -input=false -auto-approve -no-color {stack_name}.tfplan",
+                shell=True,
+                capture_output=True,
+                encoding="utf8",
             )
             unsecret(stack_name, environment, squad, name, secreto)
+
             # Capture events
-            apply_logs = [i for i in runner_response.events]
-            apply_stdout = jmespath.search(
-                "[*].event_data.res.stdout_lines", apply_logs
-            )
-            apply_stderr = jmespath.search("[*].event_data.res.msg", apply_logs)
-            rc = runner_response.rc
+            rc = result.returncode
             # check result
             if rc != 0:
                 return {
@@ -303,40 +294,37 @@ class TerraformActions():
                     "deploy": name,
                     "squad": squad,
                     "stack_name": stack_name,
-                    "branch": branch,
                     "environment": environment,
                     "rc": rc,
                     "tfvars_files": variables_file,
-                    "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                     "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                    "stdout": list(dict.fromkeys(apply_stderr)),
+                    "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
+                    "stdout": [result.stderr.split("\n")],
                 }
             return {
                 "command": "apply",
                 "deploy": name,
                 "squad": squad,
                 "stack_name": stack_name,
-                "branch": branch,
                 "environment": environment,
                 "rc": rc,
                 "tfvars_files": variables_file,
                 "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": apply_stdout,
+                "stdout": [result.stdout.split("\n")],
             }
-        except Exception as err:
+        except Exception:
             return {
                 "command": "apply",
                 "deploy": name,
                 "squad": squad,
                 "stack_name": stack_name,
-                "branch": branch,
                 "environment": environment,
                 "rc": 1,
                 "tfvars_files": variables_file,
                 "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": f"{err}",
+                "stdout": "ko",
             }
 
     @staticmethod
@@ -360,62 +348,64 @@ class TerraformActions():
                 if variables_file == "" or variables_file == None
                 else variables_file
             )
-            runner_response = ansible_runner.run(
-                private_data_dir=f"/tmp/{stack_name}/{environment}/{squad}/{name}",
-                host_pattern="localhost",
-                module="terraform",
-                module_args=f"binary_path=/tmp/{version}/terraform force_init=True "
-                f"project_path=/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path} "
-                f"variables_files={variables_files} state=absent",
+            if not project_path:
+                os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/{name}")
+            os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}")
+
+            result = subprocess.run(
+                f"/tmp/{version}/terraform init -input=false --upgrade",
+                shell=True,
+                capture_output=True,
+                encoding="utf8",
+            )
+            result = subprocess.run(
+                f"/tmp/{version}/terraform destroy -input=false -auto-approve -no-color -var-file={variables_files}",
+                shell=True,
+                capture_output=True,
+                encoding="utf8",
             )
             unsecret(stack_name, environment, squad, name, secreto)
             # Capture events
-            destroy_logs = [i for i in runner_response.events]
-            destroy_stdout = jmespath.search(
-                "[*].event_data.res.stdout_lines", destroy_logs
-            )
-            destroy_stderr = jmespath.search("[*].event_data.res.msg", destroy_logs)
-            rc = runner_response.rc
+            rc = result.returncode
+            # check result
             if rc != 0:
                 return {
                     "command": "destroy",
                     "deploy": name,
                     "squad": squad,
                     "stack_name": stack_name,
-                    "branch": branch,
                     "environment": environment,
                     "rc": rc,
                     "tfvars_files": variables_file,
-                    "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                     "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                    "stdout": destroy_stderr,
+                    "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
+                    "stdout": [result.stderr.split("\n")],
                 }
             return {
                 "command": "destroy",
                 "deploy": name,
                 "squad": squad,
                 "stack_name": stack_name,
-                "branch": branch,
                 "environment": environment,
                 "rc": rc,
                 "tfvars_files": variables_file,
                 "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": destroy_stdout,
+                "stdout": [result.stdout.split("\n")],
             }
-        except Exception as err:
+        except Exception:
             return {
                 "command": "destroy",
                 "deploy": name,
                 "squad": squad,
                 "stack_name": stack_name,
-                "branch": branch,
                 "environment": environment,
                 "rc": 1,
                 "tfvars_files": variables_file,
                 "project_path": f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": f"{err}",
+                # "stdout": [result.stderr.split("\n")],
+                "stdout": "ko",
             }
 
     @staticmethod

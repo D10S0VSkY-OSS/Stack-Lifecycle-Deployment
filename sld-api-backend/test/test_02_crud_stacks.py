@@ -5,6 +5,7 @@ from helpers.api_token import get_token
 token = get_token(settings.CREDENTIALS_ADM)
 token_unprivileges = get_token(settings.CREDENTIALS_USER)
 aws_data = settings.STACK_POST_AWS
+azure_data = settings.STACK_POST_AZURE
 aws_stack_name = settings.STACK_NAME_AWS
 gcp_data = settings.STACK_POST_GCP
 gcp_stack_name = settings.STACK_NAME_GCP
@@ -39,7 +40,7 @@ def test_try_create_stack_as_unprivilege_user():
         verb="POST",
         uri="stacks/",
         headers={"Authorization": f"Bearer {token_unprivileges}"},
-        json=aws_data,
+        json=azure_data,
     )
     result = response.get("status_code")
     assert result == 403
@@ -50,7 +51,7 @@ def test_try_create_stack_as_not_authenticated_user():
         verb="POST",
         uri="stacks/",
         headers={"Authorization": f"Bearer {token_unprivileges}"},
-        json=aws_data,
+        json=azure_data,
     )
     result = response.get("status_code")
     assert result == 403

@@ -1,4 +1,4 @@
-from abc import ABCMeta, ABC, abstractmethod
+from abc import ABC, abstractmethod
 
 
 class Providers(object):
@@ -13,6 +13,7 @@ class ProvidersInterface(ABC):
     @abstractmethod
     def command(self, command):
         raise NotImplementedError
+
 
 class Terraform(ProvidersInterface):
     def command(self, command):
