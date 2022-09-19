@@ -2,7 +2,7 @@
 import redis
 from app import db, login_manager
 from app.base import blueprint
-from app.base.forms import CreateAccountForm, LoginForm
+from app.base.forms import LoginForm
 from app.base.models import User
 from app.helpers.api_token import get_token
 from app.helpers.security import vault_encrypt
@@ -71,8 +71,8 @@ def login():
     return redirect(url_for("home_blueprint.index"))
 
 
-#@blueprint.route("/register", methods=["GET", "POST"])
-#def register():
+# @blueprint.route("/register", methods=["GET", "POST"])
+# def register():
 #    LoginForm(request.form)
 #    create_account_form = CreateAccountForm(request.form)
 #    if "register" in request.form:
@@ -115,6 +115,7 @@ def login():
 #    else:
 #        return render_template("accounts/register.html", form=create_account_form)
 #
+
 
 @blueprint.route("/logout")
 def logout():

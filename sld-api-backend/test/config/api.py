@@ -19,8 +19,10 @@ class Settings(BaseSettings):
     PASS_USER: str = "Password08@"
     STACK_NAME_AWS: str = "aws_vpc"
     STACK_NAME_GCP: str = "gcp_vpc"
+    STACK_NAME_AZURE: str = "azure_vnet01"
     GIT_REPO_AWS: str = "https://gitlab.com/hernand/aws_vpc_tf.git"
     GIT_REPO_GCP: str = "https://gitlab.com/hernand/aws_gcloud_tf.git"
+    GIT_REPO_AZURE: str = "https://gitlab.com/hernand/azure_vpc_tf.git"
     INIT_CREDENTIALS: dict = {"password": PASS_ADM}
     CREDENTIALS_ADM: dict = {"username": USER_ADM, "password": PASS_ADM}
     CREDENTIALS_ADM_SQUAD: dict = {"username": USER_PRIV, "password": PASS_USER}
@@ -104,6 +106,14 @@ class Settings(BaseSettings):
         "squad_access": ["*"],
         "description": STACK_NAME_GCP,
         "tf_version": "0.14.1",
+    }
+    STACK_POST_AZURE: dict = {
+        "stack_name": STACK_NAME_AZURE,
+        "git_repo": GIT_REPO_AZURE,
+        "squad_access": ["*"],
+        "branch": "master",
+        "description": STACK_NAME_AZURE,
+        "tf_version": "1.2.3",
     }
     AWS_TEST_ACCOUNT: dict = {
         "squad": "squad1",

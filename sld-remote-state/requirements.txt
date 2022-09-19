@@ -24,7 +24,7 @@ idna==3.3
 isodate==0.6.1
 jmespath==1.0.0
 msrest==0.7.1
-oauthlib==3.2.0
+oauthlib==3.2.1
 protobuf==4.21.5
 pyasn1==0.4.8
 pyasn1-modules==0.2.8
