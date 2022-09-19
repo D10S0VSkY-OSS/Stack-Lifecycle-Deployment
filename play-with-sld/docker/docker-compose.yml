@@ -84,7 +84,7 @@ services:
   # Celery worker
   worker:
     image: d10s0vsky/sld-api:latest
-    entrypoint: ["celery", "--app", "tasks.celery_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "celery,any,squad,squad1,squad2"]
+    entrypoint: ["celery", "--app", "tasks.terraform_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "celery,any,squad,squad1,squad2"]
     environment:
       BROKER_USER: admin
       BROKER_PASSWD: admin
