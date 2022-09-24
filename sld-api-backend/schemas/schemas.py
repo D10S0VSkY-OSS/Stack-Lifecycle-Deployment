@@ -11,18 +11,13 @@ class UserCreate(UserBase):
     fullname: constr(strip_whitespace=True)
     password: str
     email: EmailStr = None
-    squad: List[str] = []
-    role: List[str] = []
-    is_active: bool = True
-
-
-class UserCreateMaster(UserBase):
-    fullname: constr(strip_whitespace=True)
-    password: str
-    email: EmailStr = None
     is_active: bool = True
     squad: List[str] = []
     role: List[str] = []
+
+
+class UserCreateMaster(UserCreate):
+    pass
 
 
 class UserUpdate(UserCreate):
