@@ -171,7 +171,7 @@ class UserForm(FlaskForm):
     squad = StringField(
         "Squad",
         [
-            validators.length(min=4, max=50),
+            validators.length(min=1, max=50),
             validators.DataRequired("The squad name is required."),
         ],
     )
