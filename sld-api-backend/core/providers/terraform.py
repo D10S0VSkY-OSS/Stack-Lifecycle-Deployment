@@ -1,6 +1,7 @@
 import json
 import logging
 import os
+from re import A
 import shutil
 import stat
 import subprocess
@@ -17,12 +18,20 @@ from jinja2 import Template
 from security.providers_credentials import secret, unsecret
 
 
-class TerraformActions:
-    @staticmethod
+class TerraformRequirements:
+    '''
+    In this class, everything that is needed so that terraformActions can be executed is generated.
+    '''
+
     def binary_download(
-        stack_name: str, environment: str, squad: str, version: str
+        stack_name: str,
+        environment: str,
+        squad: str,
+        version: str
     ) -> dict:
+
         binary = f"{settings.TERRAFORM_BIN_REPO}/{version}/terraform_{version}_linux_amd64.zip"
+    
         try:
             if not os.path.exists(f"/tmp/{version}"):
                 os.mkdir(f"/tmp/{version}")
@@ -41,7 +50,6 @@ class TerraformActions:
         except Exception as err:
             return {"command": "binaryDownload", "rc": 1, "stdout": err}
 
-    @staticmethod
     def git_clone(
         git_repo: str,
         name: str,
@@ -50,29 +58,36 @@ class TerraformActions:
         squad: str,
         branch: str,
     ) -> dict:
+
         try:
             directory = f"/tmp/{stack_name}/{environment}/{squad}/"
             os.makedirs(directory, exist_ok=True)
             logging.info(f"Directory {directory} created successfully")
         except OSError:
             logging.info(f"Directory {directory} can not be created")
+
         try:
             if os.path.exists(f"{directory}/{name}"):
                 shutil.rmtree(f"{directory}/{name}")
+
             logging.info(f"Download git repo {git_repo} branch {branch}")
             os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/")
+
             result = subprocess.run(
                 f"git clone --recurse-submodules --branch {branch} {git_repo} {name}",
                 shell=True,
                 capture_output=True,
                 encoding="utf8",
             )
+
             logging.info(f"Check if variable.tf file exist")
+
             tfvars_files = [
                 f
                 for f in listdir(directory)
                 if f.endswith(".tfvars") and isfile(join(directory, f))
             ]
+
             rc = result.returncode
             if rc != 0:
                 return {
@@ -90,7 +105,6 @@ class TerraformActions:
         except Exception as err:
             return {"command": "git", "rc": 1, "tfvars": tfvars_files, "stdout": err}
 
-    @staticmethod
     def tfstate_render(
         stack_name: str, environment: str, squad: str, project_path: str, name: str
     ) -> dict:
@@ -119,7 +133,6 @@ class TerraformActions:
         except Exception as err:
             return {"command": "tfserver", "rc": 1, "stderr": err}
 
-    @staticmethod
     def data_source_render(
         stack_name: str, environment: str, squad: str, name: str
     ) -> dict:
@@ -145,7 +158,6 @@ class TerraformActions:
         except Exception as err:
             return {"command": "datasource", "rc": 1, "stdout": err}
 
-    @staticmethod
     def tfvars(
         stack_name: str,
         environment: str,
@@ -164,7 +176,80 @@ class TerraformActions:
         except Exception as err:
             return {"command": "tfvars", "rc": 1, "stdout": f"{err}"}
 
-    @staticmethod
+
+class TerraformGetVars:
+    '''
+    In this class are the methods to obtain information from the terraform variables
+    '''
+
+    def get_vars_tfvars(stack_name: str, environment: str, squad: str, name: str):
+        if path.exists(
+            f"/tmp/{ stack_name }/{environment}/{squad}/{name}/{stack_name}.tfvars.json"
+        ):
+            with open(
+                f"/tmp/{ stack_name }/{environment}/{squad}/{name}/{stack_name}.tfvars.json",
+                "r",
+            ) as tfvars:
+                tf = tfvars.read()
+            return json.loads(tf)
+        else:
+            return {
+                "action": f"terraform.tfvars not exist in module {stack_name}",
+                "rc": 1,
+            }
+
+    def get_vars_list(stack_name: str, environment: str, squad: str, name: str) -> list:
+        try:
+            file_hcl = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/variables.tf"
+            with open(file_hcl, "r") as fp:
+                obj = hcl.load(fp)
+            if obj.get("variable"):
+                lista = [i for i in obj.get("variable")]
+                return {"command": "get_vars_list", "rc": 0, "stdout": lista}
+            else:
+                error_msg = "Variable file is empty, not iterable"
+                return {"command": "get_vars_list", "rc": 1, "stdout": error_msg}
+        except IOError:
+            error_msg = "Variable file not accessible"
+            return {"command": "get_vars_list", "rc": 1, "stdout": error_msg}
+        except Exception as err:
+            return {"command": "get_vars_list", "rc": 1, "stdout": err}
+
+    def get_vars_json(stack_name: str, environment: str, squad: str, name: str) -> dict:
+        try:
+            file_hcl = f"/tmp/{stack_name}/{environment}/{squad}/{name}/variables.tf"
+            with open(file_hcl, "r") as fp:
+                obj = hcl.load(fp)
+            if obj.get("variable"):
+                return {"command": "get_vars_json", "rc": 0, "stdout": json.dumps(obj)}
+            else:
+                error_msg = "Variable file is empty, not iterable"
+                return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
+        except IOError:
+            error_msg = "Variable file not accessible"
+            return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
+        except Exception as err:
+            return {"command": "get_vars_json", "rc": 1, "stdout": err}
+
+
+class TerraformUtils:
+    '''
+    Class where methods similar to a helper are added
+    '''
+    def delete_local_folder(dir_path: str) -> dict:
+        try:
+            shutil.rmtree(dir_path)
+        except FileNotFoundError:
+            pass
+        except OSError:
+            raise
+
+
+class TerraformActions:
+    '''
+    In this class are all the methods equivalent to the terraform commands
+    '''
+
     def plan_execute(
         stack_name: str,
         environment: str,
@@ -245,7 +330,6 @@ class TerraformActions:
                 "stdout": [result.stderr.split("\n")],
             }
 
-    @staticmethod
     def apply_execute(
         stack_name: str,
         branch: str,
@@ -327,7 +411,6 @@ class TerraformActions:
                 "stdout": "ko",
             }
 
-    @staticmethod
     def destroy_execute(
         stack_name: str,
         branch: str,
@@ -408,7 +491,6 @@ class TerraformActions:
                 "stdout": "ko",
             }
 
-    @staticmethod
     def output_execute(stack_name: str, environment: str, squad: str, name: str):
         try:
             import requests
@@ -425,7 +507,6 @@ class TerraformActions:
         except Exception as err:
             return {"command": "output", "rc": 1, "stdout": err}
 
-    @staticmethod
     def unlock_execute(stack_name: str, environment: str, squad: str, name: str):
         try:
             import requests
@@ -440,7 +521,6 @@ class TerraformActions:
         except Exception as err:
             return {"command": "unlock", "rc": 1, "stdout": err}
 
-    @staticmethod
     def show_execute(stack_name: str, environment: str, squad: str, name: str):
         try:
             import requests
@@ -454,63 +534,4 @@ class TerraformActions:
         except Exception as err:
             return {"command": "show", "rc": 1, "stdout": err}
 
-    @staticmethod
-    def get_vars_tfvars(stack_name: str, environment: str, squad: str, name: str):
-        if path.exists(
-            f"/tmp/{ stack_name }/{environment}/{squad}/{name}/{stack_name}.tfvars.json"
-        ):
-            with open(
-                f"/tmp/{ stack_name }/{environment}/{squad}/{name}/{stack_name}.tfvars.json",
-                "r",
-            ) as tfvars:
-                tf = tfvars.read()
-            return json.loads(tf)
-        else:
-            return {
-                "action": f"terraform.tfvars not exist in module {stack_name}",
-                "rc": 1,
-            }
 
-    @staticmethod
-    def get_vars_list(stack_name: str, environment: str, squad: str, name: str) -> list:
-        try:
-            file_hcl = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/variables.tf"
-            with open(file_hcl, "r") as fp:
-                obj = hcl.load(fp)
-            if obj.get("variable"):
-                lista = [i for i in obj.get("variable")]
-                return {"command": "get_vars_list", "rc": 0, "stdout": lista}
-            else:
-                error_msg = "Variable file is empty, not iterable"
-                return {"command": "get_vars_list", "rc": 1, "stdout": error_msg}
-        except IOError:
-            error_msg = "Variable file not accessible"
-            return {"command": "get_vars_list", "rc": 1, "stdout": error_msg}
-        except Exception as err:
-            return {"command": "get_vars_list", "rc": 1, "stdout": err}
-
-    @staticmethod
-    def get_vars_json(stack_name: str, environment: str, squad: str, name: str) -> dict:
-        try:
-            file_hcl = f"/tmp/{stack_name}/{environment}/{squad}/{name}/variables.tf"
-            with open(file_hcl, "r") as fp:
-                obj = hcl.load(fp)
-            if obj.get("variable"):
-                return {"command": "get_vars_json", "rc": 0, "stdout": json.dumps(obj)}
-            else:
-                error_msg = "Variable file is empty, not iterable"
-                return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
-        except IOError:
-            error_msg = "Variable file not accessible"
-            return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
-        except Exception as err:
-            return {"command": "get_vars_json", "rc": 1, "stdout": err}
-
-    @staticmethod
-    def delete_local_folder(dir_path: str) -> dict:
-        try:
-            shutil.rmtree(dir_path)
-        except FileNotFoundError:
-            pass
-        except OSError:
-            raise
