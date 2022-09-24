@@ -1,4 +1,6 @@
-from typing import Generator
+from typing import Generator, List, Tuple
+from password_strength import PasswordPolicy
+from usernames import is_safe_username
 
 from config.api import settings
 from config.database import SessionLocal
@@ -16,6 +18,53 @@ reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/authenticate/access-token"
 )
 
+class PasswordValidator:
+    def __init__(self) -> None:
+        self._policy = PasswordPolicy.from_names(
+                length=8,
+                uppercase=1,
+                numbers=1,
+                special=1,
+                nonletters=1
+                )
+        print("passwd validate constructor called")
+        
+    def validate(self, password: str) -> bool:
+        if password == None or len(password) == 0:
+            return False
+        if len(self._policy.test(password))>0:
+            return False
+        return True
+
+class UsernameValidator:
+    def __init__(self) -> None:
+        self._whitelist = ["admin"]
+        self._black_list = ["guest", "root", "administrator"]
+        self._max_length = 12
+        print("username validate constructor called")
+
+    def validate(self, username: str) -> bool:
+        print(username)
+        return is_safe_username(
+            username,
+            whitelist=self._whitelist,
+            blacklist=self._black_list,
+            max_length=self._max_length
+            )
+
+
+class UserService:
+    def __init__(self):
+        pass
+
+    def validate(self, username: str, password: str) -> Tuple[str, str]:
+        password_validator = PasswordValidator()
+        username_validator = UsernameValidator()
+        if not password_validator.validate(password):
+            return (False, "pwd_weak")
+        elif not username_validator.validate(username):
+            return (False, "usr_invalid")
+        return (True, "")
 
 def get_db() -> Generator:
     try:
@@ -66,33 +115,12 @@ def get_current_active_superuser(
     return current_user
 
 
-def validate_password(password: str):
-    SpecialSymbol = ["$", "@", "#", "%", ".", "!", "&", '"', "?"]
-    if len(password) < settings.PASSWORD_LEN:
+def validate_password(username: str, password: str):
+    user_service = UserService()
+    (result, aditional_info) = user_service.validate(username, password)
+    if not result:
         raise HTTPException(
             status_code=400,
-            detail=f"Make sure your password is at lest {settings.PASSWORD_LEN} letters",
-        )
-    if len(password) > 20:
-        raise HTTPException(
-            status_code=400, detail="length should be not be greater than 20"
-        )
-    if not any(char.isdigit() for char in password):
-        raise HTTPException(
-            status_code=400, detail="Make sure your password has a number in it"
-        )
-    if not any(char.isupper() for char in password):
-        raise HTTPException(
-            status_code=400, detail="Make sure your password has a capital letter in it"
-        )
-    if not any(char.islower() for char in password):
-        raise HTTPException(
-            status_code=400,
-            detail="Make sure your password has a lowercase letter in it",
-        )
-    if not any(char in SpecialSymbol for char in password):
-        raise HTTPException(
-            status_code=400,
-            detail="Make sure your password has a one of the symbols $@#% in it",
+            detail=f"{aditional_info}",
         )
     return True

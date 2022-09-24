@@ -17,8 +17,8 @@ async def create_init_user(passwd: UserInit, db: Session = Depends(deps.get_db))
     """
     Create init user
     """
-    deps.validate_password(passwd.password)
     init_user = settings.INIT_USER
+    deps.validate_password(init_user.get("username"), passwd.password)
     db_user = crud_users.get_user_by_username(db, username=init_user.get("username"))
     if db_user:
         raise HTTPException(status_code=409, detail="Username already registered")
@@ -71,7 +71,7 @@ async def create_user(
     db_user = crud_users.get_user_by_username(db, username=user.username)
     if db_user:
         raise HTTPException(status_code=400, detail="Username already registered")
-    deps.validate_password(user.password)
+    deps.validate_password(user.username, user.password)
     try:
         result = crud_users.create_user(db=db, user=user)
         db_task = crud_activity.create_activity_log(
@@ -126,7 +126,7 @@ async def update_user(
             )
     check_None = [None, "", "string"]
     if user.password not in check_None:
-        deps.validate_password(user.password)
+        deps.validate_password(user.username, user.password)
     try:
         # Push task data
         result = crud_users.update_user(db=db, user_id=user_id, user=user)

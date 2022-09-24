@@ -22,7 +22,7 @@ def test_update_user_init():
         headers={"Authorization": f"Bearer {token}"},
         json=data,
     )
-    assert response.get("status_code") == 200
+    assert response.get("status_code") == 400
 
 
 def test_list_users():

@@ -18,7 +18,7 @@ class User(Base):
     is_active = Column(Boolean(), default=True)
     created_at = Column(DateTime, default=datetime.datetime.now())
     updated_at = Column(DateTime)
-    stacks = relationship("Stack", back_populates="owner")
+    #stacks = relationship("Stack", back_populates="owner")
 
 
 class Stack(Base):
@@ -34,8 +34,8 @@ class Stack(Base):
     tf_version = Column(String(30))
     created_at = Column(DateTime, default=datetime.datetime.now())
     description = Column(Text())
-    user_id = Column(Integer, ForeignKey("users.id"))
-    owner = relationship("User", back_populates="stacks")
+    user_id = Column(Integer)
+    #owner = relationship("User", back_populates="stacks")
 
 
 class Aws_provider(Base):
