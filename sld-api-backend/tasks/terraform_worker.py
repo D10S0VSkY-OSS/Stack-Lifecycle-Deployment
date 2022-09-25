@@ -63,10 +63,15 @@ def pipeline_deploy(
         logger.info(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
         )
+        result = TerraformRequirements.artifactoryFunction(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            git_repo, 
+            branch
+            )
 
-        result = provider.execute(
-            TerraformRequirements.git_clone(git_repo, name, stack_name, environment, squad, branch)
-        )
         self.update_state(state="PULLING", meta={"done": "1 of 6"})
         if result["rc"] != 0:
             logger.error(
@@ -77,9 +82,8 @@ def pipeline_deploy(
         logger.info(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
-        result = provider.execute(
-            TerraformRequirements.binary_download(stack_name, environment, squad, version)
-        )
+        result = TerraformRequirements.binaryFunction(version)
+
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
@@ -89,18 +93,30 @@ def pipeline_deploy(
                 f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
             )
             raise Exception(result)
+
         # Create tf to use the custom artifactory as config
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
-        result = provider.execute(
-            TerraformRequirements.tfstate_render(stack_name, environment, squad, project_path, name)
-        )
+
+        result = TerraformRequirements.storageState(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            project_path
+            )
         if result["rc"] != 0:
             raise Exception(result)
+
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
-        result = provider.execute(
-            TerraformRequirements.tfvars(stack_name, environment, squad, name, project_path, vars=kwargs)
-        )
+        result = TerraformRequirements.parameterVars(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            project_path,
+            kwargs
+            )
         if result["rc"] != 0:
             raise Exception(result)
         # Plan execute

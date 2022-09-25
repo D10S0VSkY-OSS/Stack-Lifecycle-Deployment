@@ -1,3 +1,5 @@
+from distutils.command.config import config
+from inspect import stack
 import json
 import logging
 import os
@@ -12,169 +14,67 @@ from os.path import isfile, join
 
 import hcl
 import jmespath
-import requests
 from config.api import settings
 from jinja2 import Template
 from security.providers_credentials import secret, unsecret
 
 
+#DI terraform provider
+from core.providers.hashicorp.download import BinaryDownload
+from core.providers.hashicorp.artifact import Artifact
+from core.providers.hashicorp.templates import Backend, Tfvars
+
 class TerraformRequirements:
     '''
     In this class, everything that is needed so that terraformActions can be executed is generated.
     '''
+    def binaryFunction(version, binary_download = BinaryDownload):
+        binaryMethod = binary_download(version)
+        return binaryMethod.get()
 
-    def binary_download(
+
+    def artifactoryFunction(
+        name: str,
         stack_name: str,
         environment: str,
         squad: str,
-        version: str
-    ) -> dict:
-
-        binary = f"{settings.TERRAFORM_BIN_REPO}/{version}/terraform_{version}_linux_amd64.zip"
-    
-        try:
-            if not os.path.exists(f"/tmp/{version}"):
-                os.mkdir(f"/tmp/{version}")
-            if not os.path.isfile(f"/tmp/{version}/terraform"):
-                req = requests.get(binary)
-                _zipfile = zipfile.ZipFile(BytesIO(req.content))
-                _zipfile.extractall(f"/tmp/{version}")
-                st = os.stat(f"/tmp/{version}/terraform")
-                os.chmod(f"/tmp/{version}/terraform", st.st_mode | stat.S_IEXEC)
-            return {
-                "command": "binaryDownload",
-                "rc": 0,
-                "stdout": "Download Binary file",
-            }
-
-        except Exception as err:
-            return {"command": "binaryDownload", "rc": 1, "stdout": err}
-
-    def git_clone(
         git_repo: str,
-        name: str,
-        stack_name: str,
-        environment: str,
-        squad: str,
         branch: str,
+        artifact = Artifact
     ) -> dict:
+        getArtifact = artifact(
+            name,
+            stack_name,
+            environment,
+            squad,
+            git_repo,
+            branch
+        )
+        return getArtifact.get()
 
-        try:
-            directory = f"/tmp/{stack_name}/{environment}/{squad}/"
-            os.makedirs(directory, exist_ok=True)
-            logging.info(f"Directory {directory} created successfully")
-        except OSError:
-            logging.info(f"Directory {directory} can not be created")
-
-        try:
-            if os.path.exists(f"{directory}/{name}"):
-                shutil.rmtree(f"{directory}/{name}")
-
-            logging.info(f"Download git repo {git_repo} branch {branch}")
-            os.chdir(f"/tmp/{stack_name}/{environment}/{squad}/")
-
-            result = subprocess.run(
-                f"git clone --recurse-submodules --branch {branch} {git_repo} {name}",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
-
-            logging.info(f"Check if variable.tf file exist")
-
-            tfvars_files = [
-                f
-                for f in listdir(directory)
-                if f.endswith(".tfvars") and isfile(join(directory, f))
-            ]
-
-            rc = result.returncode
-            if rc != 0:
-                return {
-                    "command": "git",
-                    "rc": rc,
-                    "tfvars": tfvars_files,
-                    "stdout": result.stderr,
-                }
-            return {
-                "command": "git",
-                "rc": rc,
-                "tfvars": tfvars_files,
-                "stdout": result.stdout,
-            }
-        except Exception as err:
-            return {"command": "git", "rc": 1, "tfvars": tfvars_files, "stdout": err}
-
-    def tfstate_render(
-        stack_name: str, environment: str, squad: str, project_path: str, name: str
-    ) -> dict:
-        data = """
-        terraform {
-          backend "http" {
-            address = "http://remote-state:8080/terraform_state/{{deploy_state}}"
-            lock_address = "http://remote-state:8080/terraform_lock/{{deploy_state}}"
-            lock_method = "PUT"
-            unlock_address = "http://remote-state:8080/terraform_lock/{{deploy_state}}"
-            unlock_method = "DELETE"
-          }
-        }
-        """
-        try:
-            tm = Template(data)
-            provider_backend = tm.render(
-                deploy_state=f"{stack_name}-{squad}-{environment}-{name}"
-            )
-            file_path = f"/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}-{name}-{environment}.tf"
-            if project_path:
-                file_path = f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}/{stack_name}-{name}-{environment}.tf"
-            with open(file_path, "w") as tf_state:
-                tf_state.write(provider_backend)
-            return {"command": "tfserver", "rc": 0, "stdout": data}
-        except Exception as err:
-            return {"command": "tfserver", "rc": 1, "stderr": err}
-
-    def data_source_render(
-        stack_name: str, environment: str, squad: str, name: str
-    ) -> dict:
-        data = """
-        data "terraform_remote_state" "generic" {
-          backend = "http"
-          config = {
-          address = "http://remote-state:8080/terraform_state/{{deploy_state}}"
-        }
-        }
-        """
-        try:
-            tm = Template(data)
-            provider_backend = tm.render(
-                deploy_state=f"{environment}_{stack_name}_{squad}_{name}"
-            )
-            with open(
-                f"/tmp/{stack_name}/{environment}/{squad}/{name}/data_{environment}_{stack_name}_{name}.tf",
-                "w",
-            ) as tf_state:
-                tf_state.write(provider_backend)
-            return {"command": "datasource", "rc": 0, "stdout": data}
-        except Exception as err:
-            return {"command": "datasource", "rc": 1, "stdout": err}
-
-    def tfvars(
+    def storageState(
+        name: str,
         stack_name: str,
         environment: str,
         squad: str,
+        project_path: str, 
+        backend = Backend
+        ) -> dict:
+        configBackend = backend(name,stack_name,environment,squad,project_path)
+        return configBackend.save()
+
+
+    def parameterVars(
         name: str,
+        stack_name: str,
+        environment: str,
+        squad: str,
         project_path: str,
-        **kwargs: dict,
-    ) -> dict:
-        try:
-            file_path = f"/tmp/{stack_name}/{environment}/{squad}/{name}/{stack_name}.tfvars.json"
-            if project_path:
-                file_path = f"/tmp/{stack_name}/{environment}/{squad}/{name}/{project_path}/{stack_name}.tfvars.json"
-            with open(file_path, "w") as tfvars_json:
-                json.dump(kwargs.get("vars"), tfvars_json)
-            return {"command": "tfvars", "rc": 0, "stdout": kwargs.get("vars")}
-        except Exception as err:
-            return {"command": "tfvars", "rc": 1, "stdout": f"{err}"}
+        kwargs: dict,
+        vars = Tfvars,
+        ) -> dict:
+        configVars = vars(name,stack_name,environment,squad,project_path,kwargs)
+        return configVars.save()
 
 
 class TerraformGetVars:
@@ -533,5 +433,6 @@ class TerraformActions:
             return json_data
         except Exception as err:
             return {"command": "show", "rc": 1, "stdout": err}
+
 
 
