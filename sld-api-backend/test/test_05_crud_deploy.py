@@ -23,6 +23,7 @@ def get_task_id(task_id):
     )
     return response
 
+
 def test_deploy_stack_stormtrooper():
     response = request_url(
         verb="POST",

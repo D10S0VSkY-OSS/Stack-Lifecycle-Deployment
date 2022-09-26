@@ -1,7 +1,6 @@
 from typing import Tuple
 
 from dependency_injector import containers, providers
-
 from password_strength import PasswordPolicy
 from usernames import is_safe_username
 
@@ -9,17 +8,13 @@ from usernames import is_safe_username
 class PasswordValidator:
     def __init__(self) -> None:
         self._policy = PasswordPolicy.from_names(
-                length=8,
-                uppercase=1,
-                numbers=1,
-                special=1,
-                nonletters=1
-                )
-        
+            length=8, uppercase=1, numbers=1, special=1, nonletters=1
+        )
+
     def validate(self, password: str) -> bool:
         if password == None or len(password) == 0:
             return False
-        if len(self._policy.test(password))>0:
+        if len(self._policy.test(password)) > 0:
             return False
         return True
 
@@ -36,12 +31,16 @@ class UsernameValidator:
             username,
             whitelist=self._whitelist,
             blacklist=self._black_list,
-            max_length=self._max_length
-            )
+            max_length=self._max_length,
+        )
 
 
 class UserService:
-    def __init__(self, username_validator: UsernameValidator, password_validator: PasswordValidator):
+    def __init__(
+        self,
+        username_validator: UsernameValidator,
+        password_validator: PasswordValidator,
+    ):
         self.username_validator = username_validator
         self.password_validator = password_validator
 
@@ -58,7 +57,5 @@ class Container(containers.DeclarativeContainer):
     password_validator = providers.Singleton(PasswordValidator)
 
     user_service = providers.Singleton(
-        UserService,
-        username_validator,
-        password_validator
+        UserService, username_validator, password_validator
     )

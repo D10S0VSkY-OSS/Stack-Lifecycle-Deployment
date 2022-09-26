@@ -425,7 +425,7 @@ async def get_output(
         environment = deploy_data.environment
         name = deploy_data.name
         # Get  credentials by providers supported
-        return {"task": async_output(stack_name, environment, squad, name)}
+        return {"task": async_output(stack_name, squad, environment, name)}
     except Exception as err:
         raise HTTPException(status_code=400, detail=f"{err}")
 
@@ -449,7 +449,7 @@ async def unlock_deploy(
         environment = deploy_data.environment
         name = deploy_data.name
         # Get  credentials by providers supported
-        return {"task": async_unlock(stack_name, environment, squad, name)}
+        return {"task": async_unlock(stack_name, squad, environment, name)}
     except Exception as err:
         raise HTTPException(status_code=400, detail=f"{err}")
 
@@ -472,6 +472,6 @@ async def get_show(
     environment = deploy_data.environment
     name = deploy_data.name
     try:
-        return {"task": async_show(stack_name, environment, squad, name)}
+        return {"task": async_show(stack_name, squad, environment, name)}
     except Exception as err:
         raise HTTPException(status_code=400, detail=f"{err}")
