@@ -1,7 +1,9 @@
-from dataclasses import dataclass
 import json
-from jinja2 import Template
+from dataclasses import dataclass
+
 import hcl
+from jinja2 import Template
+
 
 @dataclass
 class StructBase:
@@ -9,7 +11,7 @@ class StructBase:
     stack_name: str
     environment: str
     squad: str
-    
+
 
 @dataclass
 class Backend(StructBase):
@@ -46,6 +48,7 @@ class Backend(StructBase):
 class Tfvars(StructBase):
     project_path: str
     kwargs: dict
+
     def save(self) -> dict:
         try:
             file_path = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.stack_name}.tfvars.json"
@@ -56,11 +59,13 @@ class Tfvars(StructBase):
             return {"command": "tfvars", "rc": 0, "stdout": self.kwargs}
         except Exception as err:
             return {"command": "tfvars", "rc": 1, "stdout": f"{err}"}
+
+
 @dataclass
 class GetVars(StructBase):
-    '''
+    """
     In this class are the methods to obtain information from the terraform variables
-    '''
+    """
 
     def get_vars_json(self) -> dict:
         try:

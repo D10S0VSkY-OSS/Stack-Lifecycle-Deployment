@@ -2,11 +2,10 @@ import logging
 import os
 import shutil
 import subprocess
+from dataclasses import dataclass
 from os import listdir
 from os.path import isfile, join
 
-
-from dataclasses import dataclass
 
 @dataclass
 class StructBase:
@@ -14,7 +13,7 @@ class StructBase:
     stack_name: str
     environment: str
     squad: str
-    
+
 
 @dataclass
 class Artifact(StructBase):

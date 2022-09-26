@@ -1,10 +1,10 @@
-from config.api import settings
 import os
-from re import A
 import stat
 import zipfile
 from io import BytesIO
+
 import requests
+from config.api import settings
 
 
 class BinaryDownload:
@@ -26,7 +26,7 @@ class BinaryDownload:
                 "command": "binaryDownload",
                 "rc": 0,
                 "stdout": "Download Binary file",
-                }
+            }
 
         except Exception as err:
             return {"command": "binaryDownload", "rc": 1, "stdout": err}

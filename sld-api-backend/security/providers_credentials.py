@@ -28,9 +28,7 @@ def aws_config(secreto):
             profile_name = secreto.get("profile_name")
             if not config.has_section(f"profile {profile_name}"):
                 config.add_section(f"profile {profile_name}")
-            config.set(
-                f"profile {profile_name}", "role_arn", secreto.get("role_arn")
-            )
+            config.set(f"profile {profile_name}", "role_arn", secreto.get("role_arn"))
             config.set(
                 f"profile {profile_name}",
                 "region",
@@ -65,9 +63,7 @@ def aws_credentials(secreto):
             if not config.has_section(source_profile):
                 config.add_section(source_profile)
             config.set(source_profile, "region", secreto.get("default_region"))
-            config.set(
-                source_profile, "aws_access_key_id", secreto.get("access_key")
-            )
+            config.set(source_profile, "aws_access_key_id", secreto.get("access_key"))
             config.set(
                 source_profile,
                 "aws_secret_access_key",
@@ -108,9 +104,7 @@ def secret(
 
     elif any(i in stack_name.lower() for i in settings.GCLOUD_PREFIX):
         gcloud_keyfile = f"/tmp/{stack_name}/{environment}/{squad}/{name}/gcp_{environment}_{stack_name}_{name}.json"
-        gcloud_keyfile_data = ast.literal_eval(
-            secreto.get("gcloud_keyfile_json")
-        )
+        gcloud_keyfile_data = ast.literal_eval(secreto.get("gcloud_keyfile_json"))
         with open(gcloud_keyfile, "w") as gcloud_file:
             json.dump(gcloud_keyfile_data, gcloud_file, indent=4)
 

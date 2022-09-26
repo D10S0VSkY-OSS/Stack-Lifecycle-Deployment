@@ -1,10 +1,10 @@
 from typing import Generator
 
-
 from config.api import settings
 from config.database import SessionLocal
 from crud import user as crud_users
 from db import models
+from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
@@ -12,13 +12,11 @@ from pydantic import ValidationError
 from schemas import schemas
 from security import tokens
 from security.validator import Container
-from dependency_injector.wiring import inject, Provide
 from sqlalchemy.orm import Session
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/authenticate/access-token"
 )
-
 
 
 def get_db() -> Generator:
@@ -69,8 +67,11 @@ def get_current_active_superuser(
         )
     return current_user
 
+
 @inject
-def validate_password(username: str, password: str, user_service = Provide[Container.user_service]):
+def validate_password(
+    username: str, password: str, user_service=Provide[Container.user_service]
+):
     (result, aditional_info) = user_service.validate(username, password)
     if not result:
         raise HTTPException(
@@ -82,6 +83,3 @@ def validate_password(username: str, password: str, user_service = Provide[Conta
 
 container = Container()
 container.wire(modules=[__name__])
-
-
-

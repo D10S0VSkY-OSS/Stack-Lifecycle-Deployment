@@ -1,11 +1,12 @@
-from ensurepip import version
 import os
 import subprocess
+from dataclasses import dataclass
+
 import jmespath
+import requests
 from config.api import settings
 from security.providers_credentials import secret, unsecret
-import requests
-from dataclasses import dataclass
+
 
 @dataclass
 class StructBase:
@@ -14,22 +15,26 @@ class StructBase:
     branch: str
     environment: str
     squad: str
-    
+
 
 @dataclass
 class Actions(StructBase):
     version: str
     secreto: dict
-    variables_file: str 
+    variables_file: str
     project_path: str
-    '''
+    """
     In this class are all the methods equivalent to the terraform commands
-    '''
+    """
 
     def plan_execute(self) -> dict:
         try:
-            secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
-            deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
+            secret(
+                self.stack_name, self.environment, self.squad, self.name, self.secreto
+            )
+            deploy_state = (
+                f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
+            )
             # Execute task
             variables_files = (
                 f"{self.stack_name}.tfvars.json"
@@ -38,8 +43,12 @@ class Actions(StructBase):
             )
 
             if not self.project_path:
-                os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}")
-            os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
+                os.chdir(
+                    f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}"
+                )
+            os.chdir(
+                f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
+            )
             result = subprocess.run(
                 f"/tmp/{self.version}/terraform init -input=false --upgrade",
                 shell=True,
@@ -52,7 +61,9 @@ class Actions(StructBase):
                 capture_output=True,
                 encoding="utf8",
             )
-            unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
+            unsecret(
+                self.stack_name, self.environment, self.squad, self.name, self.secreto
+            )
 
             # Capture events
             rc = result.returncode
@@ -71,7 +82,7 @@ class Actions(StructBase):
                     "stdout": [result.stderr.split("\n")],
                 }
             return {
-               "command": "plan",
+                "command": "plan",
                 "deploy": self.name,
                 "squad": self.squad,
                 "stack_name": self.stack_name,
@@ -98,14 +109,21 @@ class Actions(StructBase):
 
     def apply_execute(self) -> dict:
         try:
-            secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
-            deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
+            secret(
+                self.stack_name, self.environment, self.squad, self.name, self.secreto
+            )
+            deploy_state = (
+                f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
+            )
             # Execute task
 
-
             if not self.project_path:
-                os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}")
-            os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
+                os.chdir(
+                    f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}"
+                )
+            os.chdir(
+                f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
+            )
 
             result = subprocess.run(
                 f"/tmp/{self.version}/terraform init -input=false --upgrade",
@@ -119,7 +137,9 @@ class Actions(StructBase):
                 capture_output=True,
                 encoding="utf8",
             )
-            unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
+            unsecret(
+                self.stack_name, self.environment, self.squad, self.name, self.secreto
+            )
 
             # Capture events
             rc = result.returncode
@@ -165,8 +185,12 @@ class Actions(StructBase):
 
     def destroy_execute(self) -> dict:
         try:
-            secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
-            deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
+            secret(
+                self.stack_name, self.environment, self.squad, self.name, self.secreto
+            )
+            deploy_state = (
+                f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
+            )
             # Execute task
             variables_files = (
                 f"{self.stack_name}.tfvars.json"
@@ -174,8 +198,12 @@ class Actions(StructBase):
                 else self.variables_file
             )
             if not self.project_path:
-                os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}")
-            os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
+                os.chdir(
+                    f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}"
+                )
+            os.chdir(
+                f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
+            )
 
             result = subprocess.run(
                 f"/tmp/{self.version}/terraform init -input=false --upgrade",
@@ -189,7 +217,9 @@ class Actions(StructBase):
                 capture_output=True,
                 encoding="utf8",
             )
-            unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
+            unsecret(
+                self.stack_name, self.environment, self.squad, self.name, self.secreto
+            )
             # Capture events
             rc = result.returncode
             # check result
@@ -233,9 +263,18 @@ class Actions(StructBase):
                 "stdout": "ko",
             }
 
+
+@dataclass
+class SimpleActions:
+    stack_name: str
+    squad: str
+    environment: str
+    name: str
+
     def output_execute(self):
         try:
             get_path = f"{self.stack_name}-{self.squad}-{self.environment}-{self.name}"
+            print(get_path)
             response = requests.get(
                 f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
             )
@@ -253,15 +292,14 @@ class Actions(StructBase):
             response = requests.delete(
                 f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={}
             )
-            json_data = response.json()
-            result = json_data
-            return result
+            return response.json()
         except Exception as err:
             return {"command": "unlock", "rc": 1, "stdout": err}
 
     def show_execute(self):
         try:
             get_path = f"{self.stack_name}-{self.squad}-{self.environment}-{self.name}"
+            print(get_path)
             response = requests.get(
                 f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
             )

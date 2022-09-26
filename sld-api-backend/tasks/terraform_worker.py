@@ -7,12 +7,11 @@ from celery.exceptions import Ignore
 from celery.utils.log import get_task_logger
 from config.api import settings
 from config.celery_config import celery_app
-from core.provider import ProviderRequirements
-from core.provider import ProviderActions
-from core.provider import ProviderGetVars
+from core.provider import (ProviderActions, ProviderGetVars,
+                           ProviderRequirements)
+from helpers.folders import Utils
 from helpers.metrics import push_metric
 from helpers.schedule import request_url
-from helpers.folders import Utils
 
 r = redis.Redis(
     host=settings.BACKEND_SERVER,
@@ -60,13 +59,8 @@ def pipeline_deploy(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
         )
         result = ProviderRequirements.artifact_download(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            git_repo, 
-            branch
-            )
+            name, stack_name, environment, squad, git_repo, branch
+        )
 
         self.update_state(state="PULLING", meta={"done": "1 of 6"})
         if result["rc"] != 0:
@@ -90,29 +84,20 @@ def pipeline_deploy(
             )
             raise Exception(result)
 
-        # Create tf to use the custom backend state 
+        # Create tf to use the custom backend state
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
 
         result = ProviderRequirements.storage_state(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            project_path
-            )
+            name, stack_name, environment, squad, project_path
+        )
         if result["rc"] != 0:
             raise Exception(result)
 
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
         result = ProviderRequirements.parameter_vars(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            project_path,
-            kwargs
-            )
+            name, stack_name, environment, squad, project_path, kwargs
+        )
         if result["rc"] != 0:
             raise Exception(result)
         # Plan execute
@@ -121,16 +106,16 @@ def pipeline_deploy(
         )
         self.update_state(state="PLANNING", meta={"done": "5 of 6"})
         result = ProviderActions.plan(
-                name,
-                stack_name,
-                branch,
-                environment,
-                squad,
-                version,
-                secreto,
-                variables_file,
-                project_path,
-            )
+            name,
+            stack_name,
+            branch,
+            environment,
+            squad,
+            version,
+            secreto,
+            variables_file,
+            project_path,
+        )
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
         Utils.delete_local_folder(dir_path)
@@ -146,16 +131,16 @@ def pipeline_deploy(
         )
         self.update_state(state="APPLYING", meta={"done": "6 of 6"})
         result = ProviderActions.apply(
-                name,
-                stack_name,
-                branch,
-                environment,
-                squad,
-                version,
-                secreto,
-                variables_file,
-                project_path,
-            )
+            name,
+            stack_name,
+            branch,
+            environment,
+            squad,
+            version,
+            secreto,
+            variables_file,
+            project_path,
+        )
         if result["rc"] != 0:
             logger.error(
                 f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
@@ -237,13 +222,8 @@ def pipeline_destroy(
             f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
         )
         result = ProviderRequirements.artifact_download(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            git_repo, 
-            branch
-            ) 
+            name, stack_name, environment, squad, git_repo, branch
+        )
         self.update_state(state="PULLING", meta={"done": "1 of 6"})
         if result["rc"] != 0:
             raise Exception(result)
@@ -259,27 +239,18 @@ def pipeline_destroy(
                 f"Error when User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
             )
             raise Exception(result)
-        # Create tf to use the custom backend storage state 
+        # Create tf to use the custom backend storage state
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
         result = ProviderRequirements.storage_state(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            project_path
-            )
+            name, stack_name, environment, squad, project_path
+        )
         if result["rc"] != 0:
             raise Exception(result)
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
         result = ProviderRequirements.parameter_vars(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            project_path,
-            kwargs
-            )
+            name, stack_name, environment, squad, project_path, kwargs
+        )
         if result["rc"] != 0:
             raise Exception(result)
 
@@ -335,13 +306,8 @@ def pipeline_plan(
         )
         self.update_state(state="GIT", meta={"done": "1 of 5"})
         result = ProviderRequirements.artifact_download(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            git_repo, 
-            branch
-            ) 
+            name, stack_name, environment, squad, git_repo, branch
+        )
         if result["rc"] != 0:
             logger.error(
                 f"Error when user {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
@@ -362,24 +328,15 @@ def pipeline_plan(
 
         self.update_state(state="REMOTE", meta={"done": "3 of 5"})
         result = ProviderRequirements.storage_state(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            project_path
-            )
+            name, stack_name, environment, squad, project_path
+        )
         if result["rc"] != 0:
             raise Exception(result)
 
         self.update_state(state="VARS", meta={"done": "4 of 5"})
         result = ProviderRequirements.parameter_vars(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            project_path,
-            kwargs
-            )
+            name, stack_name, environment, squad, project_path, kwargs
+        )
         if result["rc"] != 0:
             raise Exception(result)
 
@@ -409,7 +366,7 @@ def pipeline_plan(
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        #Utils.delete_local_folder(dir_path)
+        # Utils.delete_local_folder(dir_path)
 
 
 @celery_app.task(
@@ -426,13 +383,8 @@ def pipeline_git_pull(
 ):
     try:
         git_result = ProviderRequirements.artifact_download(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            git_repo, 
-            branch
-            ) 
+            name, stack_name, environment, squad, git_repo, branch
+        )
         if git_result["rc"] != 0:
             raise Exception(git_result.get("stdout"))
 
@@ -469,13 +421,8 @@ def git(
 ):
     try:
         result = ProviderRequirements.artifact_download(
-            name,
-            stack_name,
-            environment, 
-            squad, 
-            git_repo, 
-            branch
-            ) 
+            name, stack_name, environment, squad, git_repo, branch
+        )
     except Exception as err:
         self.retry(
             countdown=settings.GIT_TMOUT, exc=err, max_retries=settings.TASK_MAX_RETRY
@@ -492,9 +439,9 @@ def git(
     max_retries=1,
     name="terraform output",
 )
-def output(self, stack_name: str, environment: str, squad: str, name: str):
+def output(self, stack_name: str, squad: str, environment: str, name: str):
     try:
-        output_result = ProviderActions.output(name,stack_name, environment, squad)
+        output_result = ProviderActions.output(stack_name, squad, environment, name)
         return output_result
     except Exception as err:
         return {"stdout": err}
@@ -510,9 +457,9 @@ def output(self, stack_name: str, environment: str, squad: str, name: str):
     max_retries=1,
     name="terraform unlock",
 )
-def unlock(self, stack_name: str, environment: str, squad: str, name: str):
+def unlock(self, stack_name: str, squad: str, environment: str, name: str):
     try:
-        unlock_result = ProviderActions.unlock_execute(stack_name, environment, squad, name)
+        unlock_result = ProviderActions.unlock(stack_name, squad, environment, name)
         return unlock_result
     except Exception as err:
         return {"stdout": err}
@@ -521,8 +468,8 @@ def unlock(self, stack_name: str, environment: str, squad: str, name: str):
 @celery_app.task(
     bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="terraform show"
 )
-def show(self, stack_name: str, environment: str, squad: str, name: str):
-    show_result = ProviderActions.show_execute(stack_name, environment, squad, name)
+def show(self, stack_name: str, squad: str, environment: str, name: str):
+    show_result = ProviderActions.show(stack_name, squad, environment, name)
     return show_result
 
 
@@ -580,4 +527,3 @@ def schedule_update(self, deploy_name: str):
     except Exception as err:
         logging.warning(request_url(verb="POST", uri=f"schedule/{deploy_name}"))
         return err
-
