@@ -22,7 +22,7 @@ def check_bucket(bucket_name=settings.BUCKET):
 check_bucket()
 
 
-class GoogleCloudStorage(object):
+class Storage(object):
     def __init__(self, path):
         self.path = path
 

@@ -16,7 +16,7 @@ s3 = boto3.resource(
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
 
-class S3Store(object):
+class Storage(object):
     def __init__(self, path):
         self.path = path
 

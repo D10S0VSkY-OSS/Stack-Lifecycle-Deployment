@@ -8,7 +8,7 @@ logging.basicConfig(format="%(levelname)s:     %(message)s", level=logging.INFO)
 connection_url = f"mongodb://{settings.MONGODB_USER}:{settings.MONGODB_PASSWD}@{settings.MONGODB_URL}"
 
 
-class MongoDB(object):
+class Storage(object):
     def __init__(self, path):
         self.path = path
 
@@ -32,7 +32,7 @@ class MongoDB(object):
             if current_state:
                 current_state.pop("_id")
                 return current_state
-            return None
+            return id
         except Exception as err:
             logging.error(err)
             raise err

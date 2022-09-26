@@ -1,6 +1,6 @@
 import json
 
-from configs.store import settings
+from configs.storage import settings
 from fastapi import FastAPI, HTTPException
 
 print(
@@ -10,24 +10,25 @@ Stack LifeCycle Deployment RemoteState  {settings.SLD_RM_VER}       #
 #####################################################################
 
 ------------------------------------------------
-remote state = {settings.SLD_STORE}            
+remote state = {settings.SLD_STORAGE_BACKEND}            
 ------------------------------------------------
 """
 )
 
-if settings.SLD_STORE == "S3":
-    from stores.bucket_s3 import S3Store as Store
-if settings.SLD_STORE == "local":
-    from stores.local import LocalStore as Store
-if settings.SLD_STORE == "mongodb":
-    from stores.mongo_db import MongoDB as Store
-if settings.SLD_STORE == "azure":
-    from stores.azure_blob_storage import AzureBlobStorage as Store
-if settings.SLD_STORE == "gcp":
-    from stores.gcp_cloud_storage import GoogleCloudStorage as Store
+
+class StorageStrategy:
+    def __init__(self, mod) -> None:
+        self.mod = mod.lower()
+    def load_mod(self):
+        return __import__(f"storage.{self.mod}", fromlist=[None])
 
 
-remote_state = Store(".remote_states")
+storage_setting = StorageStrategy(settings.SLD_STORAGE_BACKEND)
+load_mod = storage_setting.load_mod()
+Storage = load_mod.Storage
+        
+
+remote_state = Storage("/tmp/.remote_states")
 app = FastAPI(
     title=f"RemoteState Stack Lifecycle Deployment {settings.SLD_RM_VER} ",
     version=f"{settings.SLD_RM_VER}",
@@ -54,10 +55,10 @@ async def health():
 
 @app.get("/terraform_state/{id}", tags=["Remote_state"])
 async def get_tfstate(id: str):
-    s = remote_state.get(id)
-    if not s:
+    result = remote_state.get(id)
+    if not result:
         raise HTTPException(status_code=404)
-    return s
+    return result
 
 
 @app.post("/terraform_state/{id}", tags=["Remote_state"])
