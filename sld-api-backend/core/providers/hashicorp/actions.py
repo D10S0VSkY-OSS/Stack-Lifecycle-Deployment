@@ -22,17 +22,17 @@ class Actions(StructBase):
     secreto: dict
     variables_file: str 
     project_path: str
-    def __post_init__(self):
-        self.project_path = "" if self.project_path is None else self.project_path
-        self.variables_file = "" if self.variables_file is None else self.variables_file
     '''
     In this class are all the methods equivalent to the terraform commands
     '''
 
     def plan_execute(self) -> dict:
-
         try:
             secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
+            print(os.getenv('AWS_ACCESS_KEY_ID'))
+            print(os.getenv('AWS_SECRET_ACCESS_KEY'))
+            print(os.getenv('AWS_DEFAULT_REGION'))
+            print(os.getenv('AWS_SESSION_TOKEN'))
             deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
             # Execute task
             variables_files = (
@@ -105,11 +105,7 @@ class Actions(StructBase):
             secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
             deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
             # Execute task
-            variables_files = (
-                f"{self.stack_name}.tfvars.json"
-                if self.variables_file == "" or self.variables_file == None
-                else self.variables_file
-            )
+
 
             if not self.project_path:
                 os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}")
@@ -261,6 +257,7 @@ class Actions(StructBase):
             response = requests.delete(
                 f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={}
             )
+            print(response)
             json_data = response.json()
             result = json_data
             return result

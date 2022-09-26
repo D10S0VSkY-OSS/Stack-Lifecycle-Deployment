@@ -413,7 +413,7 @@ def pipeline_plan(
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        Utils.delete_local_folder(dir_path)
+        #Utils.delete_local_folder(dir_path)
 
 
 @celery_app.task(
