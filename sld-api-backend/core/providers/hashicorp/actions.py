@@ -29,10 +29,6 @@ class Actions(StructBase):
     def plan_execute(self) -> dict:
         try:
             secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
-            print(os.getenv('AWS_ACCESS_KEY_ID'))
-            print(os.getenv('AWS_SECRET_ACCESS_KEY'))
-            print(os.getenv('AWS_DEFAULT_REGION'))
-            print(os.getenv('AWS_SESSION_TOKEN'))
             deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
             # Execute task
             variables_files = (
@@ -257,7 +253,6 @@ class Actions(StructBase):
             response = requests.delete(
                 f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={}
             )
-            print(response)
             json_data = response.json()
             result = json_data
             return result

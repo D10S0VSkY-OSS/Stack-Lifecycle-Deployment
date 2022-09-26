@@ -7,10 +7,9 @@ from celery.exceptions import Ignore
 from celery.utils.log import get_task_logger
 from config.api import settings
 from config.celery_config import celery_app
-from core.providers.sld import Providers, Terraform
-from core.providers.terraform import TerraformRequirements
-from core.providers.terraform import TerraformActions
-from core.providers.terraform import TerraformGetVars
+from core.provider import ProviderRequirements
+from core.provider import ProviderActions
+from core.provider import ProviderGetVars
 from helpers.metrics import push_metric
 from helpers.schedule import request_url
 from helpers.folders import Utils
@@ -24,9 +23,6 @@ r = redis.Redis(
 )
 
 logger = get_task_logger(__name__)
-
-terrafom = Terraform()
-provider = Providers(terrafom)
 
 
 @celery_app.task(
@@ -63,7 +59,7 @@ def pipeline_deploy(
         logger.info(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
         )
-        result = TerraformRequirements.artifact_download(
+        result = ProviderRequirements.artifact_download(
             name,
             stack_name,
             environment, 
@@ -82,7 +78,7 @@ def pipeline_deploy(
         logger.info(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
-        result = TerraformRequirements.binary_download(version)
+        result = ProviderRequirements.binary_download(version)
 
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
@@ -97,7 +93,7 @@ def pipeline_deploy(
         # Create tf to use the custom backend state 
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
 
-        result = TerraformRequirements.storage_state(
+        result = ProviderRequirements.storage_state(
             name,
             stack_name,
             environment, 
@@ -109,7 +105,7 @@ def pipeline_deploy(
 
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
-        result = TerraformRequirements.parameter_vars(
+        result = ProviderRequirements.parameter_vars(
             name,
             stack_name,
             environment, 
@@ -124,7 +120,7 @@ def pipeline_deploy(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform plan"
         )
         self.update_state(state="PLANNING", meta={"done": "5 of 6"})
-        result = TerraformActions.plan(
+        result = ProviderActions.plan(
                 name,
                 stack_name,
                 branch,
@@ -137,7 +133,7 @@ def pipeline_deploy(
             )
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
-        provider.execute(Utils.delete_local_folder(dir_path))
+        Utils.delete_local_folder(dir_path)
 
         if result["rc"] != 0:
             logger.error(
@@ -149,7 +145,7 @@ def pipeline_deploy(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform apply with timeout deploy setting {settings.DEPLOY_TMOUT}"
         )
         self.update_state(state="APPLYING", meta={"done": "6 of 6"})
-        result = TerraformActions.apply(
+        result = ProviderActions.apply(
                 name,
                 stack_name,
                 branch,
@@ -182,7 +178,7 @@ def pipeline_deploy(
                 f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version} execute RollBack"
             )
         self.update_state(state="ROLLBACK", meta={"done": "1 of 1"})
-        destroy_result = TerraformActions.destroy(
+        destroy_result = ProviderActions.destroy(
             name,
             stack_name,
             branch,
@@ -240,7 +236,7 @@ def pipeline_destroy(
         logger.info(
             f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
         )
-        result = TerraformRequirements.artifact_download(
+        result = ProviderRequirements.artifact_download(
             name,
             stack_name,
             environment, 
@@ -255,7 +251,7 @@ def pipeline_destroy(
         logger.info(
             f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
-        result = TerraformRequirements.binary_download(version)
+        result = ProviderRequirements.binary_download(version)
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
         if result["rc"] != 0:
@@ -265,7 +261,7 @@ def pipeline_destroy(
             raise Exception(result)
         # Create tf to use the custom backend storage state 
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
-        result = TerraformRequirements.storage_state(
+        result = ProviderRequirements.storage_state(
             name,
             stack_name,
             environment, 
@@ -276,7 +272,7 @@ def pipeline_destroy(
             raise Exception(result)
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
-        result = TerraformRequirements.parameter_vars(
+        result = ProviderRequirements.parameter_vars(
             name,
             stack_name,
             environment, 
@@ -291,7 +287,7 @@ def pipeline_destroy(
             f"User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment} execute destroy"
         )
         self.update_state(state="DESTROYING", meta={"done": "6 of 6"})
-        result = TerraformActions.destroy(
+        result = ProviderActions.destroy(
             name,
             stack_name,
             branch,
@@ -338,7 +334,7 @@ def pipeline_plan(
             f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment}"
         )
         self.update_state(state="GIT", meta={"done": "1 of 5"})
-        result = TerraformRequirements.artifact_download(
+        result = ProviderRequirements.artifact_download(
             name,
             stack_name,
             environment, 
@@ -355,7 +351,7 @@ def pipeline_plan(
         logger.info(
             f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
-        result = TerraformRequirements.binary_download(version)
+        result = ProviderRequirements.binary_download(version)
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
         Utils.delete_local_folder(dir_path)
         if result["rc"] != 0:
@@ -365,7 +361,7 @@ def pipeline_plan(
             raise Exception(result)
 
         self.update_state(state="REMOTE", meta={"done": "3 of 5"})
-        result = TerraformRequirements.storage_state(
+        result = ProviderRequirements.storage_state(
             name,
             stack_name,
             environment, 
@@ -376,7 +372,7 @@ def pipeline_plan(
             raise Exception(result)
 
         self.update_state(state="VARS", meta={"done": "4 of 5"})
-        result = TerraformRequirements.parameter_vars(
+        result = ProviderRequirements.parameter_vars(
             name,
             stack_name,
             environment, 
@@ -388,7 +384,7 @@ def pipeline_plan(
             raise Exception(result)
 
         self.update_state(state="PLAN", meta={"done": "5 of 5"})
-        result = TerraformActions.plan(
+        result = ProviderActions.plan(
             name,
             stack_name,
             branch,
@@ -429,7 +425,7 @@ def pipeline_git_pull(
     branch: str,
 ):
     try:
-        git_result = TerraformRequirements.artifact_download(
+        git_result = ProviderRequirements.artifact_download(
             name,
             stack_name,
             environment, 
@@ -441,7 +437,7 @@ def pipeline_git_pull(
             raise Exception(git_result.get("stdout"))
 
         self.update_state(state="GET_VARS_AS_JSON", meta={"done": "2 of 2"})
-        result = TerraformGetVars.json_vars(
+        result = ProviderGetVars.json_vars(
             environment=environment, stack_name=stack_name, squad=squad, name=name
         )
         if result["rc"] != 0:
@@ -472,7 +468,7 @@ def git(
     branch: str,
 ):
     try:
-        result = TerraformRequirements.artifact_download(
+        result = ProviderRequirements.artifact_download(
             name,
             stack_name,
             environment, 
@@ -498,7 +494,7 @@ def git(
 )
 def output(self, stack_name: str, environment: str, squad: str, name: str):
     try:
-        output_result = TerraformActions.output(name,stack_name, environment, squad)
+        output_result = ProviderActions.output(name,stack_name, environment, squad)
         return output_result
     except Exception as err:
         return {"stdout": err}
@@ -516,7 +512,7 @@ def output(self, stack_name: str, environment: str, squad: str, name: str):
 )
 def unlock(self, stack_name: str, environment: str, squad: str, name: str):
     try:
-        unlock_result = TerraformActions.unlock_execute(stack_name, environment, squad, name)
+        unlock_result = ProviderActions.unlock_execute(stack_name, environment, squad, name)
         return unlock_result
     except Exception as err:
         return {"stdout": err}
@@ -526,7 +522,7 @@ def unlock(self, stack_name: str, environment: str, squad: str, name: str):
     bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="terraform show"
 )
 def show(self, stack_name: str, environment: str, squad: str, name: str):
-    show_result = TerraformActions.show_execute(stack_name, environment, squad, name)
+    show_result = ProviderActions.show_execute(stack_name, environment, squad, name)
     return show_result
 
 
