@@ -1,6 +1,7 @@
 from dataclasses import dataclass
 import json
 from jinja2 import Template
+import hcl
 
 @dataclass
 class StructBase:
@@ -55,3 +56,24 @@ class Tfvars(StructBase):
             return {"command": "tfvars", "rc": 0, "stdout": self.kwargs}
         except Exception as err:
             return {"command": "tfvars", "rc": 1, "stdout": f"{err}"}
+@dataclass
+class GetVars(StructBase):
+    '''
+    In this class are the methods to obtain information from the terraform variables
+    '''
+
+    def get_vars_json(self) -> dict:
+        try:
+            file_hcl = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/variables.tf"
+            with open(file_hcl, "r") as fp:
+                obj = hcl.load(fp)
+            if obj.get("variable"):
+                return {"command": "get_vars_json", "rc": 0, "stdout": json.dumps(obj)}
+            else:
+                error_msg = "Variable file is empty, not iterable"
+                return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
+        except IOError:
+            error_msg = "Variable file not accessible"
+            return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
+        except Exception as err:
+            return {"command": "get_vars_json", "rc": 1, "stdout": err}

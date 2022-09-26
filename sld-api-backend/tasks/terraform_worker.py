@@ -9,11 +9,11 @@ from config.api import settings
 from config.celery_config import celery_app
 from core.providers.sld import Providers, Terraform
 from core.providers.terraform import TerraformRequirements
-from core.providers.terraform import TerraformGetVars
-from core.providers.terraform import TerraformUtils
 from core.providers.terraform import TerraformActions
+from core.providers.terraform import TerraformGetVars
 from helpers.metrics import push_metric
 from helpers.schedule import request_url
+from helpers.folders import Utils
 
 r = redis.Redis(
     host=settings.BACKEND_SERVER,
@@ -63,7 +63,7 @@ def pipeline_deploy(
         logger.info(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
         )
-        result = TerraformRequirements.artifactoryFunction(
+        result = TerraformRequirements.artifact_download(
             name,
             stack_name,
             environment, 
@@ -82,22 +82,22 @@ def pipeline_deploy(
         logger.info(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
-        result = TerraformRequirements.binaryFunction(version)
+        result = TerraformRequirements.binary_download(version)
 
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
-        TerraformUtils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
         if result["rc"] != 0:
             logger.error(
                 f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
             )
             raise Exception(result)
 
-        # Create tf to use the custom artifactory as config
+        # Create tf to use the custom backend state 
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
 
-        result = TerraformRequirements.storageState(
+        result = TerraformRequirements.storage_state(
             name,
             stack_name,
             environment, 
@@ -109,7 +109,7 @@ def pipeline_deploy(
 
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
-        result = TerraformRequirements.parameterVars(
+        result = TerraformRequirements.parameter_vars(
             name,
             stack_name,
             environment, 
@@ -124,21 +124,20 @@ def pipeline_deploy(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform plan"
         )
         self.update_state(state="PLANNING", meta={"done": "5 of 6"})
-        result = provider.execute(
-            TerraformActions.plan_execute(
+        result = TerraformActions.plan(
+                name,
                 stack_name,
+                branch,
                 environment,
                 squad,
-                name,
                 version,
+                secreto,
                 variables_file,
                 project_path,
-                data=secreto,
             )
-        )
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
-        provider.execute(TerraformUtils.delete_local_folder(dir_path))
+        provider.execute(Utils.delete_local_folder(dir_path))
 
         if result["rc"] != 0:
             logger.error(
@@ -150,19 +149,17 @@ def pipeline_deploy(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform apply with timeout deploy setting {settings.DEPLOY_TMOUT}"
         )
         self.update_state(state="APPLYING", meta={"done": "6 of 6"})
-        result = provider.execute(
-            TerraformActions.apply_execute(
+        result = TerraformActions.apply(
+                name,
                 stack_name,
                 branch,
                 environment,
                 squad,
-                name,
                 version,
+                secreto,
                 variables_file,
                 project_path,
-                data=secreto,
             )
-        )
         if result["rc"] != 0:
             logger.error(
                 f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
@@ -185,16 +182,16 @@ def pipeline_deploy(
                 f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version} execute RollBack"
             )
         self.update_state(state="ROLLBACK", meta={"done": "1 of 1"})
-        destroy_result = TerraformActions.destroy_execute(
+        destroy_result = TerraformActions.destroy(
+            name,
             stack_name,
             branch,
             environment,
             squad,
-            name,
             version,
+            secreto,
             variables_file,
             project_path,
-            data=secreto,
         )
         self.update_state(
             state=states.FAILURE,
@@ -208,7 +205,7 @@ def pipeline_deploy(
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
         r.delete(f"{name}-{squad}-{environment}")
         if not settings.DEBUG:
-            TerraformUtils.delete_local_folder(dir_path)
+            Utils.delete_local_folder(dir_path)
 
 
 @celery_app.task(bind=True, acks_late=True, name="pipeline Destroy")
@@ -243,7 +240,14 @@ def pipeline_destroy(
         logger.info(
             f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
         )
-        result = TerraformRequirements.git_clone(git_repo, name, stack_name, environment, squad, branch)
+        result = TerraformRequirements.artifact_download(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            git_repo, 
+            branch
+            ) 
         self.update_state(state="PULLING", meta={"done": "1 of 6"})
         if result["rc"] != 0:
             raise Exception(result)
@@ -251,7 +255,7 @@ def pipeline_destroy(
         logger.info(
             f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
-        result = TerraformRequirements.binary_download(stack_name, environment, squad, version)
+        result = TerraformRequirements.binary_download(version)
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
         if result["rc"] != 0:
@@ -259,16 +263,27 @@ def pipeline_destroy(
                 f"Error when User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
             )
             raise Exception(result)
-        # Create tf to use the custom artifactory as config
+        # Create tf to use the custom backend storage state 
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
-        result = TerraformRequirements.tfstate_render(stack_name, environment, squad, project_path, name)
+        result = TerraformRequirements.storage_state(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            project_path
+            )
         if result["rc"] != 0:
             raise Exception(result)
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
-        result = TerraformRequirements.tfvars(
-            stack_name, environment, squad, name, project_path, vars=kwargs
-        )
+        result = TerraformRequirements.parameter_vars(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            project_path,
+            kwargs
+            )
         if result["rc"] != 0:
             raise Exception(result)
 
@@ -276,16 +291,16 @@ def pipeline_destroy(
             f"User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment} execute destroy"
         )
         self.update_state(state="DESTROYING", meta={"done": "6 of 6"})
-        result = TerraformActions.destroy_execute(
+        result = TerraformActions.destroy(
+            name,
             stack_name,
             branch,
             environment,
             squad,
-            name,
             version,
+            secreto,
             variables_file,
             project_path,
-            data=secreto,
         )
         if result["rc"] != 0:
             raise Exception(result)
@@ -296,7 +311,7 @@ def pipeline_destroy(
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        TerraformUtils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
         r.delete(f"{name}-{squad}-{environment}")
 
 
@@ -323,7 +338,14 @@ def pipeline_plan(
             f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment}"
         )
         self.update_state(state="GIT", meta={"done": "1 of 5"})
-        result = TerraformRequirements.git_clone(git_repo, name, stack_name, environment, squad, branch)
+        result = TerraformRequirements.artifact_download(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            git_repo, 
+            branch
+            ) 
         if result["rc"] != 0:
             logger.error(
                 f"Error when user {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
@@ -333,9 +355,9 @@ def pipeline_plan(
         logger.info(
             f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
-        result = TerraformRequirements.binary_download(stack_name, environment, squad, version)
+        result = TerraformRequirements.binary_download(version)
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
-        TerraformUtils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
         if result["rc"] != 0:
             logger.error(
                 f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
@@ -343,30 +365,42 @@ def pipeline_plan(
             raise Exception(result)
 
         self.update_state(state="REMOTE", meta={"done": "3 of 5"})
-        result = TerraformRequirements.tfstate_render(stack_name, environment, squad, project_path, name)
+        result = TerraformRequirements.storage_state(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            project_path
+            )
         if result["rc"] != 0:
             raise Exception(result)
 
         self.update_state(state="VARS", meta={"done": "4 of 5"})
-        result = TerraformRequirements.tfvars(
-            stack_name, environment, squad, name, project_path, vars=kwargs
-        )
+        result = TerraformRequirements.parameter_vars(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            project_path,
+            kwargs
+            )
         if result["rc"] != 0:
             raise Exception(result)
 
         self.update_state(state="PLAN", meta={"done": "5 of 5"})
-        result = TerraformActions.plan_execute(
+        result = TerraformActions.plan(
+            name,
             stack_name,
+            branch,
             environment,
             squad,
-            name,
             version,
+            secreto,
             variables_file,
             project_path,
-            data=secreto,
         )
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
-        TerraformUtils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
         if result["rc"] != 0:
             logger.error(
                 f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} execute terraform plan"
@@ -379,7 +413,7 @@ def pipeline_plan(
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        TerraformUtils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
 
 
 @celery_app.task(
@@ -395,14 +429,19 @@ def pipeline_git_pull(
     branch: str,
 ):
     try:
-        git_result = TerraformRequirements.git_clone(
-            git_repo, name, stack_name, environment, squad, branch
-        )
+        git_result = TerraformRequirements.artifact_download(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            git_repo, 
+            branch
+            ) 
         if git_result["rc"] != 0:
-            raise Exception(result.get("stdout"))
+            raise Exception(git_result.get("stdout"))
 
         self.update_state(state="GET_VARS_AS_JSON", meta={"done": "2 of 2"})
-        result = TerraformGetVars.get_vars_json(
+        result = TerraformGetVars.json_vars(
             environment=environment, stack_name=stack_name, squad=squad, name=name
         )
         if result["rc"] != 0:
@@ -417,7 +456,7 @@ def pipeline_git_pull(
         raise Ignore()
     finally:
         dir_path = f"/tmp/artifacts"
-        TerraformUtils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
 
 
 @celery_app.task(
@@ -433,7 +472,14 @@ def git(
     branch: str,
 ):
     try:
-        result = TerraformRequirements.git_clone(git_repo, name, stack_name, environment, squad, branch)
+        result = TerraformRequirements.artifact_download(
+            name,
+            stack_name,
+            environment, 
+            squad, 
+            git_repo, 
+            branch
+            ) 
     except Exception as err:
         self.retry(
             countdown=settings.GIT_TMOUT, exc=err, max_retries=settings.TASK_MAX_RETRY
@@ -452,13 +498,13 @@ def git(
 )
 def output(self, stack_name: str, environment: str, squad: str, name: str):
     try:
-        output_result = TerraformActions.output_execute(stack_name, environment, squad, name)
+        output_result = TerraformActions.output(name,stack_name, environment, squad)
         return output_result
     except Exception as err:
         return {"stdout": err}
     finally:
         dir_path = f"/tmp/artifacts"
-        TerraformUtils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
 
 
 @celery_app.task(
@@ -539,26 +585,3 @@ def schedule_update(self, deploy_name: str):
         logging.warning(request_url(verb="POST", uri=f"schedule/{deploy_name}"))
         return err
 
-
-@celery_app.task(bind=True, acks_late=True, name="delete local module stack ")
-def delete_local_stack(self, environment: str, squad: str, args: any):
-    result = tf.delete_local_repo(environment, squad, args)
-    return result
-
-
-@celery_app.task(bind=True, acks_late=True, name="get variables list")
-def get_variable_list(self, environment: str, stack_name: str, squad: str, name: str):
-    result = TerraformGetVars.get_vars_list(environment, stack_name, squad, name)
-    return result
-
-
-@celery_app.task(bind=True, acks_late=True, name="get variables json")
-def get_variable_json(self, environment: str, stack_name: str, squad: str, name: str):
-    result = TerraformGetVars.get_vars_json(environment, stack_name, squad, name)
-    return result
-
-
-@celery_app.task(bind=True, acks_late=True, name="get variables from tfvars")
-def get_tfvars(self, environment: str, stack_name: str, squad: str, name: str):
-    result = TerraformGetVars.get_vars_tfvars(environment, stack_name, squad, name)
-    return result
