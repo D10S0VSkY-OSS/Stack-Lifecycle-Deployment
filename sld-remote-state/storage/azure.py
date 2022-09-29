@@ -23,7 +23,7 @@ def check_container(container_name=settings.CONTAINER):
 check_container()
 
 
-class AzureBlobStorage(object):
+class Storage(object):
     def __init__(self, path):
         self.path = path
 
