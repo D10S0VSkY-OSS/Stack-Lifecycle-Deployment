@@ -1,5 +1,4 @@
 import logging
-from tkinter.messagebox import NO
 
 import pymongo
 from configs.mongo_db import settings

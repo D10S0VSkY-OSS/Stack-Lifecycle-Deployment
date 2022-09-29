@@ -56,7 +56,8 @@ services:
 
   # sd-remote-state
   remote-state:
-    image: d10s0vsky/sld-remote-state:latest
+    build: ../../sld-remote-state/
+    #image: d10s0vsky/sld-remote-state:latest
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8080 --workers 4
     hostname: remote-state
     environment:
