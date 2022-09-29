@@ -1,4 +1,5 @@
 import logging
+from tkinter.messagebox import NO
 
 import pymongo
 from configs.mongo_db import settings
@@ -32,7 +33,7 @@ class Storage(object):
             if current_state:
                 current_state.pop("_id")
                 return current_state
-            return id
+            return None
         except Exception as err:
             logging.error(err)
             raise err
