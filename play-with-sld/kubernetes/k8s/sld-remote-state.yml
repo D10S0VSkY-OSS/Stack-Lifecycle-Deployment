@@ -19,7 +19,7 @@ spec:
         - name: remote-state
           image: d10s0vsky/sld-remote-state:latest
           env:
-          - name: SLD_STORE
+          - name: SLD_STORAGE_BACKEND
             value: mongodb
           - name: SLD_MONGODB_URL
             value: "mongodb:27017/"
