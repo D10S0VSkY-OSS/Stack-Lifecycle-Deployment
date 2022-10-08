@@ -2,14 +2,14 @@ from typing import Generator
 
 from config.api import settings
 from config.database import SessionLocal
-from crud import user as crud_users
-from db import models
+from src.users.crud import user as crud_users
+from src.users.db import models
+from src.users.schema import users as schemas
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
-from schemas import schemas
 from security import tokens
 from security.validator import Container
 from sqlalchemy.orm import Session

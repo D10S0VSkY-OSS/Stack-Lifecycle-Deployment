@@ -1,9 +1,10 @@
 import logging
 
-from api_v1.api import api_router
+from api.v1.api import api_router
 from config.api import settings
 from config.database import engine
-from db import models
+#from db import models
+from src.users.db import models
 from fastapi import FastAPI
 
 log = logging.getLogger(__name__)
