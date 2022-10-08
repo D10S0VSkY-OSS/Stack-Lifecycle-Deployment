@@ -1,6 +1,6 @@
-from src.activityLogs.crud import activityLogs as crud_activity
-from src.users.crud import user as crud_users
-from src.users.schema import users as schemas_users
+from src.activityLogs.infrastructure import repositories  as crud_activity
+from src.users.infrastructure import repositories as crud_users
+from src.users.domain.entities import users as schemas_users
 from fastapi import APIRouter, Depends, HTTPException
 from security import deps
 from sqlalchemy.orm import Session

@@ -1,8 +1,8 @@
-from src.activityLogs.crud import activityLogs as crud_activity
-from src.gcp.crud import gcp as crud_gcp
-from src.gcp.schema import gcp as schemas_gcp
-from src.users.crud import user as crud_users
-from src.users.schema import users as schemas_users
+from src.activityLogs.infrastructure import repositories  as crud_activity
+from src.gcp.infrastructure import repositories as crud_gcp
+from src.gcp.domain.entities import gcp as schemas_gcp
+from src.users.infrastructure import repositories as crud_users
+from src.users.domain.entities import users as schemas_users
 from fastapi import APIRouter, Depends, HTTPException, Response
 from security import deps
 from sqlalchemy.orm import Session

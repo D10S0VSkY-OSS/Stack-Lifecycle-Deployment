@@ -1,9 +1,9 @@
-from src.activityLogs.crud import activityLogs as crud_activity
-from src.azure.crud import azure as crud_azure
-from src.users.crud import user as crud_users
-from src.users.schema import users as schemas_users
+from src.activityLogs.infrastructure import repositories  as crud_activity
+from src.azure.infrastructure import repositories as crud_azure
+from src.users.infrastructure import repositories as crud_users
+from src.users.domain.entities import users as schemas_users
+from src.azure.domain.entities import azure as schemas_azure
 from fastapi import APIRouter, Depends, HTTPException, Response
-from src.azure.schema import azure as schemas_azure
 from security import deps
 from sqlalchemy.orm import Session
 

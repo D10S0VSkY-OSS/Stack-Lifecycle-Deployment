@@ -2,9 +2,9 @@ import ast
 
 from celery.result import AsyncResult
 from config.celery_config import celery_app
-from src.tasks.crud import tasks as crud_tasks
-from src.users.crud import user as crud_users
-from src.users.schema import users as schemas_users
+from src.tasks.infrastructure import repositories as crud_tasks
+from src.users.infrastructure import repositories as crud_users
+from src.users.domain.entities import users as schemas_users
 from fastapi import APIRouter, Depends, HTTPException
 from security import deps
 from sqlalchemy.orm import Session

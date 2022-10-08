@@ -1,10 +1,10 @@
 from config.api import settings
-from src.activityLogs.crud import activityLogs as crud_activity
-from src.users.crud import user as crud_users
+from src.activityLogs.infrastructure import repositories  as crud_activity
+from src.users.infrastructure import repositories as crud_users
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.get_data import (activity_log, check_role_user, check_squad_user,
                               user_squad_scope)
-from src.users.schema.users import (PasswordReset, User, UserCreate, UserInit,
+from src.users.domain.entities.users import (PasswordReset, User, UserCreate, UserInit,
                              UserUpdate)
 from security import deps
 from sqlalchemy.orm import Session

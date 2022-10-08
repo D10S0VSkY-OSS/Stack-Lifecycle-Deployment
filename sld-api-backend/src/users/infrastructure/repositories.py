@@ -3,8 +3,8 @@ import logging
 import sys
 
 import bcrypt
-import src.users.db.models as models
-import src.users.schema.users as schemas
+import src.users.infrastructure.models as models
+import src.users.domain.entities.users as schemas
 from config.api import settings
 from security.tokens import get_password_hash
 from security.vault import vault_decrypt, vault_encrypt
@@ -76,7 +76,6 @@ def get_user_by_username_squad(db: Session, username: str):
         return (
             db.query(models.User)
             .filter(models.User.username == username)
-            .filter(models.User.squad == squad)
             .first()
         )
     except Exception as err:
@@ -88,7 +87,6 @@ def get_user_by_id_squad(db: Session, id: int):
         return (
             db.query(models.User)
             .filter(models.User.id == id)
-            .filter(models.User.squad == squad)
             .first()
         )
     except Exception as err:

@@ -1,10 +1,9 @@
-import imp
-from src.deploy.crud import deploys as crud_deploys
-from src.tasks.crud import tasks as crud_tasks
-from src.users.crud import user as crud_users
-from src.deploy.schema import  deploy as schemas_deploy
-from src.deploy.schema import  plan as schemas_plan
-from src.users.schema import users as schemas_users
+from src.deploy.infrastructure import repositories as crud_deploys
+from src.tasks.infrastructure import repositories as crud_tasks
+from src.users.infrastructure import repositories as crud_users
+from src.users.domain.entities import users as schemas_users
+from src.deploy.domain.entities import deploy as schemas_deploy
+from src.deploy.domain.entities import plan as schemas_plan
 from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
                      Response, status)
 from helpers.get_data import (check_cron_schedule, check_deploy_exist,

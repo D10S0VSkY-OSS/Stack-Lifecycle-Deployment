@@ -1,6 +1,6 @@
 import datetime
 
-import src.activityLogs.db.models as models
+import src.activityLogs.infrastructure.models as models
 from sqlalchemy.orm import Session
 
 

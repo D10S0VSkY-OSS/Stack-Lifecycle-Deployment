@@ -1,7 +1,7 @@
 import datetime
 
-import src.aws.db.models as models
-from src.aws.schema import aws as schemas_aws
+import src.aws.infrastructure.models as models
+from src.aws.domain.entities import aws as schemas_aws
 from security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy.orm import Session
 

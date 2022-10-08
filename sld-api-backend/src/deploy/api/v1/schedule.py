@@ -1,5 +1,6 @@
-from src.tasks.crud import tasks as crud_tasks
-from src.users.crud import user as crud_users
+from src.tasks.infrastructure import repositories as crud_tasks
+from src.users.infrastructure import repositories as crud_users
+from src.users.domain.entities import users as schemas_users
 from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
                      Response, status)
 from helpers.get_data import (check_cron_schedule, check_squad_user, deploy,
@@ -7,9 +8,8 @@ from helpers.get_data import (check_cron_schedule, check_squad_user, deploy,
 from helpers.push_task import (async_schedule_add, async_schedule_delete,
                                async_schedule_get, async_schedule_list,
                                async_schedule_update)
-from src.deploy.schema import schedule as schemas_schedule
-from src.users.schema import users as schemas_users
-from src.deploy.crud import deploys as crud_deploys
+from src.deploy.domain.entities import schedule as schemas_schedule
+from src.deploy.infrastructure import repositories as crud_deploys
 from security import deps
 from sqlalchemy.orm import Session
 

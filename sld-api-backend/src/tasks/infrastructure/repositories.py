@@ -1,6 +1,6 @@
 import datetime
 
-import src.tasks.db.models as models
+import src.tasks.infrastructure.models as models
 from sqlalchemy.orm import Session
 
 

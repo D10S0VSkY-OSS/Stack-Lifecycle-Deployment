@@ -1,7 +1,7 @@
-from src.deploy.crud import deploys as crud_deploys
-from src.stacks.crud import stacks as crud_stacks
-from src.users.crud import user as crud_users
-from src.users.schema import users as schemas_users
+from src.deploy.infrastructure import repositories as crud_deploys
+from src.stacks.infrastructure import repositories as crud_stacks
+from src.users.infrastructure import repositories as crud_users
+from src.users.domain.entities import users as schemas_users
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.get_data import check_squad_user
 from security import deps

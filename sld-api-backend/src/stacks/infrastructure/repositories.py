@@ -1,7 +1,7 @@
 import datetime
 
-import src.stacks.db.models as models
-import src.stacks.schema.stacks as schemas
+import src.stacks.infrastructure.models as models
+import src.stacks.domain.entities.stacks as schemas
 from sqlalchemy.orm import Session
 
 
