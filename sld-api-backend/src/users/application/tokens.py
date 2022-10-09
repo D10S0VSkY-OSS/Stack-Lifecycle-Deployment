@@ -7,14 +7,17 @@ from config.api import settings
 from fastapi import HTTPException
 from jose import jwt
 
+# Check bug conflict with openapi
+#class TokenDecode:
+#    def __init__(self, token):
+#        self.token = token
+#
+#    def decode_access_token(self):
+#        return jwt.decode(self.token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
 
-class TokenDecode:
-    def __init__(self, token):
-        self.token = token
-
-    def decode_access_token(self):
-        return jwt.decode(self.token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
-
+def decode_access_token(*, data: str):
+    token = data
+    return jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
 
 class TokenCreate:
     def __init__(self, subject: Union[str, Any] , expires_delta: timedelta = None):
