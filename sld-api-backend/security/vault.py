@@ -1,6 +1,5 @@
 from config.api import settings
 from cryptography.fernet import Fernet
-from passlib.context import CryptContext
 
 
 def vault_encrypt(func):
@@ -23,10 +22,3 @@ def vault_decrypt(func):
         return token.decode("utf-8")
 
     return wrap
-
-
-def get_password_hash(password: str) -> str:
-    pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    return pwd_context.hash(password)
-
-

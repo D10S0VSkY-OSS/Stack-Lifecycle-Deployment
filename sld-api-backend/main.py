@@ -1,20 +1,23 @@
 import imp
 import logging
 
-from src.shared.api.v1.api import api_router
+from api.v1.api import api_router
 from config.api import settings
 from config.database import engine
-from fastapi import FastAPI
-from src.activityLogs.infrastructure import models as model_activity
-from src.aws.infrastructure import models as model_aws
-from src.azure.infrastructure import models as model_azure
-from src.deploy.infrastructure import models as model_deploy
-from src.gcp.infrastructure import models as model_gcp
-from src.stacks.infrastructure import models as model_stacks
-from src.tasks.infrastructure import models as model_tasks
-# from db import models
+#from db import models
 ## Need refactor
 from src.users.infrastructure import models as model_users
+from src.activityLogs.infrastructure import models as model_activity
+from src.stacks.infrastructure import models as model_stacks
+from src.deploy.infrastructure import models as model_deploy
+from src.tasks.infrastructure import models as model_tasks
+from src.aws.infrastructure import models as model_aws
+from src.azure.infrastructure import models as model_azure
+from src.gcp.infrastructure import models as model_gcp
+
+
+
+from fastapi import FastAPI
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.DEBUG)

@@ -4,14 +4,11 @@ import redis
 from celery.result import AsyncResult
 from config.api import settings
 from croniter import croniter
-from fastapi import HTTPException
-from src.activityLogs.infrastructure import repositories as crud_activity
+from src.activityLogs.infrastructure import repositories  as crud_activity
 from src.deploy.infrastructure import repositories as crud_deploys
 from src.stacks.infrastructure import repositories as crud_stacks
 from src.users.infrastructure import repositories as crud_users
-from src.aws.infrastructure import repositories as crud_aws
-from src.azure.infrastructure import repositories as crud_azure
-from src.gcp.infrastructure import repositories as crud_gcp
+from fastapi import HTTPException
 
 r = redis.Redis(
     host=settings.BACKEND_SERVER,
@@ -177,33 +174,3 @@ def check_cron_schedule(cron_time: str):
         if not croniter.is_valid(cron_time):
             raise ValueError("Cron time its no valid")
     return True
-
-
-def check_prefix(db, stack_name: str, environment: str, squad: str):
-    try:
-        if any(i in stack_name.lower() for i in settings.AWS_PREFIX):
-            secreto = crud_aws.get_credentials_aws_profile(
-                db=db, environment=environment, squad=squad
-            )
-            return secreto
-        elif any(i in stack_name.lower() for i in settings.GCLOUD_PREFIX):
-            secreto = crud_gcp.get_credentials_gcloud_profile(
-                db=db, environment=environment, squad=squad
-            )
-            return secreto
-        elif any(i in stack_name.lower() for i in settings.AZURE_PREFIX):
-            secreto = crud_azure.get_credentials_azure_profile(
-                db=db, environment=environment, squad=squad
-            )
-            return secreto
-        else:
-            raise HTTPException(
-                status_code=404,
-                detail=f"stack name {stack_name.lower()} no content providers support name preffix: {settings.PROVIDERS_SUPPORT} ",
-            )
-    except Exception as err:
-        raise HTTPException(
-            status_code=400,
-            detail=f"stack name {stack_name.lower()} env {environment} error {err}  ",
-        )
-

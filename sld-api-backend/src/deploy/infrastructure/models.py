@@ -1,8 +1,7 @@
 import datetime
 
 from config.database import Base
-from sqlalchemy import (JSON, Column, DateTime, Integer, String,
-                        UniqueConstraint)
+from sqlalchemy import (JSON, Column, DateTime, Integer, String, UniqueConstraint)
 
 
 class Deploy(Base):

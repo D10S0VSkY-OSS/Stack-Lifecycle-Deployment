@@ -1,13 +1,13 @@
 from config.api import settings
+from src.activityLogs.infrastructure import repositories  as crud_activity
+from src.users.infrastructure import repositories as crud_users
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.get_data import (activity_log, check_role_user, check_squad_user,
                               user_squad_scope)
+from src.users.domain.entities.users import (PasswordReset, User, UserCreate, UserInit,
+                             UserUpdate)
 from security import deps
 from sqlalchemy.orm import Session
-from src.activityLogs.infrastructure import repositories as crud_activity
-from src.users.domain.entities.users import (PasswordReset, User, UserCreate,
-                                             UserInit, UserUpdate)
-from src.users.infrastructure import repositories as crud_users
 
 router = APIRouter()
 

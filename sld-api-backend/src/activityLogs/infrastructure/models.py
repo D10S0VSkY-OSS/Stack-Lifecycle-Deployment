@@ -1,8 +1,7 @@
 import datetime
 
 from config.database import Base
-from sqlalchemy import JSON, Column, DateTime, Integer, String
-
+from sqlalchemy import (JSON, Column, DateTime, Integer, String )
 
 class ActivityLogs(Base):
     __tablename__ = "activity_logs"
