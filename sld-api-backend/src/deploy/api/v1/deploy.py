@@ -1,19 +1,19 @@
-from src.deploy.infrastructure import repositories as crud_deploys
-from src.tasks.infrastructure import repositories as crud_tasks
-from src.deploy.domain.entities import deploy as schemas_deploy
-from src.users.infrastructure import repositories as crud_users
-from src.users.domain.entities import users as schemas_users
 from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
                      Response, status)
 from helpers.get_data import (check_cron_schedule, check_deploy_exist,
                               check_deploy_state,
-                              check_deploy_task_pending_state,
+                              check_deploy_task_pending_state,check_prefix,
                               check_squad_user, deploy, deploy_squad, stack)
 from helpers.push_task import (async_deploy, async_destroy, async_output,
                                async_schedule_add, async_schedule_delete,
                                async_show, async_unlock)
-from security import deps, tokens
+from security import deps
 from sqlalchemy.orm import Session
+from src.deploy.domain.entities import deploy as schemas_deploy
+from src.deploy.infrastructure import repositories as crud_deploys
+from src.tasks.infrastructure import repositories as crud_tasks
+from src.users.domain.entities import users as schemas_users
+from src.users.infrastructure import repositories as crud_users
 
 router = APIRouter()
 
@@ -38,7 +38,7 @@ async def deploy_infra_by_stack_name(
                 status_code=403, detail=f"Not enough permissions in {squad}"
             )
     # Get  credentials by providers supported
-    secreto = tokens.check_prefix(
+    secreto = check_prefix(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad
     )
     # Get info from stack data
@@ -129,7 +129,7 @@ async def update_deploy_by_id(
     environment = deploy_data.environment
     name = deploy_data.name
     # Get  credentials by providers supported
-    secreto = tokens.check_prefix(
+    secreto = check_prefix(
         db, stack_name=stack_name, environment=environment, squad=squad
     )
     # Get info from stack data
@@ -228,7 +228,7 @@ async def destroy_infra(
     project_path = deploy_data.project_path
     name = deploy_data.name
     # Get  credentials by providers supported
-    secreto = tokens.check_prefix(
+    secreto = check_prefix(
         db, stack_name=stack_name, environment=environment, squad=squad
     )
     # Get info from stack data
@@ -355,7 +355,7 @@ async def delete_infra_by_id(
     project_path = deploy_data.project_path
     variables = deploy_data.variables
     # Get  credentials by providers supported
-    secreto = tokens.check_prefix(
+    secreto = check_prefix(
         db, stack_name=stack_name, environment=environment, squad=squad
     )
     # Get info from stack data

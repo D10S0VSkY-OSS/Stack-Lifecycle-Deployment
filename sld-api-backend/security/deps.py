@@ -2,17 +2,17 @@ from typing import Generator
 
 from config.api import settings
 from config.database import SessionLocal
-from src.users.infrastructure import repositories as crud_users
-from src.users.infrastructure import models
-from src.users.domain.entities import users as schemas
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
-from security import tokens
-from security.validator import Container
+from src.users.application.tokens import TokenDecode
+from src.users.application.validator import Container
 from sqlalchemy.orm import Session
+from src.users.domain.entities import users as schemas
+from src.users.infrastructure import models
+from src.users.infrastructure import repositories as crud_users
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/authenticate/access-token"
@@ -28,7 +28,9 @@ def get_db() -> Generator:
 
 
 def get_current_user(
-    token: str = Depends(reusable_oauth2), db: Session = Depends(get_db)
+    token: str = Depends(reusable_oauth2),
+    db: Session = Depends(get_db),
+    token_decode = TokenDecode
 ):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -36,7 +38,8 @@ def get_current_user(
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
-        payload = tokens.decode_access_token(data=token)
+        token_decode = token_decode(token)
+        payload = token_decode.decode_access_token()
         username: str = payload.get("sub")
         if username is None:
             raise credentials_exception
