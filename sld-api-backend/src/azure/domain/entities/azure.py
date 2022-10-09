@@ -1,8 +1,6 @@
 from pydantic import BaseModel, constr
 
 
-
-
 class AzureBase(BaseModel):
     squad: constr(strip_whitespace=True)
     environment: constr(strip_whitespace=True)

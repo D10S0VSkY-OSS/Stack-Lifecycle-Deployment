@@ -59,7 +59,6 @@ class TokenData(BaseModel):
     username: str = None
 
 
-
 class PlanCreate(BaseModel):
     name: constr(strip_whitespace=True)
     stack_name: constr(strip_whitespace=True)

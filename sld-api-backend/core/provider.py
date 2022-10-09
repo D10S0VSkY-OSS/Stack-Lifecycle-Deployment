@@ -72,6 +72,7 @@ class ProviderActions:
     """
     This class contains the typical methods of a deployment
     """
+
     def plan(
         name: str,
         stack_name: str,

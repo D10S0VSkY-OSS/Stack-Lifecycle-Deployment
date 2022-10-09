@@ -1,17 +1,17 @@
-from src.deploy.infrastructure import repositories as crud_deploys
-from src.tasks.infrastructure import repositories as crud_tasks
-from src.users.infrastructure import repositories as crud_users
-from src.users.domain.entities import users as schemas_users
-from src.deploy.domain.entities import deploy as schemas_deploy
-from src.deploy.domain.entities import plan as schemas_plan
 from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
                      Response, status)
 from helpers.get_data import (check_cron_schedule, check_deploy_exist,
                               check_deploy_state, check_squad_user, deploy,
-                              stack)
+                              stack, check_prefix)
 from helpers.push_task import async_plan
-from security import deps, tokens
+from security import deps
 from sqlalchemy.orm import Session
+from src.deploy.domain.entities import deploy as schemas_deploy
+from src.deploy.domain.entities import plan as schemas_plan
+from src.deploy.infrastructure import repositories as crud_deploys
+from src.tasks.infrastructure import repositories as crud_tasks
+from src.users.domain.entities import users as schemas_users
+from src.users.infrastructure import repositories as crud_users
 
 router = APIRouter()
 
@@ -35,7 +35,7 @@ async def plan_infra_by_stack_name(
                 status_code=403, detail=f"Not enough permissions in {squad}"
             )
     # Get  credentials by providers supported
-    secreto = tokens.check_prefix(
+    secreto = check_prefix(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad
     )
     # Get info from stack data
@@ -110,7 +110,7 @@ async def update_plan_by_id(
                 status_code=403, detail=f"Not enough permissions in {squad}"
             )
     # Get  credentials by providers supported
-    secreto = tokens.check_prefix(
+    secreto = check_prefix(
         db, stack_name=stack_name, environment=environment, squad=squad
     )
     # Get info from stack data
@@ -195,7 +195,7 @@ async def get_plan_by_id_deploy(
                 status_code=403, detail=f"Not enough permissions in {deploy_data.squad}"
             )
     # Get  credentials by providers supported
-    secreto = tokens.check_prefix(
+    secreto = check_prefix(
         db,
         stack_name=deploy_data.stack_name,
         environment=deploy_data.environment,

@@ -1,8 +1,7 @@
 import datetime
 
 from config.database import Base
-from sqlalchemy import (Column, DateTime, Integer, String)
-   
+from sqlalchemy import Column, DateTime, Integer, String
 
 
 class Tasks(Base):

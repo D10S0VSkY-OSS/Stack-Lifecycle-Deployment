@@ -4,6 +4,7 @@ from config.database import Base
 from sqlalchemy import (Column, DateTime, Integer, String, Text,
                         UniqueConstraint)
 
+
 class Aws_provider(Base):
     __tablename__ = "aws_provider"
     id = Column(Integer, primary_key=True, index=True)
