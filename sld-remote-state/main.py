@@ -19,6 +19,7 @@ remote state = {settings.SLD_STORAGE_BACKEND}
 class StorageStrategy:
     def __init__(self, mod) -> None:
         self.mod = mod.lower()
+
     def load_mod(self):
         return __import__(f"storage.{self.mod}", fromlist=[None])
 
@@ -26,7 +27,7 @@ class StorageStrategy:
 storage_setting = StorageStrategy(settings.SLD_STORAGE_BACKEND)
 load_mod = storage_setting.load_mod()
 Storage = load_mod.Storage
-        
+
 
 remote_state = Storage("/tmp/.remote_states")
 app = FastAPI(

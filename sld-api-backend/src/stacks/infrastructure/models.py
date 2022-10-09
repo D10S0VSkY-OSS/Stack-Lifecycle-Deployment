@@ -1,7 +1,7 @@
 import datetime
 
 from config.database import Base
-from sqlalchemy import (JSON, Column, DateTime, Integer, String, Text)
+from sqlalchemy import JSON, Column, DateTime, Integer, String, Text
 
 
 class Stack(Base):
