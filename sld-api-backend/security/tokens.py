@@ -2,10 +2,10 @@ from datetime import datetime, timedelta
 from typing import Any, Union
 
 from config.api import settings
-from crud import aws as crud_aws
-from crud import azure as crud_azure
-from crud import gcp as crud_gcp
-from crud import user as crud_users
+from src.aws.infrastructure import repositories as crud_aws
+from src.azure.infrastructure import repositories as crud_azure
+from src.gcp.infrastructure import repositories as crud_gcp
+from src.users.infrastructure import repositories as crud_users
 from fastapi import HTTPException
 from jose import jwt
 from passlib.context import CryptContext

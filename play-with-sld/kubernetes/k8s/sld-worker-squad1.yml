@@ -22,4 +22,4 @@ spec:
           env:
           - name: TF_WARN_OUTPUT_ERRORS
             value: "1"
-          command: ["celery", "--app", "tasks.terraform_worker", "worker", "--loglevel=info", "-c", "1", "-E", "-Q", "any,squad1"]
+          command: ["celery", "--app", "tasks.terraform_worker", "worker", "--loglevel=info", "-c", "8", "-E", "-Q", "any,squad1"]

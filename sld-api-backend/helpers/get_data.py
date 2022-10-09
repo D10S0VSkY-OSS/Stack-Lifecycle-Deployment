@@ -4,10 +4,10 @@ import redis
 from celery.result import AsyncResult
 from config.api import settings
 from croniter import croniter
-from crud import activityLogs as crud_activity
-from crud import deploys as crud_deploys
-from crud import stacks as crud_stacks
-from crud import user as crud_users
+from src.activityLogs.infrastructure import repositories  as crud_activity
+from src.deploy.infrastructure import repositories as crud_deploys
+from src.stacks.infrastructure import repositories as crud_stacks
+from src.users.infrastructure import repositories as crud_users
 from fastapi import HTTPException
 
 r = redis.Redis(
