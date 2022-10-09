@@ -1,7 +1,7 @@
 import datetime
 
-import src.deploy.infrastructure.models as models
 import src.deploy.domain.entities.deploy as schemas_deploy
+import src.deploy.infrastructure.models as models
 from sqlalchemy.orm import Session
 
 

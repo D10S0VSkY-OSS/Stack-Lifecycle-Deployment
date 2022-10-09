@@ -1,7 +1,7 @@
 import datetime
 
 from config.database import Base
-from sqlalchemy import (Column, DateTime, Integer, String, UniqueConstraint)
+from sqlalchemy import Column, DateTime, Integer, String, UniqueConstraint
 
 
 class Azure_provider(Base):
@@ -15,4 +15,3 @@ class Azure_provider(Base):
     tenant_id = Column(String(200), nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now())
     __table_args__ = (UniqueConstraint("squad", "environment"),)
-

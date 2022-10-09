@@ -1,14 +1,14 @@
+from fastapi import APIRouter
+from src.activityLogs.api.v1 import activity_logs
 from src.aws.api.v1 import aws
 from src.azure.api.v1 import azure
+from src.deploy.api.v1 import deploy, plan, schedule
 from src.gcp.api.v1 import gcp
-from src.activityLogs.api.v1 import activity_logs
-from src.deploy.api.v1 import deploy, schedule, plan
+from src.healthy.api.v1 import healthy
 from src.stacks.api.v1 import stacks
 from src.tasks.api.v1 import tasks
-from src.users.api.v1 import users, auth
+from src.users.api.v1 import auth, users
 from src.variables.api.v1 import variables
-from src.healthy.api.v1 import healthy
-from fastapi import APIRouter
 
 api_router = APIRouter()
 api_router.include_router(users.router, prefix="/users", tags=["Users"])

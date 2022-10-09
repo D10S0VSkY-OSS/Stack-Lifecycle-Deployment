@@ -3,10 +3,10 @@ import logging
 import sys
 
 import bcrypt
-import src.users.infrastructure.models as models
 import src.users.domain.entities.users as schemas
+import src.users.infrastructure.models as models
 from config.api import settings
-from security.tokens import get_password_hash
+from security.vault import get_password_hash
 from security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
@@ -73,22 +73,14 @@ def get_user_by_id(db: Session, id: int):
 
 def get_user_by_username_squad(db: Session, username: str):
     try:
-        return (
-            db.query(models.User)
-            .filter(models.User.username == username)
-            .first()
-        )
+        return db.query(models.User).filter(models.User.username == username).first()
     except Exception as err:
         raise err
 
 
 def get_user_by_id_squad(db: Session, id: int):
     try:
-        return (
-            db.query(models.User)
-            .filter(models.User.id == id)
-            .first()
-        )
+        return db.query(models.User).filter(models.User.id == id).first()
     except Exception as err:
         raise err
 

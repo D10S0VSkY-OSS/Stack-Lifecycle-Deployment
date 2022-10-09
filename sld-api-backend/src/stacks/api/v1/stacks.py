@@ -1,14 +1,14 @@
-from src.activityLogs.infrastructure import repositories  as crud_activity
-from src.stacks.infrastructure import repositories as crud_stacks
-from src.stacks.domain.entities import stacks as schemas_stacks
-from src.users.infrastructure import repositories as crud_users
-from src.users.domain.entities import users as schemas_users
 from fastapi import APIRouter, Depends, HTTPException
 from helpers.get_data import (check_providers, check_squad_stack,
                               check_squad_user)
 from helpers.push_task import sync_git
 from security import deps
 from sqlalchemy.orm import Session
+from src.activityLogs.infrastructure import repositories as crud_activity
+from src.stacks.domain.entities import stacks as schemas_stacks
+from src.stacks.infrastructure import repositories as crud_stacks
+from src.users.domain.entities import users as schemas_users
+from src.users.infrastructure import repositories as crud_users
 
 router = APIRouter()
 
