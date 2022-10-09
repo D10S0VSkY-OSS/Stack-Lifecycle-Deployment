@@ -1,7 +1,7 @@
 import datetime
 
 from config.database import Base
-from sqlalchemy import Column, DateTime, Integer, String, UniqueConstraint
+from sqlalchemy import (Column, DateTime, Integer, String, UniqueConstraint)
 
 
 class Gcloud_provider(Base):

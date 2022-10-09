@@ -1,5 +1,4 @@
 import datetime
-
 import src.gcp.infrastructure.models as models
 from security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy import exc

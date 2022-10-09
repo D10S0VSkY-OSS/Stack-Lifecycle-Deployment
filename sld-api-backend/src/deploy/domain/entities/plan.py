@@ -3,6 +3,7 @@ from typing import Optional
 from pydantic import BaseModel, Field, constr
 
 
+
 class PlanCreate(BaseModel):
     name: constr(strip_whitespace=True)
     stack_name: constr(strip_whitespace=True)

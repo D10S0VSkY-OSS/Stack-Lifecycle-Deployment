@@ -1,11 +1,11 @@
+from src.activityLogs.infrastructure import repositories  as crud_activity
+from src.azure.infrastructure import repositories as crud_azure
+from src.users.infrastructure import repositories as crud_users
+from src.users.domain.entities import users as schemas_users
+from src.azure.domain.entities import azure as schemas_azure
 from fastapi import APIRouter, Depends, HTTPException, Response
 from security import deps
 from sqlalchemy.orm import Session
-from src.activityLogs.infrastructure import repositories as crud_activity
-from src.azure.domain.entities import azure as schemas_azure
-from src.azure.infrastructure import repositories as crud_azure
-from src.users.domain.entities import users as schemas_users
-from src.users.infrastructure import repositories as crud_users
 
 router = APIRouter()
 
