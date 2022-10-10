@@ -7,6 +7,7 @@ from sqlalchemy.orm import Session
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.stacks.domain.entities import stacks as schemas_stacks
 from src.stacks.infrastructure import repositories as crud_stacks
+from src.deploy.infrastructure import repositories as crud_deploy
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
 
@@ -183,8 +184,11 @@ async def delete_stack_by_id_or_name(
         if not stack.isdigit():
             result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
             if result is None:
-                raise HTTPException(status_code=404, detail="stack id not found")
-            # Check if the user have permissions for create stack
+                raise HTTPException(status_code=404, detail="Stack id not found")
+            deploy = crud_deploy.get_deploy_by_stack(db=db, stack_name=stack)
+            if deploy is not None:
+                raise HTTPException(status_code=409, detail=f"Stack is used by {deploy.name}")
+            # Check if the user have permissions for delete stack
             check_squad_stack(db, current_user, current_user.squad, result.squad_access)
 
             crud_activity.create_activity_log(
@@ -197,7 +201,10 @@ async def delete_stack_by_id_or_name(
 
         result = crud_stacks.get_stack_by_id(db=db, stack_id=stack)
         if result is None:
-            raise HTTPException(status_code=404, detail="stack id not found")
+            raise HTTPException(status_code=404, detail="Stack id not found")
+        deploy = crud_deploy.get_deploy_by_stack(db=db, stack_name=result.stack_name)
+        if deploy is not None:
+            raise HTTPException(status_code=409, detail=f"The stack is being used by {deploy.name}")
 
         # Check if the user have permissions for create stack
         check_squad_stack(db, current_user, current_user.squad, result.squad_access)

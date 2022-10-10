@@ -19,4 +19,3 @@ class Stack(Base):
     created_at = Column(DateTime, default=datetime.datetime.now())
     description = Column(Text())
     user_id = Column(Integer)
-    # owner = relationship("User", back_populates="stacks")
