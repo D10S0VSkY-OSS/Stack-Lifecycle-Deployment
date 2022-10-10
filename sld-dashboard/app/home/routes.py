@@ -458,6 +458,7 @@ def new_stack():
                 "branch": form.branch.data,
                 "squad_access": squad_acces_form_to_list,
                 "tf_version": form.tf_version.data,
+                "project_path": form.project_path.data,
                 "description": form.description.data,
             }
             response = request_url(
@@ -505,6 +506,7 @@ def edit_stack(stack_id):
                 "branch": form.branch.data,
                 "squad_access": squad_acces_form_to_list,
                 "tf_version": form.tf_version.data,
+                "project_path": form.project_path.data,
                 "description": form.description_edit.data,
             }
             # Deploy
@@ -573,6 +575,7 @@ def resync_stack(stack_id):
                 "branch": response.get("json").get("branch"),
                 "squad_access": response.get("json").get("squad_access"),
                 "tf_version": response.get("json").get("tf_version"),
+                "project_path": response.get("json").get("project_path"),
                 "description": response.get("json").get("description"),
             }
             response = request_url(

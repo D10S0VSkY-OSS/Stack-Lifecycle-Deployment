@@ -380,25 +380,26 @@ def pipeline_git_pull(
     environment: str,
     squad: str,
     branch: str,
+    project_path: str,
 ):
     try:
         git_result = ProviderRequirements.artifact_download(
-            name, stack_name, environment, squad, git_repo, branch
+            name, stack_name, environment, squad, git_repo, branch, project_path
         )
         if git_result["rc"] != 0:
             raise Exception(git_result.get("stdout"))
 
         self.update_state(state="GET_VARS_AS_JSON", meta={"done": "2 of 2"})
         result = ProviderGetVars.json_vars(
-            environment=environment, stack_name=stack_name, squad=squad, name=name
+            environment=environment, stack_name=stack_name, squad=squad, name=name, project_path=project_path
         )
         if result["rc"] != 0:
-            raise Exception(result)
+            raise Exception(result.get("stdout"))
         result["tfvars"] = git_result["tfvars"]
         return result
     except Exception as err:
         self.retry(
-            countdown=settings.GIT_TMOUT, exc=err, max_retries=settings.TASK_MAX_RETRY
+            countdown=1, exc=err, max_retries=settings.TASK_MAX_RETRY
         )
         self.update_state(state=states.FAILURE, meta={"exc": result})
         raise Ignore()

@@ -135,6 +135,14 @@ def get_deploy_by_name(db: Session, deploy_name: str):
         raise err
 
 
+def get_deploy_by_stack(db: Session, stack_name: str):
+    try:
+        return db.query(models.Deploy).filter(models.Deploy.stack_name == stack_name).first()
+    except Exception as err:
+        raise err
+
+
+
 def get_deploy_by_id_squad(db: Session, deploy_id: int, squad: str):
     try:
         return (

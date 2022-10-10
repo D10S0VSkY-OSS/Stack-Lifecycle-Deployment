@@ -181,13 +181,14 @@ def async_show(stack_name: str, environment: str, squad: str, name: str):
 
 
 def sync_git(
-    stack_name: str, git_repo: str, branch: str, environment: str, squad: str, name: str
+    stack_name: str, git_repo: str, branch: str, project_path: str, environment: str, squad: str, name: str
 ):
     try:
         pipeline_git_result = pipeline_git_pull.s(
             stack_name=stack_name,
             git_repo=git_repo,
             branch=branch,
+            project_path=project_path,
             environment=environment,
             squad=squad,
             name=name,

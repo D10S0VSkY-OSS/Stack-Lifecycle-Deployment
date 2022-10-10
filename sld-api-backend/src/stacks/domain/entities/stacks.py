@@ -1,6 +1,6 @@
-from typing import List
+from typing import List, Optional
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, Field, constr
 
 
 class StackBase(BaseModel):
@@ -8,7 +8,8 @@ class StackBase(BaseModel):
     git_repo: constr(strip_whitespace=True)
     branch: constr(strip_whitespace=True) = "master"
     squad_access: List[str] = ["*"]
-    tf_version: constr(strip_whitespace=True) = "1.2.3"
+    tf_version: constr(strip_whitespace=True) = "1.3.2"
+    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
     description: constr(strip_whitespace=True)
 
 

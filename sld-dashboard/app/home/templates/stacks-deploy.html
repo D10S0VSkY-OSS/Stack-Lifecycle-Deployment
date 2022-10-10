@@ -154,8 +154,9 @@
                                     </div>
                                     <div class="form-group">
                                         {{ render_field(form.project_path, autocomplete="off",
-                                        class='form-control', placeholder='Project path name',
-                                        value="") }}
+                                        class='form-control', placeholder='project path',
+                                        value=stack['json']['project_path']) }}
+                                    </div>
                                 <p>
                                 <a class="btn btn-primary" data-toggle="collapse"
                                    data-target="#variables" href="#collapseExample"
