@@ -50,7 +50,7 @@
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.branch, autocomplete="off", class='form-control', value='master') }}
+                                        {{ render_field(form.branch, autocomplete="off", class='form-control', placeholder='Set git ref tag version or branch') }}
                                     </div>
 
                                     <div class="form-group">
@@ -58,7 +58,12 @@
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.tf_version, autocomplete="off", class='form-control', value='1.2.3') }}
+                                        {{ render_field(form.tf_version, autocomplete="off", class='form-control', value='1.3.2') }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.project_path, autocomplete="off", class='form-control', 
+                                           placeholder='Only complete if you use monrepo') }}
                                     </div>
 
                                     <div class="form-group">

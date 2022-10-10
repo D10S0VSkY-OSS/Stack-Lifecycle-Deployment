@@ -18,6 +18,7 @@ def create_new_stack(
         stack_name=stack.stack_name,
         git_repo=stack.git_repo,
         tf_version=stack.tf_version,
+        project_path=stack.project_path,
         description=stack.description,
         branch=stack.branch,
         user_id=user_id,
@@ -62,6 +63,8 @@ def update_stack(
         db_stack.branch = stack.branch
     if db_stack.tf_version not in check_None:
         db_stack.tf_version = stack.tf_version
+    if db_stack.project_path not in check_None:
+        db_stack.project_path = stack.project_path
     if db_stack.description not in check_None:
         db_stack.description = stack.description
     if db_stack.squad_access not in check_None:

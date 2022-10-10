@@ -43,6 +43,12 @@ class StackForm(FlaskForm):
             validators.DataRequired(message="tf version requerid."),
         ],
     )
+    project_path = StringField(
+        "project_path",
+        [
+            validators.length(min=1, max=20, message="Folder path when use monorepo"),
+        ],
+    )
     description = TextAreaField(
         "Description",
         [validators.DataRequired(message="The description is required.")],

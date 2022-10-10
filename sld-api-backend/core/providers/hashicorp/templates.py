@@ -63,13 +63,19 @@ class Tfvars(StructBase):
 
 @dataclass
 class GetVars(StructBase):
+    project_path: str
     """
     In this class are the methods to obtain information from the terraform variables
     """
+    def __set_path(self):
+        if not self.project_path:
+            return f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/variables.tf"
+        return f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}/variables.tf"
 
     def get_vars_json(self) -> dict:
         try:
-            file_hcl = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/variables.tf"
+            file_hcl = self.__set_path()
+            print(file_hcl)
             with open(file_hcl, "r") as fp:
                 obj = hcl.load(fp)
             if obj.get("variable"):

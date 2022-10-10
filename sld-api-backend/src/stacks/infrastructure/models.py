@@ -15,6 +15,7 @@ class Stack(Base):
     var_list = Column(JSON)
     squad_access = Column(JSON)
     tf_version = Column(String(30))
+    project_path = Column(String(50))
     created_at = Column(DateTime, default=datetime.datetime.now())
     description = Column(Text())
     user_id = Column(Integer)
