@@ -22,10 +22,27 @@ class Actions(StructBase):
     version: str
     secreto: dict
     variables_file: str
-    project_path: str
+    project_path: str = ""
+    backend_config: str = ""
     """
     In this class are all the methods equivalent to the terraform commands
     """
+
+    def __tf_init(self):
+        if self.backend_config:
+            return subprocess.run(
+                f"/tmp/{self.version}/terraform init -backend-config {self.backend_config} -backend=true -force-copy  -lock=false",
+                shell=True,
+                capture_output=True,
+                encoding="utf8",
+            )
+        return subprocess.run(
+            f"/tmp/{self.version}/terraform init -input=false --upgrade",
+            shell=True,
+            capture_output=True,
+            encoding="utf8",
+        )
+
 
     def plan_execute(self) -> dict:
         try:
@@ -49,12 +66,7 @@ class Actions(StructBase):
             os.chdir(
                 f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
             )
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform init -input=false --upgrade",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
+            result = self.__tf_init()
             result = subprocess.run(
                 f"/tmp/{self.version}/terraform plan -input=false -refresh -no-color -var-file={variables_files} -out={self.stack_name}.tfplan",
                 shell=True,
@@ -125,12 +137,7 @@ class Actions(StructBase):
                 f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
             )
 
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform init -input=false --upgrade",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
+            result = self.__tf_init()
             result = subprocess.run(
                 f"/tmp/{self.version}/terraform apply -input=false -auto-approve -no-color {self.stack_name}.tfplan",
                 shell=True,
@@ -205,12 +212,7 @@ class Actions(StructBase):
                 f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
             )
 
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform init -input=false --upgrade",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
+            result = self.__tf_init()
             result = subprocess.run(
                 f"/tmp/{self.version}/terraform destroy -input=false -auto-approve -no-color -var-file={variables_files}",
                 shell=True,
@@ -274,7 +276,6 @@ class SimpleActions:
     def output_execute(self):
         try:
             get_path = f"{self.stack_name}-{self.squad}-{self.environment}-{self.name}"
-            print(get_path)
             response = requests.get(
                 f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
             )
@@ -299,7 +300,6 @@ class SimpleActions:
     def show_execute(self):
         try:
             get_path = f"{self.stack_name}-{self.squad}-{self.environment}-{self.name}"
-            print(get_path)
             response = requests.get(
                 f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
             )

@@ -24,4 +24,5 @@ class Deploy(Base):
     environment = Column(String(50))
     tfvar_file = Column(String(50))
     project_path = Column(String(50))
+    backend_config = Column(String(100))
     __table_args__ = (UniqueConstraint("squad", "environment", "name", "stack_name"),)

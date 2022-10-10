@@ -16,7 +16,8 @@ class PlanCreate(BaseModel):
         None, example="30 18 * * 0-4"
     )
     tfvar_file: Optional[constr(strip_whitespace=True)] = Field(
-        "", example="terraform.tfvars"
+        "", example=""
     )
-    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="s")
+    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
+    backend_config: Optional[constr(strip_whitespace=True)] = Field("", example="")
     variables: dict

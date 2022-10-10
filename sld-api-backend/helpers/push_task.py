@@ -21,6 +21,7 @@ def async_deploy(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    backend_config: str = "",
     user: str = "",
 ):
 
@@ -37,6 +38,7 @@ def async_deploy(
         secreto=secreto,
         variables_file=variables_file,
         project_path=project_path,
+        backend_config=backend_config,
         user=user,
     ).apply_async(
         queue=queue,
@@ -62,6 +64,7 @@ def async_destroy(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    backend_config: str = "",
     user: str = "",
 ):
 
@@ -78,6 +81,7 @@ def async_destroy(
         secreto=secreto,
         variables_file=variables_file,
         project_path=project_path,
+        backend_config=backend_config,
         user=user,
     ).apply_async(
         queue=queue,
@@ -103,6 +107,7 @@ def async_plan(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    backend_config: str = "",
     user: str = "",
 ):
 
@@ -119,6 +124,7 @@ def async_plan(
         secreto=secreto,
         variables_file=variables_file,
         project_path=project_path,
+        backend_config=backend_config,
         user=user,
     ).apply_async(
         queue=queue,

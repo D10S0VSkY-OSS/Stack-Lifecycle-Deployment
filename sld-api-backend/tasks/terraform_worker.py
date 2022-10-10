@@ -41,6 +41,7 @@ def pipeline_deploy(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    backend_config: str = "",
     user: str = "",
 ):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
@@ -85,13 +86,14 @@ def pipeline_deploy(
             raise Exception(result)
 
         # Create tf to use the custom backend state
-        self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
+        if backend_config == "":
+            self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
 
-        result = ProviderRequirements.storage_state(
-            name, stack_name, environment, squad, project_path
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
+            result = ProviderRequirements.storage_state(
+                name, stack_name, environment, squad, project_path
+            )
+            if result["rc"] != 0:
+                raise Exception(result)
 
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
@@ -115,6 +117,7 @@ def pipeline_deploy(
             secreto,
             variables_file,
             project_path,
+            backend_config,
         )
         # Delete artifactory to avoid duplicating the runner logs
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
@@ -140,6 +143,7 @@ def pipeline_deploy(
             secreto,
             variables_file,
             project_path,
+            backend_config,
         )
         if result["rc"] != 0:
             logger.error(
@@ -173,6 +177,7 @@ def pipeline_deploy(
             secreto,
             variables_file,
             project_path,
+            backend_config,
         )
         self.update_state(
             state=states.FAILURE,
@@ -204,6 +209,7 @@ def pipeline_destroy(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    backend_config: str = "",
     user: str = "",
 ):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
@@ -240,12 +246,13 @@ def pipeline_destroy(
             )
             raise Exception(result)
         # Create tf to use the custom backend storage state
-        self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
-        result = ProviderRequirements.storage_state(
-            name, stack_name, environment, squad, project_path
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
+        if backend_config == "":
+            self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
+            result = ProviderRequirements.storage_state(
+                name, stack_name, environment, squad, project_path
+            )
+            if result["rc"] != 0:
+                raise Exception(result)
         # Create tfvar serialize with json
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
         result = ProviderRequirements.parameter_vars(
@@ -268,6 +275,7 @@ def pipeline_destroy(
             secreto,
             variables_file,
             project_path,
+            backend_config,
         )
         if result["rc"] != 0:
             raise Exception(result)
@@ -297,6 +305,7 @@ def pipeline_plan(
     secreto: str,
     variables_file: str = "",
     project_path: str = "",
+    backend_config: str = "",
     user: str = "",
 ):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
@@ -325,13 +334,14 @@ def pipeline_plan(
                 f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
             )
             raise Exception(result)
-
-        self.update_state(state="REMOTE", meta={"done": "3 of 5"})
-        result = ProviderRequirements.storage_state(
-            name, stack_name, environment, squad, project_path
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
+        
+        if backend_config == "":
+            self.update_state(state="REMOTE", meta={"done": "3 of 5"})
+            result = ProviderRequirements.storage_state(
+                name, stack_name, environment, squad, project_path
+            )
+            if result["rc"] != 0:
+                raise Exception(result)
 
         self.update_state(state="VARS", meta={"done": "4 of 5"})
         result = ProviderRequirements.parameter_vars(
@@ -351,6 +361,7 @@ def pipeline_plan(
             secreto,
             variables_file,
             project_path,
+            backend_config,
         )
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
         Utils.delete_local_folder(dir_path)
@@ -366,7 +377,7 @@ def pipeline_plan(
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        # Utils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
 
 
 @celery_app.task(
@@ -404,7 +415,7 @@ def pipeline_git_pull(
         self.update_state(state=states.FAILURE, meta={"exc": result})
         raise Ignore()
     finally:
-        dir_path = f"/tmp/artifacts"
+        dir_path = f"/tmp/{stack_name}/{environment}/{squad}/{name}"
         Utils.delete_local_folder(dir_path)
 
 

@@ -85,6 +85,7 @@ class ProviderActions:
         secreto: dict,
         variables_file: str = "",
         project_path: str = "",
+        backend_config: str = "",
         action=Actions,
     ) -> dict:
         config_action = action(
@@ -97,6 +98,7 @@ class ProviderActions:
             secreto,
             variables_file,
             project_path,
+            backend_config,
         )
         return config_action.plan_execute()
 
@@ -110,6 +112,7 @@ class ProviderActions:
         secreto: dict,
         variables_file: str = "",
         project_path: str = "",
+        backend_config: str = "",
         action=Actions,
     ) -> dict:
         config_action = action(
@@ -122,6 +125,7 @@ class ProviderActions:
             secreto,
             variables_file,
             project_path,
+            backend_config,
         )
         return config_action.apply_execute()
 
@@ -135,6 +139,7 @@ class ProviderActions:
         secreto: dict,
         variables_file: str = "",
         project_path: str = "",
+        backend_config: str = "",
         action=Actions,
     ) -> dict:
         config_action = action(
@@ -147,11 +152,12 @@ class ProviderActions:
             secreto,
             variables_file,
             project_path,
+            backend_config,
         )
         return config_action.destroy_execute()
 
     def output(
-        stack_name: str, squad: str, environment: str, name: str, action=SimpleActions
+        stack_name: str, squad: str, environment: str, name: str,  action=SimpleActions
     ) -> dict:
         config_action = action(stack_name, squad, environment, name)
         return config_action.output_execute()

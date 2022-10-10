@@ -69,6 +69,7 @@ async def deploy_infra_by_stack_name(
             secreto,
             deploy.tfvar_file,
             deploy.project_path,
+            deploy.backend_config,
             current_user.username,
         )
         # Push deploy task data
@@ -164,6 +165,7 @@ async def update_deploy_by_id(
             secreto,
             deploy_update.tfvar_file,
             deploy_update.project_path,
+            deploy_update.backend_config,
             current_user.username,
         )
         # Push deploy task data
@@ -175,6 +177,7 @@ async def update_deploy_by_id(
             user_id=current_user.id,
             tfvar_file=deploy_update.tfvar_file,
             project_path=deploy_update.project_path,
+            backend_config=deploy_update.backend_config,
             stack_branch=branch,
             variables=deploy_update.variables,
             start_time=deploy_update.start_time,
@@ -226,6 +229,7 @@ async def destroy_infra(
     variables = deploy_data.variables
     tfvar_file = deploy_data.tfvar_file
     project_path = deploy_data.project_path
+    backend_config = deploy_data.backend_config
     name = deploy_data.name
     # Get  credentials by providers supported
     secreto = check_prefix(
@@ -259,6 +263,7 @@ async def destroy_infra(
             secreto,
             tfvar_file,
             project_path,
+            backend_config,
             current_user.username,
         )
         # Push deploy task data
@@ -273,6 +278,7 @@ async def destroy_infra(
             stack_branch=branch,
             tfvar_file=tfvar_file,
             project_path=project_path,
+            backend_config=backend_config,
             variables=variables,
             username=current_user.username,
         )
@@ -353,6 +359,7 @@ async def delete_infra_by_id(
     name = deploy_data.name
     tfvar_file = deploy_data.tfvar_file
     project_path = deploy_data.project_path
+    backend_config = deploy_data.backend_config
     variables = deploy_data.variables
     # Get  credentials by providers supported
     secreto = check_prefix(
@@ -386,6 +393,7 @@ async def delete_infra_by_id(
             secreto,
             tfvar_file,
             project_path,
+            backend_config,
             current_user.username,
         )
         # Push task data

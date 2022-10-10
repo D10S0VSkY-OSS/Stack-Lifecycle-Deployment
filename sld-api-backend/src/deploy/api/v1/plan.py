@@ -58,6 +58,7 @@ async def plan_infra_by_stack_name(
             secreto,
             deploy.tfvar_file,
             deploy.project_path,
+            deploy.backend_config,
             current_user.username,
         )
         # Push deploy task data
@@ -144,6 +145,7 @@ async def update_plan_by_id(
             secreto,
             deploy_update.tfvar_file,
             deploy_update.project_path,
+            deploy_update.backend_config,
             current_user.username,
         )
         # Push deploy task data
@@ -156,6 +158,7 @@ async def update_plan_by_id(
             stack_branch=deploy_update.stack_branch,
             tfvar_file=deploy_update.tfvar_file,
             project_path=deploy_update.project_path,
+            backend_config=deploy_update.backend_config,
             variables=deploy_update.variables,
             start_time=deploy_update.start_time,
             destroy_time=deploy_update.destroy_time,
@@ -223,6 +226,7 @@ async def get_plan_by_id_deploy(
             secreto,
             deploy_data.tfvar_file,
             deploy_data.project_path,
+            deploy_data.backend_config,
         )
         return {"task": pipeline_plan}
     except Exception as err:
