@@ -49,6 +49,12 @@ class StackForm(FlaskForm):
             validators.length(min=1, max=20, message="Folder path when use monorepo"),
         ],
     )
+    backend_config = StringField(
+        "backend_config",
+        [
+            validators.length(min=1, max=20, message="Custom backend tfvar"),
+        ],
+    )
     description = TextAreaField(
         "Description",
         [validators.DataRequired(message="The description is required.")],
@@ -140,6 +146,12 @@ class DeployForm(FlaskForm):
         "project_path",
         [
             validators.length(min=2, max=30, message="Project path name."),
+        ],
+    )
+    backend_config = StringField(
+        "backend_config",
+        [
+            validators.length(min=1, max=20, message="Custom backend tfvar"),
         ],
     )
     environment = StringField(

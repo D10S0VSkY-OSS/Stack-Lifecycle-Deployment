@@ -1,5 +1,6 @@
 import logging
 import traceback
+from turtle import back
 
 import redis
 from celery import states
@@ -334,7 +335,6 @@ def pipeline_plan(
                 f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
             )
             raise Exception(result)
-        
         if backend_config == "":
             self.update_state(state="REMOTE", meta={"done": "3 of 5"})
             result = ProviderRequirements.storage_state(

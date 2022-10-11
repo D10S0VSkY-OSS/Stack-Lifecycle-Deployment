@@ -59,6 +59,11 @@
                                            value=deploy.project_path) }}
                                     </div>
                                     <div class="form-group">
+                                        {{ render_field(form.backend_config,
+                                           autocomplete="off", class='form-control',
+                                           value=deploy.backend_config) }}
+                                    </div>
+                                    <div class="form-group">
                                         {{ render_field(form.tfvar_file, autocomplete="off", class='form-control',
                                         value=deploy.tfvar_file) }}
                                     </div>

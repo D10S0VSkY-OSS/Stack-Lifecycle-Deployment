@@ -157,6 +157,11 @@
                                         class='form-control', placeholder='project path',
                                         value=stack['json']['project_path']) }}
                                     </div>
+                                    <div class="form-group">
+                                        {{ render_field(form.backend_config, autocomplete="off",
+                                        class='form-control', placeholder='tfvars backend config')
+                                        }}
+                                    </div>
                                 <p>
                                 <a class="btn btn-primary" data-toggle="collapse"
                                    data-target="#variables" href="#collapseExample"

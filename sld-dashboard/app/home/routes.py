@@ -177,6 +177,7 @@ def relaunch_deploy(deploy_id):
             "stack_branch": content["stack_branch"],
             "tfvar_file": content["tfvar_file"],
             "project_path": content["project_path"],
+            "backend_config": content["backend_config"],
             "variables": content["variables"],
         }
         response = request_url(
@@ -237,6 +238,7 @@ def edit_deploy(deploy_id):
                 "branch",
                 "tfvar_file",
                 "project_path",
+                "backend_config",
             ]
             # Clean exclude data vars
             data_raw = {
@@ -257,6 +259,7 @@ def edit_deploy(deploy_id):
                 "stack_branch": form.branch.data,
                 "tfvar_file": form.tfvar_file.data,
                 "project_path": form.project_path.data,
+                "backend_config": form.backend_config.data,
                 "variables": ast.literal_eval(variables),
             }
             if not "deploy" in request.form.get("button"):
@@ -324,6 +327,7 @@ def get_plan(deploy_id):
                 "branch",
                 "tfvar_file",
                 "project_path",
+                "backend_config",
             ]
             # Clean exclude data vars
             data_raw = {
@@ -342,6 +346,7 @@ def get_plan(deploy_id):
                 "stack_branch": form.branch.data,
                 "tfvar_file": form.tfvar_file.data,
                 "project_path": form.project_path.data,
+                "backend_config": form.backend_config.data,
                 "variables": ast.literal_eval(variables),
             }
             # Deploy
@@ -655,6 +660,7 @@ def deploy_stack(stack_id):
                 "branch",
                 "tfvar_file",
                 "project_path",
+                "backend_config"
             ]
             variables = {}
             if request.form.get("tfvar_file") == "":
@@ -674,6 +680,7 @@ def deploy_stack(stack_id):
                 "stack_branch": request.form.get("branch"),
                 "tfvar_file": request.form.get("tfvar_file"),
                 "project_path": request.form.get("project_path"),
+                "backend_config": request.form.get("backend_config"),
                 "variables": variables,
             }
             endpoint = f"plan"
