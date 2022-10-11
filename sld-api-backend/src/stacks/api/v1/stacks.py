@@ -85,7 +85,12 @@ def update_stack(
     # Checkif stack name providers are supperted
     check_providers(stack_name=stack.stack_name)
     # Check if stack exist
-    db_stack = crud_stacks.get_stack_by_name(db, stack_name=stack.stack_name)
+    db_stack = crud_stacks.get_stack_by_id(db, stack_id=stack_id )
+    # Check if stack used by deploy
+    if db_stack.stack_name != stack.stack_name:
+        deploy = crud_deploy.get_deploy_by_stack(db=db, stack_name=db_stack.stack_name)
+        if deploy is not None:
+            raise HTTPException(status_code=409, detail=f"The stack is being used by {deploy.name}")
     # Push git task to queue squad, all workers are subscribed to this queue
     task = sync_git(
         stack_name=stack.stack_name,
@@ -162,15 +167,15 @@ async def get_stack_by_id_or_name(
     result = crud_stacks.get_stack_by_id(db=db, stack_id=stack)
     if result is None:
         raise HTTPException(status_code=404, detail="stack id not found")
-        if not crud_users.is_master(db, current_user):
-            if (
-                not check_squad_user(current_user.squad, result.squad_access)
-                and not "*" in result.squad_access
-            ):
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"Not enough permissions in {result.squad_access}",
-                )
+    if not crud_users.is_master(db, current_user):
+        if (
+            not check_squad_user(current_user.squad, result.squad_access)
+            and not "*" in result.squad_access
+        ):
+            raise HTTPException(
+                status_code=403,
+                detail=f"Not enough permissions in {result.squad_access}",
+            )
     return result
 
 
