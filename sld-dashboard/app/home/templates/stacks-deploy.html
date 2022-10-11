@@ -146,7 +146,15 @@
                                         {{ render_field(form.destroy_time, autocomplete="off",
                                         class='form-control', value='30 18 * * 0-4') }}
                                     </div>
-
+                                <!-- Collapse advance options -->
+                                    <p>
+                                        <a class="btn btn-primary" data-toggle="collapse"
+                                           data-target="#advance_options" href="#collapseExample"
+                                           role="button" aria-expanded="false" aria-controls="collapseExample">
+                                           Adcance options
+                                        </a>
+                                    </p>
+                                    <div class="collapse" id="advance_options" aria-expanded="false">
                                     <div class="form-group">
                                         {{ render_field(form.branch, autocomplete="off",
                                         class='form-control', placeholder='Branch name',
@@ -154,7 +162,7 @@
                                     </div>
                                     <div class="form-group">
                                         {{ render_field(form.project_path, autocomplete="off",
-                                        class='form-control', placeholder='project path',
+                                        class='form-control', placeholder='Folder path when use monorepo',
                                         value=stack['json']['project_path']) }}
                                     </div>
                                     <div class="form-group">
@@ -162,19 +170,22 @@
                                         class='form-control', placeholder='tfvars backend config')
                                         }}
                                     </div>
+                                </div>
+                                <!-- End Collapse variables -->
+                                <!-- Collapse variables -->
                                 <p>
                                 <a class="btn btn-primary" data-toggle="collapse"
                                    data-target="#variables" href="#collapseExample"
                                    role="button" aria-expanded="false" aria-controls="collapseExample">
                                    Use Variables Form
                                 </a>
+                                <!-- Collapse Tfvars -->
                                 <button class="btn btn-primary" type="button" data-toggle="collapse"
-                                 data-target="#tfvars" aria-expanded="false" aria-controls="collapseExample">
+                                 data-target="#tfvars" aria-expanded="false" aria-controls="collapseExample" >
                                    Use custom tfvars file
                                 </button>
                                 </p>
-                                    <!-- Collapse Tfvars -->
-                                <div class="collapse" id="tfvars">
+                                <div class="collapse indent" id="tfvars">
                                 <h3>Tfvars</h3>
                                 <footer class="blockquote-footer">
                                  Indicates the path and name of the tfvar file
@@ -195,6 +206,7 @@
                                 </button>
                                 </div>
                                 </div>
+                                <!-- End Collapse Tfvars -->
                                     <!-- Collapse Variables -->
                                 <div class="collapse" id="variables">
                                 <h3>Variables</h3>
