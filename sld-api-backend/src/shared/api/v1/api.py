@@ -9,12 +9,14 @@ from src.stacks.api.v1 import stacks
 from src.tasks.api.v1 import tasks
 from src.users.api.v1 import auth, users
 from src.variables.api.v1 import variables
+from src.custom_providers.api.v1 import custom_providers
 
 api_router = APIRouter()
 api_router.include_router(users.router, prefix="/users", tags=["Users"])
 api_router.include_router(auth.router, prefix="/authenticate", tags=["AccessToken"])
 api_router.include_router(aws.router, prefix="/accounts/aws", tags=["Aws"])
 api_router.include_router(gcp.router, prefix="/accounts/gcp", tags=["Gcloud"])
+api_router.include_router(custom_providers.router, prefix="/accounts/custom_providers", tags=["CustomProviders"])
 api_router.include_router(azure.router, prefix="/accounts/azure", tags=["Azure"])
 api_router.include_router(stacks.router, prefix="/stacks", tags=["Stacks"])
 api_router.include_router(plan.router, prefix="/plan", tags=["Plan"])
