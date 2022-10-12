@@ -59,7 +59,7 @@ async def get_all_custom_providers_accounts(
     return crud_custom_provider.get_all_custom_profile(db=db)
 
 
-@router.delete("/{gcloud_account_id}")
+@router.delete("/{custom_provider_id}")
 async def delete_custom_provider_account_by_id(
     custom_provider_id,
     current_user: schemas_users.User = Depends(deps.get_current_active_user),

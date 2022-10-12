@@ -135,6 +135,36 @@
                                     </div>
                                     {% endif %}
 
+                                                                        <!-- Specific GCP account  -->
+                                    {% set custom_squad_status_before = [] %}
+                                    {% if "custom" in  stack['json']['stack_name'] %}
+                                    {% for custom_account in custom_content %}
+                                    {% set __ = custom_squad_status_before.append(custom_account.squad) %}
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <h6><strong>Squad</strong></h6>
+                                        <select class="form-control" name=squad v-model="squad">
+                                            {% for custom_squad in custom_squad_status_before|unique %}
+                                            <option value={{ custom_squad }}>{{ custom_squad }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        </label>
+                                    </div>
+
+                                    {% set custom_env_status_before = [] %}
+                                    {% for custom_account in custom_content %}
+                                    {% set __ = custom_env_status_before.append(custom_account.environment) %}
+                                    {% endfor %}
+                                    <div class="form-group">
+                                        <h6><strong>Environment</strong></h6>
+                                        <select class="form-control" name=environment v-model="environment">
+                                            {% for custom_env in custom_env_status_before|unique %}
+                                            <option value={{ gcp_env }}>{{ custom_env }}</option>
+                                            {% endfor %}
+                                        </select>
+                                        </label>
+                                    </div>
+                                    {% endif %}
 
 
                                     <div class="form-group">

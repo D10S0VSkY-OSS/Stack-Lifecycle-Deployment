@@ -65,7 +65,7 @@
                 <span class="nav-link  collapsed  d-flex justify-content-between align-items-center"
                     data-toggle="collapse" data-target="#submenu-components-stacks">
                     <span>
-                        <span class="sidebar-icon"><span class="fas fa-box-open"></span></span>
+                        <span class="sidebar-icon"><span class="fas fa-layer-group"></span></span>
                         Stacks
                     </span>
                     <span class="link-arrow"><span class="fas fa-chevron-right"></span></span>
@@ -87,7 +87,7 @@
             </li>
             <li class="nav-item  {% if 'transactions' in segment %} active {% endif %}">
                 <a href="/deploys-list" class="nav-link">
-                    <span class="sidebar-icon"><span class="fas fa-layer-group"></span></span>
+                    <span class="sidebar-icon"><span class="fas fa-box-open"></span></span>
                     <span>Deploys</span>
                 </a>
             </li>
@@ -188,6 +188,29 @@
                                     <span>List</span></a></li>
                     </ul>
                 </div>
+                <li class="nav-item">
+                    <span class="nav-link  collapsed  d-flex justify-content-between align-items-center"
+                        data-toggle="collapse" data-target="#submenu-components-custom-provider">
+                        <span>
+                            <span class="sidebar-icon"><span class="fas fa-solid fa-code"></span></span>
+                            Custom
+                        </span>
+                        <span class="link-arrow"><span class="fas fa-chevron-right"></span></span>
+                    </span>
+                    <div class="multi-level collapse " role="list" id="submenu-components-custom-provider" aria-expanded="false">
+                        <ul class="flex-column nav">
+                            {% if "yoda" in current_user.role %}
+                            <li class="nav-item "><a class="nav-link" href="/custom-provider-new">
+                                    <span class="sidebar-icon"><span class="fas fa-plus"></span>
+                                        <span>New</span>
+                                </a>
+                            </li>
+                            {% endif %}
+                            <li class="nav-item "><a class="nav-link" href="/custom-provider-list">
+                                    <span class="sidebar-icon"><span class="fas fa-database"></span>
+                                        <span>List</span></a></li>
+                        </ul>
+                    </div>
                 {% endif %}
             <li role="separator" class="dropdown-divider mt-4 mb-3 border-black"></li>
             <li class="nav-item">

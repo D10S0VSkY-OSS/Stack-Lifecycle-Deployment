@@ -13,7 +13,7 @@ from app.helpers.converter import convert_to_dict
 from app.helpers.security import vault_decrypt
 from app.home import blueprint
 from app.home.forms import (AwsForm, AzureForm, DeployForm, GcpForm, StackForm,
-                            UserForm)
+                            UserForm, CustomProviderForm)
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from jinja2 import TemplateNotFound
@@ -627,6 +627,13 @@ def deploy_stack(stack_id):
             headers={"Authorization": f"Bearer {token}"},
         )
         azure_content = azure_response.get("json")
+        # Get data from custom providers accounts
+        custom_response = request_url(
+            verb="GET",
+            uri=f"accounts/custom_providers/",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        custom_content = custom_response.get("json")
         # Get data from stack
         stack = request_url(
             verb="GET",
@@ -702,6 +709,7 @@ def deploy_stack(stack_id):
             aws_content=aws_content,
             gcp_content=gcp_content,
             azure_content=azure_content,
+            custom_content=custom_content,
             data_json=vars_json,
         )
     except ValueError:
@@ -1283,6 +1291,84 @@ def route_template(template):
     except Exception:
         return render_template("page-500.html"), 500
 
+
+# start custom provides
+@blueprint.route("/custom-provider-new", methods=["GET", "POST"])
+@login_required
+def new_custom_providers_account():
+    try:
+        form = CustomProviderForm(request.form)
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        if request.method == "POST":
+            new_provider: dict = {
+                "squad": form.squad.data,
+                "environment": form.environment.data,
+                "configuration": ast.literal_eval(form.configuration.data),
+            }
+            response = request_url(
+                verb="POST",
+                uri="accounts/custom_providers/",
+                headers={"Authorization": f"Bearer {token}"},
+                json=new_provider,
+            )
+            if response.get("status_code") == 200:
+                flash(
+                    f"Created custom provider account for environment {form.environment.data} in {form.squad.data} "
+                )
+            elif response.get("status_code") == 409:
+                flash(response["json"].get("detail"), "error")
+            else:
+                flash(response["json"], "error")
+
+        return render_template(
+            "/custom-provider-new.html",
+            title="New custom provider account",
+            form=form,
+            active="new_custom_providers_account",
+            external_api_dns=external_api_dns,
+        )
+    except ValueError:
+        return redirect(url_for("base_blueprint.logout"))
+
+
+@blueprint.route("/custom-provider-list")
+@login_required
+def list_custom_providers_account():
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        response = request_url(
+            verb="GET",
+            uri=f"accounts/custom_providers/",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        content = response.get("json")
+        return render_template(
+            "custom-provider-list.html", name="Name", custom_provider_content=content, external_api_dns=external_api_dns
+        )
+    except ValueError:
+        return redirect(url_for("base_blueprint.logout"))
+
+
+@blueprint.route("/custom-provider/delete/<int:custom_provider_id>")
+@login_required
+def delete_custom_providers_account(custom_provider_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        response = request_url(
+            verb="DELETE",
+            uri=f"accounts/custom_providers/{custom_provider_id}",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        return redirect(url_for("home_blueprint.route_template", template="custom-provider-list"))
+    except ValueError:
+        return redirect(url_for("base_blueprint.logout"))
+# End custom provider
 
 # Helper - Extract current page name from request
 def get_segment(request):
