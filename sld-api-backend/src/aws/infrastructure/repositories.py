@@ -139,3 +139,15 @@ def delete_aws_profile_by_id(db: Session, aws_profile_id: int):
         return {aws_profile_id: "deleted", "aws_profile_id": aws_profile_id}
     except Exception as err:
         raise err
+
+
+
+def get_cloud_account_by_id(db: Session, provider_id: int):
+    try:
+        return (
+            db.query(models.Aws_provider)
+            .filter(models.Aws_provider.id == provider_id)
+            .first()
+        )
+    except Exception as err:
+        raise err

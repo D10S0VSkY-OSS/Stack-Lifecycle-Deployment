@@ -121,3 +121,14 @@ def delete_azure_profile_by_id(db: Session, azure_profile_id: int):
         return {azure_profile_id: "deleted", "azure_profile_id": azure_profile_id}
     except Exception as err:
         raise err
+
+
+def get_cloud_account_by_id(db: Session, provider_id: int):
+    try:
+        return (
+            db.query(models.Azure_provider)
+            .filter(models.Azure_provider.id == provider_id)
+            .first()
+        )
+    except Exception as err:
+        raise err

@@ -187,3 +187,14 @@ def get_all_deploys_by_squad(db: Session, squad: str, skip: int = 0, limit: int 
         return set(result)
     except Exception as err:
         raise err
+
+def get_deploy_by_cloud_account(db: Session,  squad: str, environment: str):
+    try:
+        return (
+            db.query(models.Deploy)
+            .filter(models.Deploy.environment == environment)
+            .filter(models.Deploy.squad == squad)
+            .first()
+        )
+    except Exception as err:
+        raise err

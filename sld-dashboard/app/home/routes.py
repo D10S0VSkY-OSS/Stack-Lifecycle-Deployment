@@ -1061,6 +1061,16 @@ def delete_aws_account(aws_account_id):
             uri=f"accounts/aws/{aws_account_id}",
             headers={"Authorization": f"Bearer {token}"},
         )
+
+        if response.get("status_code") == 200:
+            flash(
+                f"Account Deleted"
+            )
+        elif response.get("status_code") == 409:
+            flash(response["json"].get("detail"), "error")
+        else:
+            flash(response["json"], "error")
+
         return redirect(url_for("home_blueprint.route_template", template="aws-list"))
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
@@ -1139,6 +1149,16 @@ def delete_gcp_account(gcp_account_id):
             uri=f"accounts/gcp/{gcp_account_id}",
             headers={"Authorization": f"Bearer {token}"},
         )
+
+        if response.get("status_code") == 200:
+            flash(
+                f"Account Deleted"
+            )
+        elif response.get("status_code") == 409:
+            flash(response["json"].get("detail"), "error")
+        else:
+            flash(response["json"], "error")
+
         return redirect(url_for("home_blueprint.route_template", template="gcp-list"))
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
@@ -1223,6 +1243,16 @@ def delete_azure_account(azure_account_id):
             uri=f"accounts/azure/{azure_account_id}",
             headers={"Authorization": f"Bearer {token}"},
         )
+
+        if response.get("status_code") == 200:
+            flash(
+                f"Account Deleted"
+            )
+        elif response.get("status_code") == 409:
+            flash(response["json"].get("detail"), "error")
+        else:
+            flash(response["json"], "error")
+
         return redirect(url_for("home_blueprint.route_template", template="azure-list"))
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
@@ -1365,6 +1395,16 @@ def delete_custom_providers_account(custom_provider_id):
             uri=f"accounts/custom_providers/{custom_provider_id}",
             headers={"Authorization": f"Bearer {token}"},
         )
+        
+        if response.get("status_code") == 200:
+            flash(
+                f"Account Deleted"
+            )
+        elif response.get("status_code") == 409:
+            flash(response["json"].get("detail"), "error")
+        else:
+            flash(response["json"], "error")
+
         return redirect(url_for("home_blueprint.route_template", template="custom-provider-list"))
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))

@@ -1,3 +1,4 @@
+import imp
 from fastapi import APIRouter, Depends, HTTPException, Response
 from security import deps
 from sqlalchemy.orm import Session
@@ -6,6 +7,7 @@ from src.custom_providers.domain.entities import custom_providers as schemas_cus
 from src.custom_providers.infrastructure import repositories as crud_custom_provider
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from src.deploy.infrastructure import repositories as crud_deploy
 
 router = APIRouter()
 
@@ -67,9 +69,17 @@ async def delete_custom_provider_account_by_id(
 ):
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
+
+    provider_account = crud_custom_provider.get_cloud_account_by_id(db=db, provider_id=custom_provider_id)
+    deploy = crud_deploy.get_deploy_by_cloud_account(db=db, squad=provider_account.squad, environment=provider_account.environment)
+    if "custom" in deploy.stack_name:
+        if deploy is not None:
+            raise HTTPException(status_code=409, detail=f"The cloud account being used by {deploy.name}")
+
     result = crud_custom_provider.delete_custom_profile_by_id(
         db=db, custom_profile_id=custom_provider_id
     )
+
     crud_activity.create_activity_log(
         db=db,
         username=current_user.username,
