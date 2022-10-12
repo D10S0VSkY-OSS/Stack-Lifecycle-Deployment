@@ -338,7 +338,7 @@ class CustomProviderForm(FlaskForm):
         ],
     )
     configuration = TextAreaField(
-        "configuration",
+        "Configuration",
         [validators.DataRequired(message="Configuration file json is required.")],
         render_kw={"rows": 20},
     )

@@ -52,7 +52,14 @@
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.configuration, class='form-control', placeholder='configuration json') }}
+                                        {{ render_field(form.configuration, class='form-control', placeholder='configuration json example:
+{
+"TF_VAR_tenancy_ocid":"<tenancy_OCID>",
+"TF_VAR_compartment_ocid:"<compartment_OCID>",
+"TF_VAR_user_ocid:"<user_OCID>",
+"TF_VAR_fingerprint":"</key_fingerprint>",
+"TF_VAR_private_key_path":"</private_key_path>"
+}') }}
                                     </div>
 
                                     <button type="submit" class="btn btn-primary" name="button">

@@ -135,7 +135,7 @@
                                     </div>
                                     {% endif %}
 
-                                                                        <!-- Specific GCP account  -->
+                                  <!-- Specific CUSTOM PROVIDER account  -->
                                     {% set custom_squad_status_before = [] %}
                                     {% if "custom" in  stack['json']['stack_name'] %}
                                     {% for custom_account in custom_content %}
@@ -159,7 +159,7 @@
                                         <h6><strong>Environment</strong></h6>
                                         <select class="form-control" name=environment v-model="environment">
                                             {% for custom_env in custom_env_status_before|unique %}
-                                            <option value={{ gcp_env }}>{{ custom_env }}</option>
+                                            <option value={{ custom_env }}>{{ custom_env }}</option>
                                             {% endfor %}
                                         </select>
                                         </label>

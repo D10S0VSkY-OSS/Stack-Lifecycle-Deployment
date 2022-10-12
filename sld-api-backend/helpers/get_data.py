@@ -12,6 +12,7 @@ from src.users.infrastructure import repositories as crud_users
 from src.aws.infrastructure import repositories as crud_aws
 from src.azure.infrastructure import repositories as crud_azure
 from src.gcp.infrastructure import repositories as crud_gcp
+from src.custom_providers.infrastructure import repositories as crud_custom_provider
 
 r = redis.Redis(
     host=settings.BACKEND_SERVER,
@@ -193,6 +194,11 @@ def check_prefix(db, stack_name: str, environment: str, squad: str):
             return secreto
         elif any(i in stack_name.lower() for i in settings.AZURE_PREFIX):
             secreto = crud_azure.get_credentials_azure_profile(
+                db=db, environment=environment, squad=squad
+            )
+            return secreto
+        elif any(i in stack_name.lower() for i in settings.CUSTOM_PREFIX):
+            secreto = crud_custom_provider.get_credentials_custom_provider_profile(
                 db=db, environment=environment, squad=squad
             )
             return secreto
