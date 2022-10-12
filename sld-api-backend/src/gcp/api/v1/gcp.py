@@ -68,11 +68,6 @@ async def delete_gcloud_account_by_id(
 ):
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=400, detail="Not enough permissions")
-    provider_account = crud_gcp.get_cloud_account_by_id(db=db, provider_id=gcloud_account_id)
-    deploy = crud_deploy.get_deploy_by_cloud_account(db=db, squad=provider_account.squad, environment=provider_account.environment )
-    if "gcp" in deploy.stack_name:
-        if deploy is not None:
-            raise HTTPException(status_code=409, detail=f"The cloud account is being used by {deploy.name}")
 
     result = crud_gcp.delete_gcloud_profile_by_id(
         db=db, gcloud_profile_id=gcloud_account_id

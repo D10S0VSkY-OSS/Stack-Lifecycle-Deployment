@@ -67,12 +67,6 @@ async def delete_aws_account_by_id(
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    provider_account = crud_aws.get_cloud_account_by_id(db=db, provider_id=aws_account_id)
-    deploy = crud_deploy.get_deploy_by_cloud_account(db=db, squad=provider_account.squad, environment=provider_account.environment )
-    if "aws" in deploy.stack_name:
-        if deploy is not None:
-            raise HTTPException(status_code=409, detail=f"The cloud account is being used by {deploy.name}")
-
     result = crud_aws.delete_aws_profile_by_id(db=db, aws_profile_id=aws_account_id)
     crud_activity.create_activity_log(
         db=db,

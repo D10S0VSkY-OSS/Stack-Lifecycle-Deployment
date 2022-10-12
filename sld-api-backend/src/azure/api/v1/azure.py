@@ -66,12 +66,6 @@ async def delete_azure_account_by_id(
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
 
-    provider_account = crud_azure.get_cloud_account_by_id(db=db, provider_id=azure_account_id)
-    deploy = crud_deploy.get_deploy_by_cloud_account(db=db, squad=provider_account.squad, environment=provider_account.environment )
-    if "azure" in deploy.stack_name:
-        if deploy is not None:
-            raise HTTPException(status_code=409, detail=f"The cloud account is being used by {deploy.name}")
-        
     result = crud_azure.delete_azure_profile_by_id(
         db=db, azure_profile_id=azure_account_id
     )
