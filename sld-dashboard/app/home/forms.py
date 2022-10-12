@@ -320,3 +320,25 @@ class AzureForm(FlaskForm):
             validators.DataRequired(message="tenant_id."),
         ],
     )
+
+
+class CustomProviderForm(FlaskForm):
+    squad = StringField(
+        "Squad",
+        [
+            validators.length(min=4, max=50, message="Squad out of reange."),
+            validators.DataRequired(message="Squad Name requerid."),
+        ],
+    )
+    environment = StringField(
+        "Environment",
+        [
+            validators.length(min=2, max=250, message="Branch out of reange."),
+            validators.DataRequired(message="Environment requerid."),
+        ],
+    )
+    configuration = TextAreaField(
+        "Configuration",
+        [validators.DataRequired(message="Configuration file json is required.")],
+        render_kw={"rows": 20},
+    )

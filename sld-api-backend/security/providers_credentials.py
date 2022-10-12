@@ -6,6 +6,12 @@ import os
 
 from config.api import settings
 
+class SecretsProviders:
+    def __init__(self, secret_provider: dict) -> None:
+        self.secret_provider = secret_provider
+    def export(self):
+        for k, v in self.secret_provider.items():
+            os.environ[k] = v
 
 def createLocalFolder(dir_path: str):
     try:
@@ -116,6 +122,13 @@ def secret(
         os.environ["ARM_SUBSCRIPTION_ID"] = secreto.get("subscription_id")
         os.environ["ARM_TENANT_ID"] = secreto.get("tenant_id")
 
+    elif any(i in stack_name.lower() for i in settings.CUSTOM_PREFIX):
+        configuration = ast.literal_eval(secreto.get("custom_provider_keyfile_json"))
+        R = SecretsProviders(configuration)
+        R.export()
+
+#        os.environ["GOOGLE_CLOUD_KEYFILE_JSON"] = gcloud_keyfile
+
 
 def unsecret(stack_name, environment, squad, name, secreto):
     if any(i in stack_name.lower() for i in settings.AWS_PREFIX):
@@ -157,3 +170,6 @@ def unsecret(stack_name, environment, squad, name, secreto):
         os.environ.pop("ARM_CLIENT_SECRET")
         os.environ.pop("ARM_SUBSCRIPTION_ID")
         os.environ.pop("ARM_TENANT_ID")
+
+    elif any(i in stack_name.lower() for i in settings.CUSTOM_PREFIX):
+        pass

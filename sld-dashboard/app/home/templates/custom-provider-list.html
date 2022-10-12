@@ -1,6 +1,6 @@
 {% extends "layouts/base.html" %}
 
-{% block title %} GCP Accounts {% endblock %}
+{% block title %} Custom Providers Accounts {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -21,12 +21,12 @@
                 <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
                     <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
                     <li class="breadcrumb-item"><a href="#">Accounts</a></li>
-                    <li class="breadcrumb-item"><a href="#">GCP</a></li>
+                    <li class="breadcrumb-item"><a href="#">Custom Provider</a></li>
                     <li class="breadcrumb-item active" aria-current="page">List</li>
                 </ol>
             </nav>
-            <h2 class="h4">All gcp accounts</h2>
-            <p class="mb-0">List all gcp accounts</p>
+            <h2 class="h4">All custom providers accounts</h2>
+            <p class="mb-0">List all custom providers accounts</p>
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
@@ -74,12 +74,12 @@
             </thead>
             <tbody>
                 <!-- Item -->
-                {% for gcp_account in gcp %}
+                {% for custom_provider in custom_provider_content %}
                 <tr>
                     </td>
-                    <td><span class="font-weight-normal">{{ gcp_account.id }}</span></td>
-                    <td><span class="font-weight-normal">{{ gcp_account.squad }}</span></td>
-                    <td><span class="font-weight-normal">{{ gcp_account.environment }}</span></td>
+                    <td><span class="font-weight-normal">{{ custom_provider.id }}</span></td>
+                    <td><span class="font-weight-normal">{{ custom_provider.squad }}</span></td>
+                    <td><span class="font-weight-normal">{{ custom_provider.environment }}</span></td>
                     <td>
                         {% if "yoda" in current_user.role %}
                         <div class="btn-group">
@@ -92,7 +92,7 @@
                             </button>
                             <div class="dropdown-menu">
                                 <a class="dropdown-item text-danger"
-                                    href="{{ url_for('.delete_gcp_account', gcp_account_id=gcp_account.id)}}"><span
+                                    href="{{ url_for('.delete_custom_providers_account', custom_provider_id=custom_provider.id)}}"><span
                                         class="fas fa-trash-alt mr-2"></span>Remove</a>
                             </div>
                             {% endif %}

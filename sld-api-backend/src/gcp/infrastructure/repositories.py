@@ -94,3 +94,14 @@ def delete_gcloud_profile_by_id(db: Session, gcloud_profile_id: int):
         return {gcloud_profile_id: "deleted", "gcloud_profile_id": gcloud_profile_id}
     except Exception as err:
         raise err
+
+
+def get_cloud_account_by_id(db: Session, provider_id: int):
+    try:
+        return (
+            db.query(models.Gcloud_provider)
+            .filter(models.Gcloud_provider.id == provider_id)
+            .first()
+        )
+    except Exception as err:
+        raise err
