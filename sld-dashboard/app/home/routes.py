@@ -42,7 +42,7 @@ def index():
 
 
 # Start Deploy
-@blueprint.route("/deploys-list", defaults={"limit": 15})
+@blueprint.route("/deploys-list", defaults={"limit": 9999999999999999999})
 @blueprint.route("/deploys-list/<int:limit>")
 @login_required
 def list_deploys(limit):
@@ -745,7 +745,7 @@ def get_task(task_id):
         return redirect(url_for("base_blueprint.logout"))
 
 
-@blueprint.route("/tasks-logs/", defaults={"limit": 15})
+@blueprint.route("/tasks-logs/", defaults={"limit": 9999999999999999999})
 @blueprint.route("/tasks-logs/<int:limit>")
 @login_required
 def list_tasks(limit):
@@ -787,7 +787,7 @@ def list_task(task_id):
 
 
 # activity logs
-@blueprint.route("/activity-logs/", defaults={"limit": 15})
+@blueprint.route("/activity-logs/", defaults={"limit": 9999999999999999999})
 @blueprint.route("/activity-logs/<int:limit>")
 @login_required
 def list_activity(limit):

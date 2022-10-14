@@ -36,7 +36,7 @@
             <div class="col col-md-6 col-lg-3 col-xl-4">
                 <div class="input-group">
                     <span class="input-group-text" id="basic-addon2"><span class="fas fa-search"></span></span>
-                    <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search"
+                    <input type="text" class="form-control" id="myInput" placeholder="Search"
                         aria-label="Search" aria-describedby="basic-addon2">
                 </div>
             </div>
@@ -56,12 +56,12 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">
                             <span class="dropdown-item font-weight-bold text-dark">Show</span>
-                            <a class="dropdown-item d-flex font-weight-bold" href="/activity-logs/15">15 <span
+                            <a class="dropdown-item d-flex font-weight-bold" href="/activity-logs/"> All <span
                                     class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
+                            <a class="dropdown-item font-weight-bold" href="/activity-logs/5">5</a>
                             <a class="dropdown-item font-weight-bold" href="/activity-logs/50">50</a>
                             <a class="dropdown-item font-weight-bold" href="/activity-logs/100">100</a>
                             <a class="dropdown-item font-weight-bold" href="/activity-logs/1000">1000</a>
-                            <a class="dropdown-item font-weight-bold" href="/activity-logs/9999999999999999999">All</a>
                         </div>
                     </div>
             </div>
@@ -80,7 +80,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="myTable">
                 <!-- Item -->
                 {% for logs in activity %}
                 <tr>
@@ -145,22 +145,13 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-    function search() {
-        const input = document.getElementById('search')
-        const filter = input.value.toLowerCase()
-        const table = document.getElementById('table')
-        const tr = [...table.getElementsByTagName('tr')]
-
-        tr.forEach((t) => {
-            const foundMatch = [...t.getElementsByTagName('td')].some((td) => {
-                return td.innerHTML.toLowerCase().indexOf(filter) > -1
-            })
-            if (foundMatch) {
-                t.style.display = ''
-            } else {
-                t.style.display = 'none'
-            }
-        })
-    }
-</script>
+    $(document).ready(function(){
+      $("#myInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#myTable tr").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+    </script>
 {% endblock javascripts %}

@@ -12,9 +12,17 @@ class StackBase(BaseModel):
     project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
     description: constr(strip_whitespace=True)
 
+    class Config:
+        """Extra configuration options"""
+        anystr_strip_whitespace = True  # remove trailing whitespace
+
 
 class StackCreate(StackBase):
     pass
+
+    class Config:
+        """Extra configuration options"""
+        anystr_strip_whitespace = True  # remove trailing whitespace
 
 
 class Stack(StackBase):

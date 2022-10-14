@@ -4,7 +4,7 @@
 
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 {% block content %}
 <main class="content">
 
@@ -52,8 +52,7 @@
             <div class="col col-md-6 col-lg-3 col-xl-4">
                 <div class="input-group">
                     <span class="input-group-text" id="asic-addon2"><span class="fas fa-search"></span></span>
-                    <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search"
-                                                                                           aria-label="Search" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" id="myInput" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
                 </div>
             </div>
             <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
@@ -72,13 +71,13 @@
                         </button>
                         <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">
                             <span class="dropdown-item font-weight-bold text-dark">Show</span>
-                            <a class="dropdown-item d-flex font-weight-bold" href="/deploys-list/35">35 <span
+                            <a class="dropdown-item d-flex font-weight-bold" href="/deploys-list/">All <span
                                                                              class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
+                            <a class="dropdown-item font-weight-bold" href="/deploys-list/5">5</a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/55">55</a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/75">75</a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/90">90</a>
                             <a class="dropdown-item font-weight-bold" href="/deploys-list/100">100</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/9999999999999999999">All</a>
                         </div>
                     </div>
             </div>
@@ -95,6 +94,7 @@
 	        data-pagination="true"
             autoRefreshInterval="3"
             >
+            
             <thead class="thead-dark">
                 <tr>
                     <th>Id</th>
@@ -110,7 +110,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="myTable">
                 <!-- Item -->
                 {% for deploy in deploys| sort(attribute='id') %}
 
@@ -358,31 +358,13 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-    function search() {
-        const input = document.getElementById('search')
-        const filter = input.value.toLowerCase()
-        const table = document.getElementById('table')
-        const tr = [...table.getElementsByTagName('tr')]
-
-        tr.forEach((t) => {
-            const foundMatch = [...t.getElementsByTagName('td')].some((td) => {
-                return td.innerHTML.toLowerCase().indexOf(filter) > -1
-            })
-            if (foundMatch) {
-                t.style.display = ''
-            } else {
-                t.style.display = 'none'
-            }
-        })
-    }
-</script>
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script>
-function autoRefresh_div()
-{
-$("#result").load("load.html");// a function which will load data from other file after x seconds
-}
-
-setInterval('autoRefresh_div()', 5000); // refresh div after 5 secs
-</script>
+    $(document).ready(function(){
+      $("#myInput").on("keyup", function() {
+        var value = $(this).val().toLowerCase();
+        $("#myTable tr").filter(function() {
+          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+        });
+      });
+    });
+    </script>
 {% endblock javascripts %}

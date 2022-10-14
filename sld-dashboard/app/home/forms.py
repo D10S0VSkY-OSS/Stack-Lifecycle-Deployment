@@ -8,11 +8,13 @@ from wtforms.fields import EmailField
 
 
 class StackForm(FlaskForm):
+
     name = StringField(
         "Name",
         [
             validators.length(min=4, max=50, message="Name out of reange."),
             validators.DataRequired(message="Name requerid."),
+            validators.Regexp('[\r\n\t\f\v  ]', message="Username must contain only letters numbers or underscore"),
         ],
     )
     git = StringField(
