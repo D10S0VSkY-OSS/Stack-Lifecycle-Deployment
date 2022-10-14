@@ -27,11 +27,10 @@ class StackForm(FlaskForm):
     branch = StringField(
         "Branch",
         [
-            validators.length(min=2, max=250, message="Branch out of reange."),
+            validators.length(min=2, max=30, message="Branch out of reange."),
             validators.DataRequired(message="Branch requerid."),
         ],
     )
-    # squad_access = FieldList(StringField('squads'), min_entries=1)
     squad_access = TextAreaField(
         "Squad Access (* share with everyone or pass a list: squad1, squad2)",
         default="*",
@@ -39,48 +38,28 @@ class StackForm(FlaskForm):
     )
 
     tf_version = StringField(
-        "tf version",
+        "Terraform version",
         [
-            validators.length(min=4, max=10, message="tf version out of reange."),
+            validators.length(min=5, max=5, message="tf version out of reange."),
             validators.DataRequired(message="tf version requerid."),
         ],
     )
     project_path = StringField(
-        "project_path",
+        "Project_path",
         [
             validators.length(min=1, max=20, message="Folder path when use monorepo"),
         ],
     )
-    description = TextAreaField(
+    description = StringField(
         "Description",
-        [validators.DataRequired(message="The description is required.")],
-        render_kw={"rows": 5},
+        [
+            validators.length(min=1, max=10, message="Set short Description"),
+        ],
     )
     squad_access_edit = StringField(
         "Squad Access (* share with everyone or pass a list: squad1, squad2)",
         render_kw={"rows": 1},
     )
-    tfvar_file = StringField(
-        "tfvar_file",
-        [
-            validators.length(min=2, max=30, message="Tfvars file name."),
-        ],
-    )
-    project_path = StringField(
-        "project_path",
-        [
-            validators.length(min=2, max=30, message="Project path name"),
-        ],
-    )
-    branch = StringField(
-        "branch",
-        [
-            validators.length(
-                min=2, max=30, message="Custom branch if empty use stack default branch"
-            ),
-        ],
-    )
-    description_edit = StringField("Description", render_kw={"rows": 1})
 
 
 class DeployForm(FlaskForm):
