@@ -3,6 +3,7 @@
 import ast
 import json
 import time
+from turtle import st
 
 import redis
 from app import login_manager
@@ -42,7 +43,7 @@ def index():
 
 
 # Start Deploy
-@blueprint.route("/deploys-list", defaults={"limit": 15})
+@blueprint.route("/deploys-list", defaults={"limit": 9999999999999999999})
 @blueprint.route("/deploys-list/<int:limit>")
 @login_required
 def list_deploys(limit):
@@ -453,14 +454,15 @@ def new_stack():
         squad_acces_form_to_list = squad_acces_form.split(",")
         if request.method == "POST":
             new_stack: dict = {
-                "stack_name": form.name.data,
-                "git_repo": form.git.data,
-                "branch": form.branch.data,
+                "stack_name": form.name.data.replace(" ",""),
+                "git_repo": form.git.data.replace(" ",""),
+                "branch": form.branch.data.replace(" ",""),
                 "squad_access": squad_acces_form_to_list,
-                "tf_version": form.tf_version.data,
-                "project_path": form.project_path.data,
+                "tf_version": form.tf_version.data.replace(" ",""),
+                "project_path": form.project_path.data.replace(" ",""),
                 "description": form.description.data,
             }
+            print(new_stack)
             response = request_url(
                 verb="POST",
                 uri="stacks/",
@@ -501,13 +503,13 @@ def edit_stack(stack_id):
             squad_acces_form = form.squad_access_edit.data
             squad_acces_form_to_list = squad_acces_form.split(",")
             update_stack = {
-                "stack_name": form.name.data,
-                "git_repo": form.git.data,
-                "branch": form.branch.data,
+                "stack_name": form.name.data.replace(" ",""),
+                "git_repo": form.git.data.replace(" ",""),
+                "branch": form.branch.data.replace(" ",""),
                 "squad_access": squad_acces_form_to_list,
-                "tf_version": form.tf_version.data,
-                "project_path": form.project_path.data,
-                "description": form.description_edit.data,
+                "tf_version": form.tf_version.data.replace(" ",""),
+                "project_path": form.project_path.data.replace(" ",""),
+                "description": form.description.data,
             }
             # Deploy
             response = request_url(
@@ -683,6 +685,7 @@ def deploy_stack(stack_id):
                 "project_path": request.form.get("project_path"),
                 "variables": variables,
             }
+            print(data)
             endpoint = f"plan"
             if not "plan" in request.form.get("button"):
                 endpoint = f"deploy"
@@ -745,7 +748,7 @@ def get_task(task_id):
         return redirect(url_for("base_blueprint.logout"))
 
 
-@blueprint.route("/tasks-logs/", defaults={"limit": 15})
+@blueprint.route("/tasks-logs/", defaults={"limit": 9999999999999999999})
 @blueprint.route("/tasks-logs/<int:limit>")
 @login_required
 def list_tasks(limit):
@@ -787,7 +790,7 @@ def list_task(task_id):
 
 
 # activity logs
-@blueprint.route("/activity-logs/", defaults={"limit": 15})
+@blueprint.route("/activity-logs/", defaults={"limit": 9999999999999999999})
 @blueprint.route("/activity-logs/<int:limit>")
 @login_required
 def list_activity(limit):
