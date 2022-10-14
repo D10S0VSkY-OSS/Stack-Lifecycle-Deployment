@@ -3,7 +3,6 @@
 import ast
 import json
 import time
-from turtle import st
 
 import redis
 from app import login_manager
