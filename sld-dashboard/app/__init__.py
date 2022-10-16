@@ -26,7 +26,7 @@ def configure_database(app):
     @app.before_first_request
     def initialize_database():
         try:
-            db.create_all()
+            pass
         except Exception as err:
             pass
 

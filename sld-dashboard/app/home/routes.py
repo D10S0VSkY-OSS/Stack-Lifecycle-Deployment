@@ -254,9 +254,9 @@ def edit_deploy(deploy_id):
             data = {
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
-                "stack_branch": form.branch.data,
-                "tfvar_file": form.tfvar_file.data,
-                "project_path": form.project_path.data,
+                "stack_branch": form.branch.data.replace(" ",""),
+                "tfvar_file": form.tfvar_file.data.replace(" ",""),
+                "project_path": form.project_path.data.replace(" ",""),
                 "variables": ast.literal_eval(variables),
             }
             if not "deploy" in request.form.get("button"):
@@ -335,13 +335,13 @@ def get_plan(deploy_id):
             # Data dend to deploy
             data = {
                 "name": deploy["name"],
-                "stack_name": deploy["stack_name"],
-                "environment": deploy["environment"],
+                "stack_name": deploy["stack_name"].replace(" ",""),
+                "environment": deploy["environment"].replace(" ",""),
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
-                "stack_branch": form.branch.data,
-                "tfvar_file": form.tfvar_file.data,
-                "project_path": form.project_path.data,
+                "stack_branch": form.branch.data.replace(" ",""),
+                "tfvar_file": form.tfvar_file.data.replace(" ",""),
+                "project_path": form.project_path.data.replace(" ",""),
                 "variables": ast.literal_eval(variables),
             }
             # Deploy
@@ -673,15 +673,15 @@ def deploy_stack(stack_id):
                 }
                 variables = ast.literal_eval(json.dumps(convert_to_dict(data_raw)))
             data = {
-                "name": form.deploy_name.data,
+                "name": form.deploy_name.data.replace(" ",""),
                 "stack_name": stack["json"]["stack_name"],
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
                 "squad": request.form.get("squad"),
                 "environment": request.form.get("environment"),
-                "stack_branch": request.form.get("branch"),
-                "tfvar_file": request.form.get("tfvar_file"),
-                "project_path": request.form.get("project_path"),
+                "stack_branch": request.form.get("branch").replace(" ",""),
+                "tfvar_file": request.form.get("tfvar_file").replace(" ",""),
+                "project_path": request.form.get("project_path").replace(" ",""),
                 "variables": variables,
             }
             print(data)
@@ -825,10 +825,10 @@ def new_user():
         check_unauthorized_token(token)
         if request.method == "POST":
             new_user: dict = {
-                "username": form.username.data,
+                "username": form.username.data.replace(" ",""),
                 "fullname": form.fullname.data,
                 "password": form.password.data,
-                "email": form.email.data,
+                "email": form.email.data.replace(" ",""),
                 "squad": form.squad.data.split(","),
                 "role": request.form.get("role").split(","),
                 "is_active": form.is_active.data,
@@ -995,14 +995,14 @@ def new_aws_account():
         check_unauthorized_token(token)
         if request.method == "POST":
             new_user: dict = {
-                "squad": form.squad.data,
-                "environment": form.environment.data,
-                "access_key_id": form.access_key_id.data,
-                "secret_access_key": form.secret_access_key.data,
-                "default_region": form.default_region.data,
-                "profile_name": form.profile_name.data,
-                "role_arn": form.role_arn.data,
-                "source_profile": form.source_profile.data,
+                "squad": form.squad.data.replace(" ",""),
+                "environment": form.environment.data.replace(" ",""),
+                "access_key_id": form.access_key_id.data.replace(" ",""),
+                "secret_access_key": form.secret_access_key.data.replace(" ",""),
+                "default_region": form.default_region.data.replace(" ",""),
+                "profile_name": form.profile_name.data.replace(" ",""),
+                "role_arn": form.role_arn.data.replace(" ",""),
+                "source_profile": form.source_profile.data.replace(" ",""),
             }
             response = request_url(
                 verb="POST",
@@ -1089,8 +1089,8 @@ def new_gcp_account():
         check_unauthorized_token(token)
         if request.method == "POST":
             new_user: dict = {
-                "squad": form.squad.data,
-                "environment": form.environment.data,
+                "squad": form.squad.data.replace(" ",""),
+                "environment": form.environment.data.replace(" ",""),
                 "gcloud_keyfile_json": ast.literal_eval(form.gcloud_keyfile_json.data),
             }
             response = request_url(
@@ -1177,12 +1177,12 @@ def new_azure_account():
             # Check if token no expired
             check_unauthorized_token(token)
             new_user: dict = {
-                "squad": form.squad.data,
-                "environment": form.environment.data,
-                "subscription_id": form.subscription_id.data,
-                "client_id": form.client_id.data,
-                "client_secret": form.client_secret.data,
-                "tenant_id": form.tenant_id.data,
+                "squad": form.squad.data.replace(" ",""),
+                "environment": form.environment.data.replace(" ",""),
+                "subscription_id": form.subscription_id.data.replace(" ",""),
+                "client_id": form.client_id.data.replace(" ",""),
+                "client_secret": form.client_secret.data.replace(" ",""),
+                "tenant_id": form.tenant_id.data.replace(" ",""),
             }
             response = request_url(
                 verb="POST",
@@ -1335,8 +1335,8 @@ def new_custom_providers_account():
         check_unauthorized_token(token)
         if request.method == "POST":
             new_provider: dict = {
-                "squad": form.squad.data,
-                "environment": form.environment.data,
+                "squad": form.squad.data.replace(" ",""),
+                "environment": form.environment.data.replace(" ",""),
                 "configuration": ast.literal_eval(form.configuration.data),
             }
             response = request_url(
