@@ -301,6 +301,9 @@ def pipeline_plan(
 ):
     filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     try:
+        r.set(f"{name}-{squad}-{environment}", "Locked")
+        logger.info(f"[DEPLOY] lock sld {name}-{squad}-{environment}")
+        r.expire(f"{name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
         logger.info(
             f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment}"
         )
@@ -366,7 +369,8 @@ def pipeline_plan(
         raise Ignore()
     finally:
         dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        # Utils.delete_local_folder(dir_path)
+        Utils.delete_local_folder(dir_path)
+        r.delete(f"{name}-{squad}-{environment}")
 
 
 @celery_app.task(
