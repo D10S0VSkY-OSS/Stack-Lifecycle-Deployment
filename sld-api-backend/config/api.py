@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     AWS_SHARED_CONFIG_FILE: str = f"{AWS_CONGIG_DEFAULT_FOLDER}/config"
     TASK_MAX_RETRY: int = os.getenv("SLD_TASK_MAX_RETRY", 1)
     TASK_RETRY_INTERVAL: int = os.getenv("SLD_TASK_RETRY_INTERVAL", 20)
-    TASK_LOCKED_EXPIRED = os.getenv("SLD_TASK_LOCKED_EXPIRED", 3600)
+    TASK_LOCKED_EXPIRED = os.getenv("SLD_TASK_LOCKED_EXPIRED", 300)
     TASK_ROUTE: bool = os.getenv("SLD_TASK_ROUTE", False)
     TERRAFORM_BIN_REPO: str = os.getenv(
         "SLD_TERRAFORM_BIN_REPO", "https://releases.hashicorp.com/terraform"
