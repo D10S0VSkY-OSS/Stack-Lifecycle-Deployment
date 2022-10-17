@@ -24,11 +24,11 @@ jobs:
 
     - name: Build the Docker image with tags
       working-directory: ./sld-dashboard
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-dashboard:2.13.1
+      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-dashboard:2.13.2
       
     - name: Docker Push with tags
       #if: github.event.pull_request.merged == true
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-dashboard:2.13.1
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-dashboard:2.13.2
 
     - name: Build the Docker image
       working-directory: ./sld-dashboard

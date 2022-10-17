@@ -25,8 +25,6 @@ async def plan_infra_by_stack_name(
     db: Session = Depends(deps.get_db),
 ):
     response.status_code = status.HTTP_202_ACCEPTED
-    for i in deploy:
-        print(i)
 
     squad = deploy.squad
     # Get squad from current user
