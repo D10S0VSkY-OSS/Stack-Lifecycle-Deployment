@@ -1,8 +1,9 @@
 import datetime
 
 from config.database import Base
+from sqlalchemy.orm import relationship
 from sqlalchemy import (Column, DateTime, Integer, String, Text,
-                        UniqueConstraint)
+                        UniqueConstraint, ForeignKey)
 
 
 class Aws_provider(Base):
@@ -18,3 +19,4 @@ class Aws_provider(Base):
     source_profile = Column(String(200), nullable=True)
     created_at = Column(DateTime, default=datetime.datetime.now())
     __table_args__ = (UniqueConstraint("squad", "environment"),)
+

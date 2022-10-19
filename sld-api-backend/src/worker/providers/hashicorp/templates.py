@@ -75,7 +75,6 @@ class GetVars(StructBase):
     def get_vars_json(self) -> dict:
         try:
             file_hcl = self.__set_path()
-            print(file_hcl)
             with open(file_hcl, "r") as fp:
                 obj = hcl.load(fp)
             if obj.get("variable"):

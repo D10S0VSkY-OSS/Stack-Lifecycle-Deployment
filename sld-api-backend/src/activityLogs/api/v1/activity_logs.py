@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from security import deps
+from src.shared.security import deps
 from sqlalchemy.orm import Session
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.users.domain.entities import users as schemas_users

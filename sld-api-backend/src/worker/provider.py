@@ -1,8 +1,8 @@
 # DI terraform provider
-from core.providers.hashicorp.actions import Actions, SimpleActions
-from core.providers.hashicorp.artifact import Artifact
-from core.providers.hashicorp.download import BinaryDownload
-from core.providers.hashicorp.templates import Backend, GetVars, Tfvars
+from src.worker.providers.hashicorp.actions import Actions, SimpleActions
+from src.worker.providers.hashicorp.artifact import Artifact
+from src.worker.providers.hashicorp.download import BinaryDownload
+from src.worker.providers.hashicorp.templates import Backend, GetVars, Tfvars
 
 
 class ProviderRequirements:

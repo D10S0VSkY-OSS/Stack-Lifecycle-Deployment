@@ -1,8 +1,8 @@
 from config.api import settings
 from fastapi import APIRouter, Depends, HTTPException
-from helpers.get_data import (activity_log, check_role_user, check_squad_user,
+from src.shared.helpers.get_data import (activity_log, check_role_user, check_squad_user,
                               user_squad_scope)
-from security import deps
+from src.shared.security import deps
 from sqlalchemy.orm import Session
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.users.domain.entities.users import (PasswordReset, User, UserCreate,

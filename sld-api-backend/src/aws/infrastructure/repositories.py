@@ -1,7 +1,7 @@
 import datetime
 
 import src.aws.infrastructure.models as models
-from security.vault import vault_decrypt, vault_encrypt
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy.orm import Session
 from src.aws.domain.entities import aws as schemas_aws
 
@@ -131,10 +131,10 @@ def get_all_aws_profile(db: Session):
 
 
 def delete_aws_profile_by_id(db: Session, aws_profile_id: int):
-    db.query(models.Aws_provider).filter(
-        models.Aws_provider.id == aws_profile_id
-    ).delete()
     try:
+        db.query(models.Aws_provider).filter(
+            models.Aws_provider.id == aws_profile_id
+        ).delete()
         db.commit()
         return {aws_profile_id: "deleted", "aws_profile_id": aws_profile_id}
     except Exception as err:

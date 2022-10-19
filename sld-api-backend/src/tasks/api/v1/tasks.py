@@ -3,7 +3,7 @@ import ast
 from celery.result import AsyncResult
 from config.celery_config import celery_app
 from fastapi import APIRouter, Depends, HTTPException
-from security import deps
+from src.shared.security import deps
 from sqlalchemy.orm import Session
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users

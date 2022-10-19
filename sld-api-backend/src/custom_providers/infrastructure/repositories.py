@@ -1,7 +1,7 @@
 import datetime
 
 import src.custom_providers.infrastructure.models as models
-from security.vault import vault_decrypt, vault_encrypt
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
 
@@ -86,10 +86,10 @@ def get_all_custom_profile(db: Session):
 
 
 def delete_custom_profile_by_id(db: Session, custom_profile_id: int):
-    db.query(models.Custom_provider).filter(
-        models.Custom_provider.id == custom_profile_id
-    ).delete()
     try:
+        db.query(models.Custom_provider).filter(
+            models.Custom_provider.id == custom_profile_id
+        ).delete()
         db.commit()
         return {custom_profile_id: "deleted", "custom_profile_id": custom_profile_id}
     except Exception as err:
