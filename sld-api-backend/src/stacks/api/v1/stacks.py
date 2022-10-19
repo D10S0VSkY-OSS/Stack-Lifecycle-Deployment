@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
-from helpers.get_data import (check_providers, check_squad_stack,
+from src.shared.helpers.get_data import (check_providers, check_squad_stack,
                               check_squad_user)
-from helpers.push_task import sync_git
-from security import deps
+from src.shared.helpers.push_task import sync_git
+from src.shared.security import deps
 from sqlalchemy.orm import Session
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.stacks.domain.entities import stacks as schemas_stacks

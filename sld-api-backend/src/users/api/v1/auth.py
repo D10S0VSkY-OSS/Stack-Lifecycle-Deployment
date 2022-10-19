@@ -2,7 +2,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
-from security import deps
+from src.shared.security import deps
 from src.users.application.tokens import UserExist
 from sqlalchemy.orm import Session
 from src.users.domain.entities import users as schemas_users

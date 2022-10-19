@@ -6,8 +6,8 @@ import bcrypt
 import src.users.domain.entities.users as schemas
 import src.users.infrastructure.models as models
 from config.api import settings
-from security.vault import get_password_hash
-from security.vault import vault_decrypt, vault_encrypt
+from src.shared.security.vault import get_password_hash
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
 

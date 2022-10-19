@@ -1,10 +1,10 @@
 from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
                      Response, status)
-from helpers.get_data import (check_cron_schedule, check_deploy_exist,
+from src.shared.helpers.get_data import (check_cron_schedule, check_deploy_exist,
                               check_deploy_state, check_squad_user, deploy,
                               stack, check_prefix)
-from helpers.push_task import async_plan
-from security import deps
+from src.shared.helpers.push_task import async_plan
+from src.shared.security import deps
 from sqlalchemy.orm import Session
 from src.deploy.domain.entities import deploy as schemas_deploy
 from src.deploy.domain.entities import plan as schemas_plan

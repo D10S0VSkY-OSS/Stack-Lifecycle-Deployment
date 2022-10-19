@@ -1,12 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, Response
-from security import deps
+from src.shared.security import deps
 from sqlalchemy.orm import Session
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.aws.domain.entities import aws as schemas_aws
 from src.aws.infrastructure import repositories as crud_aws
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-from src.deploy.infrastructure import repositories as crud_deploy
 
 router = APIRouter()
 

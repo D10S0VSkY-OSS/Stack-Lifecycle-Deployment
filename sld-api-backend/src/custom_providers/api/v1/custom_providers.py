@@ -1,6 +1,6 @@
 import imp
 from fastapi import APIRouter, Depends, HTTPException, Response
-from security import deps
+from src.shared.security import deps
 from sqlalchemy.orm import Session
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.custom_providers.domain.entities import custom_providers as schemas_custom_provider

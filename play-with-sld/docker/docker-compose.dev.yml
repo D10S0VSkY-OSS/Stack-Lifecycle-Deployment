@@ -8,7 +8,7 @@ services:
     cap_add:
       - SYS_NICE 
     volumes:
-      - sld-db:/var/lib/mysql
+      - sld-db_dev:/var/lib/mysql
     restart: always
     ports:
       - 3306:3306
@@ -50,13 +50,14 @@ services:
       - MONGO_INITDB_ROOT_USERNAME=admin
       - MONGO_INITDB_ROOT_PASSWORD=admin
     volumes:
-      - mongo-volume:/data/db
+      - mongo-volume_dev:/data/db
     ports:
       - 27017:27017  
 
   # sd-remote-state
   remote-state:
-    image: d10s0vsky/sld-remote-state:latest
+    build: ../../sld-remote-state/
+    #image: d10s0vsky/sld-remote-state:latest
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8080 --workers 4
     hostname: remote-state
     environment:
@@ -67,7 +68,8 @@ services:
   
   # sd-remote-state
   schedule:
-    image: d10s0vsky/sld-schedule:latest
+    build: ../../sld-schedule/
+    #image: d10s0vsky/sld-schedule:latest
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 10000 --workers 4
     hostname: schedule
     ports:
@@ -83,7 +85,8 @@ services:
 
   # Celery worker
   worker:
-    image: d10s0vsky/sld-api:latest
+    build: ../../sld-api-backend/
+    #image: d10s0vsky/sld-api:latest
     entrypoint: ["celery", "--app", "src.worker.tasks.terraform_worker", "worker", "--loglevel=info", "-c", "8", "-E", "-Q", "any,squad,squad1,squad2"]
     environment:
       BROKER_USER: admin
@@ -96,7 +99,8 @@ services:
 
   # SLD Dashboard - UI
   sld-dashboard:
-    image: d10s0vsky/sld-dashboard:latest
+    build: ../../sld-dashboard/
+    #image: d10s0vsky/sld-dashboard:latest
     hostname: sld-dashboard
     entrypoint: gunicorn --config gunicorn-cfg.py run:app
     restart: always
@@ -116,7 +120,8 @@ services:
 
   # FastApi Stack Deploy
   api-backend:
-    image: d10s0vsky/sld-api:latest
+    build: ../../sld-api-backend/
+    #image: d10s0vsky/sld-api:latest
     entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 
     hostname: api-backend
     ports:
@@ -134,5 +139,5 @@ services:
       - rabbit
 
 volumes:
-  sld-db:
-  mongo-volume:
+  sld-db_dev:
+  mongo-volume_dev:

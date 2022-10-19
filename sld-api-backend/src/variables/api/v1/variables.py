@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
-from helpers.get_data import check_squad_user
-from security import deps
+from src.shared.helpers.get_data import check_squad_user
+from src.shared.security import deps
 from sqlalchemy.orm import Session
 from src.deploy.infrastructure import repositories as crud_deploys
 from src.stacks.infrastructure import repositories as crud_stacks

@@ -7,11 +7,11 @@ from celery.exceptions import Ignore
 from celery.utils.log import get_task_logger
 from config.api import settings
 from config.celery_config import celery_app
-from core.provider import (ProviderActions, ProviderGetVars,
+from src.worker.provider import (ProviderActions, ProviderGetVars,
                            ProviderRequirements)
-from helpers.folders import Utils
-from helpers.metrics import push_metric
-from helpers.schedule import request_url
+from src.worker.tasks.helpers.folders import Utils
+from src.worker.tasks.helpers.schedule import request_url
+from src.worker.tasks.helpers.metrics import push_metric
 
 r = redis.Redis(
     host=settings.BACKEND_SERVER,

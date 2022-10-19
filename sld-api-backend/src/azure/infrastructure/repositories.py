@@ -2,7 +2,7 @@ import datetime
 import imp
 
 import src.azure.infrastructure.models as models
-from security.vault import vault_decrypt, vault_encrypt
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
 from src.azure.domain.entities import azure as schemas_azure
@@ -113,10 +113,10 @@ def get_all_azure_profile(db: Session):
 
 
 def delete_azure_profile_by_id(db: Session, azure_profile_id: int):
-    db.query(models.Azure_provider).filter(
-        models.Azure_provider.id == azure_profile_id
-    ).delete()
     try:
+        db.query(models.Azure_provider).filter(
+            models.Azure_provider.id == azure_profile_id
+        ).delete()
         db.commit()
         return {azure_profile_id: "deleted", "azure_profile_id": azure_profile_id}
     except Exception as err:
