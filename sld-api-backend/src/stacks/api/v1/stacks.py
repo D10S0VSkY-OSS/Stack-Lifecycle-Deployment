@@ -190,9 +190,6 @@ async def delete_stack_by_id_or_name(
             result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
             if result is None:
                 raise HTTPException(status_code=404, detail="Stack id not found")
-            deploy = crud_deploy.get_deploy_by_stack(db=db, stack_name=stack)
-            if deploy is not None:
-                raise HTTPException(status_code=409, detail=f"Stack is used by {deploy.name}")
             # Check if the user have permissions for delete stack
             check_squad_stack(db, current_user, current_user.squad, result.squad_access)
 
@@ -207,9 +204,6 @@ async def delete_stack_by_id_or_name(
         result = crud_stacks.get_stack_by_id(db=db, stack_id=stack)
         if result is None:
             raise HTTPException(status_code=404, detail="Stack id not found")
-        deploy = crud_deploy.get_deploy_by_stack(db=db, stack_name=result.stack_name)
-        if deploy is not None:
-            raise HTTPException(status_code=409, detail=f"The stack is being used by {deploy.name}")
 
         # Check if the user have permissions for create stack
         check_squad_stack(db, current_user, current_user.squad, result.squad_access)

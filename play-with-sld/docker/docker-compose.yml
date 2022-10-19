@@ -8,7 +8,7 @@ services:
     cap_add:
       - SYS_NICE 
     volumes:
-      - sld-db:/var/lib/mysql
+      - sld-db2:/var/lib/mysql
     restart: always
     ports:
       - 3306:3306
@@ -139,5 +139,5 @@ services:
       - rabbit
 
 volumes:
-  sld-db:
+  sld-db2:
   mongo-volume:

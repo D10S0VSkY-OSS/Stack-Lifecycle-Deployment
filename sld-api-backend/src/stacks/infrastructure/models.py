@@ -1,6 +1,7 @@
 import datetime
 
 from config.database import Base
+from sqlalchemy.orm import relationship
 from sqlalchemy import JSON, Column, DateTime, Integer, String, Text
 
 
@@ -19,3 +20,4 @@ class Stack(Base):
     created_at = Column(DateTime, default=datetime.datetime.now())
     description = Column(Text())
     user_id = Column(Integer)
+    deploy = relationship("Deploy")

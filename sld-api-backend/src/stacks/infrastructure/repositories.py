@@ -1,8 +1,11 @@
 import datetime
+from fastapi import HTTPException
 
 import src.stacks.domain.entities.stacks as schemas
 import src.stacks.infrastructure.models as models
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
+
 
 
 def create_new_stack(
@@ -33,6 +36,8 @@ def create_new_stack(
         db.commit()
         db.refresh(db_stack)
         return db_stack
+    except IntegrityError as err:
+        raise HTTPException(status_code=409, detail="The stack name already exist")
     except Exception as err:
         raise err
 
@@ -120,12 +125,15 @@ def get_stack_by_id(db: Session, stack_id: int):
 
 
 def delete_stack_by_id(db: Session, stack_id: int):
-    db.query(models.Stack).filter(models.Stack.id == stack_id).delete()
     try:
+        db.query(models.Stack).filter(models.Stack.id == stack_id).delete()
         db.commit()
         return {"result": "deleted", "stack_id": stack_id}
+    except IntegrityError:
+        raise HTTPException(status_code=409, detail="The stack cannot be removed, check that it is not used by any deploy")
     except Exception as err:
         raise err
+       
 
 
 def get_stack_by_name(db: Session, stack_name: str):
@@ -138,9 +146,11 @@ def get_stack_by_name(db: Session, stack_name: str):
 
 
 def delete_stack_by_name(db: Session, stack_name: str):
-    db.query(models.Stack).filter(models.Stack.stack_name == stack_name).delete()
     try:
+        db.query(models.Stack).filter(models.Stack.stack_name == stack_name).delete()
         db.commit()
         return {"result": "deleted", "stack_name": stack_name}
+    except IntegrityError:
+        raise HTTPException(status_code=409, detail="The stack cannot be removed, check that it is not used by any deploy")
     except Exception as err:
         raise err

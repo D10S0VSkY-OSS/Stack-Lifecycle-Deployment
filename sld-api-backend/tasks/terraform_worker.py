@@ -43,7 +43,6 @@ def pipeline_deploy(
     project_path: str = "",
     user: str = "",
 ):
-    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     try:
         logger.info(
             f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment}"
@@ -76,8 +75,6 @@ def pipeline_deploy(
 
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
         # Delete artifactory to avoid duplicating the runner logs
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
-        Utils.delete_local_folder(dir_path)
         if result["rc"] != 0:
             logger.error(
                 f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
@@ -116,9 +113,6 @@ def pipeline_deploy(
             variables_file,
             project_path,
         )
-        # Delete artifactory to avoid duplicating the runner logs
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
-        Utils.delete_local_folder(dir_path)
 
         if result["rc"] != 0:
             logger.error(
@@ -206,7 +200,6 @@ def pipeline_destroy(
     project_path: str = "",
     user: str = "",
 ):
-    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     try:
         logger.info(
             f"User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment}"
@@ -299,7 +292,6 @@ def pipeline_plan(
     project_path: str = "",
     user: str = "",
 ):
-    filter_kwargs = {key: value for (key, value) in kwargs.items() if "pass" not in key}
     try:
         r.set(f"{name}-{squad}-{environment}", "Locked")
         logger.info(f"[DEPLOY] lock sld {name}-{squad}-{environment}")
@@ -321,8 +313,6 @@ def pipeline_plan(
             f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
         )
         result = ProviderRequirements.binary_download(version)
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/artifacts"
-        Utils.delete_local_folder(dir_path)
         if result["rc"] != 0:
             logger.error(
                 f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
@@ -355,8 +345,6 @@ def pipeline_plan(
             variables_file,
             project_path,
         )
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}/artifacts"
-        Utils.delete_local_folder(dir_path)
         if result["rc"] != 0:
             logger.error(
                 f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} execute terraform plan"
@@ -408,7 +396,7 @@ def pipeline_git_pull(
         self.update_state(state=states.FAILURE, meta={"exc": result})
         raise Ignore()
     finally:
-        dir_path = f"/tmp/artifacts"
+        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
         Utils.delete_local_folder(dir_path)
 
 
@@ -451,7 +439,7 @@ def output(self, stack_name: str, squad: str, environment: str, name: str):
     except Exception as err:
         return {"stdout": err}
     finally:
-        dir_path = f"/tmp/artifacts"
+        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
         Utils.delete_local_folder(dir_path)
 
 
