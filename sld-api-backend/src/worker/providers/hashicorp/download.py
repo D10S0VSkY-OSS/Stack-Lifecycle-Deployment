@@ -4,6 +4,8 @@ import zipfile
 from io import BytesIO
 
 import requests
+from urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 from config.api import settings
 
 
@@ -17,7 +19,7 @@ class BinaryDownload:
             if not os.path.exists(f"/tmp/{self.version}"):
                 os.mkdir(f"/tmp/{self.version}")
             if not os.path.isfile(f"/tmp/{self.version}/terraform"):
-                req = requests.get(binary)
+                req = requests.get(binary, verify=False)
                 _zipfile = zipfile.ZipFile(BytesIO(req.content))
                 _zipfile.extractall(f"/tmp/{self.version}")
                 st = os.stat(f"/tmp/{self.version}/terraform")
