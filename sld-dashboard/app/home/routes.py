@@ -42,7 +42,7 @@ def index():
 
 
 # Start Deploy
-@blueprint.route("/deploys-list", defaults={"limit": 9999999999999})
+@blueprint.route("/deploys-list", defaults={"limit": 0})
 @blueprint.route("/deploys-list/<int:limit>")
 @login_required
 def list_deploys(limit):
@@ -52,12 +52,16 @@ def list_deploys(limit):
         check_unauthorized_token(token)
         # get stack info
         endpoint = f"stacks/?limit={limit}"
+        if limit == 0:
+            endpoint = f"stacks/" 
         stack_response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
         stack = stack_response.get("json")
         # Get deploy data vars and set var for render
         endpoint = f"deploy/?limit={limit}"
+        if limit == 0:
+            endpoint = f"deploy/" 
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -747,7 +751,7 @@ def get_task(task_id):
         return redirect(url_for("base_blueprint.logout"))
 
 
-@blueprint.route("/tasks-logs/", defaults={"limit": 99999999999999})
+@blueprint.route("/tasks-logs/", defaults={"limit": 0})
 @blueprint.route("/tasks-logs/<int:limit>")
 @login_required
 def list_tasks(limit):
@@ -756,6 +760,8 @@ def list_tasks(limit):
         # Check if token no expired
         check_unauthorized_token(token)
         endpoint = f"tasks/all?limit={limit}"
+        if limit == 0:
+            endpoint = f"tasks/all"
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -789,7 +795,7 @@ def list_task(task_id):
 
 
 # activity logs
-@blueprint.route("/activity-logs/", defaults={"limit": 99999999999999})
+@blueprint.route("/activity-logs/", defaults={"limit": 0})
 @blueprint.route("/activity-logs/<int:limit>")
 @login_required
 def list_activity(limit):
@@ -798,6 +804,8 @@ def list_activity(limit):
         # Check if token no expired
         check_unauthorized_token(token)
         endpoint = f"activity/all?limit={limit}"
+        if limit == 0:
+            endpoint = f"activity/all"
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -856,7 +864,7 @@ def new_user():
         return redirect(url_for("base_blueprint.logout"))
 
 
-@blueprint.route("/users-list/", defaults={"limit": 30})
+@blueprint.route("/users-list/", defaults={"limit": 0})
 @blueprint.route("/users-list/<int:limit>")
 @login_required
 def list_users(limit):
@@ -865,6 +873,8 @@ def list_users(limit):
         # Check if token no expired
         check_unauthorized_token(token)
         endpoint = f"users/?limit={limit}"
+        if limit == 0:
+            endpoint = f"users/" 
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -1276,17 +1286,17 @@ def route_template(template):
         # Get Api data
         deploy_response = request_url(
             verb="GET",
-            uri=f"deploy?limit=10000",
+            uri=f"deploy",
             headers={"Authorization": f"Bearer {token}"},
         )
         stack_response = request_url(
             verb="GET",
-            uri=f"stacks/?limit=10000",
+            uri=f"stacks/",
             headers={"Authorization": f"Bearer {token}"},
         )
         tasks_response = request_url(
             verb="GET",
-            uri=f"tasks/all?limit=10000",
+            uri=f"tasks/all",
             headers={"Authorization": f"Bearer {token}"},
         )
         try:
