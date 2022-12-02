@@ -57,7 +57,7 @@ services:
   # sd-remote-state
   remote-state:
     image: d10s0vsky/sld-remote-state:latest
-    entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8080 --workers 4
+    entrypoint: python -m uvicorn main:app --host 0.0.0.0 --port 8080 --workers 4
     hostname: remote-state
     environment:
       SLD_STORAGE_BACKEND: mongodb
@@ -68,7 +68,7 @@ services:
   # sd-remote-state
   schedule:
     image: d10s0vsky/sld-schedule:latest
-    entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 10000 --workers 4
+    entrypoint: python -m uvicorn main:app --host 0.0.0.0 --port 10000 --workers 4
     hostname: schedule
     ports:
       - "10000:10000"
@@ -117,7 +117,7 @@ services:
   # FastApi Stack Deploy
   api-backend:
     image: d10s0vsky/sld-api:latest
-    entrypoint: python3 -m uvicorn main:app --host 0.0.0.0 --port 8000 
+    entrypoint: python -m uvicorn main:app --host 0.0.0.0 --port 8000 
     hostname: api-backend
     ports:
       - "8000:8000"

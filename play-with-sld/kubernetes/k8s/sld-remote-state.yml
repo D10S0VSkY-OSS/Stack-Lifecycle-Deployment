@@ -24,7 +24,7 @@ spec:
           - name: SLD_MONGODB_URL
             value: "mongodb:27017/"
           imagePullPolicy: Always
-          command: ["python3", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
+          command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
           ports:
             - containerPort: 8080
           livenessProbe:
