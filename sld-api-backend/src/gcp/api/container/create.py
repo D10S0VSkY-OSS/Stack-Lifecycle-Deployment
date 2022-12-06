@@ -1,12 +1,13 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
-from src.shared.security import deps
+from fastapi import Depends, HTTPException, Response
 from sqlalchemy.orm import Session
+
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.gcp.domain.entities import gcp as schemas_gcp
 from src.gcp.infrastructure import repositories as crud_gcp
+from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-from src.deploy.infrastructure import repositories as crud_deploy
+
 
 async def new_gcloud_profile(
     gcp: schemas_gcp.GcloudBase,
@@ -42,4 +43,3 @@ async def new_gcloud_profile(
         return {"result": f"Create GCP account {gcp.squad} {gcp.environment}"}
     except Exception as err:
         raise HTTPException(status_code=400, detail=err)
-

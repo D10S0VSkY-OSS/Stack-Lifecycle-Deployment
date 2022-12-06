@@ -5,6 +5,7 @@ from dataclasses import dataclass
 import jmespath
 import requests
 from config.api import settings
+
 from src.worker.security.providers_credentials import secret, unsecret
 
 

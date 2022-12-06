@@ -1,12 +1,11 @@
 from fastapi import Depends, HTTPException
-from src.shared.security import deps
 from sqlalchemy.orm import Session
+
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.azure.infrastructure import repositories as crud_azure
+from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-
-
 
 
 async def azure_account_by_id(

@@ -1,13 +1,14 @@
-import imp
-from fastapi import APIRouter, Depends, HTTPException, Response
-from src.shared.security import deps
+from fastapi import Depends, HTTPException, Response
 from sqlalchemy.orm import Session
+
 from src.activityLogs.infrastructure import repositories as crud_activity
-from src.custom_providers.domain.entities import custom_providers as schemas_custom_provider
+from src.custom_providers.domain.entities import (
+    custom_providers as schemas_custom_provider,
+)
 from src.custom_providers.infrastructure import repositories as crud_custom_provider
+from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-from src.deploy.infrastructure import repositories as crud_deploy
 
 
 async def create_custom_provider_profile(
@@ -41,6 +42,8 @@ async def create_custom_provider_profile(
             squad=current_user.squad,
             action=f"Create custom provider account {result.id}",
         )
-        return {"result": f"Create custom provider account {custom_provider.squad} {custom_provider.environment}"}
+        return {
+            "result": f"Create custom provider account {custom_provider.squad} {custom_provider.environment}"
+        }
     except Exception as err:
         raise HTTPException(status_code=400, detail=err)

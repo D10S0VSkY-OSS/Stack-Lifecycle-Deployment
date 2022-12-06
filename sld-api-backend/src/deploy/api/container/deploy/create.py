@@ -1,17 +1,25 @@
 from fastapi import Depends, HTTPException, Response, status
-from src.shared.helpers.get_data import (check_cron_schedule, check_deploy_exist,
-                              check_deploy_task_pending_state,check_prefix,
-                              check_squad_user,stack)
-from src.shared.helpers.push_task import (async_deploy, 
-                               async_schedule_add, async_schedule_delete)
-from src.shared.security import deps
 from sqlalchemy.orm import Session
+
 from src.deploy.domain.entities import deploy as schemas_deploy
 from src.deploy.infrastructure import repositories as crud_deploys
+from src.shared.helpers.get_data import (
+    check_cron_schedule,
+    check_deploy_exist,
+    check_deploy_task_pending_state,
+    check_prefix,
+    check_squad_user,
+    stack,
+)
+from src.shared.helpers.push_task import (
+    async_deploy,
+    async_schedule_add,
+    async_schedule_delete,
+)
+from src.shared.security import deps
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-
 
 
 async def deploy_infra_by_stack_name(
@@ -98,4 +106,3 @@ async def deploy_infra_by_stack_name(
             async_schedule_add(db_deploy.id, squad)
         except Exception as err:
             print(err)
-

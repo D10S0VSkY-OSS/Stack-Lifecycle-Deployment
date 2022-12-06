@@ -7,9 +7,10 @@ from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import jwt
 from pydantic import ValidationError
+from sqlalchemy.orm import Session
+
 from src.users.application.tokens import decode_access_token
 from src.users.application.validator import Container
-from sqlalchemy.orm import Session
 from src.users.domain.entities import users as schemas
 from src.users.infrastructure import models
 from src.users.infrastructure import repositories as crud_users

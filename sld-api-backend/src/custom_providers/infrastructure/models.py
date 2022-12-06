@@ -1,7 +1,7 @@
 import datetime
 
 from config.database import Base
-from sqlalchemy import Column, DateTime, Integer, String, UniqueConstraint, JSON
+from sqlalchemy import JSON, Column, DateTime, Integer, String, UniqueConstraint
 
 
 class Custom_provider(Base):

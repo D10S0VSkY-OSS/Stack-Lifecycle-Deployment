@@ -5,14 +5,15 @@ from celery.result import AsyncResult
 from config.api import settings
 from croniter import croniter
 from fastapi import HTTPException
+
 from src.activityLogs.infrastructure import repositories as crud_activity
-from src.deploy.infrastructure import repositories as crud_deploys
-from src.stacks.infrastructure import repositories as crud_stacks
-from src.users.infrastructure import repositories as crud_users
 from src.aws.infrastructure import repositories as crud_aws
 from src.azure.infrastructure import repositories as crud_azure
-from src.gcp.infrastructure import repositories as crud_gcp
 from src.custom_providers.infrastructure import repositories as crud_custom_provider
+from src.deploy.infrastructure import repositories as crud_deploys
+from src.gcp.infrastructure import repositories as crud_gcp
+from src.stacks.infrastructure import repositories as crud_stacks
+from src.users.infrastructure import repositories as crud_users
 
 r = redis.Redis(
     host=settings.BACKEND_SERVER,
@@ -212,4 +213,3 @@ def check_prefix(db, stack_name: str, environment: str, squad: str):
             status_code=400,
             detail=f"stack name {stack_name.lower()} env {environment} error {err}  ",
         )
-

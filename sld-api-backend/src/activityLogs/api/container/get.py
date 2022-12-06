@@ -1,9 +1,11 @@
 from fastapi import Depends, HTTPException
-from src.shared.security import deps
 from sqlalchemy.orm import Session
+
 from src.activityLogs.infrastructure import repositories as crud_activity
+from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+
 
 async def get_activity_logs_by_username(
     username: str,

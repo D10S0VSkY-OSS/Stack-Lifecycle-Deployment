@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends
-from src.shared.security import deps
 from sqlalchemy.orm import Session
+
+from src.shared.security import deps
 
 router = APIRouter()
 

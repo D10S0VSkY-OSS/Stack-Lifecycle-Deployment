@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Depends
+
+from src.deploy.api.container.deploy import create, delete, destroy, get, update
 from src.deploy.domain.entities import deploy as schemas_deploy
-from src.deploy.api.container.deploy import create, get, update, delete, destroy
 
 router = APIRouter()
 
 
 @router.post("/", status_code=202)
 async def deploy_infra_by_stack_name(
-    create_deploy: schemas_deploy.DeployCreate = Depends(create.deploy_infra_by_stack_name),
+    create_deploy: schemas_deploy.DeployCreate = Depends(
+        create.deploy_infra_by_stack_name
+    ),
 ):
     return create_deploy
 
@@ -25,11 +28,13 @@ async def destroy_infra(
 ):
     return destroy_deploy
 
+
 @router.delete("/{deploy_id}")
 async def delete_infra_by_id(
     delete_deploy: schemas_deploy.DeployBase = Depends(delete.delete_infra_by_id),
 ):
     return delete_deploy
+
 
 @router.get("/")
 async def get_all_deploys(

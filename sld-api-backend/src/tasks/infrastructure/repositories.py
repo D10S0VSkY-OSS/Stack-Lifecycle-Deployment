@@ -1,7 +1,8 @@
 import datetime
 
-import src.tasks.infrastructure.models as models
 from sqlalchemy.orm import Session
+
+import src.tasks.infrastructure.models as models
 
 
 def create_task(

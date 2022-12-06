@@ -37,7 +37,6 @@ class Artifact(StructBase):
             logging.info(f"Download git repo {self.git_repo} branch {self.branch}")
             os.chdir(directory)
 
-
             result = subprocess.run(
                 f"git clone --recurse-submodules --branch {self.branch} {self.git_repo} {self.name}",
                 shell=True,

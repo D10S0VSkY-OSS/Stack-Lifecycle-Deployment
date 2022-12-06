@@ -1,9 +1,10 @@
 import datetime
 
-import src.aws.infrastructure.models as models
-from src.shared.security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy.orm import Session
+
+import src.aws.infrastructure.models as models
 from src.aws.domain.entities import aws as schemas_aws
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 
 
 @vault_encrypt
@@ -139,7 +140,6 @@ def delete_aws_profile_by_id(db: Session, aws_profile_id: int):
         return {aws_profile_id: "deleted", "aws_profile_id": aws_profile_id}
     except Exception as err:
         raise err
-
 
 
 def get_cloud_account_by_id(db: Session, provider_id: int):

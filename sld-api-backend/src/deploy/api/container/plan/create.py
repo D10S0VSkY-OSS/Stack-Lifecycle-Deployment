@@ -1,45 +1,86 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
-from src.shared.security import deps
+from fastapi import BackgroundTasks, Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
-from src.activityLogs.infrastructure import repositories as crud_activity
-from src.gcp.domain.entities import gcp as schemas_gcp
-from src.gcp.infrastructure import repositories as crud_gcp
+
+from src.deploy.domain.entities import plan as schemas_plan
+from src.deploy.infrastructure import repositories as crud_deploys
+from src.shared.helpers.get_data import (
+    check_deploy_exist,
+    check_prefix,
+    check_squad_user,
+    stack,
+)
+from src.shared.helpers.push_task import async_plan
+from src.shared.security import deps
+from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-from src.deploy.infrastructure import repositories as crud_deploy
 
-async def new_gcloud_profile(
-    gcp: schemas_gcp.GcloudBase,
+
+async def plan_infra_by_stack_name(
     response: Response,
+    background_tasks: BackgroundTasks,
+    deploy: schemas_plan.PlanCreate,
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-    if not crud_users.is_master(db, current_user):
-        raise HTTPException(status_code=403, detail="Not enough permissions")
-    if "string" in [gcp.squad, gcp.environment]:
-        raise HTTPException(
-            status_code=409,
-            detail="The squad or environment field must have a value that is not a string.",
-        )
-    db_gcp_account = crud_gcp.get_squad_gcloud_profile(
-        db=db, squad=gcp.squad, environment=gcp.environment
-    )
-    if db_gcp_account:
-        raise HTTPException(status_code=409, detail="Account already exists")
-    try:
-        result = crud_gcp.create_gcloud_profile(
-            db=db,
-            squad=gcp.squad,
-            environment=gcp.environment,
-            gcloud_keyfile_json=gcp.gcloud_keyfile_json,
-        )
-        crud_activity.create_activity_log(
-            db=db,
-            username=current_user.username,
-            squad=current_user.squad,
-            action=f"Create GCP account {result.id}",
-        )
-        return {"result": f"Create GCP account {gcp.squad} {gcp.environment}"}
-    except Exception as err:
-        raise HTTPException(status_code=400, detail=err)
+    response.status_code = status.HTTP_202_ACCEPTED
 
+    squad = deploy.squad
+    # Get squad from current user
+    if not crud_users.is_master(db, current_user):
+        current_squad = current_user.squad
+        if not check_squad_user(current_squad, [deploy.squad]):
+            raise HTTPException(
+                status_code=403, detail=f"Not enough permissions in {squad}"
+            )
+    # Get  credentials by providers supported
+    secreto = check_prefix(
+        db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad
+    )
+    # Get info from stack data
+    stack_data = stack(db, stack_name=deploy.stack_name)
+    branch = stack_data.branch if deploy.stack_branch == "" else deploy.stack_branch
+    git_repo = stack_data.git_repo
+    tf_ver = stack_data.tf_version
+    check_deploy_exist(db, deploy.name, squad, deploy.environment, deploy.stack_name)
+    try:
+        # push task Deploy to queue and return task_id
+        pipeline_plan = async_plan(
+            git_repo,
+            deploy.name,
+            deploy.stack_name,
+            deploy.environment,
+            squad,
+            branch,
+            tf_ver,
+            deploy.variables,
+            secreto,
+            deploy.tfvar_file,
+            deploy.project_path,
+            current_user.username,
+        )
+        # Push deploy task data
+        db_deploy = crud_deploys.create_new_deploy(
+            db=db,
+            deploy=deploy,
+            stack_branch=branch,
+            task_id=pipeline_plan,
+            action="Plan",
+            squad=squad,
+            user_id=current_user.id,
+            username=current_user.username,
+        )
+        # Push task data
+        db_task = crud_tasks.create_task(
+            db=db,
+            task_id=pipeline_plan,
+            task_name=f"{deploy.stack_name}-{squad}-{deploy.environment}-{deploy.name}",
+            user_id=current_user.id,
+            deploy_id=db_deploy.id,
+            username=current_user.username,
+            squad=squad,
+            action="Plan",
+        )
+        return {"task": pipeline_plan}
+    except Exception as err:
+        raise HTTPException(status_code=400, detail=f"{err}")

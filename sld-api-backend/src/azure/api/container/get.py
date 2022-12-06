@@ -1,10 +1,10 @@
 from fastapi import Depends
-from src.shared.security import deps
 from sqlalchemy.orm import Session
+
 from src.azure.infrastructure import repositories as crud_azure
+from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-
 
 
 async def get_all_azure_accounts(
@@ -16,5 +16,3 @@ async def get_all_azure_accounts(
             db=db, squad=current_user.squad, environment=None
         )
     return crud_azure.get_all_azure_profile(db=db)
-
-

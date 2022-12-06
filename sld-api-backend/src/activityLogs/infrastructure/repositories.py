@@ -1,7 +1,8 @@
 import datetime
 
-import src.activityLogs.infrastructure.models as models
 from sqlalchemy.orm import Session
+
+import src.activityLogs.infrastructure.models as models
 
 
 def create_activity_log(db: Session, username: str, squad: str, action: str):

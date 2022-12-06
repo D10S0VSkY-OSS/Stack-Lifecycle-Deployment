@@ -1,20 +1,19 @@
-from fastapi import (APIRouter, BackgroundTasks, Depends, HTTPException,
-                     Response, status)
-from src.shared.helpers.get_data import (check_cron_schedule, check_deploy_exist,
-                              check_deploy_state,
-                              check_deploy_task_pending_state,check_prefix,
-                              check_squad_user, deploy, deploy_squad, stack)
-from src.shared.helpers.push_task import (async_deploy, async_destroy, async_output,
-                               async_schedule_add, async_schedule_delete,
-                               async_show, async_unlock)
-from src.shared.security import deps
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
-from src.deploy.domain.entities import deploy as schemas_deploy
+
 from src.deploy.infrastructure import repositories as crud_deploys
+from src.shared.helpers.get_data import (
+    check_deploy_state,
+    check_prefix,
+    check_squad_user,
+    deploy,
+    stack,
+)
+from src.shared.helpers.push_task import async_destroy, async_schedule_delete
+from src.shared.security import deps
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-from src.deploy.api.container.deploy import create,get,update,delete
 
 
 async def delete_infra_by_id(
@@ -88,5 +87,3 @@ async def delete_infra_by_id(
         raise HTTPException(status_code=400, detail=f"{err}")
     finally:
         async_schedule_delete(deploy_id, squad)
-
-

@@ -1,9 +1,15 @@
 import datetime
 
 from config.database import Base
-from sqlalchemy.orm import relationship
-from sqlalchemy import (JSON, Column, DateTime, Integer, String,
-                        UniqueConstraint, ForeignKey)
+from sqlalchemy import (
+    JSON,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 
 
 class Deploy(Base):
@@ -14,7 +20,7 @@ class Deploy(Base):
     action = Column(String(100))
     start_time = Column(String(100))
     destroy_time = Column(String(100))
-    #stack_name = Column(String(100), ForeignKey("stacks.stack_name", ondelete='CASCADE'))
+    # stack_name = Column(String(100), ForeignKey("stacks.stack_name", ondelete='CASCADE'))
     stack_name = Column(String(100), ForeignKey("stacks.stack_name"))
     stack_branch = Column(String(100))
     created_at = Column(DateTime, default=datetime.datetime.now())
@@ -27,5 +33,3 @@ class Deploy(Base):
     tfvar_file = Column(String(50))
     project_path = Column(String(50))
     __table_args__ = (UniqueConstraint("squad", "environment", "name", "stack_name"),)
-
-

@@ -1,10 +1,10 @@
 from fastapi import Depends
-from src.shared.security import deps
 from sqlalchemy.orm import Session
+
 from src.aws.infrastructure import repositories as crud_aws
+from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-
 
 
 async def get_all_aws_accounts(
@@ -17,6 +17,3 @@ async def get_all_aws_accounts(
             db=db, squad=current_user.squad, environment=None
         )
     return crud_aws.get_all_aws_profile(db=db)
-
-
-

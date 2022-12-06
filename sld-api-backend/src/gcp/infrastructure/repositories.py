@@ -1,9 +1,10 @@
 import datetime
 
-import src.gcp.infrastructure.models as models
-from src.shared.security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
+
+import src.gcp.infrastructure.models as models
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 
 
 @vault_encrypt

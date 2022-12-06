@@ -7,11 +7,11 @@ from celery.exceptions import Ignore
 from celery.utils.log import get_task_logger
 from config.api import settings
 from config.celery_config import celery_app
-from src.worker.provider import (ProviderActions, ProviderGetVars,
-                           ProviderRequirements)
+
+from src.worker.provider import ProviderActions, ProviderGetVars, ProviderRequirements
 from src.worker.tasks.helpers.folders import Utils
-from src.worker.tasks.helpers.schedule import request_url
 from src.worker.tasks.helpers.metrics import push_metric
+from src.worker.tasks.helpers.schedule import request_url
 
 r = redis.Redis(
     host=settings.BACKEND_SERVER,
@@ -383,16 +383,18 @@ def pipeline_git_pull(
 
         self.update_state(state="GET_VARS_AS_JSON", meta={"done": "2 of 2"})
         result = ProviderGetVars.json_vars(
-            environment=environment, stack_name=stack_name, squad=squad, name=name, project_path=project_path
+            environment=environment,
+            stack_name=stack_name,
+            squad=squad,
+            name=name,
+            project_path=project_path,
         )
         if result["rc"] != 0:
             raise Exception(result.get("stdout"))
         result["tfvars"] = git_result["tfvars"]
         return result
     except Exception as err:
-        self.retry(
-            countdown=1, exc=err, max_retries=settings.TASK_MAX_RETRY
-        )
+        self.retry(countdown=1, exc=err, max_retries=settings.TASK_MAX_RETRY)
         self.update_state(state=states.FAILURE, meta={"exc": result})
         raise Ignore()
     finally:
