@@ -1,8 +1,9 @@
 import datetime
 
+from sqlalchemy.orm import Session
+
 import src.deploy.domain.entities.deploy as schemas_deploy
 import src.deploy.infrastructure.models as models
-from sqlalchemy.orm import Session
 
 
 def create_new_deploy(
@@ -137,10 +138,13 @@ def get_deploy_by_name(db: Session, deploy_name: str):
 
 def get_deploy_by_stack(db: Session, stack_name: str):
     try:
-        return db.query(models.Deploy).filter(models.Deploy.stack_name == stack_name).first()
+        return (
+            db.query(models.Deploy)
+            .filter(models.Deploy.stack_name == stack_name)
+            .first()
+        )
     except Exception as err:
         raise err
-
 
 
 def get_deploy_by_id_squad(db: Session, deploy_id: int, squad: str):
@@ -188,7 +192,8 @@ def get_all_deploys_by_squad(db: Session, squad: str, skip: int = 0, limit: int 
     except Exception as err:
         raise err
 
-def get_deploy_by_cloud_account(db: Session,  squad: str, environment: str):
+
+def get_deploy_by_cloud_account(db: Session, squad: str, environment: str):
     try:
         return (
             db.query(models.Deploy)

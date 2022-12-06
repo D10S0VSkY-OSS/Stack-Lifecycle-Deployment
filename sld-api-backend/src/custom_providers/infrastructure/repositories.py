@@ -1,9 +1,10 @@
 import datetime
 
-import src.custom_providers.infrastructure.models as models
-from src.shared.security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
+
+import src.custom_providers.infrastructure.models as models
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 
 
 @vault_encrypt
@@ -94,6 +95,7 @@ def delete_custom_profile_by_id(db: Session, custom_profile_id: int):
         return {custom_profile_id: "deleted", "custom_profile_id": custom_profile_id}
     except Exception as err:
         raise err
+
 
 def get_cloud_account_by_id(db: Session, provider_id: int):
     try:

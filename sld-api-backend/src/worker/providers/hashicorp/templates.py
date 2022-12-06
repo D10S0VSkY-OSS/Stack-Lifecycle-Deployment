@@ -67,6 +67,7 @@ class GetVars(StructBase):
     """
     In this class are the methods to obtain information from the terraform variables
     """
+
     def __set_path(self):
         if not self.project_path:
             return f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/variables.tf"

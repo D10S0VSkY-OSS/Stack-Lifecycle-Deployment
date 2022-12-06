@@ -6,12 +6,15 @@ import os
 
 from config.api import settings
 
+
 class SecretsProviders:
     def __init__(self, secret_provider: dict) -> None:
         self.secret_provider = secret_provider
+
     def export(self):
         for k, v in self.secret_provider.items():
             os.environ[k] = v
+
 
 def createLocalFolder(dir_path: str):
     try:
@@ -126,6 +129,7 @@ def secret(
         configuration = ast.literal_eval(secreto.get("custom_provider_keyfile_json"))
         R = SecretsProviders(configuration)
         R.export()
+
 
 #        os.environ["GOOGLE_CLOUD_KEYFILE_JSON"] = gcloud_keyfile
 

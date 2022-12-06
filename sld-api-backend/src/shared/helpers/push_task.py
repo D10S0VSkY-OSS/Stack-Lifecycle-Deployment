@@ -2,11 +2,21 @@ import json
 
 from config.api import settings
 from fastapi import HTTPException
-from src.worker.tasks.terraform_worker import (output, pipeline_deploy, pipeline_destroy,
-                                    pipeline_git_pull, pipeline_plan,
-                                    schedule_add, schedule_delete,
-                                    schedule_get, schedule_update,
-                                    schedules_list, show, unlock)
+
+from src.worker.tasks.terraform_worker import (
+    output,
+    pipeline_deploy,
+    pipeline_destroy,
+    pipeline_git_pull,
+    pipeline_plan,
+    schedule_add,
+    schedule_delete,
+    schedule_get,
+    schedule_update,
+    schedules_list,
+    show,
+    unlock,
+)
 
 
 def async_deploy(
@@ -181,7 +191,13 @@ def async_show(stack_name: str, environment: str, squad: str, name: str):
 
 
 def sync_git(
-    stack_name: str, git_repo: str, branch: str, project_path: str, environment: str, squad: str, name: str
+    stack_name: str,
+    git_repo: str,
+    branch: str,
+    project_path: str,
+    environment: str,
+    squad: str,
+    name: str,
 ):
     try:
         pipeline_git_result = pipeline_git_pull.s(

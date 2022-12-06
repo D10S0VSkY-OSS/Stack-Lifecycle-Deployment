@@ -3,13 +3,13 @@ import logging
 import sys
 
 import bcrypt
-import src.users.domain.entities.users as schemas
-import src.users.infrastructure.models as models
 from config.api import settings
-from src.shared.security.vault import get_password_hash
-from src.shared.security.vault import vault_decrypt, vault_encrypt
 from sqlalchemy import exc
 from sqlalchemy.orm import Session
+
+import src.users.domain.entities.users as schemas
+import src.users.infrastructure.models as models
+from src.shared.security.vault import get_password_hash, vault_decrypt, vault_encrypt
 
 logging.getLogger("uvicorn.error").propagate = False
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)

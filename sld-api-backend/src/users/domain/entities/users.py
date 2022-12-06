@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from pydantic import BaseModel, EmailStr, Field, constr
+from pydantic import BaseModel, EmailStr, constr
 
 
 class UserBase(BaseModel):
@@ -57,5 +57,3 @@ class TokenPayload(BaseModel):
 
 class TokenData(BaseModel):
     username: str = None
-
-

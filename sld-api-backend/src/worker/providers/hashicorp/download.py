@@ -5,6 +5,7 @@ from io import BytesIO
 
 import requests
 from urllib3.exceptions import InsecureRequestWarning
+
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 from config.api import settings
 
