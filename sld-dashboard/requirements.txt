@@ -1,7 +1,7 @@
 alembic==1.8.1
 async-timeout==4.0.2
 bcrypt==4.0.1
-certifi==2022.9.24
+certifi==2022.12.7
 cffi==1.15.1
 chardet==5.1.0
 charset-normalizer==2.1.1
