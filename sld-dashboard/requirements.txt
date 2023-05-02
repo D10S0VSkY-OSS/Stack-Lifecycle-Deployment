@@ -11,7 +11,7 @@ Deprecated==1.2.13
 dnspython==2.2.1
 email-validator==1.3.0
 fernet==1.0.1
-Flask==2.2.2
+Flask==2.3.2
 Flask-Login==0.6.2
 Flask-Migrate==4.0.0
 Flask-MySQLdb==1.0.1
