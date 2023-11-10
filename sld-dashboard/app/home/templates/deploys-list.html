@@ -248,7 +248,7 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body" style="background-color: #140d0d; color: white;">
+                            <div class="modal-body" style="background-color: #040720; color: white;">
                                 {% set stdout = task_log(deploy.task_id, token).result %}
                                 {% if stdout is iterable and (stdout is not string and stdout is not mapping) %}
                                 {%for i in stdout %}
