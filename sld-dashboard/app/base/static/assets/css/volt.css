@@ -41710,3 +41710,12 @@ pre {
   display: block;
   word-wrap: break-word;
 }
+
+.plus { color: #54C571; }
+.minus { color: #C34A2C; }
+.tilde { color: #5500FF; }
+
+.modal-black-background {
+    background-color: black;
+    color: white; 
+}

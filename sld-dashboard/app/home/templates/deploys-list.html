@@ -238,7 +238,7 @@
                     </div>
                 </div>
                 <!-- Modal Output-->
-                <div class="modal fade bd-example-modal-lg" id="OutputModalCenter-{{deploy.id}}">
+                <div class="modal fade" id="OutputModalCenter-{{deploy.id}}">
                     <div class="modal-dialog modal-xl" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -248,11 +248,20 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body" style="background-color: #140d0d; color: white;">
                                 {% set stdout = task_log(deploy.task_id, token).result %}
                                 {% if stdout is iterable and (stdout is not string and stdout is not mapping) %}
                                 {%for i in stdout %}
-                                <p><strong>{{i}}</strong></p>
+                                    {% set stripped_line = i.strip() %}
+                                    {% if stripped_line.startswith('+') %}
+                                        <p><span class="plus"><strong>{{ i }}</strong></span></p>
+                                    {% elif stripped_line.startswith('-') %}
+                                        <p><span class="minus"><strong>{{ i }}</strong></span></p>
+                                    {% elif stripped_line.startswith('~') %}
+                                        <p><span class="tilde"><strong>{{ i }}</strong></span></p>
+                                    {% else %}
+                                        <p><strong>{{i}}</strong></p>
+                                    {% endif %}
                                 {% endfor %}
                                 {% else %}
                                 <p><strong>{{stdout}}</strong></p>
