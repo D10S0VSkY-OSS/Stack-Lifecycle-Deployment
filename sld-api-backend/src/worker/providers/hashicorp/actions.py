@@ -80,7 +80,7 @@ class Actions(StructBase):
                     "tfvars_files": self.variables_file,
                     "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                     "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                    "stdout": [result.stderr.split("\n")],
+                    "stdout": result.stderr.split("\n"),
                 }
             return {
                 "command": "plan",
@@ -92,7 +92,7 @@ class Actions(StructBase):
                 "tfvars_files": self.variables_file,
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                 "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                "stdout": [result.stdout.split("\n")],
+                "stdout": result.stdout.split("\n"),
             }
         except Exception:
             return {
@@ -105,7 +105,7 @@ class Actions(StructBase):
                 "tfvars_files": self.variables_file,
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                 "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                "stdout": [result.stderr.split("\n")],
+                "stdout": result.stderr.split("\n"),
             }
 
     def apply_execute(self) -> dict:
@@ -156,7 +156,7 @@ class Actions(StructBase):
                     "tfvars_files": self.variables_file,
                     "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                     "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                    "stdout": [result.stderr.split("\n")],
+                    "stdout": result.stderr.split("\n"),
                 }
             return {
                 "command": "apply",
@@ -168,7 +168,7 @@ class Actions(StructBase):
                 "tfvars_files": self.variables_file,
                 "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": [result.stdout.split("\n")],
+                "stdout": result.stdout.split("\n"),
             }
         except Exception:
             return {
@@ -235,7 +235,7 @@ class Actions(StructBase):
                     "tfvars_files": self.variables_file,
                     "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                     "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                    "stdout": [result.stderr.split("\n")],
+                    "stdout": result.stderr.split("\n"),
                 }
             return {
                 "command": "destroy",
@@ -247,7 +247,7 @@ class Actions(StructBase):
                 "tfvars_files": self.variables_file,
                 "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": [result.stdout.split("\n")],
+                "stdout": result.stdout.split("\n"),
             }
         except Exception:
             return {
@@ -260,7 +260,6 @@ class Actions(StructBase):
                 "tfvars_files": self.variables_file,
                 "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                # "stdout": [result.stderr.split("\n")],
                 "stdout": "ko",
             }
 
