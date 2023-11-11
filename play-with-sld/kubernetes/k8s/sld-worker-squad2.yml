@@ -17,9 +17,11 @@ spec:
       subdomain: primary
       containers:
         - name: stack-deploy-worker-squad2
-          image: d10s0vsky/sld-api:latest
+          image: d10s0vsky/sld-api:2.18.0
           imagePullPolicy: Always
           env:
           - name: TF_WARN_OUTPUT_ERRORS
             value: "1"
-          command: ["celery", "--app", "src.worker.tasks.terraform_worker", "worker", "--loglevel=info", "-c", "8", "-E", "-Q", "any,squad2"]
+          - name: PATH
+            value: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          command: ["python", "-m", "celery", "--app", "src.worker.tasks.terraform_worker", "worker", "--loglevel=info", "-c", "8", "-E", "-Q", "any,squad2"]

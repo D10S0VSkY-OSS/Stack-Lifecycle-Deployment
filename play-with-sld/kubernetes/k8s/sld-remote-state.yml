@@ -17,8 +17,10 @@ spec:
       subdomain: primary
       containers:
         - name: remote-state
-          image: d10s0vsky/sld-remote-state:latest
+          image: d10s0vsky/sld-remote-state:2.11.0
           env:
+          - name: PATH
+            value: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           - name: SLD_STORAGE_BACKEND
             value: mongodb
           - name: SLD_MONGODB_URL
