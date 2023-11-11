@@ -41719,3 +41719,8 @@ pre {
     background-color: black;
     color: white; 
 }
+
+.textarea-right-aligned {
+    direction: rtl; /* Right-to-left */
+    text-align: right; /* For good measure, in case of LTR content */
+}
