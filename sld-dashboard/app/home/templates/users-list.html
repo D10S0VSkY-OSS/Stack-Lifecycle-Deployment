@@ -40,6 +40,7 @@
                 </div>
             </div>
             <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
+                <!--
                 <div class="btn-group">
                     <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="icon icon-sm icon-gray">
@@ -55,6 +56,7 @@
                         <a class="dropdown-item font-weight-bold" href="/users-list/200">50</a>
                     </div>
                 </div>
+                -->
             </div>
         </div>
     </div>
@@ -118,35 +120,18 @@
             </tbody>
         </table>
         <div class="card-footer px-3 border-0 d-flex align-items-center justify-content-between">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination mb-0">
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item active">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                </ul>
-            </nav>
+         <!-- Pagination -->
+         <nav>
+            <ul class="pagination">
+              <li class="page-item" id="previous-page"><a class="page-link" href="#">Previous</a></li>
+              <!-- Page numbers will be dynamically inserted here -->
+              <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
+            </ul>
+          </nav>
             <div class="font-weight-bold small"><b></b><b></b></div>
         </div>
     </div>
- <!-- Pagination -->
-<nav>
-  <ul class="pagination">
-    <li class="page-item" id="previous-page"><a class="page-link" href="#">Previous</a></li>
-    <!-- Page numbers will be dynamically inserted here -->
-    <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
-  </ul>
-</nav>
+
     {% include 'includes/footer.html' %}
 
 </main>
@@ -154,5 +139,5 @@
 {% endblock content %}
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script src="/static/assets/js/pagination.js"></script>
+<script src="/static/assets/js/pagination_edit.js"></script>
 {% endblock javascripts %}
