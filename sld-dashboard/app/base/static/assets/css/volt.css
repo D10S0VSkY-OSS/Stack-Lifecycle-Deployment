@@ -41710,3 +41710,17 @@ pre {
   display: block;
   word-wrap: break-word;
 }
+
+.plus { color: #54C571; }
+.minus { color: #C34A2C; }
+.tilde { color: #6698FF; }
+
+.modal-black-background {
+    background-color: black;
+    color: white; 
+}
+
+.textarea-right-aligned {
+    direction: rtl; /* Right-to-left */
+    text-align: right; /* For good measure, in case of LTR content */
+}

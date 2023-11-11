@@ -40,6 +40,7 @@
                 </div>
             </div>
             <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
+                <!--
                 <div class="btn-group">
                     <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         <span class="icon icon-sm icon-gray">
@@ -50,12 +51,12 @@
                     <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">
                         <span class="dropdown-item font-weight-bold text-dark">Show</span>
                         <a class="dropdown-item d-flex font-weight-bold" href="/users-list">All<span class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
-                        <a class="dropdown-item font-weight-bold" href="/users-list/50">50</a>
-                        <a class="dropdown-item font-weight-bold" href="/users-list/100">100</a>
-                        <a class="dropdown-item font-weight-bold" href="/users-list/200">200</a>
-                        <a class="dropdown-item font-weight-bold" href="/users-list/300">300</a>
+                        <a class="dropdown-item font-weight-bold" href="/users-list/50">5</a>
+                        <a class="dropdown-item font-weight-bold" href="/users-list/100">20</a>
+                        <a class="dropdown-item font-weight-bold" href="/users-list/200">50</a>
                     </div>
                 </div>
+                -->
             </div>
         </div>
     </div>
@@ -119,52 +120,24 @@
             </tbody>
         </table>
         <div class="card-footer px-3 border-0 d-flex align-items-center justify-content-between">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination mb-0">
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item active">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                </ul>
-            </nav>
+         <!-- Pagination -->
+         <nav>
+            <ul class="pagination">
+              <li class="page-item" id="previous-page"><a class="page-link" href="#">Previous</a></li>
+              <!-- Page numbers will be dynamically inserted here -->
+              <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
+            </ul>
+          </nav>
             <div class="font-weight-bold small"><b></b><b></b></div>
         </div>
     </div>
+
     {% include 'includes/footer.html' %}
 
 </main>
 
 {% endblock content %}
-
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script>
-function search() {
-  const input = document.getElementById('search')
-  const filter = input.value.toLowerCase()
-  const table = document.getElementById('table')
-  const tr = [...table.getElementsByTagName('tr')]
-
-  tr.forEach((t) => {
-    const foundMatch = [...t.getElementsByTagName('td')].some((td) => {
-      return td.innerHTML.toLowerCase().indexOf(filter) > -1
-    })
-    if (foundMatch) {
-      t.style.display = ''
-    } else {
-      t.style.display = 'none'
-    }
-  })
-}
-</script>
+<script src="/static/assets/js/pagination_edit.js"></script>
 {% endblock javascripts %}

@@ -38,7 +38,7 @@
                             <!-- Form -->
                             <div class="col-md-12 col-md-offset-1">
                                 <h3>Stack {{ stack['json']['stack_name'] }}</h3>
-                                <form class="" method="post">
+                                <form class="" method="post" id="vars_form">
 
 
                                     <div class="form-group">
@@ -222,64 +222,80 @@
                                 </div>
                                     <!-- Collapse Variables -->
                                 <div class="collapse" id="variables">
-                                <h3>Variables</h3>
-                                <footer class="blockquote-footer">
-                                 Complete the form with the variables
-                                </footer>
                                     <div class="border-top my-4"></div>
-                                    <!-- start SLD_SORT False -->
+                                    <!-- start SLD_SORT VARS -->
                                     {% if not sort_form %}
-                                    {% for key, value in data_json.items()%}
-                                    <div class="form-group">
-                                        <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
-                                        <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
+{% set basic_variables = {} %}
+{% set advanced_variables = {} %}
 
-                                        {% for k, v in value.items() %}
-                                            {% if v == "bool" %}
-                                                <input type="text" value={{value.get("default")|lower}}
-                                            {% elif "default" in k %}
-                                                <input type="text" value="{{ v }}"
-                                            {% elif "passw" in key %}
-                                                <input type="password"
-                                            {% elif "type" in k %}
-                                                <input type="text" title="{{k}} {{v}} "
-                                            {% else %}
-                                                <input type="text"
-                                            {% endif %}
-                                        {% endfor %}
-                                        name={{ key }} class='form-control'>
-                                    </div>
-                                    {% endfor %}
+{% for key, value in data_json.items() %}
+    {% if value.get('default') is none %}
+        {% set _ = basic_variables.update({key: value}) %}
+    {% else %}
+        {% set _ = advanced_variables.update({key: value}) %}
+    {% endif %}
+{% endfor %}
+
+<!-- Basic Variables -->
+<div class="basic-variables-section">
+    <h4>Basic Variables</h4>
+    {% for key, value in basic_variables.items() %}
+        <div class="form-group">
+            <p class="mb-110"><h6><strong>{{ key }}</strong></h6></p>
+            <footer class="blockquote-footer">{{ value.get('description', "").split('|')[-1] }}</footer>
+
+            {% set field_type = value.get('type', 'string') %}
+            {% if field_type == "bool" %}
+                <select name={{ key }} class='form-control'>
+                    <option value="true" {% if value.get("default") %} selected {% endif %}>True</option>
+                    <option value="false" {% if not value.get("default") %} selected {% endif %}>False</option>
+                </select>
+            {% elif field_type.startswith("map") or "object" in field_type %}
+                <textarea name={{ key }} class='form-control' rows="6" required>
+{{ value.get("default") | tojson | replace(",", ",\n") | replace("{", "{\n") | replace("}", "\n}") | trim | indent(4) }}
+                </textarea>
+            {% elif "passw" in key or "token" in key or "key" in key or "secret" in key %}
+                <input type="password" name={{ key }} class='form-control' required>
+            {% else %}
+                <input type="text" value="{{ value.get('default') }}" name={{ key }} class='form-control' required>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+<hr>
+<!-- Advanced Variables -->
+<form onsubmit="return cleanFormData()">
+<div class="advanced-variables-section">
+    <h4 class="toggle-advanced" style="cursor:pointer;">
+        Advanced Variables <i id="advanced-icon" class="fas fa-chevron-down"></i>
+    </h4>
+    <div id="advanced-variables-content" style="display:none;">
+        {% for key, value in advanced_variables.items() %}
+            <div class="form-group">
+            <p class="mb-110"><h6><strong>{{ key }}</strong></h6></p>
+            <footer class="blockquote-footer">{{ value.get('description', "").split('|')[-1] }}</footer>
+
+            {% set field_type = value.get('type', 'string') %}
+            {% if field_type == "bool" %}
+                <select name={{ key }} class='form-control'>
+                    <option value="true" {% if value.get("default") %} selected {% endif %}>True</option>
+                    <option value="false" {% if not value.get("default") %} selected {% endif %}>False</option>
+                </select>
+            {% elif field_type.startswith("map") or "object" in field_type %}
+                <textarea name={{ key }} class='form-control' rows="6">
+{{ value.get("default") | tojson | replace(",", ",\n") | replace("{", "{\n") | replace("}", "\n}") | trim | indent(4) }}
+                </textarea>
+            {% elif "passw" in key or "token" in key or "key" in key or "secret" in key %}
+                <input type="password" name={{ key }} class='form-control'>
+            {% else %}
+                <input type="text" value="{{ value.get('default') }}" name={{ key }} class='form-control'>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
+</div>
                                     {% endif %}
                                     <!-- END SLD_SORT False -->
-                                    <!-- start SLD_SORT True -->
-                                    {% if sort_form %}
-                                        {% for key, value in data_json.items()|sort(attribute='1.description') %}
-                                            {% if value.get('description').split('|')[1] %}
-                                                 <div class="border-top my-4"></div>
-                                                 <h5>{{value.get('description').split('|')[1]}}</h4>
-                                                <div class="border border-dark"></div>
-                                            {% endif %}
-                                            <div class="form-group">
-                                            <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
-                                            <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
-                                            {% for k, v in value.items() %}
-                                                {% if v == "bool" %}
-                                                    <input type="text" value={{value.get("default")|lower}}
-                                                {% elif "default" in k %}
-                                                    <input type="text" value="{{ v }}"
-                                                {% elif "passw" in key %}
-                                                    <input type="password"
-                                                {% elif "type" in k %}
-                                                    <input type="text" title="{{k}} {{v}}"
-                                                {% else %}
-                                                    <input type="text"
-                                                {% endif %}
-                                            {% endfor %}
-                                            name={{ key }} class='form-control' autocomplete="off">
-                                        </div>
-                                        {% endfor %}
-                                    {% endif %}
                                  <div class="border-top my-4"></div>
                           <button type="submit" class="btn btn-success" name="button" value=plan action="{{url_for('.list_deploys')}}">
                               Plan
@@ -306,4 +322,57 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    document.querySelector('.toggle-advanced').addEventListener('click', function() {
+        var content = document.getElementById('advanced-variables-content');
+        if (content.style.display === 'none') {
+            content.style.display = 'block';
+        } else {
+            content.style.display = 'none';
+        }
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var form = document.getElementById('vars_form');
+    form.addEventListener('submit', function() {
+        document.querySelectorAll('textarea').forEach(function(textarea) {
+            textarea.value = textarea.value.replace(/\s+/g, ' ').trim();
+        });
+    });
+});
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var variablesFormButton = document.querySelector("[data-target='#variables']");
+    var tfvarsFormButton = document.querySelector("[data-target='#tfvars']");
+    var variablesFormContent = document.getElementById('variables');
+    var tfvarsFormContent = document.getElementById('tfvars');
+
+    variablesFormButton.addEventListener('click', function() {
+        // Toggle current content
+        variablesFormContent.classList.toggle('show');
+
+        // Close the other content if it's open
+        if (tfvarsFormContent.classList.contains('show')) {
+            tfvarsFormContent.classList.remove('show');
+        }
+    });
+
+    tfvarsFormButton.addEventListener('click', function() {
+        // Toggle current content
+        tfvarsFormContent.classList.toggle('show');
+
+        // Close the other content if it's open
+        if (variablesFormContent.classList.contains('show')) {
+            variablesFormContent.classList.remove('show');
+        }
+    });
+});
+
+
+</script>
+
 {% endblock javascripts %}

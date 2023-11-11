@@ -688,7 +688,6 @@ def deploy_stack(stack_id):
                 "project_path": request.form.get("project_path").replace(" ",""),
                 "variables": variables,
             }
-            print(data)
             endpoint = f"plan"
             if not "plan" in request.form.get("button"):
                 endpoint = f"deploy"

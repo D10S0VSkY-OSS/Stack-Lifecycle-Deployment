@@ -23,12 +23,12 @@ def register_blueprints(app):
 
 
 def configure_database(app):
-    @app.before_first_request
-    def initialize_database():
-        try:
-            pass
-        except Exception as err:
-            pass
+    with app.app_context():
+        def initialize_database():
+            try:
+                pass
+            except Exception as err:
+                pass
 
     @app.teardown_request
     def shutdown_session(exception=None):

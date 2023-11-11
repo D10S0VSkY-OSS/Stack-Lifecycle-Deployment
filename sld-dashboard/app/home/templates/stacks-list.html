@@ -161,27 +161,14 @@
                 {% endfor %}
             </tbody>
         </table>
-        <div class="card-footer px-3 border-0 d-flex align-items-center justify-content-between">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination mb-0">
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item active">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                </ul>
-            </nav>
-            <div class="font-weight-bold small"><b></b><b></b></div>
         </div>
+        <nav aria-label="Page navigation example">
+  <ul class="pagination">
+    <li class="page-item" id="previous-page"><a class="page-link" href="#">Previous</a></li>
+    <!-- Los números de página se insertarán aquí dinámicamente -->
+    <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
+  </ul>
+</nav>
     </div>
 
     {% include 'includes/footer.html' %}
@@ -203,24 +190,5 @@ function checkForm(form) // Submit button clicked
   }
 
 </script>
-<script>
-function search() {
-  var input, filter, table, tr, td, i, txtValue;
-  input = document.getElementById("search");
-  filter = input.value.toUpperCase();
-  table = document.getElementById("table");
-  tr = table.getElementsByTagName("tr");
-  for (i = 0; i < tr.length; i++) {
-    td = tr[i].getElementsByTagName("td")[2];
-    if (td) {
-      txtValue = td.textContent || td.innerText;
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        tr[i].style.display = "";
-      } else {
-        tr[i].style.display = "none";
-      }
-    }       
-  }
-}
-</script>
+<script src="/static/assets/js/pagination_edit.js"></script>
 {% endblock javascripts %}

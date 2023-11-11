@@ -52,7 +52,7 @@
             <div class="col col-md-6 col-lg-3 col-xl-4">
                 <div class="input-group">
                     <span class="input-group-text" id="asic-addon2"><span class="fas fa-search"></span></span>
-                    <input type="text" class="form-control" id="myInput" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" id="search" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
                 </div>
             </div>
             <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
@@ -62,6 +62,7 @@
                     <a class="nav-link icon-notifications text-dark" href="/deploys-list">
                         <span class="fas fa-redo-alt mr-1"></span></a>
                     <div class="btn-group">
+                        <!--
                         <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="icon icon-sm icon-gray">
@@ -72,13 +73,9 @@
                         <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">
                             <span class="dropdown-item font-weight-bold text-dark">Show</span>
                             <a class="dropdown-item d-flex font-weight-bold" href="/deploys-list">All <span
-                                                                             class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/5">5</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/55">55</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/75">75</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/90">90</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/100">100</a>
+                                                                             class="small ml-auto"><span class="fas fa-check"></span></span></a>
                         </div>
+                        -->
                     </div>
             </div>
         </div>
@@ -110,7 +107,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="myTable">
+            <tbody>
                 <!-- Item -->
                 {% for deploy in deploys| sort(attribute='id') %}
 
@@ -155,7 +152,7 @@
                                 </span>
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
-                            {% if deploy.action == "Plan"%}
+                            {% if deploy.action == "Plan_disable"%}
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{ url_for('.edit_deploy',deploy_id=deploy.id)}}">
                                     <span class="fas fa-edit mr-2"></span>Edit</a>
@@ -177,7 +174,7 @@
                                 <a class="dropdown-item" href="{{ url_for('.edit_deploy',deploy_id=deploy.id)}}">
                                     <span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
-                                    <span class="fas fa-sync mr-2"></span>ReDeploy</a>
+                                    <span class="fas fa-sync mr-2"></span>Apply</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal"
                                                                      data-target="#DestroyModalCenter-{{deploy.id}}">
                                     <span class="fas fa-trash-alt mr-2"></span>Destroy</a>
@@ -238,7 +235,7 @@
                     </div>
                 </div>
                 <!-- Modal Output-->
-                <div class="modal fade bd-example-modal-lg" id="OutputModalCenter-{{deploy.id}}">
+                <div class="modal fade" id="OutputModalCenter-{{deploy.id}}">
                     <div class="modal-dialog modal-xl" role="document">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -248,11 +245,20 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body">
+                            <div class="modal-body" style="background-color: #040720; color: white;">
                                 {% set stdout = task_log(deploy.task_id, token).result %}
                                 {% if stdout is iterable and (stdout is not string and stdout is not mapping) %}
                                 {%for i in stdout %}
-                                <p><strong>{{i}}</strong></p>
+                                    {% set stripped_line = i.strip() %}
+                                    {% if stripped_line.startswith('+') %}
+                                        <p><span class="plus"><strong>{{ i }}</strong></span></p>
+                                    {% elif stripped_line.startswith('-') %}
+                                        <p><span class="minus"><strong>{{ i }}</strong></span></p>
+                                    {% elif stripped_line.startswith('~') %}
+                                        <p><span class="tilde"><strong>{{ i }}</strong></span></p>
+                                    {% else %}
+                                        <p><strong>{{i}}</strong></p>
+                                    {% endif %}
                                 {% endfor %}
                                 {% else %}
                                 <p><strong>{{stdout}}</strong></p>
@@ -327,27 +333,19 @@
             </tbody>
         </table>
         <div class="card-footer px-3 border-0 d-flex align-items-center justify-content-between">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination mb-0">
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item active">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                </ul>
+             <!-- Pagination -->
+            <nav>
+              <ul class="pagination">
+                <li class="page-item" id="previous-page"><a class="page-link" href="#">Previous</a></li>
+                <!-- Page numbers will be dynamically inserted here -->
+                <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
+              </ul>
             </nav>
             <div class="font-weight-bold small"></div>
         </div>
     </div>
+
+
 
     {% include 'includes/footer.html' %}
 
@@ -357,14 +355,5 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script>
-    $(document).ready(function(){
-      $("#myInput").on("keyup", function() {
-        var value = $(this).val().toLowerCase();
-        $("#myTable tr").filter(function() {
-          $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
-        });
-      });
-    });
-    </script>
+<script src="/static/assets/js/pagination_edit.js"></script>
 {% endblock javascripts %}

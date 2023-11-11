@@ -41,7 +41,7 @@ class Backend(StructBase):
                 tf_state.write(provider_backend)
             return {"command": "tfserver", "rc": 0, "stdout": data}
         except Exception as err:
-            return {"command": "tfserver", "rc": 1, "stderr": err}
+            return {"command": "tfserver", "rc": 1, "stdout": str(err)}
 
 
 @dataclass

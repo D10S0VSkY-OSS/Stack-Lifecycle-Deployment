@@ -4,13 +4,13 @@ from celery import Celery
 
 celery_app = None
 # Rabbit broker config
-BROKER_USER = os.getenv("BROKER_USER", "admin")
-BROKER_PASSWD = os.getenv("BROKER_PASSWD", "admin")
-BROKER_SERVER = os.getenv("BROKER_SERVER", "rabbit")  # use rabbit or redis
+BROKER_USER = os.getenv("BROKER_USER", "")
+BROKER_PASSWD = os.getenv("BROKER_PASSWD", "")
+BROKER_SERVER = os.getenv("BROKER_SERVER", "redis")  # use rabbit or redis
 BROKER_SERVER_PORT = os.getenv(
-    "BROKER_SERVER_PORT", "5672"
+    "BROKER_SERVER_PORT", "6379"
 )  # use por 6379 for redis or 5672 for RabbitMQ
-BROKER_TYPE = os.getenv("BROKER_TYPE", "amqp")  # use amqp for RabbitMQ or redis
+BROKER_TYPE = os.getenv("BROKER_TYPE", "redis")  # use amqp for RabbitMQ or redis
 # Redus backend config
 BACKEND_TYPE = os.getenv("BACKEND_TYPE", "redis")
 BACKEND_USER = os.getenv("BACKEND_USER", "")

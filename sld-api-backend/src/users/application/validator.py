@@ -2,7 +2,7 @@ from typing import Tuple
 
 from dependency_injector import containers, providers
 from password_strength import PasswordPolicy
-from usernames import is_safe_username
+from python_usernames import is_safe_username
 
 
 class PasswordValidator:

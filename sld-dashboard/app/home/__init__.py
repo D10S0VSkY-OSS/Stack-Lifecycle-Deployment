@@ -58,7 +58,7 @@ def log_utility():
                 return {"result": content.get("result").get("status"), "type": "str"}
             if not isinstance(data, list):
                 return {"result": content.get("result").get("module").get("stdout")}
-            return {"result": content.get("result").get("module").get("stdout")[0]}
+            return {"result": content.get("result").get("module").get("stdout")}
         except Exception as err:
             return {"result": response}
 
