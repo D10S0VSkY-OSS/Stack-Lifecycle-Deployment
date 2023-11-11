@@ -22,7 +22,9 @@ spec:
           - name: PATH
             value: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
           - name: SLD_STORAGE_BACKEND
-            value: local
+            value: mongodb
+          - name: SLD_MONGODB_URL
+            value: "mongodb:27017/"
           imagePullPolicy: Always
           command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
           ports:
