@@ -52,7 +52,7 @@
             <div class="col col-md-6 col-lg-3 col-xl-4">
                 <div class="input-group">
                     <span class="input-group-text" id="asic-addon2"><span class="fas fa-search"></span></span>
-                    <input type="text" class="form-control" id="myInput" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" id="search" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
                 </div>
             </div>
             <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
@@ -62,6 +62,7 @@
                     <a class="nav-link icon-notifications text-dark" href="/deploys-list">
                         <span class="fas fa-redo-alt mr-1"></span></a>
                     <div class="btn-group">
+                        <!--
                         <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="icon icon-sm icon-gray">
@@ -72,13 +73,9 @@
                         <div class="dropdown-menu dropdown-menu-xs dropdown-menu-right">
                             <span class="dropdown-item font-weight-bold text-dark">Show</span>
                             <a class="dropdown-item d-flex font-weight-bold" href="/deploys-list">All <span
-                                                                             class="icon icon-small ml-auto"><span class="fas fa-check"></span></span></a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/5">5</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/55">10</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/75">20</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/90">30</a>
-                            <a class="dropdown-item font-weight-bold" href="/deploys-list/100">40</a>
+                                                                             class="small ml-auto"><span class="fas fa-check"></span></span></a>
                         </div>
+                        -->
                     </div>
             </div>
         </div>
@@ -110,7 +107,7 @@
                     <th></th>
                 </tr>
             </thead>
-            <tbody id="myTable">
+            <tbody>
                 <!-- Item -->
                 {% for deploy in deploys| sort(attribute='id') %}
 
@@ -336,35 +333,18 @@
             </tbody>
         </table>
         <div class="card-footer px-3 border-0 d-flex align-items-center justify-content-between">
-            <nav aria-label="Page navigation example">
-                <ul class="pagination mb-0">
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item active">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                    <li class="page-item">
-                    </li>
-                </ul>
+             <!-- Pagination -->
+            <nav>
+              <ul class="pagination">
+                <li class="page-item" id="previous-page"><a class="page-link" href="#">Previous</a></li>
+                <!-- Page numbers will be dynamically inserted here -->
+                <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
+              </ul>
             </nav>
             <div class="font-weight-bold small"></div>
         </div>
     </div>
- <!-- Pagination -->
-<nav>
-  <ul class="pagination">
-    <li class="page-item" id="previous-page"><a class="page-link" href="#">Previous</a></li>
-    <!-- Page numbers will be dynamically inserted here -->
-    <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
-  </ul>
-</nav>
+
 
 
     {% include 'includes/footer.html' %}
@@ -375,5 +355,5 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
-<script src="/static/assets/js/pagination.js"></script>
+<script src="/static/assets/js/pagination_edit.js"></script>
 {% endblock javascripts %}
