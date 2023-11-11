@@ -55,6 +55,3 @@ RUN chown -R sld:sld /app
 
 # Switch to user 'sld' for runtime
 USER sld
-
-
-
