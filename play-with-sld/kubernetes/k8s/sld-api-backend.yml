@@ -34,4 +34,3 @@ spec:
         env:
         - name: PATH
           value: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-
