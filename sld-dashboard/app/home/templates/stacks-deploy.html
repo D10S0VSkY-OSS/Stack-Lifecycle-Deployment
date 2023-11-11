@@ -223,7 +223,7 @@
                                     <!-- Collapse Variables -->
                                 <div class="collapse" id="variables">
                                     <div class="border-top my-4"></div>
-                                    <!-- start SLD_SORT False -->
+                                    <!-- start SLD_SORT VARS -->
                                     {% if not sort_form %}
 {% set basic_variables = {} %}
 {% set advanced_variables = {} %}
@@ -238,7 +238,7 @@
 
 <!-- Basic Variables -->
 <div class="basic-variables-section">
-    <h2>Basic Variables</h2>
+    <h4>Basic Variables</h4>
     {% for key, value in basic_variables.items() %}
         <div class="form-group">
             <p class="mb-110"><h6><strong>{{ key }}</strong></h6></p>
@@ -262,11 +262,13 @@
         </div>
     {% endfor %}
 </div>
-
+<hr>
 <!-- Advanced Variables -->
 <form onsubmit="return cleanFormData()">
 <div class="advanced-variables-section">
-    <h2 class="toggle-advanced" style="cursor:pointer;">Advanced Variables</h2>
+    <h4 class="toggle-advanced" style="cursor:pointer;">
+        Advanced Variables <i id="advanced-icon" class="fas fa-chevron-down"></i>
+    </h4>
     <div id="advanced-variables-content" style="display:none;">
         {% for key, value in advanced_variables.items() %}
             <div class="form-group">
@@ -292,37 +294,8 @@
     {% endfor %}
 </div>
 </div>
-
                                     {% endif %}
                                     <!-- END SLD_SORT False -->
-                                    <!-- start SLD_SORT True -->
-                                    {% if sort_form %}
-                                        {% for key, value in data_json.items()|sort(attribute='1.description') %}
-                                            {% if value.get('description').split('|')[1] %}
-                                                 <div class="border-top my-4"></div>
-                                                 <h5>{{value.get('description').split('|')[1]}}</h4>
-                                                <div class="border border-dark"></div>
-                                            {% endif %}
-                                            <div class="form-group">
-                                            <p class="mb-110"><h6><strong>{{key}}</strong></h6></p>
-                                            <footer class="blockquote-footer"> {{value.get('description', "").split('|')[-1]}}</footer>
-                                            {% for k, v in value.items() %}
-                                                {% if v == "bool" %}
-                                                    <input type="text" value={{value.get("default")|lower}}
-                                                {% elif "default" in k %}
-                                                    <input type="text" value="{{ v }}"
-                                                {% elif "passw" in key %}
-                                                    <input type="password"
-                                                {% elif "type" in k %}
-                                                    <input type="text" title="{{k}} {{v}}"
-                                                {% else %}
-                                                    <input type="text"
-                                                {% endif %}
-                                            {% endfor %}
-                                            name={{ key }} class='form-control' autocomplete="off">
-                                        </div>
-                                        {% endfor %}
-                                    {% endif %}
                                  <div class="border-top my-4"></div>
                           <button type="submit" class="btn btn-success" name="button" value=plan action="{{url_for('.list_deploys')}}">
                               Plan
@@ -371,8 +344,35 @@ document.addEventListener("DOMContentLoaded", function() {
     });
 });
 </script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    var variablesFormButton = document.querySelector("[data-target='#variables']");
+    var tfvarsFormButton = document.querySelector("[data-target='#tfvars']");
+    var variablesFormContent = document.getElementById('variables');
+    var tfvarsFormContent = document.getElementById('tfvars');
+
+    variablesFormButton.addEventListener('click', function() {
+        // Toggle current content
+        variablesFormContent.classList.toggle('show');
+
+        // Close the other content if it's open
+        if (tfvarsFormContent.classList.contains('show')) {
+            tfvarsFormContent.classList.remove('show');
+        }
+    });
+
+    tfvarsFormButton.addEventListener('click', function() {
+        // Toggle current content
+        tfvarsFormContent.classList.toggle('show');
+
+        // Close the other content if it's open
+        if (variablesFormContent.classList.contains('show')) {
+            variablesFormContent.classList.remove('show');
+        }
+    });
+});
 
 
-
+</script>
 
 {% endblock javascripts %}
