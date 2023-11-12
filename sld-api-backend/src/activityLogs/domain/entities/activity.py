@@ -8,4 +8,4 @@ class ActivityLogs(BaseModel):
     action: constr(strip_whitespace=True)
 
     class Config:
-        orm_mode = True
+        from_attributes = True

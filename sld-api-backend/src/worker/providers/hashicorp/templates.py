@@ -1,8 +1,10 @@
 import json
+import logging
 from dataclasses import dataclass
 
 import hcl
 from jinja2 import Template
+from src.worker.helpers.hcl2_to_json import convert_to_json
 
 
 @dataclass
@@ -11,6 +13,11 @@ class StructBase:
     stack_name: str
     environment: str
     squad: str
+
+
+@dataclass
+class StructProject(StructBase):
+    project_path: str
 
 
 @dataclass
@@ -62,8 +69,7 @@ class Tfvars(StructBase):
 
 
 @dataclass
-class GetVars(StructBase):
-    project_path: str
+class GetVars(StructProject):
     """
     In this class are the methods to obtain information from the terraform variables
     """
@@ -73,18 +79,52 @@ class GetVars(StructBase):
             return f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/variables.tf"
         return f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}/variables.tf"
 
+    def process_dict(self, d):
+        return {
+            key: (
+                value.replace("${", "").replace("}", "")
+                if isinstance(value, str)
+                else (
+                    self.process_dict(value)
+                    if isinstance(value, dict)
+                    else [self.process_dict(item) for item in value]
+                    if isinstance(value, list)
+                    else value
+                )
+            )
+            for key, value in d.items()
+        }
+
     def get_vars_json(self) -> dict:
         try:
             file_hcl = self.__set_path()
             with open(file_hcl, "r") as fp:
-                obj = hcl.load(fp)
-            if obj.get("variable"):
-                return {"command": "get_vars_json", "rc": 0, "stdout": json.dumps(obj)}
+                hcl_data = hcl.load(fp)
+            if hcl_data.get("variable"):
+                return {
+                    "command": "get_vars_json",
+                    "rc": 0,
+                    "stdout": json.dumps(hcl_data),
+                }
             else:
                 error_msg = "Variable file is empty, not iterable"
                 return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
         except IOError:
             error_msg = "Variable file not accessible"
             return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
+        except ValueError as err:
+            logging.warn(err)
+            logging.warn("hclv1 cannot read variables.tf trying to read with hcl2")
+            try:
+                result = {"variable": convert_to_json(file_hcl)}
+                return {
+                    "command": "get_vars_json",
+                    "rc": 0,
+                    "stdout": json.dumps(result),
+                }
+            except Exception as err:
+                error_msg = f"Syntax error in variable file(check with terraform validate): {err}"
+                logging.error(error_msg)
+                return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
         except Exception as err:
             return {"command": "get_vars_json", "rc": 1, "stdout": err}

@@ -15,7 +15,7 @@ class StackBase(BaseModel):
     class Config:
         """Extra configuration options"""
 
-        anystr_strip_whitespace = True  # remove trailing whitespace
+        str_strip_whitespace = True  # remove trailing whitespace
 
 
 class StackCreate(StackBase):
@@ -24,7 +24,7 @@ class StackCreate(StackBase):
     class Config:
         """Extra configuration options"""
 
-        anystr_strip_whitespace = True  # remove trailing whitespace
+        str_strip_whitespace = True  # remove trailing whitespace
 
 
 class Stack(StackBase):
@@ -33,4 +33,4 @@ class Stack(StackBase):
     user_id: int
 
     class Config:
-        orm_mode = True
+        from_attributes = True
