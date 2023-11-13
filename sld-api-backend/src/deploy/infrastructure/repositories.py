@@ -1,6 +1,7 @@
 import datetime
 
 from sqlalchemy.orm import Session
+from sqlalchemy import desc
 
 import src.deploy.domain.entities.deploy as schemas_deploy
 import src.deploy.infrastructure.models as models
@@ -176,7 +177,7 @@ def get_deploy_by_name_squad(
 
 def get_all_deploys(db: Session, skip: int = 0, limit: int = 100):
     try:
-        return db.query(models.Deploy).offset(skip).limit(limit).all()
+        return db.query(models.Deploy).order_by(desc(models.Deploy.id)).offset(skip).limit(limit).all()
     except Exception as err:
         raise err
 
