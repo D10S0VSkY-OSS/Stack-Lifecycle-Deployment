@@ -116,9 +116,13 @@
                     onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
                 <i class="far fa-copy"></i>
                 </span>
+               <span class="download-icon" data-variables="{{ deploy.variables }}" onclick="downloadTFVars(this)" title="Download tfvars">
+                <i class="far fa-file"></i>
+                </span>
                         <a href="" class="font-weight-bold">
                             {{ deploy.id }}
                         </a>
+
                     </td>
                     <td>
                         <span class="font-weight-normal">{{ deploy.name }}</span>
@@ -360,4 +364,5 @@
 {% block javascripts %}
 <script src="/static/assets/js/pagination_edit.js"></script>
 <script src="/static/assets/js/copy_clipboard.js"></script>
+<script src="/static/assets/js/download_tfvars.js"></script>
 {% endblock javascripts %}
