@@ -245,7 +245,7 @@
                                     <span aria-hidden="true">&times;</span>
                                 </button>
                             </div>
-                            <div class="modal-body" style="background-color: #040720; color: white;">
+                            <div class="modal-output">
                                 {% set stdout = task_log(deploy.task_id, token).result %}
                                 {% if stdout is iterable and (stdout is not string and stdout is not mapping) %}
                                 {%for i in stdout %}
@@ -257,7 +257,7 @@
                                     {% elif stripped_line.startswith('~') %}
                                         <p><span class="tilde"><strong>{{ i }}</strong></span></p>
                                     {% else %}
-                                        <p><strong>{{i}}</strong></p>
+                                        <p><span class="others"><strong>{{i}}</strong></span></p>
                                     {% endif %}
                                 {% endfor %}
                                 {% else %}
