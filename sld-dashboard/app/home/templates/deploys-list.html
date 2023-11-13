@@ -110,9 +110,12 @@
             <tbody>
                 <!-- Item -->
                 {% for deploy in deploys %}
-
                 <tr>
                     <td>
+                    <span class="copy-icon"
+                    onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
+                <i class="far fa-copy"></i>
+                </span>
                         <a href="" class="font-weight-bold">
                             {{ deploy.id }}
                         </a>
@@ -356,4 +359,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script src="/static/assets/js/pagination_edit.js"></script>
+<script src="/static/assets/js/copy_clipboard.js"></script>
 {% endblock javascripts %}
