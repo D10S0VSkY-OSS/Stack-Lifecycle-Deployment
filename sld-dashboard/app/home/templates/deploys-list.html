@@ -5,6 +5,7 @@
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 {% block content %}
 <main class="content">
 
@@ -95,8 +96,7 @@
             <thead class="thead-dark">
                 <tr>
                     <th>Id</th>
-                    <th>Deploy Name</th>
-                    <th>Stack</th>
+                    <th>Deploy Name| Stack | Branch</th>
                     <th>Squad</th>
                     <th>Environment</th>
                     <th>Username</th>
@@ -112,43 +112,46 @@
                 {% for deploy in deploys %}
                 <tr>
                     <td>
-                    <span class="copy-icon"
-                    onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
-                <i class="far fa-copy"></i>
-                </span>
-               <span class="download-icon" data-variables="{{ deploy.variables }}" onclick="downloadTFVars(this)" title="Download tfvars">
-                <i class="far fa-file"></i>
-                </span>
+
                         <a href="" class="font-weight-bold">
-                            {{ deploy.id }}
+                            <div>{{ deploy.id }}</div>
                         </a>
 
                     </td>
                     <td>
-                        <span class="font-weight-normal">{{ deploy.name }}</span>
+                        <span class="font-weight-normal">
+                            <div style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
+                            <div><span style="font-size: 12px; font-weight: bold;">stack</span>: {{ deploy.stack_name }}</div>
+                            <div><span style="font-size: 12px; font-weight: bold;">branch/tag</span>: {{deploy.stack_branch }}</div>
+                            <div>
+                <span class="copy-icon"
+                    onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
+                <span style="font-size: 12px; font-weight: bold;">copy:</span> <i class="far fa-copy"></i>
+                </span>
+               <span class="download-icon" data-variables="{{ deploy.variables }}" onclick="downloadTFVars(this)" title="Download tfvars">
+                | <span style="font-size: 12px; font-weight: bold;">tfvars:</span> <i class="far fa-file"></i>
+                </span>
+                            </div>
+                        </span>
                     </td>
-                    <td><span class="font-weight-normal">
-                            <a href="#" aria-disabled="true"
-                               title="branch {{deploy.get('stack_branch')}}">
-                               {{ deploy.stack_name }}
-                            </a></span></td>
-                    <!--<td><span class="font-weight-normal">{{ deploy.stack_name}}</span></td>-->
-                    <td><span class="font-weight-normal">{{ deploy.squad}}</span></td>
-                    <td><span class="font-weight-normal">{{ deploy.environment}}</span></td>
+                    <td><span class="tag-style">{{ deploy.squad}}</span></td>
+                    <td><span class="tag-style">{{ deploy.environment}}</span></td>
                     <td><span class="font-weight-normal">{{ deploy.username}}</span></td>
                     <td><span class="font-weight-bold">{{ deploy.start_time }}</span></td>
                     <td><span class="font-weight-bold">{{ deploy.destroy_time }}</span></td>
-                    <td><span class="font-weight-normal">{{ deploy.action}}</span></td>
+                    <td><span class="tag-style">{{ deploy.action}}</span></td>
+                    <div id="status">
                     {% set status = task_status(deploy.task_id, token).result %}
                     {% if status == "SUCCESS" %}
-                    <td><span class="font-weight-bold text-success">{{ status }}</span></td>
+                    <td><span class="tag-style-success">{{ status }}</span></td>
                     {% elif status == "ERROR" or (status == "FAILURE") %}
-                    <td><span class="font-weight-bold text-danger">{{ status }}</span></td>
+                    <td><span class="tag-style-failure">{{ status }}</span></td>
                     {% elif status == "RETRY" %}
-                    <td><span class="font-weight-bold text-warning">{{ status }}</span></td>
+                    <td><span class="tag-style-retry">{{ status }}</span></td>
                     {% else %}
-                    <td><span class="font-weight-bold text-info ">{{ status }}</span></td>
+                    <td><span class="tag-style-status">{{ status }}</span></td>
                     {% endif %}
+                    </div>
                     <td>
                         <!-- button group-->
                         <div class="btn-group">

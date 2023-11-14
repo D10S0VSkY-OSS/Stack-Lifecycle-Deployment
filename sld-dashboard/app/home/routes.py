@@ -720,6 +720,22 @@ def deploy_stack(stack_id):
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
 
+#status
+@blueprint.route('/get-task-status/<task_id>')
+@login_required
+def get_task_status(task_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        response = request_url(
+            verb="GET",
+            uri=f"tasks/id/{task_id}",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        return render_template('deploy-list', status=response)
+    except:
+     pass
 
 # Task
 @blueprint.route("/task_id/<task_id>")
