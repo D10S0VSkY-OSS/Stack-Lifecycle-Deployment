@@ -1,0 +1,15 @@
+sld_api_backend:
+  name: api-backend
+  replicaCount: 1
+  image:
+    name: api-backend
+    repository: d10s0vsky/sld-api
+    pullPolicy: Always
+    tag: "2.18.0"
+
+sld_api_backend_service:
+  service:
+    name: api-backend
+    type: NodePort
+    port: 8000
+    nodePort: 30003

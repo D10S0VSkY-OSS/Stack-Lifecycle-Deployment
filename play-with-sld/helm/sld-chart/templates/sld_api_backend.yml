@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.sld_api_backend.name }}
+  labels:
+    {{- include "sld-chart.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.sld_api_backend.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "sld-chart.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "sld-chart.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: {{ .Chart.Name }}
+        image: "{{ .Values.sld_api_backend.image.repository }}:{{ .Values.sld_api_backend.image.tag }}"
+        imagePullPolicy: {{ .Values.sld_api_backend.image.pullPolicy }}
+        command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+        ports:
+        - containerPort: 8000
+        livenessProbe:
+          httpGet:
+            path: /api/v1/
+            port: 8000
+            httpHeaders:
+            - name: status
+              value: healthy
+          initialDelaySeconds: 60
+          periodSeconds: 60
+        env:
+        - name: PATH
+          value: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
