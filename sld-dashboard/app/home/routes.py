@@ -3,6 +3,8 @@
 import ast
 import json
 import time
+from flask import jsonify, render_template, request, url_for, redirect, flash
+
 
 import redis
 from app import login_manager
@@ -39,6 +41,41 @@ def index():
     return render_template(
         "index.html", segment="index", external_api_dns=external_api_dns
     )
+
+@blueprint.route('/status/<task_id>')
+def status(task_id):
+    token = decrypt(r.get(current_user.id))
+    # Check if token no expired
+    check_unauthorized_token(token)
+    response = request_url(
+        verb="GET",
+        uri=f"tasks/id/{task_id}",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    if response.get("status_code") == 200:
+        data = response.get("json").get("result")
+        return jsonify(data) 
+    else:
+        return jsonify({"status": "Error"}), response.status_code
+
+
+@blueprint.route('/output/<task_id>')
+@login_required
+def output(task_id):
+    token = decrypt(r.get(current_user.id))
+    # Check if token no expired
+    check_unauthorized_token(token)
+    response = request_url(
+        verb="GET",
+        uri=f"tasks/id/{task_id}",
+        headers={"Authorization": f"Bearer {token}"}
+    )
+    if response.get("status_code") == 200:
+        data = response.get("json").get("result")
+        return redirect(
+            url_for("home_blueprint.route_template", template="deploys-list", stdout=data)
+        )
+    flash(response["json"]["detail"], "error")
 
 
 # Start Deploy
@@ -720,22 +757,6 @@ def deploy_stack(stack_id):
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
 
-#status
-@blueprint.route('/get-task-status/<task_id>')
-@login_required
-def get_task_status(task_id):
-    try:
-        token = decrypt(r.get(current_user.id))
-        # Check if token no expired
-        check_unauthorized_token(token)
-        response = request_url(
-            verb="GET",
-            uri=f"tasks/id/{task_id}",
-            headers={"Authorization": f"Bearer {token}"},
-        )
-        return render_template('deploy-list', status=response)
-    except:
-     pass
 
 # Task
 @blueprint.route("/task_id/<task_id>")

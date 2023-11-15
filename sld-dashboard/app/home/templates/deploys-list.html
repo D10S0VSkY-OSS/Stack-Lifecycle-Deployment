@@ -120,7 +120,7 @@
                     </td>
                     <td>
                         <span class="font-weight-normal">
-                            <div style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
+                            <div style="font-size: 16px; font-weight: bold;">{{ deploy.name }}</div>
                             <div><span style="font-size: 12px; font-weight: bold;">stack</span>: {{ deploy.stack_name }}</div>
                             <div><span style="font-size: 12px; font-weight: bold;">branch/tag</span>: {{deploy.stack_branch }}</div>
                             <div>
@@ -140,18 +140,8 @@
                     <td><span class="font-weight-bold">{{ deploy.start_time }}</span></td>
                     <td><span class="font-weight-bold">{{ deploy.destroy_time }}</span></td>
                     <td><span class="tag-style">{{ deploy.action}}</span></td>
-                    <div id="status">
-                    {% set status = task_status(deploy.task_id, token).result %}
-                    {% if status == "SUCCESS" %}
-                    <td><span class="tag-style-success">{{ status }}</span></td>
-                    {% elif status == "ERROR" or (status == "FAILURE") %}
-                    <td><span class="tag-style-failure">{{ status }}</span></td>
-                    {% elif status == "RETRY" %}
-                    <td><span class="tag-style-retry">{{ status }}</span></td>
-                    {% else %}
-                    <td><span class="tag-style-status">{{ status }}</span></td>
-                    {% endif %}
-                    </div>
+                    <td id="status-{{ deploy.task_id }}">
+
                     <td>
                         <!-- button group-->
                         <div class="btn-group">
@@ -355,6 +345,7 @@
         </div>
     </div>
 
+<div id="sse"></div>
 
 
     {% include 'includes/footer.html' %}
@@ -368,4 +359,42 @@
 <script src="/static/assets/js/pagination_edit.js"></script>
 <script src="/static/assets/js/copy_clipboard.js"></script>
 <script src="/static/assets/js/download_tfvars.js"></script>
+<script>
+    // Función para actualizar el estado de un deploy específico
+    function updateStatus(taskId) {
+        fetch('/status/' + taskId)
+            .then(response => response.json())
+            .then(data => {
+                var statusElement = document.getElementById('status-' + taskId);
+                if (statusElement) {
+                    statusElement.innerHTML = renderStatus(data.status);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Función para renderizar el estado en formato HTML
+    function renderStatus(status) {
+        switch(status) {
+            case "SUCCESS":
+                return '<span class="tag-style-success">' + status + '</span>';
+            case "FAILURE":
+                return '<span class="tag-style-failure">' + status + '</span>';
+            case "RETRY":
+                return '<span class="tag-style-retry">' + status + '</span>';
+            default:
+                return '<span class="tag-style-status">' + status + '</span>';
+        }
+    }
+
+    // Iniciar la actualización del estado para cada deploy
+    {% for deploy in deploys %}
+        updateStatus('{{ deploy.task_id }}')
+        setInterval(() => updateStatus('{{ deploy.task_id }}'), 5000);
+    {% endfor %}
+</script>
+
+
+
+
 {% endblock javascripts %}
