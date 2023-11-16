@@ -44,35 +44,49 @@ def index():
 
 @blueprint.route('/status/<task_id>')
 def status(task_id):
-    token = decrypt(r.get(current_user.id))
-    # Check if token no expired
-    check_unauthorized_token(token)
-    response = request_url(
-        verb="GET",
-        uri=f"tasks/id/{task_id}",
-        headers={"Authorization": f"Bearer {token}"}
-    )
-    if response.get("status_code") == 200:
-        data = response.get("json").get("result")
-        return jsonify(data) 
-    else:
-        return jsonify({"status": "Error"}), response.status_code
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        response = request_url(
+            verb="GET",
+            uri=f"tasks/id/{task_id}",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        if response.get("status_code") == 200:
+            data = response.get("json").get("result")
+            return jsonify(data) 
+        else:
+            return jsonify({"status": "Error"}), response.status_code
+    except TemplateNotFound:
+        return render_template("page-404.html"), 404
+    except TypeError:
+        return redirect(url_for("base_blueprint.logout"))
+    except Exception:
+        return render_template("page-500.html"), 500
 
 
 @blueprint.route('/output/<task_id>')
 @login_required
 def output(task_id):
-    token = decrypt(r.get(current_user.id))
-    # Check if token no expired
-    check_unauthorized_token(token)
-    response = request_url(
-        verb="GET",
-        uri=f"tasks/id/{task_id}",
-        headers={"Authorization": f"Bearer {token}"}
-    )
-    if response.get("status_code") == 200:
-        data = response.get("json").get("result").get("module").get("stdout")
-        return data
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        response = request_url(
+            verb="GET",
+            uri=f"tasks/id/{task_id}",
+            headers={"Authorization": f"Bearer {token}"}
+        )
+        if response.get("status_code") == 200:
+            data = response.get("json").get("result").get("module").get("stdout")
+            return data
+    except TemplateNotFound:
+        return render_template("page-404.html"), 404
+    except TypeError:
+        return redirect(url_for("base_blueprint.logout"))
+    except Exception:
+        return render_template("page-500.html"), 500
 
 
 # Start Deploy
