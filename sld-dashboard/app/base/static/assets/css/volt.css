@@ -41746,6 +41746,71 @@ pre {
     position: relative;
     flex: 1 1 auto;
     padding: 1rem;
-    background-color: #040720;
+    background-color: #333;
     color: #fff;
 }
+
+.tag-style {
+    background-color: #262B40;
+; /* Un gris oscuro */
+    color: white; /* Texto en color blanco para contraste */
+    padding: 5px 10px; /* Espaciado interno para dar forma al tag */
+    border-radius: 5px; /* Bordes redondeados para la apariencia de un tag */
+    font-weight: normal; /* Peso de la fuente, ajusta según necesidad */
+    display: inline-block; /* Para asegurar que el estilo se aplique correctamente */
+    margin: 2px; /* Un pequeño margen alrededor del tag */
+    width: 100px; /* Ancho fijo para el tag */
+    text-align: center; /* Centrar el texto dentro del tag */
+}
+
+
+.tag-style-success {
+    background-color: var(--bs-soft-green); /* Un gris oscuro */
+    color: white; /* Texto en color blanco para contraste */
+    padding: 5px 10px; /* Espaciado interno para dar forma al tag */
+    border-radius: 5px; /* Bordes redondeados para la apariencia de un tag */
+    font-weight: normal; /* Peso de la fuente, ajusta según necesidad */
+    display: inline-block; /* Para asegurar que el estilo se aplique correctamente */
+    margin: 2px; /* Un pequeño margen alrededor del tag */
+    width: 100px; /* Ancho fijo para el tag */
+    text-align: center; /* Centrar el texto dentro del tag */
+}
+
+.tag-style-failure {
+    background-color: var(--bs-reddit); /* Un gris oscuro */
+    color: white; /* Texto en color blanco para contraste */
+    padding: 5px 10px; /* Espaciado interno para dar forma al tag */
+    border-radius: 5px; /* Bordes redondeados para la apariencia de un tag */
+    font-weight: normal; /* Peso de la fuente, ajusta según necesidad */
+    display: inline-block; /* Para asegurar que el estilo se aplique correctamente */
+    margin: 2px; /* Un pequeño margen alrededor del tag */
+    width: 100px; /* Ancho fijo para el tag */
+    text-align: center; /* Centrar el texto dentro del tag */    
+}
+
+.tag-style-status {
+    background-color: var(--bs-purple); /* Un gris oscuro */
+    color: white; /* Texto en color blanco para contraste */
+    padding: 5px 10px; /* Espaciado interno para dar forma al tag */
+    border-radius: 5px; /* Bordes redondeados para la apariencia de un tag */
+    font-weight: normal; /* Peso de la fuente, ajusta según necesidad */
+    display: inline-block; /* Para asegurar que el estilo se aplique correctamente */
+    margin: 2px; /* Un pequeño margen alrededor del tag */
+    width: 100px; /* Ancho fijo para el tag */
+    text-align: center; /* Centrar el texto dentro del tag */    
+}
+
+.tag-style-retry {
+    background-color: var(--bs-warning); /* Un gris oscuro */
+    color: white; /* Texto en color blanco para contraste */
+    padding: 5px 10px; /* Espaciado interno para dar forma al tag */
+    border-radius: 5px; /* Bordes redondeados para la apariencia de un tag */
+    font-weight: normal; /* Peso de la fuente, ajusta según necesidad */
+    display: inline-block; /* Para asegurar que el estilo se aplique correctamente */
+    margin: 2px; /* Un pequeño margen alrededor del tag */
+    width: 100px; /* Ancho fijo para el tag */
+    text-align: center; /* Centrar el texto dentro del tag */    
+}
+
+
+

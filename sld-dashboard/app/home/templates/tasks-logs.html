@@ -93,12 +93,20 @@
                     {% else %}
                     <td><span class="icon icon-sm"><span class="fas fa-box-open"></span></span></td>
                     {% endif %}
-                    <td><span class="font-weight-normal">{{ task.task_id }}</span></td>
+                    <td>
+                        <div>
+                        <span class="font-weight-normal">{{ task.task_id }}</span>
+                         <span class="copy-icon"
+                            onclick="copyToClipboard('{{ task.task_id }}')" title="Copy to clipboard">
+                            <i class="far fa-copy"></i>
+                        </div>
+                        </span> 
+                    </td>
                     <td><span class="font-weight-normal">{{ task.deploy_id }}</span></td>
-                    <td><span class="font-weight-normal">{{ task.action }}</span></td>
-                    <td><span class="font-weight-normal">{{ task.username }}</span></td>
+                    <td><span class="tag-style">{{ task.action }}</span></td>
+                    <td><span class="tag-style">{{ task.username }}</span></td>
                     <td><span class="font-weight-normal">{{ task.task_name }}</span></td>
-                    <td><span class="font-weight-normal">{{ task.squad}}</span></td>
+                    <td><span class="tag-style">{{ task.squad}}</span></td>
                     <td><span class="font-weight-bold">{{ task.created_at }}</span></td>
                     <td>
     </div>
@@ -145,4 +153,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script src="/static/assets/js/pagination.js"></script>
+<script src="/static/assets/js/copy_clipboard.js"></script>
 {% endblock javascripts %}

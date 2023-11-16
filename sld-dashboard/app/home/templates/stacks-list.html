@@ -71,11 +71,11 @@
                     <td><span class="icon icon-sm"><span class="fab fas fa-layer-group"></span></span></td>
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.id }}</span></td>
-                    <td><span class="font-weight-normal">{{ stack.stack_name }}</span></td>
+                    <td><span class="tag-style">{{ stack.stack_name }}</span></td>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                     <td><span class="font-weight-normal">{{ stack.git_repo }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.branch }}</span></td>
-                    <td><span class="font-weight-normal">{{ stack.tf_version }}</span></td>
+                    <td><span class="tag-style">{{ stack.tf_version }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.squad_access }}</span></td>
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.description}}</span></td>

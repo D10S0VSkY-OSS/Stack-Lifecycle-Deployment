@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  var rowsPerPage = 10; // Valor inicial
+  var rowsPerPage = 20; // Valor inicial
   var rows = $('#myTable tr');
   var filteredRows = rows; // Inicialmente, todas las filas son el conjunto filtrado
   var pagesCount;

@@ -5,6 +5,7 @@
 <!-- Specific Page CSS goes HERE  -->
 {% block stylesheets %}{% endblock stylesheets %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+
 {% block content %}
 <main class="content">
 
@@ -95,8 +96,7 @@
             <thead class="thead-dark">
                 <tr>
                     <th>Id</th>
-                    <th>Deploy Name</th>
-                    <th>Stack</th>
+                    <th>Deploy Name| Stack | Branch</th>
                     <th>Squad</th>
                     <th>Environment</th>
                     <th>Username</th>
@@ -112,43 +112,36 @@
                 {% for deploy in deploys %}
                 <tr>
                     <td>
-                    <span class="copy-icon"
-                    onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
-                <i class="far fa-copy"></i>
-                </span>
-               <span class="download-icon" data-variables="{{ deploy.variables }}" onclick="downloadTFVars(this)" title="Download tfvars">
-                <i class="far fa-file"></i>
-                </span>
+
                         <a href="" class="font-weight-bold">
-                            {{ deploy.id }}
+                            <div>{{ deploy.id }}</div>
                         </a>
 
                     </td>
                     <td>
-                        <span class="font-weight-normal">{{ deploy.name }}</span>
+                        <span class="font-weight-normal">
+                            <div style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
+                            <div><span style="font-size: 12px; font-weight: bold;">stack</span>: {{ deploy.stack_name }}</div>
+                            <div><span style="font-size: 12px; font-weight: bold;">branch</span>: {{deploy.stack_branch }}</div>
+                            <div>
+                <span class="copy-icon"
+                    onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
+                <span style="font-size: 12px; font-weight: bold;">copy:</span> <i class="far fa-copy"></i>
+                </span>
+               <span class="download-icon" data-variables="{{ deploy.variables }}" onclick="downloadTFVars(this)" title="Download tfvars">
+                | <span style="font-size: 12px; font-weight: bold;">tfvars:</span> <i class="far fa-file"></i>
+                </span>
+                            </div>
+                        </span>
                     </td>
-                    <td><span class="font-weight-normal">
-                            <a href="#" aria-disabled="true"
-                               title="branch {{deploy.get('stack_branch')}}">
-                               {{ deploy.stack_name }}
-                            </a></span></td>
-                    <!--<td><span class="font-weight-normal">{{ deploy.stack_name}}</span></td>-->
-                    <td><span class="font-weight-normal">{{ deploy.squad}}</span></td>
-                    <td><span class="font-weight-normal">{{ deploy.environment}}</span></td>
+                    <td><span class="tag-style">{{ deploy.squad}}</span></td>
+                    <td><span class="tag-style">{{ deploy.environment}}</span></td>
                     <td><span class="font-weight-normal">{{ deploy.username}}</span></td>
                     <td><span class="font-weight-bold">{{ deploy.start_time }}</span></td>
                     <td><span class="font-weight-bold">{{ deploy.destroy_time }}</span></td>
-                    <td><span class="font-weight-normal">{{ deploy.action}}</span></td>
-                    {% set status = task_status(deploy.task_id, token).result %}
-                    {% if status == "SUCCESS" %}
-                    <td><span class="font-weight-bold text-success">{{ status }}</span></td>
-                    {% elif status == "ERROR" or (status == "FAILURE") %}
-                    <td><span class="font-weight-bold text-danger">{{ status }}</span></td>
-                    {% elif status == "RETRY" %}
-                    <td><span class="font-weight-bold text-warning">{{ status }}</span></td>
-                    {% else %}
-                    <td><span class="font-weight-bold text-info ">{{ status }}</span></td>
-                    {% endif %}
+                    <td><span class="tag-style">{{ deploy.action}}</span></td>
+                    <td id="status-{{ deploy.task_id }}">
+
                     <td>
                         <!-- button group-->
                         <div class="btn-group">
@@ -165,6 +158,8 @@
                                     <span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
                                     <span class="fas fa-sync mr-2"></span>Approve</a>
+                                <a class="dropdown-item" href="{{url_for('.list_deploys')}}">
+                                    <span class="fas fa-sync mr-2"></span>Plan</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal"
                                                                      data-target="#DeleteModalCenter-{{deploy.id}}">
                                     <span class="fas fa-skull-crossbones mr-2"></span> delete </a>
@@ -191,11 +186,12 @@
                             </div>
                             {% endif %}
                             <!-- Output-->
-                            <span class="icon icon-sm">
-                                <a title="Output Deploy" class="nav-link icon-notifications text-dark" data-toggle="modal"
-                                                                                 data-target="#OutputModalCenter-{{deploy.id}}">
-                                    <span class="fab fa-searchengin mr-0"></span></a>
-                            </span>
+                            <!-- Botón para abrir el modal -->
+<span class="icon icon-sm">
+    <a title="Output Deploy" class="nav-link icon-notifications text-dark output-button" data-task-id="{{deploy.task_id}}" data-deploy-id="{{deploy.id}}">
+        <span class="fab fa-searchengin mr-0"></span>
+    </a>
+</span>
                             <!-- Schedule -->
                             <span class="icon icon-sm">
                                 <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
@@ -242,42 +238,22 @@
                     </div>
                 </div>
                 <!-- Modal Output-->
-                <div class="modal fade" id="OutputModalCenter-{{deploy.id}}">
-                    <div class="modal-dialog modal-xl" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="OutputModalLongTitle-{{deploy.id}}">Output Deploy
-                                    {{deploy.name}}</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-output">
-                                {% set stdout = task_log(deploy.task_id, token).result %}
-                                {% if stdout is iterable and (stdout is not string and stdout is not mapping) %}
-                                {%for i in stdout %}
-                                    {% set stripped_line = i.strip() %}
-                                    {% if stripped_line.startswith('+') %}
-                                        <p><span class="plus"><strong>{{ i }}</strong></span></p>
-                                    {% elif stripped_line.startswith('-') %}
-                                        <p><span class="minus"><strong>{{ i }}</strong></span></p>
-                                    {% elif stripped_line.startswith('~') %}
-                                        <p><span class="tilde"><strong>{{ i }}</strong></span></p>
-                                    {% else %}
-                                        <p><span class="others"><strong>{{i}}</strong></span></p>
-                                    {% endif %}
-                                {% endfor %}
-                                {% else %}
-                                <p><strong>{{stdout}}</strong></p>
-                                {% endif %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Modal para mostrar los outputs -->
+<div class="modal fade" id="OutputModalCenter-{{deploy.id}}" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" >
+        <div class="modal-content">
+            <div class="modal-header">
+                ...
+            </div>
+            <div class="modal-output" id="modal-output-{{deploy.id}}">
+                <!-- Los outputs se renderizarán aquí -->
+            </div>
+            <div class="modal-footer">
+                ...
+            </div>
+        </div>
+    </div>
+</div>
                 <!-- Modal Destroy-->
                 <div class="modal fade" id="DestroyModalCenter-{{deploy.id}}">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -352,8 +328,6 @@
         </div>
     </div>
 
-
-
     {% include 'includes/footer.html' %}
 
 </main>
@@ -365,4 +339,101 @@
 <script src="/static/assets/js/pagination_edit.js"></script>
 <script src="/static/assets/js/copy_clipboard.js"></script>
 <script src="/static/assets/js/download_tfvars.js"></script>
+<script>
+    // Función para actualizar el estado de un deploy específico
+    function updateStatus(taskId) {
+        fetch('/status/' + taskId)
+            .then(response => response.json())
+            .then(data => {
+                var statusElement = document.getElementById('status-' + taskId);
+                if (statusElement) {
+                    statusElement.innerHTML = renderStatus(data.status);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Función para renderizar el estado en formato HTML
+    function renderStatus(status) {
+        switch(status) {
+            case "SUCCESS":
+                return '<span class="tag-style-success">' + status + '</span>';
+            case "FAILURE":
+                return '<span class="tag-style-failure">' + status + '</span>';
+            case "RETRY":
+                return '<span class="tag-style-retry">' + status + '</span>';
+            default:
+                return '<span class="tag-style-status">' + status + '</span>';
+        }
+    }
+
+    // Iniciar la actualización del estado para cada deploy
+    {% for deploy in deploys %}
+        updateStatus('{{ deploy.task_id }}')
+        setInterval(() => updateStatus('{{ deploy.task_id }}'), 5000);
+    {% endfor %}
+</script>
+<script>
+    // Función para abrir un modal y mostrar los outputs del deploy
+    function showModal(taskId, deployId) {
+        fetch('/output/' + taskId)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Respuesta del servidor no es OK. Estado: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Respuesta exitosa:', data); // Log exitoso
+                var modalBody = document.getElementById('modal-output-' + deployId);
+                if (modalBody) {
+                    modalBody.innerHTML = renderOutput(data);
+                }
+
+                // Inicializar y mostrar el modal
+                var modalElement = document.getElementById('OutputModalCenter-' + deployId);
+                if (modalElement) {
+                    var myModal = new bootstrap.Modal(modalElement, {
+                        keyboard: true
+                    });
+                    myModal.show();
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener datos:', error);
+                console.log('Error al obtener datos del endpoint para el taskId:', taskId);
+            });
+    }
+
+    // Función para renderizar los outputs en formato HTML
+    function renderOutput(data) {
+        if (Array.isArray(data)) {
+            return data.map(line => `<p><span class="${getClassForLine(line)}"><strong>${line}</strong></span></p>`).join('');
+        } else {
+            return `<p><strong>${data}</strong></p>`;
+        }
+    }
+
+    // Función auxiliar para determinar la clase CSS según el contenido de la línea
+    function getClassForLine(line) {
+        if (line.startsWith('+')) return 'plus';
+        if (line.startsWith('-')) return 'minus';
+        if (line.startsWith('~')) return 'tilde';
+        return 'others';
+    }
+
+    // Asignar el evento click a los botones para abrir el modal
+    document.querySelectorAll('.output-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const taskId = button.getAttribute('data-task-id');
+            const deployId = button.getAttribute('data-deploy-id');
+            showModal(taskId, deployId);
+        });
+    });
+</script>
+
+
+
+
+
 {% endblock javascripts %}
