@@ -71,11 +71,8 @@ def output(task_id):
         headers={"Authorization": f"Bearer {token}"}
     )
     if response.get("status_code") == 200:
-        data = response.get("json").get("result")
-        return redirect(
-            url_for("home_blueprint.route_template", template="deploys-list", stdout=data)
-        )
-    flash(response["json"]["detail"], "error")
+        data = response.get("json").get("result").get("module").get("stdout")
+        return data
 
 
 # Start Deploy

@@ -120,9 +120,9 @@
                     </td>
                     <td>
                         <span class="font-weight-normal">
-                            <div style="font-size: 16px; font-weight: bold;">{{ deploy.name }}</div>
+                            <div style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
                             <div><span style="font-size: 12px; font-weight: bold;">stack</span>: {{ deploy.stack_name }}</div>
-                            <div><span style="font-size: 12px; font-weight: bold;">branch/tag</span>: {{deploy.stack_branch }}</div>
+                            <div><span style="font-size: 12px; font-weight: bold;">branch</span>: {{deploy.stack_branch }}</div>
                             <div>
                 <span class="copy-icon"
                     onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
@@ -158,6 +158,8 @@
                                     <span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
                                     <span class="fas fa-sync mr-2"></span>Approve</a>
+                                <a class="dropdown-item" href="{{url_for('.list_deploys')}}">
+                                    <span class="fas fa-sync mr-2"></span>Plan</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal"
                                                                      data-target="#DeleteModalCenter-{{deploy.id}}">
                                     <span class="fas fa-skull-crossbones mr-2"></span> delete </a>
@@ -184,11 +186,12 @@
                             </div>
                             {% endif %}
                             <!-- Output-->
-                            <span class="icon icon-sm">
-                                <a title="Output Deploy" class="nav-link icon-notifications text-dark" data-toggle="modal"
-                                                                                 data-target="#OutputModalCenter-{{deploy.id}}">
-                                    <span class="fab fa-searchengin mr-0"></span></a>
-                            </span>
+                            <!-- Botón para abrir el modal -->
+<span class="icon icon-sm">
+    <a title="Output Deploy" class="nav-link icon-notifications text-dark output-button" data-task-id="{{deploy.task_id}}" data-deploy-id="{{deploy.id}}">
+        <span class="fab fa-searchengin mr-0"></span>
+    </a>
+</span>
                             <!-- Schedule -->
                             <span class="icon icon-sm">
                                 <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
@@ -235,42 +238,22 @@
                     </div>
                 </div>
                 <!-- Modal Output-->
-                <div class="modal fade" id="OutputModalCenter-{{deploy.id}}">
-                    <div class="modal-dialog modal-xl" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="OutputModalLongTitle-{{deploy.id}}">Output Deploy
-                                    {{deploy.name}}</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <div class="modal-output">
-                                {% set stdout = task_log(deploy.task_id, token).result %}
-                                {% if stdout is iterable and (stdout is not string and stdout is not mapping) %}
-                                {%for i in stdout %}
-                                    {% set stripped_line = i.strip() %}
-                                    {% if stripped_line.startswith('+') %}
-                                        <p><span class="plus"><strong>{{ i }}</strong></span></p>
-                                    {% elif stripped_line.startswith('-') %}
-                                        <p><span class="minus"><strong>{{ i }}</strong></span></p>
-                                    {% elif stripped_line.startswith('~') %}
-                                        <p><span class="tilde"><strong>{{ i }}</strong></span></p>
-                                    {% else %}
-                                        <p><span class="others"><strong>{{i}}</strong></span></p>
-                                    {% endif %}
-                                {% endfor %}
-                                {% else %}
-                                <p><strong>{{stdout}}</strong></p>
-                                {% endif %}
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+<!-- Modal para mostrar los outputs -->
+<div class="modal fade" id="OutputModalCenter-{{deploy.id}}" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl" >
+        <div class="modal-content">
+            <div class="modal-header">
+                ...
+            </div>
+            <div class="modal-output" id="modal-output-{{deploy.id}}">
+                <!-- Los outputs se renderizarán aquí -->
+            </div>
+            <div class="modal-footer">
+                ...
+            </div>
+        </div>
+    </div>
+</div>
                 <!-- Modal Destroy-->
                 <div class="modal fade" id="DestroyModalCenter-{{deploy.id}}">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -345,9 +328,6 @@
         </div>
     </div>
 
-<div id="sse"></div>
-
-
     {% include 'includes/footer.html' %}
 
 </main>
@@ -393,6 +373,65 @@
         setInterval(() => updateStatus('{{ deploy.task_id }}'), 5000);
     {% endfor %}
 </script>
+<script>
+    // Función para abrir un modal y mostrar los outputs del deploy
+    function showModal(taskId, deployId) {
+        fetch('/output/' + taskId)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Respuesta del servidor no es OK. Estado: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Respuesta exitosa:', data); // Log exitoso
+                var modalBody = document.getElementById('modal-output-' + deployId);
+                if (modalBody) {
+                    modalBody.innerHTML = renderOutput(data);
+                }
+
+                // Inicializar y mostrar el modal
+                var modalElement = document.getElementById('OutputModalCenter-' + deployId);
+                if (modalElement) {
+                    var myModal = new bootstrap.Modal(modalElement, {
+                        keyboard: true
+                    });
+                    myModal.show();
+                }
+            })
+            .catch(error => {
+                console.error('Error al obtener datos:', error);
+                console.log('Error al obtener datos del endpoint para el taskId:', taskId);
+            });
+    }
+
+    // Función para renderizar los outputs en formato HTML
+    function renderOutput(data) {
+        if (Array.isArray(data)) {
+            return data.map(line => `<p><span class="${getClassForLine(line)}"><strong>${line}</strong></span></p>`).join('');
+        } else {
+            return `<p><strong>${data}</strong></p>`;
+        }
+    }
+
+    // Función auxiliar para determinar la clase CSS según el contenido de la línea
+    function getClassForLine(line) {
+        if (line.startsWith('+')) return 'plus';
+        if (line.startsWith('-')) return 'minus';
+        if (line.startsWith('~')) return 'tilde';
+        return 'others';
+    }
+
+    // Asignar el evento click a los botones para abrir el modal
+    document.querySelectorAll('.output-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const taskId = button.getAttribute('data-task-id');
+            const deployId = button.getAttribute('data-deploy-id');
+            showModal(taskId, deployId);
+        });
+    });
+</script>
+
 
 
 

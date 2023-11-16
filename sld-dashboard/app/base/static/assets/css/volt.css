@@ -41751,7 +41751,8 @@ pre {
 }
 
 .tag-style {
-    background-color: #333; /* Un gris oscuro */
+    background-color: #262B40;
+; /* Un gris oscuro */
     color: white; /* Texto en color blanco para contraste */
     padding: 5px 10px; /* Espaciado interno para dar forma al tag */
     border-radius: 5px; /* Bordes redondeados para la apariencia de un tag */

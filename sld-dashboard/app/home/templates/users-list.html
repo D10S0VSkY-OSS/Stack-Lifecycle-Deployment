@@ -92,12 +92,20 @@
                     <td><span class="icon icon-sm w-30" ><img src="/static/assets/img/team/user.png"</span></td>
                     {% endif %}
                     <td><span class="font-weight-normal">{{ user.id }}</span></td>
-                    <td><span class="font-weight-normal">{{ user.username }}</span></td>
+                    <td>
+                        <div>
+                         <span class="tag-style">{{ user.username }}</span>
+                         <span class="copy-icon"
+                            onclick="copyToClipboard('{{ user.username }}')" title="Copy to clipboard">
+                            <i class="far fa-copy"></i>
+                        </div>
+                        </span> 
+                    </td>
                     <td><span class="font-weight-normal">{{ user.fullname }}</span></td>
                     <td><span class="font-weight-normal">{{ user.email }}</span></td>
                     <td><span class="font-weight-normal">{{ user.squad }}</span></td>
                     <td><span class="font-weight-normal">{{ user.role }}</span></td>
-                    <td><span class="font-weight-normal">{{ user.is_active }}</span></td>
+                    <td><span class="tag-style">{{ user.is_active }}</span></td>
                     {% if current_user.master %}
                     <td><span class="font-weight-normal">{{ user.master }}</span></td>
                     {% endif %}
@@ -140,4 +148,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script src="/static/assets/js/pagination_edit.js"></script>
+<script src="/static/assets/js/copy_clipboard.js"></script>
 {% endblock javascripts %}
