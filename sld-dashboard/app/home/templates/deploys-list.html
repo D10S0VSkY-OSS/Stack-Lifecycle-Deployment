@@ -173,10 +173,12 @@
                             </div>
                             {% else %}
                             <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ url_for('.relaunch_plan',deploy_id=deploy.id)}}">
+                                    <span class="fas fa-sync mr-2"></span>Plan</a>
                                 <a class="dropdown-item" href="{{ url_for('.edit_deploy',deploy_id=deploy.id)}}">
                                     <span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
-                                    <span class="fas fa-sync mr-2"></span>Apply</a>
+                                    <span class="fas fa-cloud mr-2"></span>Apply</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal"
                                                                      data-target="#DestroyModalCenter-{{deploy.id}}">
                                     <span class="fas fa-trash-alt mr-2"></span>Destroy</a>
@@ -238,22 +240,21 @@
                     </div>
                 </div>
                 <!-- Modal Output-->
-<!-- Modal para mostrar los outputs -->
-<div class="modal fade" id="OutputModalCenter-{{deploy.id}}" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" >
-        <div class="modal-content">
-            <div class="modal-header">
-                ...
-            </div>
-            <div class="modal-output" id="modal-output-{{deploy.id}}">
-                <!-- Los outputs se renderizarán aquí -->
-            </div>
-            <div class="modal-footer">
-                ...
-            </div>
-        </div>
-    </div>
-</div>
+                <div class="modal fade" id="OutputModalCenter-{{deploy.id}}" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-xl" >
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                ...
+                            </div>
+                            <div class="modal-output" id="modal-output-{{deploy.id}}">
+                            </div>
+                            <div class="modal-footer">
+                                ...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- end Modal Output-->
                 <!-- Modal Destroy-->
                 <div class="modal fade" id="DestroyModalCenter-{{deploy.id}}">
                     <div class="modal-dialog modal-dialog-centered" role="document">
