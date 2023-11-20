@@ -1,8 +1,8 @@
 # -*- encoding: utf-8 -*-
-
 import ast
 import json
 import time
+import logging
 from flask import jsonify, render_template, request, url_for, redirect, flash
 
 
@@ -78,14 +78,14 @@ def output(task_id):
             uri=f"tasks/id/{task_id}",
             headers={"Authorization": f"Bearer {token}"}
         )
+    
         if response.get("status_code") == 200:
             data = response.get("json").get("result").get("module").get("stdout")
+            if not isinstance(data, list):
+                data = [data] 
             return data
-    except TemplateNotFound:
-        return render_template("page-404.html"), 404
-    except TypeError:
-        return redirect(url_for("base_blueprint.logout"))
-    except Exception:
+    except Exception as err:
+        logging.error(err) 
         return render_template("page-500.html"), 500
 
 

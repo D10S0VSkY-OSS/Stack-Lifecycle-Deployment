@@ -47,7 +47,7 @@ class StackForm(FlaskForm):
     project_path = StringField(
         "Project_path",
         [
-            validators.length(min=1, max=20, message="Folder path when use monorepo"),
+            validators.length(min=1, max=500, message="Folder path when use monorepo"),
         ],
     )
     description = StringField(
@@ -120,7 +120,7 @@ class DeployForm(FlaskForm):
     project_path = StringField(
         "project_path",
         [
-            validators.length(min=2, max=30, message="Project path name."),
+            validators.length(min=2, max=500, message="Project path name."),
         ],
     )
     environment = StringField(
