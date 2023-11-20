@@ -41759,7 +41759,7 @@ pre {
     font-weight: normal; /* Peso de la fuente, ajusta según necesidad */
     display: inline-block; /* Para asegurar que el estilo se aplique correctamente */
     margin: 2px; /* Un pequeño margen alrededor del tag */
-    width: 100px; /* Ancho fijo para el tag */
+    width: auto;
     text-align: center; /* Centrar el texto dentro del tag */
 }
 
