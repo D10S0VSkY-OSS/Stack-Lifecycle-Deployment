@@ -142,10 +142,13 @@
                             <span class="font-weight-normal">
                                 <div style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
                                 <div>
-                                    <span style="font-size: 12px; font-weight: bold;">stack</span>: {{ deploy.stack_name }}
+                                    <span style="font-size: 12px; font-weight: bold;">stack</span>
+                                    : {{ deploy.stack_name }}
                                 </div>
                                 <div>
-                                    <span style="font-size: 12px; font-weight: bold;">branch</span>: {{deploy.stack_branch }}
+                                    <span style="font-size: 12px; font-weight: bold;">branch</span>
+                                    : {{deploy.stack_branch
+                                }}
                                 </div>
                                 <div>
                                     <span class="copy-icon" onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
@@ -201,43 +204,54 @@
                                     {% if deploy.action == "Plan_disable"%}
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" href="{{ url_for('.edit_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-edit mr-2"></span>Edit
+                                            <span class="fas fa-edit mr-2"></span>
+                                            Edit
                                         </a>
                                         <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-sync mr-2"></span>Approve
+                                            <span class="fas fa-sync mr-2"></span>
+                                            Approve
                                         </a>
                                         <a class="dropdown-item" href="{{url_for('.list_deploys')}}">
-                                            <span class="fas fa-sync mr-2"></span>Plan
+                                            <span class="fas fa-sync mr-2"></span>
+                                            Plan
                                         </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DeleteModalCenter-{{deploy.id}}">
-                                            <span class="fas fa-skull-crossbones mr-2"></span> delete
+                                            <span class="fas fa-skull-crossbones mr-2"></span>
+                                            delete
                                         </a>
                                     </div>
                                     {% elif deploy.action == "DryRun"%}
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" href="{{ url_for('.edit_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-edit mr-2"></span>Edit
+                                            <span class="fas fa-edit mr-2"></span>
+                                            Edit
                                         </a>
                                         <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-sync mr-2"></span>ReDeploy
+                                            <span class="fas fa-sync mr-2"></span>
+                                            ReDeploy
                                         </a>
                                     </div>
                                     {% else %}
                                     <div class="dropdown-menu">
                                         <a class="dropdown-item" href="{{ url_for('.relaunch_plan',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-sync mr-2"></span>Plan
+                                            <span class="fas fa-sync mr-2"></span>
+                                            Plan
                                         </a>
                                         <a class="dropdown-item" href="{{ url_for('.edit_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-edit mr-2"></span>Edit
+                                            <span class="fas fa-edit mr-2"></span>
+                                            Edit
                                         </a>
                                         <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-cloud mr-2"></span>Apply
+                                            <span class="fas fa-cloud mr-2"></span>
+                                            Apply
                                         </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DestroyModalCenter-{{deploy.id}}">
-                                            <span class="fas fa-trash-alt mr-2"></span>Destroy
+                                            <span class="fas fa-trash-alt mr-2"></span>
+                                            Destroy
                                         </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DeleteModalCenter-{{deploy.id}}">
-                                            <span class="fas fa-skull-crossbones mr-2"></span> delete
+                                            <span class="fas fa-skull-crossbones mr-2"></span>
+                                            delete
                                         </a>
                                     </div>
                                     {% endif %}
@@ -259,7 +273,7 @@
                                             <span class="far fa-clock mr-0"></span>
                                         </a>
                                     </span>
-                                    {% if "yoda" in current_user.role or  "darth_vader" in current_user.role %}
+                                    {% if "yoda" in current_user.role or "darth_vader" in current_user.role %}
                                     <!-- Unlock-->
                                     <span class="icon icon-sm">
                                         <a
@@ -282,7 +296,7 @@
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="UnlockModalLongTitle-{{deploy.id}}">
                                             Unlock Deploy
-                                                                                                {{deploy.name}}
+                                    {{deploy.name}}
                                         </h5>
                                         <button
                                             type="button"
@@ -297,9 +311,9 @@
                                         <p>
                                             <strong>
                                                 Acquires a state lock to protect the state from being written
-                                by multiple users at the same time. Please resolve the issue and try
-                                again. You can disable locking with the "Unlock botton", but this is not
-                                                                                          recommended:
+                                        by multiple users at the same time. Please resolve the issue and try
+                                        again. You can disable locking with the "Unlock botton", but this is not
+                                        recommended:
                                             </strong>
                                         </p>
                                         <p>
@@ -391,7 +405,7 @@
                                         <p>
                                             <strong>
                                                 If you destroy before delete would be better.
-                                    This Deploy will be deleted permanently and cannot be recovered later:
+                                        This Deploy will be deleted permanently and cannot be recovered later:
                                             </strong>
                                         </p>
                                         <p>
@@ -451,7 +465,7 @@
 
     // Función para renderizar el estado en formato HTML
     function renderStatus(status) {
-        switch(status) {
+        switch (status) {
             case "SUCCESS":
                 return '<span class="tag-style-success">' + status + '</span>';
             case "FAILURE":
@@ -465,8 +479,8 @@
 
     // Iniciar la actualización del estado para cada deploy
     {% for deploy in deploys %}
-        updateStatus('{{ deploy.task_id }}')
-        setInterval(() => updateStatus('{{ deploy.task_id }}'), 5000);
+    updateStatus('{{ deploy.task_id }}')
+    setInterval(() => updateStatus('{{ deploy.task_id }}'), 5000);
     {% endfor %}
     </script>
     <script>
