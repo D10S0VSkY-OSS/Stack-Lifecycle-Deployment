@@ -95,6 +95,7 @@
             
             <thead class="thead-dark">
                 <tr>
+                    <th>Provider</th>
                     <th>Id</th>
                     <th>Deploy Name| Stack | Branch</th>
                     <th>Squad</th>
@@ -111,16 +112,26 @@
                 <!-- Item -->
                 {% for deploy in deploys %}
                 <tr>
+                    {% if "aws" in deploy.stack_name %}
+                    <td><span class="icon icon-sm w-30" ><span class="fab fa-aws"></span></span></td>
+                    {% elif "gcp" in deploy.stack_name %}
+                    <td><span class="icon icon-sm w-30"><span class="fab fa-google"></span></span></td>
+                    {% elif "azure" in deploy.stack_name %}
+                    <td><span class="icon icon-sm w-30"><span class="fab fa-windows"></span></span></td>
+                    {% else %}
+                    <td><span class="icon icon-sm"><span class="fab fas fa-layer-group"></span></span></td>                    
+                    {% endif %}
                     <td>
-
                         <a href="" class="font-weight-bold">
                             <div>{{ deploy.id }}</div>
                         </a>
 
                     </td>
-                    <td>
                         <span class="font-weight-normal">
-                            <div style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
+                    <td>
+                            <div style="font-size: 17px; font-weight: bold;">
+                                {{ deploy.name }}
+                            </div>
                             <div><span style="font-size: 12px; font-weight: bold;">stack</span>: {{ deploy.stack_name }}</div>
                             <div><span style="font-size: 12px; font-weight: bold;">branch</span>: {{deploy.stack_branch }}</div>
                             <div>
