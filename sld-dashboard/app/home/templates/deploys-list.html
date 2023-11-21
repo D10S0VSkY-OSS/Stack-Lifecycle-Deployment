@@ -244,12 +244,11 @@
                     <div class="modal-dialog modal-xl" >
                         <div class="modal-content">
                             <div class="modal-header">
-                                ...
                             </div>
                             <div class="modal-output" id="modal-output-{{deploy.id}}">
                             </div>
                             <div class="modal-footer">
-                                ...
+                            <button type="button" class="btn btn-primary" data-dismiss="modal">Exit</button>
                             </div>
                         </div>
                     </div>
@@ -380,7 +379,7 @@
         fetch('/output/' + taskId)
             .then(response => {
                 if (!response.ok) {
-                    throw new Error('Respuesta del servidor no es OK. Estado: ' + response.status);
+                    throw new Error('Server response error: ' + response.status);
                 }
                 return response.json();
             })
@@ -401,8 +400,8 @@
                 }
             })
             .catch(error => {
-                console.error('Error al obtener datos:', error);
-                console.log('Error al obtener datos del endpoint para el taskId:', taskId);
+                console.error('Fetch data error:', error);
+                console.log('Fetch data endpoint taskId:', taskId);
             });
     }
 
@@ -417,12 +416,11 @@
 
     // Función auxiliar para determinar la clase CSS según el contenido de la línea
     function getClassForLine(line) {
-        if (line.startsWith('+')) return 'plus';
-        if (line.startsWith('-')) return 'minus';
-        if (line.startsWith('~')) return 'tilde';
-        return 'other';
+        if (/^\s*\+/.test(line)) return 'plus';
+        if (/^\s*-/.test(line)) return 'minus';
+        if (/^\s*~/.test(line)) return 'tilde';
+        return 'others';
     }
-
     // Asignar el evento click a los botones para abrir el modal
     document.querySelectorAll('.output-button').forEach(button => {
         button.addEventListener('click', () => {
@@ -432,9 +430,4 @@
         });
     });
 </script>
-
-
-
-
-
 {% endblock javascripts %}
