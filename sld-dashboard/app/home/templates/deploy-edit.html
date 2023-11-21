@@ -38,7 +38,7 @@
                         <div class="col-lg-4 col-sm-6">
                             <!-- Form -->
                             <div class="col-md-12 col-md-offset-1">
-                                <h3>{{deploy.name}}</h3>
+                                <h1>{{deploy.name}}</h1>
                                 <form class="" method="post">
                                     <div class="form-group">
                                         {{ render_field(form.start_time, autocomplete="off", class='form-control', value=deploy.start_time)
@@ -64,6 +64,8 @@
                                     </div>
                                 {% if deploy.tfvar_file == "" %}
                                     <div class="border-top my-4"></div>
+                                <h2>Variables</h2>
+                                    <div class="border-top my-4"></div>
                                     {% for key, value in data_json.items()|sort %}
                                     <div class="form-group">
                                         <span style="text-transform:capitalize">
@@ -72,11 +74,10 @@
                                         {% if "passw" in key %}
                                         <input type="password" value="{{ value }}" name={{ key }} class='form-control'
                                             placeholder={{key}} autocomplete="off">
-                                        {% elif value is number %}
-                                        <input type="text" value="{{ value }}" name={{ key }} class='form-control'
-                                        placeholder={{key}} autocomplete="off">
-                                        <select name={{ key }} class='form-control'>
-                                            <select name="{{ key }}" id="select-{{ key }}" class="form-control">
+                                        {% elif value == "true" or value == "false" %}
+                                        <select name="{{ key }}" class='form-control'>
+                                            <option value="true" {% if value == "true" %} selected {% endif %}>True</option>
+                                            <option value="false" {% if value == "false" %} selected {% endif %}>False</option>
                                         </select>
                                         {% elif value is iterable and not value is string %}
                                         <textarea id="json{{ loop.index }}" name={{ key }} class='form-control' rows="6" required placeholder={{key}} autocomplete="off">{{ value | tojson | safe }}</textarea>
@@ -171,17 +172,6 @@
                 textarea.value = JSON.stringify(obj, null, 4);
             } catch (e) {
             }
-        });
-    });
-</script>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        document.querySelectorAll('select').forEach(function (select) {
-            select.addEventListener('change', function () {
-                // Aquí puedes manejar el cambio de valor.
-                // Por ejemplo, imprimir el nuevo valor en la consola:
-                console.log('Nuevo valor para ' + this.name + ': ' + this.value);
-            });
         });
     });
 </script>
