@@ -38,10 +38,11 @@
                         <div class="col-lg-4 col-sm-6">
                             <!-- Form -->
                             <div class="col-md-12 col-md-offset-1">
-                                <h3>{{deploy.name}}</h3>
+                                <h1>{{deploy.name}}</h1>
                                 <form class="" method="post">
                                     <div class="form-group">
-                                        {{ render_field(form.start_time, autocomplete="off", class='form-control', value=deploy.start_time)
+                                        {{ render_field(form.start_time, autocomplete="off", class='form-control',
+                                        value=deploy.start_time)
                                         }}
                                     </div>
 
@@ -55,14 +56,16 @@
                                     </div>
                                     <div class="form-group">
                                         {{ render_field(form.project_path,
-                                           autocomplete="off", class='form-control',
-                                           value=deploy.project_path) }}
+                                        autocomplete="off", class='form-control',
+                                        value=deploy.project_path) }}
                                     </div>
                                     <div class="form-group">
                                         {{ render_field(form.tfvar_file, autocomplete="off", class='form-control',
                                         value=deploy.tfvar_file) }}
                                     </div>
-                                {% if deploy.tfvar_file == "" %}
+                                    {% if deploy.tfvar_file == "" %}
+                                    <div class="border-top my-4"></div>
+                                    <h2>Variables</h2>
                                     <div class="border-top my-4"></div>
                                     {% for key, value in data_json.items()|sort %}
                                     <div class="form-group">
@@ -72,13 +75,25 @@
                                         {% if "passw" in key %}
                                         <input type="password" value="{{ value }}" name={{ key }} class='form-control'
                                             placeholder={{key}} autocomplete="off">
-                                        {% else %}
+                                        {% elif value == "true" or value == "false" %}
+                                        <select name="{{ key }}" class='form-control'>
+                                            <option value="true" {% if value=="true" %} selected {% endif %}>True
+                                            </option>
+                                            <option value="false" {% if value=="false" %} selected {% endif %}>False
+                                            </option>
+                                        </select>
+                                        {% elif value is iterable and not value is string %}
+                                        <textarea id="json{{ loop.index }}" name={{ key }} class='form-control' rows="6"
+                                            required placeholder={{key}}
+                                            autocomplete="off">{{ value | tojson | safe }}</textarea>
+                                        {% elif value is string %}
                                         <input type="text" value="{{ value }}" name={{ key }} class='form-control'
                                             placeholder={{key}} autocomplete="off">
+                                        {% else %}
                                         {% endif %}
                                     </div>
                                     {% endfor %}
-                                <!-- Add custom variables -->
+                                    <!-- Add custom variables -->
                                     <div class="border-top my-4"></div>
                                     <div class="row">
                                         <div class="col-lg-12">
@@ -86,12 +101,13 @@
                                             </div>
 
                                             <div id="newRow"></div>
-                                            <button id="addRow" type="button" class="btn btn-info btn-sm">Add Variable</button>
+                                            <button id="addRow" type="button" class="btn btn-info btn-sm">Add
+                                                Variable</button>
                                         </div>
                                     </div>
                                     <div class="border-top my-4"></div>
-                                <!-- End Add custom variables -->
-                                {% endif %}
+                                    <!-- End Add custom variables -->
+                                    {% endif %}
                                     {% if deploy.action == "DryRun"%}
                                     <button type="submit" class="btn btn-success" name="button" value=plan
                                         action="{{url_for('.list_deploys')}}">
@@ -153,4 +169,17 @@
         $(this).closest('#inputFormRow').remove();
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var textareas = document.querySelectorAll('textarea');
+        textareas.forEach(function (textarea) {
+            try {
+                var obj = JSON.parse(textarea.value);
+                textarea.value = JSON.stringify(obj, null, 4);
+            } catch (e) {
+            }
+        });
+    });
+</script>
+
 {% endblock javascripts %}

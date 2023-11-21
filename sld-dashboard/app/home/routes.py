@@ -35,6 +35,10 @@ r = redis.Redis(host="redis", port=6379, db=1, charset="utf-8", decode_responses
 external_api_dns = settings.EXTERNAL_DNS_API
 
 
+def pretty_json(value):
+    return json.dumps(value, indent=4)
+
+
 @blueprint.route("/index")
 @login_required
 def index():

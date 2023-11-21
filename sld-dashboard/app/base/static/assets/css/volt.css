@@ -41812,5 +41812,11 @@ pre {
     text-align: center; /* Centrar el texto dentro del tag */    
 }
 
-
+pre {
+  border-width: 0px; /* Haz esto más pequeño para un borde más delgado */
+  border-style: solid; /* Esto define el estilo del borde (solid, dotted, dashed, etc.) */
+  border-color: #cccccc; /* Esto define el color del borde */
+  background-color: white;
+  padding: 10px;
+}
 
