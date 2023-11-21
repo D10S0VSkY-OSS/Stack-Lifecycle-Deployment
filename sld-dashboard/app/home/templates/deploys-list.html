@@ -189,11 +189,11 @@
                             {% endif %}
                             <!-- Output-->
                             <!-- Botón para abrir el modal -->
-<span class="icon icon-sm">
-    <a title="Output Deploy" class="nav-link icon-notifications text-dark output-button" data-task-id="{{deploy.task_id}}" data-deploy-id="{{deploy.id}}">
-        <span class="fab fa-searchengin mr-0"></span>
-    </a>
-</span>
+                            <span class="icon icon-sm">
+                                <a title="Output Deploy" class="nav-link icon-notifications text-dark output-button" data-task-id="{{deploy.task_id}}" data-deploy-id="{{deploy.id}}">
+                                    <span class="fab fa-searchengin mr-0"></span>
+                                </a>
+                            </span>
                             <!-- Schedule -->
                             <span class="icon icon-sm">
                                 <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
@@ -268,7 +268,6 @@
                             <div class="modal-body">
                                 <p><strong>This Deploy will be destroyed, could be regenerated later:</strong></p>
                                 <p><strong>Are you sure? </strong></p>
-                                <p> <small>Now, young Skywalker, you will die?</small></p>
                             </div>
                             <div class="modal-footer">
 
@@ -297,8 +296,6 @@
                                     This Deploy will be deleted permanently and cannot be recovered later:</strong>
                                 </p>
                                 <p><strong>Are you sure? </strong></p>
-                                <p> <small>Fear is the path to the dark side. Fear leads to anger;
-                                    anger leads to hate; hate leads to suffering. I sense much fear in you</small>
                                 </p>
                             </div>
                             <div class="modal-footer">

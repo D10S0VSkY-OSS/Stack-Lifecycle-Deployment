@@ -72,9 +72,18 @@
                                         {% if "passw" in key %}
                                         <input type="password" value="{{ value }}" name={{ key }} class='form-control'
                                             placeholder={{key}} autocomplete="off">
-                                        {% else %}
+                                        {% elif value is number %}
+                                        <input type="text" value="{{ value }}" name={{ key }} class='form-control'
+                                        placeholder={{key}} autocomplete="off">
+                                        <select name={{ key }} class='form-control'>
+                                            <select name="{{ key }}" id="select-{{ key }}" class="form-control">
+                                        </select>
+                                        {% elif value is iterable and not value is string %}
+                                        <textarea id="json{{ loop.index }}" name={{ key }} class='form-control' rows="6" required placeholder={{key}} autocomplete="off">{{ value | tojson | safe }}</textarea>
+                                        {% elif value is string %}
                                         <input type="text" value="{{ value }}" name={{ key }} class='form-control'
                                             placeholder={{key}} autocomplete="off">
+                                        {% else %}
                                         {% endif %}
                                     </div>
                                     {% endfor %}
@@ -153,4 +162,28 @@
         $(this).closest('#inputFormRow').remove();
     });
 </script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var textareas = document.querySelectorAll('textarea');
+        textareas.forEach(function (textarea) {
+            try {
+                var obj = JSON.parse(textarea.value);
+                textarea.value = JSON.stringify(obj, null, 4);
+            } catch (e) {
+            }
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('select').forEach(function (select) {
+            select.addEventListener('change', function () {
+                // Aquí puedes manejar el cambio de valor.
+                // Por ejemplo, imprimir el nuevo valor en la consola:
+                console.log('Nuevo valor para ' + this.name + ': ' + this.value);
+            });
+        });
+    });
+</script>
+
 {% endblock javascripts %}

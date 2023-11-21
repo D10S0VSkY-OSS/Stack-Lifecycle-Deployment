@@ -251,7 +251,7 @@
                     <option value="false" {% if not value.get("default") %} selected {% endif %}>False</option>
                 </select>
             {% elif field_type.startswith("map") or "object" in field_type %}
-                <textarea name={{ key }} class='form-control' rows="6" required>
+                <textarea  name={{ key }} class='form-control' rows="6" required>
 {{ value.get("default") | tojson | replace(",", ",\n") | replace("{", "{\n") | replace("}", "\n}") | trim | indent(4) }}
                 </textarea>
             {% elif "passw" in key or "token" in key or "key" in key or "secret" in key %}
