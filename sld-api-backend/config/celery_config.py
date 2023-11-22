@@ -12,11 +12,11 @@ BROKER_SERVER_PORT = os.getenv(
 )  # use por 6379 for redis or 5672 for RabbitMQ
 BROKER_TYPE = os.getenv("BROKER_TYPE", "redis")  # use amqp for RabbitMQ or redis
 # Redus backend config
-BACKEND_TYPE = os.getenv("BACKEND_TYPE", "redis")
-BACKEND_USER = os.getenv("BACKEND_USER", "")
-BACKEND_PASSWD = os.getenv("BACKEND_PASSWD", "")
-BACKEND_SERVER = os.getenv("BACKEND_SERVER", "redis")
-BACKEND_DB = os.getenv("BACKEND_DB", "0")
+BACKEND_TYPE = os.getenv("BACKEND_TYPE", "db+mysql")
+BACKEND_USER = os.getenv("BACKEND_USER", "root")
+BACKEND_PASSWD = os.getenv("BACKEND_PASSWD", "123")
+BACKEND_SERVER = os.getenv("BACKEND_SERVER", "db")
+BACKEND_DB = os.getenv("BACKEND_DB", "restapi")
 
 if not bool(os.getenv("DOCKER")):  # if running example without docker
     celery_app = Celery(
@@ -36,4 +36,6 @@ else:  # running example with docker
     }
 
 celery_app.conf.update(task_track_started=True)
+celery_app.conf.update(result_extended=True)
+celery_app.conf.broker_transport_options = {"visibility_timeout": 28800}  # 8 hours.
 celery_app.conf.result_expires = os.getenv("SLD_RESULT_EXPIRE", "259200")
