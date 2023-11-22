@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     PASSWORD_LEN: int = os.getenv("SLD_PASSWORD_LEN", 8)
     ROLLBACK: bool = os.getenv("SLD_ROLLBACK", False)
     DEPLOY_TMOUT: int = os.getenv("SLD_DEPLOY_TMOUT", 7200)
-    GIT_TMOUT: int = os.getenv("SLD_GIT_TMOUT", 15)
+    GIT_TMOUT: int = os.getenv("SLD_GIT_TMOUT", 60)
     WORKER_TMOUT: int = os.getenv("SLD_WORKER_TMOUT", 300)
     ENV: str = os.getenv("SLD_ENV", "dev")
     DEBUG: bool = os.getenv("SLD_DEBUG", False)
