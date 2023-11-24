@@ -18,6 +18,8 @@ class DeployParamsBase(BaseModel):
     class config:
         frozenset = True
 
+class GetVariablesParams(DeployParamsBase):
+    pass
 
 class RemoteStateParams(DeployParamsBase):
     pass
@@ -68,4 +70,7 @@ class ApplyParams(DeployParamsBase, DownloadBinaryParams):
         frozenset = True
 
 class PlanParams(ApplyParams):
+    pass
+
+class DestroyParams(ApplyParams):
     pass

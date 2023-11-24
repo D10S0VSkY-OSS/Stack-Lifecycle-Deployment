@@ -15,6 +15,7 @@ from src.shared.security import deps
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from src.worker.domain.entities.worker import DeployParams
 
 
 async def destroy_infra(
@@ -61,20 +62,20 @@ async def destroy_infra(
         if not check_deploy_state(deploy_data.task_id):
             raise ValueError("Deploy state running, cannot upgrade")
         # push task destroy to queue and return task_id
-        pipeline_destroy = async_destroy(
-            git_repo,
-            name,
-            stack_name,
-            environment,
-            squad,
-            branch,
-            tf_ver,
-            variables,
-            secreto,
-            tfvar_file,
-            project_path,
-            current_user.username,
-        )
+        pipeline_destroy = async_destroy(DeployParams(
+            git_repo=git_repo,
+            name=name,
+            stack_name=stack_name,
+            environment=environment,
+            squad=squad,
+            branch=branch,
+            version=tf_ver,
+            variables=variables,
+            secreto=secreto,
+            tfvar_file=tfvar_file,
+            project_path=project_path,
+            user=current_user.username,
+        ))
         # Push deploy task data
         crud_deploys.update_deploy(
             db=db,
