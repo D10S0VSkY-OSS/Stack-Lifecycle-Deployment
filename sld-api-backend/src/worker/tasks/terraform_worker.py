@@ -7,8 +7,10 @@ from celery.exceptions import Ignore
 from celery.utils.log import get_task_logger
 from config.api import settings
 from config.celery_config import celery_app
+from src.worker.domain.entities.worker import DeployParams, DestroyParams, PlanParams, DownloadGitRepoParams, GetVariablesParams
+from src.worker.domain.services.pipeline import Pipeline
 
-from src.worker.provider import ProviderActions, ProviderGetVars, ProviderRequirements
+from src.worker.domain.services.provider import ProviderActions, ProviderGetVars, ProviderRequirements
 from src.worker.tasks.helpers.folders import Utils
 from src.worker.tasks.helpers.metrics import push_metric
 from src.worker.tasks.helpers.schedule import request_url
@@ -30,155 +32,37 @@ logger = get_task_logger(__name__)
 @push_metric()
 def pipeline_deploy(
     self,
-    git_repo: str,
-    name: str,
-    stack_name: str,
-    environment: str,
-    squad: str,
-    branch: str,
-    version: str,
-    kwargs: any,
-    secreto: str,
-    variables_file: str = "",
-    project_path: str = "",
-    user: str = "",
+    params: DeployParams,
+
 ):
     try:
-        logger.info(
-            f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment}"
-        )
-        r.set(f"{name}-{squad}-{environment}", "Locked")
-        logger.info(f"[DEPLOY] lock sld {name}-{squad}-{environment}")
-        r.expire(f"{name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
-        logger.info(
-            f"[DEPLOY] set sld {name}-{squad}-{environment} expire timeout {settings.TASK_LOCKED_EXPIRED}"
-        )
-        # Git clone repo
-        logger.info(
-            f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
-        )
-        result = ProviderRequirements.artifact_download(
-            name, stack_name, environment, squad, git_repo, branch
-        )
-
+        params = DeployParams(**params)
+        pipeline = Pipeline(params=params)
+        pipeline.locked_task()
         self.update_state(state="PULLING", meta={"done": "1 of 6"})
-        if result["rc"] != 0:
-            logger.error(
-                f"[DEPLOY] Error when user {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
-            )
-            raise Exception(result)
-        # Download terrafom
-        logger.info(
-            f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
-        )
-        result = ProviderRequirements.binary_download(version)
-
+        pipeline.download_git_repo()
         self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
-        # Delete artifactory to avoid duplicating the runner logs
-        if result["rc"] != 0:
-            logger.error(
-                f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
-            )
-            raise Exception(result)
-
-        # Create tf to use the custom backend state
+        pipeline.download_binary()
         self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
-
-        result = ProviderRequirements.storage_state(
-            name, stack_name, environment, squad, project_path
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
-
-        # Create tfvar serialize with json
+        pipeline.set_remote_state()
         self.update_state(state="SETVARS", meta={"done": "4 of 6"})
-        result = ProviderRequirements.parameter_vars(
-            name, stack_name, environment, squad, project_path, kwargs
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
-        # Plan execute
-        logger.info(
-            f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform plan"
-        )
+        pipeline.set_tfvars()
         self.update_state(state="PLANNING", meta={"done": "5 of 6"})
-        result = ProviderActions.plan(
-            name,
-            stack_name,
-            branch,
-            environment,
-            squad,
-            version,
-            secreto,
-            variables_file,
-            project_path,
-        )
-
-        if result["rc"] != 0:
-            logger.error(
-                f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} execute terraform plan"
-            )
-            raise Exception(result)
-        # Apply execute
-        logger.info(
-            f"[DEPLOY] User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} terraform apply with timeout deploy setting {settings.DEPLOY_TMOUT}"
-        )
+        pipeline.execute_plan()
         self.update_state(state="APPLYING", meta={"done": "6 of 6"})
-        result = ProviderActions.apply(
-            name,
-            stack_name,
-            branch,
-            environment,
-            squad,
-            version,
-            secreto,
-            variables_file,
-            project_path,
-        )
-        if result["rc"] != 0:
-            logger.error(
-                f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
-            )
-            raise Exception(result)
-        return result
+        apply_result = pipeline.execute_apply()
+        return apply_result
     except Exception as err:
-        if not settings.ROLLBACK:
-            logger.error(
-                f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version} execute Retry"
-            )
-            self.retry(
-                countdown=settings.TASK_RETRY_INTERVAL,
-                exc=err,
-                max_retries=settings.TASK_MAX_RETRY,
-            )
-            self.update_state(state=states.FAILURE, meta={"exc": result})
-            raise Ignore()
-            logger.error(
-                f"[DEPLOY] Error when User {user} launch deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version} execute RollBack"
-            )
-        self.update_state(state="ROLLBACK", meta={"done": "1 of 1"})
-        destroy_result = ProviderActions.destroy(
-            name,
-            stack_name,
-            branch,
-            environment,
-            squad,
-            version,
-            secreto,
-            variables_file,
-            project_path,
+        self.retry(
+            countdown=settings.TASK_RETRY_INTERVAL,
+            exc=err,
+            max_retries=settings.TASK_MAX_RETRY,
         )
-        self.update_state(
-            state=states.FAILURE,
-            meta={
-                "exc_type": type(err).__name__,
-                "exc_message": traceback.format_exc().split("\n"),
-            },
-        )
+        self.update_state(state=states.FAILURE, meta={"exc": apply_result})
         raise Ignore()
     finally:
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        r.delete(f"{name}-{squad}-{environment}")
+        dir_path = f"/tmp/{params.stack_name}/{params.environment}/{params.squad}/{params.name}"
+        pipeline.unlock_task()
         if not settings.DEBUG:
             Utils.delete_local_folder(dir_path)
 
@@ -187,244 +71,99 @@ def pipeline_deploy(
 @push_metric()
 def pipeline_destroy(
     self,
-    git_repo: str,
-    name: str,
-    stack_name: str,
-    environment: str,
-    squad: str,
-    branch: str,
-    version: str,
-    kwargs: any,
-    secreto: str,
-    variables_file: str = "",
-    project_path: str = "",
-    user: str = "",
+    params: DeployParams,
 ):
     try:
-        logger.info(
-            f"User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment}"
-        )
-        r.set(f"{name}-{squad}-{environment}", "Locked")
-        logger.info(f"lock sld {name}-{squad}-{environment}")
-        r.expire(f"{name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
-        logger.info(
-            f"set sld {name}-{squad}-{environment} expire timeout {settings.TASK_LOCKED_EXPIRED}"
-        )
-        # Git clone repo
-        logger.info(
-            f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
-        )
-        result = ProviderRequirements.artifact_download(
-            name, stack_name, environment, squad, git_repo, branch
-        )
-        self.update_state(state="PULLING", meta={"done": "1 of 6"})
-        if result["rc"] != 0:
-            raise Exception(result)
-        # Download terrafom
-        logger.info(
-            f"User {user} Destroy deploy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
-        )
-        result = ProviderRequirements.binary_download(version)
-        self.update_state(state="LOADBIN", meta={"done": "2 of 6"})
-        # Delete artifactory to avoid duplicating the runner logs
-        if result["rc"] != 0:
-            logger.error(
-                f"Error when User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
-            )
-            raise Exception(result)
-        # Create tf to use the custom backend storage state
-        self.update_state(state="REMOTECONF", meta={"done": "3 of 6"})
-        result = ProviderRequirements.storage_state(
-            name, stack_name, environment, squad, project_path
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
-        # Create tfvar serialize with json
-        self.update_state(state="SETVARS", meta={"done": "4 of 6"})
-        result = ProviderRequirements.parameter_vars(
-            name, stack_name, environment, squad, project_path, kwargs
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
-
-        logger.info(
-            f"User {user} launch destroy {name} with stack {stack_name} on squad {squad} and environment {environment} execute destroy"
-        )
-        self.update_state(state="DESTROYING", meta={"done": "6 of 6"})
-        result = ProviderActions.destroy(
-            name,
-            stack_name,
-            branch,
-            environment,
-            squad,
-            version,
-            secreto,
-            variables_file,
-            project_path,
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
-        return result
+        params = DeployParams(**params)
+        pipeline = Pipeline(params=params)
+        pipeline.locked_task()
+        self.update_state(state="PULLING", meta={"done": "1 of 5"})
+        pipeline.download_git_repo()
+        self.update_state(state="LOADBIN", meta={"done": "2 of 5"})
+        pipeline.download_binary()
+        self.update_state(state="REMOTECONF", meta={"done": "3 of 5"})
+        pipeline.set_remote_state()
+        self.update_state(state="SETVARS", meta={"done": "4 of 5"})
+        pipeline.set_tfvars()
+        self.update_state(state="DESTROYING", meta={"done": "5 of 5"})
+        destroy_result = pipeline.execute_destroy()
+        if destroy_result["rc"] != 0:
+            raise Exception(destroy_result)
+        return destroy_result
     except Exception as err:
         self.retry(countdown=5, exc=err, max_retries=1)
-        self.update_state(state=states.FAILURE, meta={"exc": result})
+        self.update_state(state=states.FAILURE, meta={"exc": destroy_result})
         raise Ignore()
     finally:
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
+        dir_path = f"/tmp/{ params.stack_name }/{ params.environment}/{ params.squad}/{ params.name}"
         Utils.delete_local_folder(dir_path)
-        r.delete(f"{name}-{squad}-{environment}")
+        pipeline.unlock_task()
 
 
 @celery_app.task(bind=True, acks_late=True, name="pipeline Plan")
 @push_metric()
 def pipeline_plan(
     self,
-    git_repo: str,
-    name: str,
-    stack_name: str,
-    environment: str,
-    squad: str,
-    branch: str,
-    version: str,
-    kwargs: any,
-    secreto: str,
-    variables_file: str = "",
-    project_path: str = "",
-    user: str = "",
+    params: DeployParams,
 ):
     try:
-        r.set(f"{name}-{squad}-{environment}", "Locked")
-        logger.info(f"[DEPLOY] lock sld {name}-{squad}-{environment}")
-        r.expire(f"{name}-{squad}-{environment}", settings.TASK_LOCKED_EXPIRED)
-        logger.info(
-            f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment}"
-        )
-        self.update_state(state="GIT", meta={"done": "1 of 5"})
-        result = ProviderRequirements.artifact_download(
-            name, stack_name, environment, squad, git_repo, branch
-        )
-        if result["rc"] != 0:
-            logger.error(
-                f"Error when user {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} git pull"
-            )
-            raise Exception(result)
-        self.update_state(state="BINARY", meta={"done": "2 of 5"})
-        logger.info(
-            f"User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
-        )
-        result = ProviderRequirements.binary_download(version)
-        if result["rc"] != 0:
-            logger.error(
-                f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} download terrafom version {version}"
-            )
-            raise Exception(result)
-
-        self.update_state(state="REMOTE", meta={"done": "3 of 5"})
-        result = ProviderRequirements.storage_state(
-            name, stack_name, environment, squad, project_path
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
-
-        self.update_state(state="VARS", meta={"done": "4 of 5"})
-        result = ProviderRequirements.parameter_vars(
-            name, stack_name, environment, squad, project_path, kwargs
-        )
-        if result["rc"] != 0:
-            raise Exception(result)
-
-        self.update_state(state="PLAN", meta={"done": "5 of 5"})
-        result = ProviderActions.plan(
-            name,
-            stack_name,
-            branch,
-            environment,
-            squad,
-            version,
-            secreto,
-            variables_file,
-            project_path,
-        )
-        if result["rc"] != 0:
-            logger.error(
-                f"Error when User {user} launch plan {name} with stack {stack_name} on squad {squad} and environment {environment} execute terraform plan"
-            )
-            raise Exception(result)
-        return result
+        params = DeployParams(**params)
+        pipeline = Pipeline(params=params)
+        pipeline.locked_task()
+        self.update_state(state="PULLING", meta={"done": "1 of 5"})
+        pipeline.download_git_repo()
+        self.update_state(state="LOADBIN", meta={"done": "2 of 5"})
+        pipeline.download_binary()
+        self.update_state(state="REMOTECONF", meta={"done": "3 of 5"})
+        pipeline.set_remote_state()
+        self.update_state(state="SETVARS", meta={"done": "4 of 5"})
+        pipeline.set_tfvars()
+        self.update_state(state="PLANNING", meta={"done": "5 of 5"})
+        plan_result = pipeline.execute_plan()
+        return plan_result
     except Exception as err:
-        self.retry(countdown=5, exc=err, max_retries=1)
-        self.update_state(state=states.FAILURE, meta={"exc": result})
+        self.retry(
+            countdown=settings.TASK_RETRY_INTERVAL,
+            exc=err,
+            max_retries=settings.TASK_MAX_RETRY,
+        )
+        self.update_state(state=states.FAILURE, meta={"exc": plan_result})
         raise Ignore()
     finally:
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        Utils.delete_local_folder(dir_path)
-        r.delete(f"{name}-{squad}-{environment}")
-
+        dir_path = f"/tmp/{params.stack_name}/{params.environment}/{params.squad}/{params.name}"
+        pipeline.unlock_task()
+        if not settings.DEBUG:
+            Utils.delete_local_folder(dir_path)
 
 @celery_app.task(
     bind=True, acks_late=True, time_limit=settings.GIT_TMOUT, name="pipeline git pull"
 )
 def pipeline_git_pull(
     self,
-    git_repo: str,
-    name: str,
-    stack_name: str,
-    environment: str,
-    squad: str,
-    branch: str,
-    project_path: str,
+    params: DownloadGitRepoParams,
 ):
     try:
-        git_result = ProviderRequirements.artifact_download(
-            name, stack_name, environment, squad, git_repo, branch, project_path
-        )
+        params = DownloadGitRepoParams(**params)
+        pipeline = Pipeline(params=params)
+        self.update_state(state="PULLING", meta={"done": "1 of 2"})
+        git_result = pipeline.download_git_repo()
         if git_result["rc"] != 0:
             raise Exception(git_result.get("stdout"))
 
         self.update_state(state="GET_VARS_AS_JSON", meta={"done": "2 of 2"})
-        result = ProviderGetVars.json_vars(
-            environment=environment,
-            stack_name=stack_name,
-            squad=squad,
-            name=name,
-            project_path=project_path,
-        )
-        if result["rc"] != 0:
-            raise Exception(result.get("stdout"))
-        result["tfvars"] = git_result["tfvars"]
-        return result
+        get_vars_result = pipeline.get_variables()
+        if get_vars_result["rc"] != 0:
+            raise Exception(get_vars_result.get("stdout"))
+        get_vars_result["tfvars"] = git_result["tfvars"]
+        return get_vars_result
     except Exception as err:
         self.retry(countdown=1, exc=err, max_retries=settings.TASK_MAX_RETRY)
-        self.update_state(state=states.FAILURE, meta={"exc": result})
+        self.update_state(state=states.FAILURE, meta={"exc": get_vars_result})
         raise Ignore()
     finally:
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
+        dir_path = f"/tmp/{ params.stack_name }/{params.environment}/{params.squad}/{params.name}"
         Utils.delete_local_folder(dir_path)
 
-
-@celery_app.task(
-    bind=True, acks_late=True, time_limit=settings.GIT_TMOUT, name="download git repo"
-)
-def git(
-    self,
-    git_repo: str,
-    name: str,
-    stack_name: str,
-    environment: str,
-    squad: str,
-    branch: str,
-):
-    try:
-        result = ProviderRequirements.artifact_download(
-            name, stack_name, environment, squad, git_repo, branch
-        )
-    except Exception as err:
-        self.retry(
-            countdown=settings.GIT_TMOUT, exc=err, max_retries=settings.TASK_MAX_RETRY
-        )
-        self.update_state(state=states.FAILURE, meta={"exc": result})
-        raise Ignore()
-    return stack_name, environment, squad, name, result
 
 
 @celery_app.task(

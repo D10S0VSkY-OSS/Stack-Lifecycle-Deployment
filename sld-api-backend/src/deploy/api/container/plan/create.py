@@ -1,4 +1,4 @@
-from fastapi import BackgroundTasks, Depends, HTTPException, Response, status
+from fastapi import  Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from src.deploy.domain.entities import plan as schemas_plan
@@ -14,11 +14,11 @@ from src.shared.security import deps
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from src.worker.domain.entities.worker import DeployParams
 
 
 async def plan_infra_by_stack_name(
     response: Response,
-    background_tasks: BackgroundTasks,
     deploy: schemas_plan.PlanCreate,
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
@@ -45,20 +45,20 @@ async def plan_infra_by_stack_name(
     check_deploy_exist(db, deploy.name, squad, deploy.environment, deploy.stack_name)
     try:
         # push task Deploy to queue and return task_id
-        pipeline_plan = async_plan(
-            git_repo,
-            deploy.name,
-            deploy.stack_name,
-            deploy.environment,
-            squad,
-            branch,
-            tf_ver,
-            deploy.variables,
-            secreto,
-            deploy.tfvar_file,
-            deploy.project_path,
-            current_user.username,
-        )
+        pipeline_plan = async_plan(DeployParams(
+            git_repo=git_repo,
+            name=deploy.name,
+            stack_name=deploy.stack_name,
+            environment=deploy.environment,
+            squad=squad,
+            branch=branch,
+            version=tf_ver,
+            variables=deploy.variables,
+            secreto=secreto,
+            variables_file=deploy.tfvar_file,
+            project_path=deploy.project_path,
+            user=current_user.username,
+        ))
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
             db=db,

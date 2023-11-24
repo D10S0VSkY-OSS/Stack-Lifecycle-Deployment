@@ -20,6 +20,8 @@ from src.shared.security import deps
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from src.worker.domain.entities.worker import DeployParams, DownloadGitRepoParams
+
 
 
 async def deploy_infra_by_stack_name(
@@ -59,20 +61,20 @@ async def deploy_infra_by_stack_name(
         check_cron_schedule(deploy.start_time)
         check_cron_schedule(deploy.destroy_time)
         # push task Deploy to queue and return task_id
-        pipeline_deploy = async_deploy(
-            git_repo,
-            deploy.name,
-            deploy.stack_name,
-            deploy.environment,
-            squad,
-            branch,
-            tf_ver,
-            deploy.variables,
-            secreto,
-            deploy.tfvar_file,
-            deploy.project_path,
-            current_user.username,
-        )
+        pipeline_deploy = async_deploy(DeployParams(
+            git_repo=git_repo,
+            name=deploy.name,
+            stack_name=deploy.stack_name,
+            environment=deploy.environment,
+            squad=squad,
+            branch=branch,
+            version=tf_ver,
+            variables=deploy.variables,
+            secreto=secreto,
+            variables_file=deploy.tfvar_file,
+            project_path=deploy.project_path,
+            user=current_user.username,
+        ))
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
             db=db,

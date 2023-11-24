@@ -21,6 +21,7 @@ from src.shared.security import deps
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from src.worker.domain.entities.worker import DeployParams
 
 
 async def deploy_by_id(
@@ -67,20 +68,20 @@ async def deploy_by_id(
         if not check_deploy_state(deploy_data.task_id):
             raise ValueError("Deploy state running, cannot upgrade")
         # push task Deploy Update to queue and return task_id
-        pipeline_deploy = async_deploy(
-            git_repo,
-            name,
-            stack_name,
-            environment,
-            squad,
-            branch,
-            tf_ver,
-            deploy_update.variables,
-            secreto,
-            deploy_update.tfvar_file,
-            deploy_update.project_path,
-            current_user.username,
-        )
+        pipeline_deploy = async_deploy(DeployParams(
+            git_repo=git_repo,
+            name=name,
+            stack_name=stack_name,
+            environment=environment,
+            squad=squad,
+            branch=branch,
+            version=tf_ver,
+            variables=deploy_update.variables,
+            secreto=secreto,
+            variables_file=deploy_update.tfvar_file,
+            project_path=deploy_update.project_path,
+            user=current_user.username,
+        ))
         # Push deploy task data
         crud_deploys.update_deploy(
             db=db,

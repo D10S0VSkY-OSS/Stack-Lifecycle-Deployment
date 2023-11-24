@@ -46,10 +46,10 @@ class ProviderRequirements:
         environment: str,
         squad: str,
         project_path: str,
-        kwargs: dict,
+        variables: dict,
         vars=Tfvars,
     ) -> dict:
-        config_vars = vars(name, stack_name, environment, squad, project_path, kwargs)
+        config_vars = vars(name, stack_name, environment, squad, project_path, variables)
         return config_vars.save()
 
 
