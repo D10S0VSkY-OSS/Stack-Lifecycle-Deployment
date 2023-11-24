@@ -3,6 +3,7 @@ import json
 from config.api import settings
 from fastapi import HTTPException
 
+from src.worker.domain.entities.worker import DeployParams
 from src.worker.tasks.terraform_worker import (
     output,
     pipeline_deploy,
@@ -19,6 +20,7 @@ from src.worker.tasks.terraform_worker import (
 )
 
 
+
 def async_deploy(
     git_repo: str,
     name: str,
@@ -33,9 +35,7 @@ def async_deploy(
     project_path: str = "",
     user: str = "",
 ):
-
-    queue = "any" if not settings.TASK_ROUTE else squad
-    pipeline_deploy_result = pipeline_deploy.s(
+    deploy_params = DeployParams(
         git_repo=git_repo,
         name=name,
         stack_name=stack_name,
@@ -43,12 +43,16 @@ def async_deploy(
         squad=squad,
         branch=branch,
         version=tf_ver,
-        kwargs=variables,
+        variables=variables,
         secreto=secreto,
         variables_file=variables_file,
         project_path=project_path,
         user=user,
-    ).apply_async(
+    )
+
+    queue = "any" if not settings.TASK_ROUTE else squad
+
+    pipeline_deploy_result = pipeline_deploy.s(deploy_params.model_dump()).apply_async(
         queue=queue,
         retry=True,
         retry_policy={

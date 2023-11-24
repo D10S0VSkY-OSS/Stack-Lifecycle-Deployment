@@ -54,7 +54,7 @@ class Backend(StructBase):
 @dataclass
 class Tfvars(StructBase):
     project_path: str
-    kwargs: dict
+    variables: dict
 
     def save(self) -> dict:
         try:
@@ -62,8 +62,8 @@ class Tfvars(StructBase):
             if self.project_path:
                 file_path = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}/{self.stack_name}.tfvars.json"
             with open(file_path, "w") as tfvars_json:
-                json.dump(self.kwargs, tfvars_json)
-            return {"command": "tfvars", "rc": 0, "stdout": self.kwargs}
+                json.dump(self.variables, tfvars_json)
+            return {"command": "tfvars", "rc": 0, "stdout": self.variables}
         except Exception as err:
             return {"command": "tfvars", "rc": 1, "stdout": f"{err}"}
 
