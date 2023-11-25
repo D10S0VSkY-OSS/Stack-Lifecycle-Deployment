@@ -13,7 +13,7 @@ async def create_new_gcloud_profile(
     return create_gcp_account
 
 
-@router.get("/")
+@router.get("/", status_code=200, response_model=list[schemas_gcp.GcloudResponse])
 async def get_all_gcloud_accounts(
     get_gcp_account: schemas_gcp.GcloudBase = Depends(get.all_gcloud_accounts),
 ):

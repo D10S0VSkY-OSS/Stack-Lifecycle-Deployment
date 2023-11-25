@@ -12,3 +12,8 @@ class Gcloud(GcloudBase):
 
     class Config:
         from_attributes = True
+
+class GcloudResponse(BaseModel):
+    id: int
+    squad: str
+    environment: str
