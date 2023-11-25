@@ -482,6 +482,134 @@ def relaunch_plan(deploy_id):
     except Exception:
         return render_template("page-500.html"), 500
 
+
+@blueprint.route("/clone-deploy", methods=["GET", "POST"], defaults={"deploy_id": None})
+@blueprint.route("/clone-deploy/<deploy_id>", methods=["GET", "POST"])
+@login_required
+def clone_deploy(deploy_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        form = DeployForm(request.form)
+        aws_response = request_url(
+            verb="GET",
+            uri=f"accounts/aws/",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        aws_content = aws_response.get("json")
+        # Get data from gcp accounts
+        gcp_response = request_url(
+            verb="GET",
+            uri=f"accounts/gcp/",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        gcp_content = gcp_response.get("json")
+        # Get data from azure accounts
+        azure_response = request_url(
+            verb="GET",
+            uri=f"accounts/azure/",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        azure_content = azure_response.get("json")
+        # Get data from custom providers accounts
+        custom_response = request_url(
+            verb="GET",
+            uri=f"accounts/custom_providers/",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        custom_content = custom_response.get("json")
+        # Get defaults vars by deploy
+        vars_json = request_url(
+            verb="GET",
+            uri=f"variables/deploy/{deploy_id}",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+        endpoint = f"deploy/{deploy_id}"
+        # Get deploy data vars and set var for render
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        deploy = response.get("json")
+        deploy.get("tfvar_file")
+
+        # When user push data with POST verb
+        if request.method == "POST":
+            # List for exclude in vars
+            form_vars = [
+                "csrf_token",
+                "button",
+                "start_time",
+                "destroy_time",
+                "sld_key",
+                "sld_value",
+                "branch",
+                "tfvar_file",
+                "project_path",
+                "squad",
+                "environment",
+            ]
+            # Clean exclude data vars
+            data_raw = {
+                key: value
+                for key, value in request.form.items()
+                if key not in form_vars
+            }
+            # Add custom variables from form
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
+            data_raw.update(dict(list(zip(key_list, value_list))))
+            # Set vars to json
+            variables = json.dumps(convert_to_dict(data_raw))
+            # Data dend to deploy
+            data = {
+                "name": form.deploy_name.data,
+                "environment": form.environment.data,
+                "squad": form.squad.data,
+                "stack_name": deploy["stack_name"],
+                "start_time": form.start_time.data,
+                "destroy_time": form.destroy_time.data,
+                "stack_branch": form.branch.data.replace(" ",""),
+                "tfvar_file": form.tfvar_file.data.replace(" ",""),
+                "project_path": form.project_path.data.replace(" ",""),
+                "variables": ast.literal_eval(variables),
+            }
+            if not "deploy" in request.form.get("button"):
+                endpoint = f"plan/"
+            # Deploy
+            response = request_url(
+                verb="POST",
+                uri=f"{endpoint}",
+                headers={"Authorization": f"Bearer {token}"},
+                json=data,
+            )
+            if response.get("status_code") == 202:
+                flash(f"Updating deploy")
+            else:
+                flash(response.get("json").get("detail"), "error")
+            return redirect(
+                url_for("home_blueprint.route_template", template="deploys-list")
+            )
+
+        return render_template(
+            "deploy-clone.html",
+            name="Edit Deploy",
+            form=form,
+            deploy=deploy,
+            aws_content=aws_content,
+            gcp_content=gcp_content,
+            azure_content=azure_content,
+            custom_content=custom_content,
+            data_json=vars_json["json"],
+        )
+    except TemplateNotFound:
+        return render_template("page-404.html"), 404
+    except TypeError:
+        return redirect(url_for("base_blueprint.logout"))
+    except Exception:
+        return render_template("page-500.html"), 500
+
+
 @blueprint.route(
     "/edit-schedule", methods=["GET", "POST"], defaults={"deploy_id": None}
 )
@@ -559,7 +687,6 @@ def new_stack():
                 "project_path": form.project_path.data.replace(" ",""),
                 "description": form.description.data,
             }
-            print(new_stack)
             response = request_url(
                 verb="POST",
                 uri="stacks/",

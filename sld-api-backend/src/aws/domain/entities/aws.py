@@ -12,6 +12,7 @@ class AwsBase(BaseModel):
     )
     default_region: constr(strip_whitespace=True)
 
+    default_region: constr(strip_whitespace=True)
 
 class AwsAsumeProfile(AwsBase):
     profile_name: Optional[constr(strip_whitespace=True)] = None
@@ -24,3 +25,11 @@ class Aws(AwsBase):
 
     class Config:
         from_attributes = True
+
+class AwsAccountResponse(BaseModel):
+    id: int
+    squad: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
+    profile_name: Optional[constr(strip_whitespace=True)] = None
+    role_arn: Optional[constr(strip_whitespace=True)] = None
+    source_profile: Optional[constr(strip_whitespace=True)] = None

@@ -17,12 +17,12 @@
             <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
                 <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
                 <li class="breadcrumb-item"><a href="/deploys-list">Deploy</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Edit</li>
+                <li class="breadcrumb-item active" aria-current="page">Clone</li>
             </ol>
         </nav>
         <div class="d-flex justify-content-between w-100 flex-wrap">
             <div class="mb-3 mb-lg-0">
-                <h1 class="h4">Deploy Edit</h1>
+                <h1 class="h4">Clone Deploy</h1>
             </div>
             <div>
                 <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Deploy Docs</a>
@@ -38,8 +38,28 @@
                         <div class="col-lg-4 col-sm-6">
                             <!-- Form -->
                             <div class="col-md-12 col-md-offset-1">
-                                <h1>{{deploy.name}}</h1>
+                                <h1>Clone from {{deploy.name}}</h1>
                                 <form class="" method="post">
+                                    <div class="form-group">
+                                        {{ render_field(form.deploy_name, autocomplete="off", class='form-control', placeholder='Deploy name') }}
+                                    </div>
+<div class="form-group">
+    <label for="squadSelect">Squad:</label>
+    <select id="squadSelect" class="form-control" name="squad">
+        {% for item in squads %}
+            <option value="{{ item['squad'] }}">{{ item['squad'] }}</option>
+        {% endfor %}
+    </select>
+</div>
+
+<div class="form-group">
+    <label for="environmentSelect">Environment:</label>
+    <select id="environmentSelect" class="form-control" name="environment">
+        {% for item in environments %}
+            <option value="{{ item['environment'] }}">{{ item['environment'] }}</option>
+        {% endfor %}
+    </select>
+</div>
                                     <div class="form-group">
                                         {{ render_field(form.start_time, autocomplete="off", class='form-control',
                                         value=deploy.start_time)
@@ -166,6 +186,75 @@
                 textarea.value = JSON.stringify(obj, null, 4);
             } catch (e) {
             }
+        });
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Obtener el prefijo del deploy.stack_name
+        var stackName = "{{ deploy.stack_name | default('') }}";
+        var stackNamePrefix = stackName.split('_')[0];
+        console.log("Stack Name Prefix:", stackNamePrefix);
+
+        // Obtener el contenido correspondiente al prefijo
+        var contentList;
+        if (stackNamePrefix === "aws") {
+            contentList = {{ aws_content | safe }};
+        } else if (stackNamePrefix === "azure") {
+            contentList = {{ azure_content | safe }};
+        } else if (stackNamePrefix === "gcp") {
+            contentList = {{ gcp_content | safe }};
+        } else if (stackNamePrefix === "custom") {
+            contentList = {{ custom_content | safe }};
+        } else {
+            contentList = []; // Manejar otros casos según sea necesario
+        }
+
+        // Filtrar la lista de squads y entornos según el tipo de contenido
+        var squads = Array.from(new Set(contentList.map(item => item.squad)));
+        var environments = Array.from(new Set(contentList.map(item => item.environment)));
+
+        // Actualizar los desplegables con los datos filtrados
+        var squadSelect = document.getElementById("squadSelect");
+        var environmentSelect = document.getElementById("environmentSelect");
+
+        squads.forEach(function (squad) {
+            var option = document.createElement("option");
+            option.value = squad;
+            option.text = squad;
+            squadSelect.add(option);
+        });
+
+        environments.forEach(function (environment) {
+            var option = document.createElement("option");
+            option.value = environment;
+            option.text = environment;
+            environmentSelect.add(option);
+        });
+
+        // Función para actualizar las opciones del campo de entorno según el escuadrón seleccionado
+        function updateEnvironmentOptions(selectedSquad) {
+            // Filtrar la lista de entornos para el escuadrón seleccionado
+            var filteredEnvironments = contentList
+                .filter(item => item.squad === selectedSquad)
+                .map(item => item.environment);
+
+            // Limpiar las opciones actuales
+            environmentSelect.innerHTML = "";
+
+            // Agregar las nuevas opciones
+            filteredEnvironments.forEach(function (environment) {
+                var option = document.createElement("option");
+                option.value = environment;
+                option.text = environment;
+                environmentSelect.add(option);
+            });
+        }
+
+        // Agregar un evento de cambio al campo de escuadrón
+        squadSelect.addEventListener('change', function () {
+            var selectedSquad = squadSelect.value;
+            updateEnvironmentOptions(selectedSquad);
         });
     });
 </script>
