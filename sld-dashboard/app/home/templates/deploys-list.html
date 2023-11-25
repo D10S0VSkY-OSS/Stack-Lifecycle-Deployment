@@ -201,34 +201,31 @@
                                         </span>
                                         <span class="sr-only">Toggle Dropdown</span>
                                     </button>
-                                    {% if deploy.action == "Plan_disable"%}
+                                    {% if deploy.action == "Destroy"%}
                                     <div class="dropdown-menu">
+                                        <a class="dropdown-item" href="{{ url_for('.relaunch_plan',deploy_id=deploy.id)}}">
+                                            <span class="fas fa-sync mr-2"></span>
+                                            Plan
+                                        </a>
                                         <a class="dropdown-item" href="{{ url_for('.edit_deploy',deploy_id=deploy.id)}}">
                                             <span class="fas fa-edit mr-2"></span>
                                             Edit
                                         </a>
                                         <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-sync mr-2"></span>
-                                            Approve
+                                            <span class="fas fa-cloud mr-2"></span>
+                                            Apply
                                         </a>
-                                        <a class="dropdown-item" href="{{url_for('.list_deploys')}}">
-                                            <span class="fas fa-sync mr-2"></span>
-                                            Plan
+                                        <a class="dropdown-item" href="{{ url_for('.clone_deploy',deploy_id=deploy.id)}}">
+                                            <span class="fas fa-clone mr-2"></span>
+                                            Clone 
+                                        </a>
+                                        <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DestroyModalCenter-{{deploy.id}}">
+                                            <span class="fas fa-trash-alt mr-2"></span>
+                                            Destroy
                                         </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DeleteModalCenter-{{deploy.id}}">
                                             <span class="fas fa-skull-crossbones mr-2"></span>
                                             delete
-                                        </a>
-                                    </div>
-                                    {% elif deploy.action == "DryRun"%}
-                                    <div class="dropdown-menu">
-                                        <a class="dropdown-item" href="{{ url_for('.edit_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-edit mr-2"></span>
-                                            Edit
-                                        </a>
-                                        <a class="dropdown-item" href="{{ url_for('.relaunch_deploy',deploy_id=deploy.id)}}">
-                                            <span class="fas fa-sync mr-2"></span>
-                                            ReDeploy
                                         </a>
                                     </div>
                                     {% else %}
@@ -245,13 +242,13 @@
                                             <span class="fas fa-cloud mr-2"></span>
                                             Apply
                                         </a>
+                                        <a class="dropdown-item" href="{{ url_for('.clone_deploy',deploy_id=deploy.id)}}">
+                                            <span class="fas fa-clone mr-2"></span>
+                                            Clone 
+                                        </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DestroyModalCenter-{{deploy.id}}">
                                             <span class="fas fa-trash-alt mr-2"></span>
                                             Destroy
-                                        </a>
-                                        <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DeleteModalCenter-{{deploy.id}}">
-                                            <span class="fas fa-skull-crossbones mr-2"></span>
-                                            delete
                                         </a>
                                     </div>
                                     {% endif %}

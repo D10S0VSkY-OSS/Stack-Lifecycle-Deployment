@@ -252,7 +252,7 @@
                 </select>
             {% elif field_type.startswith("map") or "object" in field_type %}
                 <textarea  name={{ key }} class='form-control' rows="6" required>
-{{ value.get("default") | tojson | replace(",", ",\n") | replace("{", "{\n") | replace("}", "\n}") | trim | indent(4) }}
+            {{ value.get("default") | tojson | replace(",", ",\n") | replace("{", "{\n") | replace("}", "\n}") | trim | indent(4) }}
                 </textarea>
             {% else %}
                 <input type="text" value="{{ value.get('default', "") }}" name={{ key }} class='form-control' required>

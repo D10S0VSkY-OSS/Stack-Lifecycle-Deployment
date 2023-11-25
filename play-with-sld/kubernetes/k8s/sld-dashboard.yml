@@ -17,7 +17,7 @@ spec:
       subdomain: primary
       containers:
         - name: sld-dashboard
-          image: d10s0vsky/sld-dashboard:latest
+          image: d10s0vsky/sld-dashboard:2.26.0
           env:
           - name: PATH
             value: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"

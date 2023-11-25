@@ -15,7 +15,7 @@ async def create_new_azure_profile(
     return create_azure_account
 
 
-@router.get("/")
+@router.get("/", status_code=200, response_model=list[schemas_azure.AzureResponse])
 async def get_all_azure_accounts(
     get_azure_account: schemas_azure.AzureBase = Depends(get.get_all_azure_accounts),
 ):

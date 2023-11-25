@@ -15,3 +15,11 @@ class Azure(AzureBase):
 
     class Config:
         from_attributes = True
+
+
+class AzureResponse(BaseModel):
+    id: int
+    squad: constr(strip_whitespace=True)
+    environment: constr(strip_whitespace=True)
+    subscription_id: constr(strip_whitespace=True)
+    tenant_id: constr(strip_whitespace=True)
