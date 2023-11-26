@@ -546,6 +546,7 @@ def clone_deploy(deploy_id):
                 "branch",
                 "tfvar_file",
                 "project_path",
+                "deploy_name",
                 "squad",
                 "environment",
             ]

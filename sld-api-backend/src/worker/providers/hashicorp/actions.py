@@ -1,13 +1,43 @@
 import os
+import logging
+from typing import List, Tuple
 import subprocess
 from dataclasses import dataclass
-
+from subprocess import Popen, PIPE, STDOUT
 import jmespath
 import requests
 from config.api import settings
 
 from src.worker.security.providers_credentials import secret, unsecret
 
+
+class SubprocessHandler:
+    def run_command(self, command: str) -> Tuple[int, List[str]]:
+        try:
+            process = Popen(
+                command,
+                shell=True,
+                stdout=PIPE,
+                stderr=PIPE,
+                universal_newlines=True
+            )
+
+            # Read stdout and stderr in real-time
+            output_lines = []
+            while True:
+                line = process.stdout.readline()
+                logging.info(line.rstrip('\n'))
+                if not line:
+                    break
+                output_lines.append(line.strip())
+
+            # Wait for the process to finish
+            returncode = process.wait()
+            return returncode, output_lines
+
+        except Exception as e:
+            return 1, [str(e)]
+        
 
 @dataclass
 class StructBase:
@@ -24,6 +54,7 @@ class Actions(StructBase):
     secreto: dict
     variables_file: str
     project_path: str
+    subprocess_handler = SubprocessHandler()
 
     def execute_terraform_command(self, command: str) -> dict:
         try:
@@ -41,22 +72,21 @@ class Actions(StructBase):
             else:
                 os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
 
-            init_command = f"/tmp/{self.version}/terraform init -input=false --upgrade"
+            init_command = f"/tmp/{self.version}/terraform init -no-color -input=false --upgrade"
             plan_command = f"/tmp/{self.version}/terraform {command} -input=false -refresh -no-color -var-file={variables_files} -out={self.stack_name}.tfplan"
             apply_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color {self.stack_name}.tfplan"
             destroy_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color -var-file={variables_files}"
 
-            result = subprocess.run(init_command, shell=True, capture_output=True, encoding="utf8")
-            result = subprocess.run(plan_command, shell=True, capture_output=True, encoding="utf8")
+            result, output = self.subprocess_handler.run_command(init_command)
+            result, output = self.subprocess_handler.run_command(plan_command)
 
             if command == "apply":
-                result = subprocess.run(apply_command, shell=True, capture_output=True, encoding="utf8")
+                result, output = self.subprocess_handler.run_command(apply_command)
             elif command == "destroy":
-                result = subprocess.run(destroy_command, shell=True, capture_output=True, encoding="utf8")
+                result, output = self.subprocess_handler.run_command(destroy_command)
 
             unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
-
-            rc = result.returncode
+            rc = result
 
             output_data = {
                 "command": command,
@@ -68,7 +98,9 @@ class Actions(StructBase):
                 "tfvars_files": self.variables_file,
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                 "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                "stdout": result.stderr.split("\n") if rc != 0 else result.stdout.split("\n"),
+                "stdout": output,
+
+
             }
 
             return output_data

@@ -7,10 +7,10 @@ from celery.exceptions import Ignore
 from celery.utils.log import get_task_logger
 from config.api import settings
 from config.celery_config import celery_app
-from src.worker.domain.entities.worker import DeployParams, DestroyParams, PlanParams, DownloadGitRepoParams, GetVariablesParams
+from src.worker.domain.entities.worker import DeployParams, DownloadGitRepoParams
 from src.worker.domain.services.pipeline import Pipeline
 
-from src.worker.domain.services.provider import ProviderActions, ProviderGetVars, ProviderRequirements
+from src.worker.domain.services.provider import ProviderActions
 from src.worker.tasks.helpers.folders import Utils
 from src.worker.tasks.helpers.metrics import push_metric
 from src.worker.tasks.helpers.schedule import request_url
@@ -36,6 +36,7 @@ def pipeline_deploy(
 
 ):
     try:
+        params["task_id"] = self.request.id
         params = DeployParams(**params)
         pipeline = Pipeline(params=params)
         pipeline.locked_task()
@@ -74,6 +75,7 @@ def pipeline_destroy(
     params: DeployParams,
 ):
     try:
+        params["task_id"] = self.request.id
         params = DeployParams(**params)
         pipeline = Pipeline(params=params)
         pipeline.locked_task()
@@ -107,6 +109,7 @@ def pipeline_plan(
     params: DeployParams,
 ):
     try:
+        params["task_id"] = self.request.id
         params = DeployParams(**params)
         pipeline = Pipeline(params=params)
         pipeline.locked_task()
