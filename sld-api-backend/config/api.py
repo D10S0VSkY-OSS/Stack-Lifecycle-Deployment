@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     BACKEND_USER: str = os.getenv("BACKEND_USER", "")
     BACKEND_PASSWD: str = os.getenv("BACKEND_PASSWD", "")
     BACKEND_SERVER: str = os.getenv("BACKEND_SERVER", "redis")
+    CACHE_USER: str = os.getenv("SLD_CACHE_USER", "")
+    CACHE_PASSWD: str = os.getenv("SLD_CACHE_PASSWD", "")
+    CACHE_SERVER: str = os.getenv("SLD_CACHE_SERVER", "redis")
     # init user
     INIT_USER: dict = {
         "username": os.getenv("SLD_INIT_USER_NAME", "admin"),
