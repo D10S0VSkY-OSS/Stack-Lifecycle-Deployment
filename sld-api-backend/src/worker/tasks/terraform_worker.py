@@ -16,7 +16,7 @@ from src.worker.tasks.helpers.metrics import push_metric
 from src.worker.tasks.helpers.schedule import request_url
 
 r = redis.Redis(
-    host=settings.BACKEND_SERVER,
+    host=settings.CACHE_SERVER,
     port=6379,
     db=2,
     charset="utf-8",

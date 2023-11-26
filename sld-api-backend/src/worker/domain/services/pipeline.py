@@ -3,10 +3,11 @@ from src.worker.domain.entities.worker import DeployParams, DownloadGitRepoParam
 from src.worker.domain.services.provider import ProviderActions, ProviderGetVars, ProviderRequirements
 import redis
 from config.api import settings
+import logging
 
 
 r = redis.Redis(
-    host=settings.BACKEND_SERVER,
+    host=settings.CACHE_SERVER,
     port=6379,
     db=2,
     charset="utf-8",
@@ -140,6 +141,8 @@ class Pipeline:
     def __init__(self, params: DeployParams):
         self.params = params
     def locked_task(self):
+        logging.info(f"Checking if task {self.params.name}-{self.params.squad}-{self.params.environment} is locked in cache server {settings.CACHE_SERVER}")
+        logging.info(f"Locking task {self.params.name}-{self.params.squad}-{self.params.environment}")
         r.set(f"{self.params.name}-{self.params.squad}-{self.params.environment}", "Locked")
         r.expire(f"{self.params.name}-{self.params.squad}-{self.params.environment}", settings.TASK_LOCKED_EXPIRED)
 

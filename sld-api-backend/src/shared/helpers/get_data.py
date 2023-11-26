@@ -16,7 +16,7 @@ from src.stacks.infrastructure import repositories as crud_stacks
 from src.users.infrastructure import repositories as crud_users
 
 r = redis.Redis(
-    host=settings.BACKEND_SERVER,
+    host=settings.CACHE_SERVER,
     port=6379,
     db=2,
     charset="utf-8",
