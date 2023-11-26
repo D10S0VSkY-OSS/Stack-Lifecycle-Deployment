@@ -98,7 +98,7 @@ class ProviderActions:
             variables_file,
             project_path,
         )
-        return config_action.plan_execute()
+        return config_action.execute_terraform_command("plan")
 
     def apply(
         name: str,
@@ -123,7 +123,7 @@ class ProviderActions:
             variables_file,
             project_path,
         )
-        return config_action.apply_execute()
+        return config_action.execute_terraform_command("apply")
 
     def destroy(
         name: str,
@@ -148,7 +148,7 @@ class ProviderActions:
             variables_file,
             project_path,
         )
-        return config_action.destroy_execute()
+        return config_action.execute_terraform_command("destroy")
 
     def output(
         stack_name: str, squad: str, environment: str, name: str, action=SimpleActions
