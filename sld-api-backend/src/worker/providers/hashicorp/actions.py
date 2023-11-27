@@ -5,7 +5,7 @@ import requests
 from config.api import settings
 
 from src.worker.security.providers_credentials import secret, unsecret
-from src.worker.domain.services.command import SubprocessHandler
+from src.worker.domain.services.command import command
 
 
         
@@ -25,7 +25,7 @@ class Actions(StructBase):
     secreto: dict
     variables_file: str
     project_path: str
-    subprocess_handler: SubprocessHandler = SubprocessHandler()
+    subprocess_handler: command = command
 
     def execute_terraform_command(self, command: str) -> dict:
         try:
@@ -48,13 +48,13 @@ class Actions(StructBase):
             apply_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color {self.name}.tfplan"
             destroy_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color -var-file={variables_files}"
 
-            result, output = self.subprocess_handler.run_command(init_command)
-            result, output = self.subprocess_handler.run_command(plan_command)
+            result, output = self.subprocess_handler(init_command)
+            result, output = self.subprocess_handler(plan_command)
 
             if command == "apply":
-                result, output = self.subprocess_handler.run_command(apply_command)
+                result, output = self.subprocess_handler(apply_command)
             elif command == "destroy":
-                result, output = self.subprocess_handler.run_command(destroy_command)
+                result, output = self.subprocess_handler(destroy_command)
 
             unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
 
@@ -77,7 +77,7 @@ class Actions(StructBase):
 
             return output_data
 
-        except Exception as err:
+        except Exception:
             return {
                 "command": command,
                 "deploy": self.name,
@@ -89,7 +89,6 @@ class Actions(StructBase):
                 "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                 "stdout": output,
-                "error_message": err,
             }
 
 

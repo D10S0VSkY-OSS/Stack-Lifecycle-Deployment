@@ -3,7 +3,7 @@ import ast
 import json
 import time
 import logging
-from flask import jsonify, render_template, request, url_for, redirect, flash
+from flask import jsonify, render_template, request, url_for, redirect, flash, Response
 
 
 import redis
@@ -31,6 +31,7 @@ def decrypt(secreto):
 
 # Move to config file after testing
 r = redis.Redis(host="redis", port=6379, db=1, charset="utf-8", decode_responses=True)
+s = redis.Redis(host="redis", port=6379, db=15, charset="utf-8", decode_responses=True)
 
 external_api_dns = settings.EXTERNAL_DNS_API
 
@@ -45,6 +46,16 @@ def index():
     return render_template(
         "index.html", segment="index", external_api_dns=external_api_dns
     )
+
+
+@blueprint.route('/stream')
+def stream():
+    def generate():
+        pubsub = s.pubsub()
+        pubsub.subscribe('channel_name')
+        for message in pubsub.listen():
+            yield f"data: {message['data']}\n\n"
+    return Response(generate(), mimetype='text/event-stream')
 
 @blueprint.route('/status/<task_id>')
 def status(task_id):
