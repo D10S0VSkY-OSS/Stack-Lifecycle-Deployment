@@ -1,42 +1,13 @@
 import os
-import logging
-from typing import List, Tuple
-import subprocess
 from dataclasses import dataclass
-from subprocess import Popen, PIPE, STDOUT
 import jmespath
 import requests
 from config.api import settings
 
 from src.worker.security.providers_credentials import secret, unsecret
+from src.worker.domain.services.command import SubprocessHandler
 
 
-class SubprocessHandler:
-    def run_command(self, command: str) -> Tuple[int, List[str]]:
-        try:
-            process = Popen(
-                command,
-                shell=True,
-                stdout=PIPE,
-                stderr=PIPE,
-                universal_newlines=True
-            )
-
-            # Read stdout and stderr in real-time
-            output_lines = []
-            while True:
-                line = process.stdout.readline()
-                logging.info(line.rstrip('\n'))
-                if not line:
-                    break
-                output_lines.append(line.strip())
-
-            # Wait for the process to finish
-            returncode = process.wait()
-            return returncode, output_lines
-
-        except Exception as e:
-            return 1, [str(e)]
         
 
 @dataclass
@@ -54,7 +25,7 @@ class Actions(StructBase):
     secreto: dict
     variables_file: str
     project_path: str
-    subprocess_handler = SubprocessHandler()
+    subprocess_handler: SubprocessHandler = SubprocessHandler()
 
     def execute_terraform_command(self, command: str) -> dict:
         try:
@@ -62,7 +33,7 @@ class Actions(StructBase):
             deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
 
             variables_files = (
-                f"{self.stack_name}.tfvars.json"
+                f"{self.name}.tfvars.json"
                 if not self.variables_file
                 else self.variables_file
             )
@@ -73,8 +44,8 @@ class Actions(StructBase):
                 os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
 
             init_command = f"/tmp/{self.version}/terraform init -no-color -input=false --upgrade"
-            plan_command = f"/tmp/{self.version}/terraform {command} -input=false -refresh -no-color -var-file={variables_files} -out={self.stack_name}.tfplan"
-            apply_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color {self.stack_name}.tfplan"
+            plan_command = f"/tmp/{self.version}/terraform {command} -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
+            apply_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color {self.name}.tfplan"
             destroy_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color -var-file={variables_files}"
 
             result, output = self.subprocess_handler.run_command(init_command)
@@ -86,6 +57,7 @@ class Actions(StructBase):
                 result, output = self.subprocess_handler.run_command(destroy_command)
 
             unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
+
             rc = result
 
             output_data = {
@@ -105,7 +77,7 @@ class Actions(StructBase):
 
             return output_data
 
-        except Exception as e:
+        except Exception as err:
             return {
                 "command": command,
                 "deploy": self.name,
@@ -116,8 +88,8 @@ class Actions(StructBase):
                 "tfvars_files": self.variables_file,
                 "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": "ko",
-                "error_message": str(e),
+                "stdout": output,
+                "error_message": err,
             }
 
 

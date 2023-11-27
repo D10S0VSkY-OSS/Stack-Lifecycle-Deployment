@@ -58,9 +58,9 @@ class Tfvars(StructBase):
 
     def save(self) -> dict:
         try:
-            file_path = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.stack_name}.tfvars.json"
+            file_path = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.name}.tfvars.json"
             if self.project_path:
-                file_path = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}/{self.stack_name}.tfvars.json"
+                file_path = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}/{self.name}.tfvars.json"
             with open(file_path, "w") as tfvars_json:
                 json.dump(self.variables, tfvars_json)
             return {"command": "tfvars", "rc": 0, "stdout": self.variables}

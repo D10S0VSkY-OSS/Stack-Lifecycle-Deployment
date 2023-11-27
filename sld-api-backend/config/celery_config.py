@@ -39,3 +39,4 @@ celery_app.conf.update(task_track_started=True)
 celery_app.conf.update(result_extended=True)
 celery_app.conf.broker_transport_options = {"visibility_timeout": 28800}  # 8 hours.
 celery_app.conf.result_expires = os.getenv("SLD_RESULT_EXPIRE", "259200")
+celery_app.conf.broker_connection_retry_on_startup = True
