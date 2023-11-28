@@ -24,7 +24,6 @@ class Actions(StructBase):
     project_path: str
     task_id: str
     subprocess_handler: command = command
-    output = ""
 
     def execute_terraform_command(self, action: str) -> dict:
         channel = self.task_id

@@ -1,8 +1,9 @@
 import logging
 import subprocess
 import redis
+from config.api import settings
 
-redis_client = redis.Redis(host='localhost', port=6379, db=15)
+redis_client = redis.Redis(host=settings.CACHE_SERVER, port=6379, db=15)
 
 
 def command(command: str, channel: str):
@@ -48,4 +49,4 @@ def command(command: str, channel: str):
         logging.error(
             f"Error execute command code: {err.returncode}. Error:\n{err.stderr}"
         )
-        return None
+        return err.returncode, err.stderr
