@@ -3,7 +3,7 @@ import ast
 import json
 import time
 import logging
-from flask import jsonify, render_template, request, url_for, redirect, flash
+from flask import jsonify, render_template, request, url_for, redirect, flash, Response
 
 
 import redis
@@ -31,6 +31,7 @@ def decrypt(secreto):
 
 # Move to config file after testing
 r = redis.Redis(host="redis", port=6379, db=1, charset="utf-8", decode_responses=True)
+s = redis.Redis(host="redis", port=6379, db=15, charset="utf-8", decode_responses=True)
 
 external_api_dns = settings.EXTERNAL_DNS_API
 
@@ -46,7 +47,25 @@ def index():
         "index.html", segment="index", external_api_dns=external_api_dns
     )
 
+# stream SSE
+@blueprint.route('/deploy-stream/<task_id>')
+@login_required
+def deploy_stream(task_id):
+    return render_template('deploy-stream.html', task_id=task_id)
+
+@blueprint.route('/stream/<task_id>')
+@login_required
+def stream(task_id):
+    def generate():
+        pubsub = s.pubsub()
+        pubsub.subscribe(f'{task_id}')
+        for message in pubsub.listen():
+            yield f"data: {message['data']}\n\n"
+    return Response(generate(), mimetype='text/event-stream')
+
+
 @blueprint.route('/status/<task_id>')
+@login_required
 def status(task_id):
     try:
         token = decrypt(r.get(current_user.id))
@@ -82,15 +101,14 @@ def output(task_id):
             uri=f"tasks/id/{task_id}",
             headers={"Authorization": f"Bearer {token}"}
         )
-    
         if response.get("status_code") == 200:
             data = response.get("json").get("result").get("module").get("stdout")
             if not isinstance(data, list):
                 data = [data] 
             return data
     except Exception as err:
-        logging.error(err) 
-        return render_template("page-500.html"), 500
+        print(task_id)
+        raise err
 
 
 # Start Deploy
@@ -546,6 +564,7 @@ def clone_deploy(deploy_id):
                 "branch",
                 "tfvar_file",
                 "project_path",
+                "deploy_name",
                 "squad",
                 "environment",
                 "deploy_name"

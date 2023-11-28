@@ -14,6 +14,7 @@ r = redis.Redis(
     decode_responses=True,
 )
 
+
 class DownloadGitRepo:
     def __init__(self, params: DownloadGitRepoParams, provider: ProviderRequirements):
         self.params = params
@@ -29,6 +30,8 @@ class DownloadGitRepo:
             self.params.branch,
             self.params.project_path
         )
+
+
 class DownloadBinary:
     def __init__(self, params: DownloadBinaryParams, provider: ProviderRequirements):
         self.params = params
@@ -38,6 +41,7 @@ class DownloadBinary:
         return self.provider.binary_download(
             self.params.version, 
         )
+
 
 class RemoteState:
     def __init__(self, params: RemoteStateParams, provider: ProviderRequirements):
@@ -52,6 +56,7 @@ class RemoteState:
             self.params.squad, 
             self.params.project_path
         )
+
 
 class Tfvars:
     def __init__(self, params: TfvarsParams, provider: ProviderRequirements):
@@ -68,6 +73,7 @@ class Tfvars:
             self.params.variables
         )
 
+
 class GetVariables:
     def __init__(self, params: GetVariablesParams, provider: ProviderGetVars):
         self.params = params
@@ -75,12 +81,13 @@ class GetVariables:
 
     def __call__(self):
         return self.provider.json_vars(
-            self.params.name, 
-            self.params.stack_name, 
-            self.params.environment, 
+            self.params.name,
+            self.params.stack_name,
+            self.params.environment,
             self.params.squad, 
             self.params.project_path
         )
+
 
 class plan:
     def __init__(self, params: PlanParams, provider: ProviderActions):
@@ -88,17 +95,8 @@ class plan:
         self.provider = provider
 
     def __call__(self):
-        return self.provider.plan(
-            self.params.name,
-            self.params.stack_name,
-            self.params.branch,
-            self.params.environment,
-            self.params.squad,
-            self.params.version,
-            self.params.secreto,
-            self.params.variables_file,
-            self.params.project_path,
-        )
+        return self.provider.plan(self.params)
+
 
 class apply:
     def __init__(self, params: ApplyParams, provider: ProviderActions):
@@ -106,40 +104,23 @@ class apply:
         self.provider = provider
 
     def __call__(self):
-        return self.provider.apply(
-            self.params.name,
-            self.params.stack_name,
-            self.params.branch,
-            self.params.environment,
-            self.params.squad,
-            self.params.version,
-            self.params.secreto,
-            self.params.variables_file,
-            self.params.project_path,
-        )
+        return self.provider.apply(self.params)
+
 
 class destroy:
-    def __init__(self, params: DestroyParams, provider: ProviderActions):
+    def __init__(self, params: DeployParams, provider: ProviderActions):
         self.params = params
         self.provider = provider
 
     def __call__(self):
-        return self.provider.destroy(
-            self.params.name,
-            self.params.stack_name,
-            self.params.branch,
-            self.params.environment,
-            self.params.squad,
-            self.params.version,
-            self.params.secreto,
-            self.params.variables_file,
-            self.params.project_path,
-        )
-    
+        return self.provider.destroy(self.params)
+
+
 # PIPELINE
 class Pipeline:
     def __init__(self, params: DeployParams):
         self.params = params
+
     def locked_task(self):
         logging.info(f"Checking if task {self.params.name}-{self.params.squad}-{self.params.environment} is locked in cache server {settings.CACHE_SERVER}")
         logging.info(f"Locking task {self.params.name}-{self.params.squad}-{self.params.environment}")
@@ -148,8 +129,7 @@ class Pipeline:
 
     def unlock_task(self):
         r.delete(f"{self.params.name}-{self.params.squad}-{self.params.environment}")
-        
-        
+
     # Git clone repo
     def download_git_repo(self):
         git_params = DownloadGitRepoParams(
@@ -166,8 +146,7 @@ class Pipeline:
         if download_git_repo_result["rc"] != 0:
             raise Exception(download_git_repo_result)
         return download_git_repo_result
-        
-        
+    
     # Download terrafom
     def download_binary(self):
         binari_params = DownloadBinaryParams(
@@ -209,7 +188,6 @@ class Pipeline:
         if tfvars_result["rc"] != 0:
             raise Exception(tfvars_result)
         return tfvars_result
-        
     
     def get_variables(self):
         get_variables_params = GetVariablesParams(
@@ -227,16 +205,20 @@ class Pipeline:
 
     # Plan execute
     def execute_plan(self):
-        plan_params = PlanParams(
+        plan_params = DeployParams(
+            git_repo=self.params.git_repo,
             name=self.params.name,
             stack_name=self.params.stack_name,
-            branch=self.params.branch,
             environment=self.params.environment,
             squad=self.params.squad,
+            branch=self.params.branch,
             version=self.params.version,
+            variables=self.params.variables,
+            project_path=self.params.project_path,
             secreto=self.params.secreto,
             variables_file=self.params.variables_file,
-            project_path=self.params.project_path,
+            user=self.params.user,
+            task_id=self.params.task_id
         )
         plan_execute = plan(params=plan_params, provider=ProviderActions)
         plan_result = plan_execute()
@@ -246,16 +228,20 @@ class Pipeline:
 
     # Apply execute
     def execute_apply(self):
-        apply_params = ApplyParams(
+        apply_params = DeployParams(
+            git_repo=self.params.git_repo,
             name=self.params.name,
             stack_name=self.params.stack_name,
-            branch=self.params.branch,
             environment=self.params.environment,
             squad=self.params.squad,
+            branch=self.params.branch,
             version=self.params.version,
+            variables=self.params.variables,
+            project_path=self.params.project_path,
             secreto=self.params.secreto,
             variables_file=self.params.variables_file,
-            project_path=self.params.project_path,
+            user=self.params.user,
+            task_id=self.params.task_id
         )
         apply_execute = apply(params=apply_params, provider=ProviderActions)
         apply_result = apply_execute()
@@ -263,23 +249,25 @@ class Pipeline:
             raise Exception(apply_result)
         return apply_result
 
-   # Destroy execute 
+    # Destroy execute 
     def execute_destroy(self):
-        destroy_params = DestroyParams(
+        destroy_params = DeployParams(
+            git_repo=self.params.git_repo,
             name=self.params.name,
             stack_name=self.params.stack_name,
-            branch=self.params.branch,
             environment=self.params.environment,
             squad=self.params.squad,
+            branch=self.params.branch,
             version=self.params.version,
+            variables=self.params.variables,
+            project_path=self.params.project_path,
             secreto=self.params.secreto,
             variables_file=self.params.variables_file,
-            project_path=self.params.project_path,
+            user=self.params.user,
+            task_id=self.params.task_id
         )
         destroy_execute = destroy(params=destroy_params, provider=ProviderActions)
         destroy_result = destroy_execute()
         if destroy_result["rc"] != 0:
             raise Exception(destroy_result)
         return destroy_result
-    
-    

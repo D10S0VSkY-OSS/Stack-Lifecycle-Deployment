@@ -50,7 +50,7 @@ class Settings(BaseSettings):
     AWS_CONGIG_DEFAULT_FOLDER: str = f"{os.environ['HOME']}/.aws"
     AWS_SHARED_CREDENTIALS_FILE: str = f"{AWS_CONGIG_DEFAULT_FOLDER}/credentials"
     AWS_SHARED_CONFIG_FILE: str = f"{AWS_CONGIG_DEFAULT_FOLDER}/config"
-    TASK_MAX_RETRY: int = os.getenv("SLD_TASK_MAX_RETRY", 1)
+    TASK_MAX_RETRY: int = os.getenv("SLD_TASK_MAX_RETRY", 0)
     TASK_RETRY_INTERVAL: int = os.getenv("SLD_TASK_RETRY_INTERVAL", 20)
     TASK_LOCKED_EXPIRED: int = os.getenv("SLD_TASK_LOCKED_EXPIRED", 300)
     TASK_ROUTE: bool = os.getenv("SLD_TASK_ROUTE", False)

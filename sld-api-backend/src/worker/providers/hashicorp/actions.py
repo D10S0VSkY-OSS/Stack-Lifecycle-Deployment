@@ -1,13 +1,11 @@
 import os
-import subprocess
 from dataclasses import dataclass
-
 import jmespath
 import requests
 from config.api import settings
 
 from src.worker.security.providers_credentials import secret, unsecret
-
+from src.worker.domain.services.command import command
 
 @dataclass
 class StructBase:
@@ -24,66 +22,46 @@ class Actions(StructBase):
     secreto: dict
     variables_file: str
     project_path: str
-    """
-    In this class are all the methods equivalent to the terraform commands
-    """
+    task_id: str
+    subprocess_handler: command = command
 
-    def plan_execute(self) -> dict:
+    def execute_terraform_command(self, action: str) -> dict:
+        channel = self.task_id
         try:
-            secret(
-                self.stack_name, self.environment, self.squad, self.name, self.secreto
-            )
-            deploy_state = (
-                f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
-            )
-            # Execute task
+            secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
+            deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
+
             variables_files = (
-                f"{self.stack_name}.tfvars.json"
-                if self.variables_file == "" or self.variables_file == None
+                f"{self.name}.tfvars.json"
+                if not self.variables_file
                 else self.variables_file
             )
 
             if not self.project_path:
-                os.chdir(
-                    f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}"
-                )
-            os.chdir(
-                f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
-            )
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform init -input=false --upgrade",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform plan -input=false -refresh -no-color -var-file={variables_files} -out={self.stack_name}.tfplan",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
-            unsecret(
-                self.stack_name, self.environment, self.squad, self.name, self.secreto
-            )
+                os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}")
+            else:
+                os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
 
-            # Capture events
-            rc = result.returncode
-            # check result
-            if rc != 0:
-                return {
-                    "command": "plan",
-                    "deploy": self.name,
-                    "squad": self.squad,
-                    "stack_name": self.stack_name,
-                    "environment": self.environment,
-                    "rc": rc,
-                    "tfvars_files": self.variables_file,
-                    "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                    "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                    "stdout": result.stderr.split("\n"),
-                }
-            return {
-                "command": "plan",
+            init_command = f"/tmp/{self.version}/terraform init -no-color -input=false --upgrade"
+            plan_command = f"/tmp/{self.version}/terraform plan -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
+            apply_command = f"/tmp/{self.version}/terraform apply -input=false -auto-approve -no-color {self.name}.tfplan"
+            destroy_command = f"/tmp/{self.version}/terraform destroy -input=false -auto-approve -no-color -var-file={variables_files}"
+
+            if action == "plan":
+                result, output = command(init_command, channel=channel)
+                result, output = self.subprocess_handler(plan_command, channel=channel)
+            if action == "apply":
+                result, output = self.subprocess_handler(apply_command, channel=channel)
+            elif action == "destroy":
+                result, output = command(init_command, channel=channel)
+                result, output = self.subprocess_handler(destroy_command, channel=channel)
+
+            unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
+
+            rc = result
+
+            output_data = {
+                "command": action,
                 "deploy": self.name,
                 "squad": self.squad,
                 "stack_name": self.stack_name,
@@ -92,175 +70,23 @@ class Actions(StructBase):
                 "tfvars_files": self.variables_file,
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                 "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                "stdout": result.stdout.split("\n"),
+                "stdout": output,
             }
+
+            return output_data
+
         except Exception:
             return {
-                "command": "plan",
+                "command": action,
                 "deploy": self.name,
                 "squad": self.squad,
                 "stack_name": self.stack_name,
                 "environment": self.environment,
-                "rc": rc,
+                "rc": 1,
                 "tfvars_files": self.variables_file,
-                "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                 "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                "stdout": result.stderr.split("\n"),
-            }
-
-    def apply_execute(self) -> dict:
-        try:
-            secret(
-                self.stack_name, self.environment, self.squad, self.name, self.secreto
-            )
-            deploy_state = (
-                f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
-            )
-            # Execute task
-
-            if not self.project_path:
-                os.chdir(
-                    f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}"
-                )
-            os.chdir(
-                f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
-            )
-
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform init -input=false --upgrade",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform apply -input=false -auto-approve -no-color {self.stack_name}.tfplan",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
-            unsecret(
-                self.stack_name, self.environment, self.squad, self.name, self.secreto
-            )
-
-            # Capture events
-            rc = result.returncode
-            # check result
-            if rc != 0:
-                return {
-                    "command": "apply",
-                    "deploy": self.name,
-                    "self.squad": self.squad,
-                    "self.stack_name": self.stack_name,
-                    "self.environment": self.environment,
-                    "rc": rc,
-                    "tfvars_files": self.variables_file,
-                    "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                    "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                    "stdout": result.stderr.split("\n"),
-                }
-            return {
-                "command": "apply",
-                "deploy": self.name,
-                "self.squad": self.squad,
-                "self.stack_name": self.stack_name,
-                "self.environment": self.environment,
-                "rc": rc,
-                "tfvars_files": self.variables_file,
-                "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": result.stdout.split("\n"),
-            }
-        except Exception:
-            return {
-                "command": "apply",
-                "deploy": self.name,
-                "self.squad": self.squad,
-                "self.stack_name": self.stack_name,
-                "self.environment": self.environment,
-                "rc": 1,
-                "tfvars_files": self.variables_file,
-                "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": "ko",
-            }
-
-    def destroy_execute(self) -> dict:
-        try:
-            secret(
-                self.stack_name, self.environment, self.squad, self.name, self.secreto
-            )
-            deploy_state = (
-                f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
-            )
-            # Execute task
-            variables_files = (
-                f"{self.stack_name}.tfvars.json"
-                if self.variables_file == "" or self.variables_file == None
-                else self.variables_file
-            )
-            if not self.project_path:
-                os.chdir(
-                    f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}"
-                )
-            os.chdir(
-                f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
-            )
-
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform init -input=false --upgrade",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
-            result = subprocess.run(
-                f"/tmp/{self.version}/terraform destroy -input=false -auto-approve -no-color -var-file={variables_files}",
-                shell=True,
-                capture_output=True,
-                encoding="utf8",
-            )
-            unsecret(
-                self.stack_name, self.environment, self.squad, self.name, self.secreto
-            )
-            # Capture events
-            rc = result.returncode
-            # check result
-            if rc != 0:
-                return {
-                    "command": "destroy",
-                    "deploy": self.name,
-                    "self.squad": self.squad,
-                    "self.stack_name": self.stack_name,
-                    "self.environment": self.environment,
-                    "rc": rc,
-                    "tfvars_files": self.variables_file,
-                    "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                    "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                    "stdout": result.stderr.split("\n"),
-                }
-            return {
-                "command": "destroy",
-                "deploy": self.name,
-                "self.squad": self.squad,
-                "self.stack_name": self.stack_name,
-                "self.environment": self.environment,
-                "rc": rc,
-                "tfvars_files": self.variables_file,
-                "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": result.stdout.split("\n"),
-            }
-        except Exception:
-            return {
-                "command": "destroy",
-                "deploy": self.name,
-                "self.squad": self.squad,
-                "self.stack_name": self.stack_name,
-                "self.environment": self.environment,
-                "rc": 1,
-                "tfvars_files": self.variables_file,
-                "self.project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
-                "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
-                "stdout": "ko",
+                "stdout": output,
             }
 
 

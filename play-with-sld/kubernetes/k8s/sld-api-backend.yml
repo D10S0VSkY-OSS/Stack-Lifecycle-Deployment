@@ -17,7 +17,7 @@ spec:
       subdomain: primary
       containers:
       - name: api-backend
-        image: d10s0vsky/sld-api:2.26.1
+        image: d10s0vsky/sld-api:2.27.0
         imagePullPolicy: Always
         command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
         ports:

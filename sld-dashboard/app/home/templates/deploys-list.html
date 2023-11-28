@@ -250,9 +250,28 @@
                                             <span class="fas fa-trash-alt mr-2"></span>
                                             Destroy
                                         </a>
+                                    {% if "yoda" in current_user.role or "darth_vader" in current_user.role %}
+                                    <!-- Unlock-->
+                                        <a
+                                            title="Unlock Terraform State"
+                                            class="dropdown-item"
+                                            data-toggle="modal"
+                                            data-target="#UnlockModalCenter-{{deploy.id}}"
+                                        >
+                                            <span class="fas fa-unlock mr-2"></span>
+                                            Unlock
+                                        </a>
+                                    </span>
+                                    {% endif %}
                                     </div>
                                     {% endif %}
                                     <!-- Output-->
+                                    <!-- SSE stream -->
+                                    <span class="icon icon-sm">
+                                        <a title="Output Stream" class="dropdown-item" href="{{ url_for('.deploy_stream',task_id=deploy.task_id)}}">
+                                            <span class="fab fa-searchengin mr-0"></span>
+                                        </a>
+                                    </span>
                                     <!-- Botón para abrir el modal -->
                                     <span class="icon icon-sm">
                                         <a
@@ -261,7 +280,7 @@
                                             data-task-id="{{deploy.task_id}}"
                                             data-deploy-id="{{deploy.id}}"
                                         >
-                                            <span class="fab fa-searchengin mr-0"></span>
+                                            <span class="far fa-file-code mr-0"></span>
                                         </a>
                                     </span>
                                     <!-- Schedule -->
@@ -270,19 +289,7 @@
                                             <span class="far fa-clock mr-0"></span>
                                         </a>
                                     </span>
-                                    {% if "yoda" in current_user.role or "darth_vader" in current_user.role %}
-                                    <!-- Unlock-->
-                                    <span class="icon icon-sm">
-                                        <a
-                                            title="Unlock Deploy"
-                                            class="nav-link icon-notifications text-dark"
-                                            data-toggle="modal"
-                                            data-target="#UnlockModalCenter-{{deploy.id}}"
-                                        >
-                                            <span class="fas fa-unlock mr-0"></span>
-                                        </a>
-                                    </span>
-                                    {% endif %}
+
                                 </div>
                             </td>
                         </tr>
@@ -537,4 +544,5 @@
         });
     });
     </script>
+
     {% endblock javascripts %}

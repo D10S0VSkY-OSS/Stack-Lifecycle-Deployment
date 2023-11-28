@@ -3,6 +3,7 @@ from src.worker.providers.hashicorp.actions import Actions, SimpleActions
 from src.worker.providers.hashicorp.artifact import Artifact
 from src.worker.providers.hashicorp.download import BinaryDownload
 from src.worker.providers.hashicorp.templates import Backend, GetVars, Tfvars
+from src.worker.domain.entities.worker import DeployParams
 
 
 class ProviderRequirements:
@@ -75,80 +76,50 @@ class ProviderActions:
     This class contains the typical methods of a deployment
     """
 
-    def plan(
-        name: str,
-        stack_name: str,
-        branch: str,
-        environment: str,
-        squad: str,
-        version: str,
-        secreto: dict,
-        variables_file: str = "",
-        project_path: str = "",
-        action=Actions,
-    ) -> dict:
+    def plan(params: DeployParams, action: Actions = Actions) -> dict:
         config_action = action(
-            name,
-            stack_name,
-            branch,
-            environment,
-            squad,
-            version,
-            secreto,
-            variables_file,
-            project_path,
+            params.name,
+            params.stack_name,
+            params.branch,
+            params.environment,
+            params.squad,
+            params.version,
+            params.secreto,
+            params.variables_file,
+            params.project_path,
+            params.task_id,
         )
-        return config_action.plan_execute()
+        return config_action.execute_terraform_command("plan")
 
-    def apply(
-        name: str,
-        stack_name: str,
-        branch: str,
-        environment: str,
-        squad: str,
-        version: str,
-        secreto: dict,
-        variables_file: str = "",
-        project_path: str = "",
-        action=Actions,
-    ) -> dict:
+    def apply(params: DeployParams, action: Actions = Actions) -> dict:
         config_action = action(
-            name,
-            stack_name,
-            branch,
-            environment,
-            squad,
-            version,
-            secreto,
-            variables_file,
-            project_path,
+            params.name,
+            params.stack_name,
+            params.branch,
+            params.environment,
+            params.squad,
+            params.version,
+            params.secreto,
+            params.variables_file,
+            params.project_path,
+            params.task_id,
         )
-        return config_action.apply_execute()
+        return config_action.execute_terraform_command("apply")
 
-    def destroy(
-        name: str,
-        stack_name: str,
-        branch: str,
-        environment: str,
-        squad: str,
-        version: str,
-        secreto: dict,
-        variables_file: str = "",
-        project_path: str = "",
-        action=Actions,
-    ) -> dict:
+    def destroy(params: DeployParams, action: Actions = Actions) -> dict:
         config_action = action(
-            name,
-            stack_name,
-            branch,
-            environment,
-            squad,
-            version,
-            secreto,
-            variables_file,
-            project_path,
+            params.name,
+            params.stack_name,
+            params.branch,
+            params.environment,
+            params.squad,
+            params.version,
+            params.secreto,
+            params.variables_file,
+            params.project_path,
+            params.task_id,
         )
-        return config_action.destroy_execute()
+        return config_action.execute_terraform_command("destroy")
 
     def output(
         stack_name: str, squad: str, environment: str, name: str, action=SimpleActions

@@ -1,12 +1,20 @@
 from pydantic import BaseModel
-from typing import Optional, Any
+from typing import Optional, Any, Dict
 
+
+import logging
+from typing import List, Tuple
+from subprocess import Popen, PIPE
+
+
+ 
 class DownloadBinaryParams(BaseModel):
     version: str
-    #url: Optional[str]
-
+ 
+    # url: Optional[str]
     class Config:
         frozenset = True
+
 
 class DeployParamsBase(BaseModel):
     name: str
@@ -30,6 +38,7 @@ class TfvarsParams(DeployParamsBase):
     class config:
         frozenset = True
 
+
 class DeployParams(BaseModel):
     git_repo: str
     name: str
@@ -38,11 +47,12 @@ class DeployParams(BaseModel):
     squad: str
     branch: str
     version: str
-    variables: Any
+    variables: Optional[Dict[str, Any]] = {} 
     secreto: Any
     variables_file: Optional[str] = ""
     project_path: Optional[str] = ""
     user: Optional[str] = ""
+    task_id: Optional[str] = ""
 
     class Config:
         frozenset = True
@@ -60,6 +70,7 @@ class DownloadGitRepoParams(BaseModel):
     class Config:
         frozenset = True
 
+
 class ApplyParams(DeployParamsBase, DownloadBinaryParams):
     branch: str
     secreto: Any
@@ -69,8 +80,23 @@ class ApplyParams(DeployParamsBase, DownloadBinaryParams):
     class Config:
         frozenset = True
 
+
 class PlanParams(ApplyParams):
     pass
 
+
 class DestroyParams(ApplyParams):
     pass
+
+
+class ActionBase(BaseModel):
+    name: str
+    stack_name: str
+    branch: str
+    environment: str
+    squad: str
+    version: str
+    secreto: dict
+    project_path: Optional[str] = ""
+    variables_file: Optional[str] = ""
+    task_id: Optional[str] = ""

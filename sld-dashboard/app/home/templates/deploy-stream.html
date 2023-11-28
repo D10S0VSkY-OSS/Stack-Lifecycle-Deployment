@@ -1,0 +1,86 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Tasks {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+    #console-container {
+        background-color: #1e1e1e; /* Dark background for the main container */
+        padding: 15px;
+        border-radius: 4px;
+        margin-top: 20px;
+        overflow-y: auto;
+        max-height: 600px;
+    }
+
+    #console-container h2 {
+        color: #fff; /* White text for the header */
+    }
+
+    #sse-data {
+        background-color: #1e1e1e; /* Dark background for the main container */
+        color: #fff; /* White text */
+        font-size: medium;
+        font-family: "Courier New";
+        white-space: pre-wrap; /* To maintain data formatting */
+        padding: 10px; /* Internal spacing */
+        border-radius: 4px; /* Rounded borders */
+        margin-top: 5px; /* Top margin */
+        overflow-y: auto;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+<main class="content">
+    {% include 'includes/navigation.html' %}
+<div class="beta-version">
+    <span class="beta-icon">BETA</span>
+    <p>This is a beta version of the feature. Feedback is welcome!</p>
+</div>
+    <div class="preloader bg-soft flex-column justify-content-center align-items-center">
+        <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+    </div>
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item"><a href="/deploys-list">Deploy</a></li>
+            </ol>
+        </nav>
+
+        <!-- Container to display SSE data in console style -->
+        <div id="console-container">
+            <h2>Deployment Output:</h2>
+            <pre id="sse-data"></pre>
+        </div>
+    </div>
+
+    {% include 'includes/footer.html' %}
+</main>
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+<script>
+    const taskId = "{{ task_id }}";
+
+    // Establishes the SSE connection with the correct endpoint
+    const eventSource = new EventSource(`/stream/${taskId}`);
+    eventSource.onmessage = function(e) {
+        const sseDataElement = document.getElementById('sse-data');
+
+        if (e.data !== '1') {
+            sseDataElement.textContent += e.data + '\n';
+            // Delay scroll adjustment to ensure the browser has processed the new content
+            setTimeout(() => {
+                const lastLine = document.createElement("div");
+                sseDataElement.appendChild(lastLine);
+                lastLine.scrollIntoView({ behavior: "smooth", block: "end" });
+            }, 30); 
+        } 
+    };
+</script>
+{% endblock javascripts %}
