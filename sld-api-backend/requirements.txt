@@ -15,7 +15,7 @@ click-didyoumean==0.3.0
 click-plugins==1.1.1
 click-repl==0.3.0
 croniter==2.0.1
-cryptography==41.0.4
+cryptography==41.0.6
 dependency-injector==4.41.0
 Deprecated==1.2.14
 dnspython==2.4.2
