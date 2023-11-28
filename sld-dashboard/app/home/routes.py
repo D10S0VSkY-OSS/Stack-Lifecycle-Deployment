@@ -567,6 +567,7 @@ def clone_deploy(deploy_id):
                 "deploy_name",
                 "squad",
                 "environment",
+                "deploy_name"
             ]
             # Clean exclude data vars
             data_raw = {
