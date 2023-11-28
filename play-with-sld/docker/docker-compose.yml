@@ -1,7 +1,6 @@
 version: "3.7"
 
 services:
-  # Mysql database
   db:
     hostname: db
     image: mysql:latest
@@ -12,7 +11,6 @@ services:
     restart: always
     ports:
       - 3306:3306
-        #    command: --init-file init.sql
     environment:
       MYSQL_ROOT_PASSWORD: 123
       MYSQL_DATABASE: restapi
@@ -31,17 +29,6 @@ services:
       - 6379:6379
 
 
-  # RabbitMQ - queue
-  rabbit:
-    hostname: rabbit
-    image: rabbitmq:3.8-management
-    environment:
-      - RABBITMQ_DEFAULT_USER=admin
-      - RABBITMQ_DEFAULT_PASS=admin
-    ports:
-      - "5672:5672"  
-      - "15672:15672"  # here, we can access rabbitmq management plugin
-     
   mongodb:
     image: mongo
     hostname: mongodb 
@@ -62,6 +49,7 @@ services:
     environment:
       SLD_STORAGE_BACKEND: mongodb
       SLD_MONGODB_URL: "mongodb:27017/"
+      PATH: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
     ports:
       - "8080:8080"
   
@@ -78,18 +66,15 @@ services:
       - redis
       - remote-state
       - worker
-      - rabbit
 
 
   # Celery worker
   worker:
     image: d10s0vsky/sld-api:latest
-    entrypoint: ["celery", "--app", "src.worker.tasks.terraform_worker", "worker", "--loglevel=info", "-c", "8", "-E", "-Q", "any,squad,squad1,squad2"]
+    entrypoint: ["python", "-m", "celery", "--app", "src.worker.tasks.terraform_worker", "worker", "--loglevel=info", "-c", "8", "-E", "-Q", "any,squad,squad1,squad2"]
     environment:
-      BROKER_USER: admin
-      BROKER_PASSWD: admin
+      PATH: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
     depends_on:
-      - rabbit
       - redis
       - db
       - remote-state
@@ -98,19 +83,18 @@ services:
   sld-dashboard:
     image: d10s0vsky/sld-dashboard:latest
     hostname: sld-dashboard
-    entrypoint: gunicorn --config gunicorn-cfg.py run:app
+    environment:
+      PATH: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+    entrypoint: python -m gunicorn --config gunicorn-cfg.py run:app
     restart: always
     env_file: ../../sld-dashboard/.env
     ports:
       - "5000:5000"
     depends_on:
-        #      - api-backend
+      - api-backend
       - db
       - redis
       - remote-state
-        #    - worker
-      - rabbit
-        #- schedule
 
 
 
@@ -124,14 +108,10 @@ services:
     environment:
       MYSQL_USER: adm
       MYSQL_PASSWORD: 123
-      BROKER_USER: admin
-      BROKER_PASSWD: admin
+      PATH: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
     depends_on:
       - db
       - redis
-      - remote-state
-      - worker
-      - rabbit
 
 volumes:
   sld-db:
