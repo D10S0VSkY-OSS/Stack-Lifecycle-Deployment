@@ -35,7 +35,10 @@
 {% block content %}
 <main class="content">
     {% include 'includes/navigation.html' %}
-
+<div class="beta-version">
+    <span class="beta-icon">BETA</span>
+    <p>This is a beta version of the feature. Feedback is welcome!</p>
+</div>
     <div class="preloader bg-soft flex-column justify-content-center align-items-center">
         <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
     </div>
@@ -73,9 +76,11 @@
             sseDataElement.textContent += e.data + '\n';
             // Delay scroll adjustment to ensure the browser has processed the new content
             setTimeout(() => {
-                sseDataElement.scrollTop = sseDataElement.scrollHeight;
-            }, 10); // Adjust the timeout as needed
-        }
+                const lastLine = document.createElement("div");
+                sseDataElement.appendChild(lastLine);
+                lastLine.scrollIntoView({ behavior: "smooth", block: "end" });
+            }, 30); 
+        } 
     };
 </script>
 {% endblock javascripts %}
