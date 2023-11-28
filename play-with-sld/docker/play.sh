@@ -1,8 +1,8 @@
 #!/bin/bash
 check_docker () {
-    /usr/bin/which docker-compose >/dev/null
+    /usr/bin/which docker >/dev/null
     if [ $? = 0 ];then
-        echo "docker-compse ok"
+        echo "docker compse ok"
     else
         echo "Docker Compose not installed"
         echo "Run this command to download the current stable release of Docker Compose:"
@@ -22,20 +22,20 @@ check_docker () {
 }
 
 
-start_db_redis_rabbit() {
-    docker-compose up -d  db redis rabbit mongodb
+start_db_redis() {
+    docker compose up -d  db redis  mongodb
     sleep 15
 }
 
 
 start_backend() {
-    docker-compose up -d --remove-orphan api-backend worker remote-state
+    docker compose up -d api-backend worker remote-state
     sleep 10
 }
 
 
 start_frontend() {
-    docker-compose up -d --remove-orphan sld-dashboard schedule
+    docker compose up -d sld-dashboard schedule
 }
 
 
@@ -80,7 +80,7 @@ start_init_credentials() {
         case "$1" in
 
             start)  echo "Starting SLD for play"
-                start_db_redis_rabbit
+                start_db_redis
                 start_backend
                 start_frontend
                 ;;
