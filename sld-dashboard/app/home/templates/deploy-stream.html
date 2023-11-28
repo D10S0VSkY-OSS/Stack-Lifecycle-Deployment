@@ -1,15 +1,43 @@
 {% extends "layouts/base.html" %}
-{% from 'helpers/_forms.html' import render_field %}
 
-{% block title %} Edit Deploy {% endblock %}
+{% block title %} Tasks {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
-{% block content %}
-<script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+{% block stylesheets %}
+<style>
+    #console-container {
+        background-color: #1e1e1e; /* Dark background for the main container */
+        padding: 15px;
+        border-radius: 4px;
+        margin-top: 20px;
+        overflow-y: auto;
+        max-height: 600px;
+    }
 
+    #console-container h2 {
+        color: #fff; /* White text for the header */
+    }
+
+    #sse-data {
+        background-color: #000; /* Black background for the SSE data */
+        color: #fff; /* White text */
+        font-family: Consolas /* 'Monaco', 'Lucida Console', 'Courier New', monospace; */
+        white-space: pre-wrap; /* To maintain data formatting */
+        padding: 10px; /* Internal spacing */
+        border-radius: 4px; /* Rounded borders */
+        margin-top: 5px; /* Top margin */
+        overflow-y: auto;
+    }
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
 <main class="content">
     {% include 'includes/navigation.html' %}
+
+    <div class="preloader bg-soft flex-column justify-content-center align-items-center">
+        <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+    </div>
 
     <div class="py-4">
         <nav aria-label="breadcrumb">
@@ -19,28 +47,34 @@
             </ol>
         </nav>
 
-        <!-- Contenedor para mostrar los datos de SSE -->
-        <div id="sse-data-container">
+        <!-- Container to display SSE data in console style -->
+        <div id="console-container">
             <h2>Deployment Output:</h2>
             <pre id="sse-data"></pre>
         </div>
     </div>
 
-
-                {% include 'includes/footer.html' %}
-
+    {% include 'includes/footer.html' %}
 </main>
-
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-    const eventSource = new EventSource('/stream');
+    const taskId = "{{ task_id }}";
+
+    // Establishes the SSE connection with the correct endpoint
+    const eventSource = new EventSource(`/stream/${taskId}`);
     eventSource.onmessage = function(e) {
-        console.log(e.data);
-        // Actualiza el contenido del elemento con el ID 'sse-data'
-        document.getElementById('sse-data').textContent += e.data + '\n';
+        const sseDataElement = document.getElementById('sse-data');
+
+        if (e.data !== '1') {
+            sseDataElement.textContent += e.data + '\n';
+            // Delay scroll adjustment to ensure the browser has processed the new content
+            setTimeout(() => {
+                sseDataElement.scrollTop = sseDataElement.scrollHeight;
+            }, 10); // Adjust the timeout as needed
+        }
     };
 </script>
 {% endblock javascripts %}

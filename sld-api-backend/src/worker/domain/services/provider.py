@@ -87,6 +87,7 @@ class ProviderActions:
             params.secreto,
             params.variables_file,
             params.project_path,
+            params.task_id,
         )
         return config_action.execute_terraform_command("plan")
 
@@ -101,6 +102,7 @@ class ProviderActions:
             params.secreto,
             params.variables_file,
             params.project_path,
+            params.task_id,
         )
         return config_action.execute_terraform_command("apply")
 
@@ -115,6 +117,7 @@ class ProviderActions:
             params.secreto,
             params.variables_file,
             params.project_path,
+            params.task_id,
         )
         return config_action.execute_terraform_command("destroy")
 

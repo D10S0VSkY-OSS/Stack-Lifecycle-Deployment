@@ -7,34 +7,7 @@ from typing import List, Tuple
 from subprocess import Popen, PIPE
 
 
-class SubprocessHandler:
-    def run_command(self, command: str) -> Tuple[int, List[str]]:
-        try:
-            process = Popen(
-                command,
-                shell=True,
-                stdout=PIPE,
-                stderr=PIPE,
-                universal_newlines=True
-            )
-
-            # Read stdout and stderr in real-time
-            output_lines = []
-            while True:
-                line = process.stdout.readline()
-                logging.info(line.rstrip('\n'))
-                if not line:
-                    break
-                output_lines.append(line.strip())
-
-            # Wait for the process to finish
-            returncode = process.wait()
-            return returncode, output_lines
-
-        except Exception as e:
-            return 1, [str(e)]
-
-
+ 
 class DownloadBinaryParams(BaseModel):
     version: str
  
@@ -127,4 +100,3 @@ class ActionBase(BaseModel):
     project_path: Optional[str] = ""
     variables_file: Optional[str] = ""
     task_id: Optional[str] = ""
-    subprocess_handler: Optional[Any] = SubprocessHandler()

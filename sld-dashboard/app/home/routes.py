@@ -47,17 +47,25 @@ def index():
         "index.html", segment="index", external_api_dns=external_api_dns
     )
 
+# stream SSE
+@blueprint.route('/deploy-stream/<task_id>')
+@login_required
+def deploy_stream(task_id):
+    return render_template('deploy-stream.html', task_id=task_id)
 
-@blueprint.route('/stream')
-def stream():
+@blueprint.route('/stream/<task_id>')
+@login_required
+def stream(task_id):
     def generate():
         pubsub = s.pubsub()
-        pubsub.subscribe('channel_name')
+        pubsub.subscribe(f'{task_id}')
         for message in pubsub.listen():
             yield f"data: {message['data']}\n\n"
     return Response(generate(), mimetype='text/event-stream')
 
+
 @blueprint.route('/status/<task_id>')
+@login_required
 def status(task_id):
     try:
         token = decrypt(r.get(current_user.id))

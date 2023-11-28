@@ -5,7 +5,7 @@ import redis
 redis_client = redis.Redis(host='localhost', port=6379, db=15)
 
 
-def command(command: str):
+def command(command: str, channel: str):
     try:
         output_lines = []
 
@@ -22,10 +22,9 @@ def command(command: str):
             output_lines.append(line.strip())
             logging.info(line.strip())
             try:
-                redis_client.publish('channel_name', line.strip())
+                redis_client.publish(f'{channel}', line.strip())
             except Exception as err:
                 logging.error(f"Error publish redis: {err}")
-
 
         logging.info("#" * 80)
 

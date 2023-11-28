@@ -25,9 +25,11 @@ class Actions(StructBase):
     secreto: dict
     variables_file: str
     project_path: str
+    task_id: str
     subprocess_handler: command = command
 
     def execute_terraform_command(self, command: str) -> dict:
+        channel = self.task_id
         try:
             secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
             deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
@@ -48,13 +50,13 @@ class Actions(StructBase):
             apply_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color {self.name}.tfplan"
             destroy_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color -var-file={variables_files}"
 
-            result, output = self.subprocess_handler(init_command)
-            result, output = self.subprocess_handler(plan_command)
+            result, output = self.subprocess_handler(init_command, channel=channel)
+            result, output = self.subprocess_handler(plan_command, channel=channel)
 
             if command == "apply":
-                result, output = self.subprocess_handler(apply_command)
+                result, output = self.subprocess_handler(apply_command, channel=channel)
             elif command == "destroy":
-                result, output = self.subprocess_handler(destroy_command)
+                result, output = self.subprocess_handler(destroy_command, channel=channel)
 
             unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
 
