@@ -8,6 +8,11 @@ redis_client = redis.Redis(host='localhost', port=6379, db=15)
 def command(command: str, channel: str):
     try:
         output_lines = []
+        command_description = f"Executing command: {command}"
+        output_lines.append(command_description)
+        redis_client.publish(channel, "-" * 80)
+        redis_client.publish(channel, command_description)
+        redis_client.publish(channel, "-" * 80)
 
         process = subprocess.Popen(
             command,
@@ -19,12 +24,14 @@ def command(command: str, channel: str):
 
         logging.info("#" * 80)
         for line in process.stdout:
-            output_lines.append(line.strip())
-            logging.info(line.strip())
-            try:
-                redis_client.publish(f'{channel}', line.strip())
-            except Exception as err:
-                logging.error(f"Error publish redis: {err}")
+            if "[DEBUG]" not in line:
+                cleaned_line = line.strip()
+                output_lines.append(cleaned_line)
+                logging.info(cleaned_line)
+                try:
+                    redis_client.publish(f'{channel}', cleaned_line)
+                except Exception as err:
+                    logging.error(f"Error publish redis: {err}")
 
         logging.info("#" * 80)
 
@@ -36,8 +43,7 @@ def command(command: str, channel: str):
             logging.error(
                 f"Error executing the command {command}. Exit code: {process.returncode}"
             )
-
-        return process.returncode, output_lines  
+        return process.returncode, output_lines
     except subprocess.CalledProcessError as err:
         logging.error(
             f"Error execute command code: {err.returncode}. Error:\n{err.stderr}"

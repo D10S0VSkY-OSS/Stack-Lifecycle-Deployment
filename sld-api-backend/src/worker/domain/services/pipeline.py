@@ -249,7 +249,7 @@ class Pipeline:
             raise Exception(apply_result)
         return apply_result
 
-   # Destroy execute 
+    # Destroy execute 
     def execute_destroy(self):
         destroy_params = DeployParams(
             git_repo=self.params.git_repo,
@@ -271,5 +271,3 @@ class Pipeline:
         if destroy_result["rc"] != 0:
             raise Exception(destroy_result)
         return destroy_result
-    
-    

@@ -101,15 +101,14 @@ def output(task_id):
             uri=f"tasks/id/{task_id}",
             headers={"Authorization": f"Bearer {token}"}
         )
-    
         if response.get("status_code") == 200:
             data = response.get("json").get("result").get("module").get("stdout")
             if not isinstance(data, list):
                 data = [data] 
             return data
     except Exception as err:
-        logging.error(err) 
-        return render_template("page-500.html"), 500
+        print(task_id)
+        raise err
 
 
 # Start Deploy

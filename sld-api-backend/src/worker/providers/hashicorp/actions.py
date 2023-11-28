@@ -7,9 +7,6 @@ from config.api import settings
 from src.worker.security.providers_credentials import secret, unsecret
 from src.worker.domain.services.command import command
 
-
-        
-
 @dataclass
 class StructBase:
     name: str
@@ -28,7 +25,7 @@ class Actions(StructBase):
     task_id: str
     subprocess_handler: command = command
 
-    def execute_terraform_command(self, command: str) -> dict:
+    def execute_terraform_command(self, action: str) -> dict:
         channel = self.task_id
         try:
             secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
@@ -46,16 +43,17 @@ class Actions(StructBase):
                 os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
 
             init_command = f"/tmp/{self.version}/terraform init -no-color -input=false --upgrade"
-            plan_command = f"/tmp/{self.version}/terraform {command} -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
-            apply_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color {self.name}.tfplan"
-            destroy_command = f"/tmp/{self.version}/terraform {command} -input=false -auto-approve -no-color -var-file={variables_files}"
+            plan_command = f"/tmp/{self.version}/terraform plan -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
+            apply_command = f"/tmp/{self.version}/terraform apply -input=false -auto-approve -no-color {self.name}.tfplan"
+            destroy_command = f"/tmp/{self.version}/terraform destroy -input=false -auto-approve -no-color -var-file={variables_files}"
 
-            result, output = self.subprocess_handler(init_command, channel=channel)
-            result, output = self.subprocess_handler(plan_command, channel=channel)
-
-            if command == "apply":
+            if action == "plan":
+                result, output = command(init_command, channel=channel)
+                result, output = self.subprocess_handler(plan_command, channel=channel)
+            if action == "apply":
                 result, output = self.subprocess_handler(apply_command, channel=channel)
-            elif command == "destroy":
+            elif action == "destroy":
+                result, output = command(init_command, channel=channel)
                 result, output = self.subprocess_handler(destroy_command, channel=channel)
 
             unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
@@ -63,7 +61,7 @@ class Actions(StructBase):
             rc = result
 
             output_data = {
-                "command": command,
+                "command": action,
                 "deploy": self.name,
                 "squad": self.squad,
                 "stack_name": self.stack_name,
@@ -73,15 +71,13 @@ class Actions(StructBase):
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                 "project_path": f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}",
                 "stdout": output,
-
-
             }
 
             return output_data
 
         except Exception:
             return {
-                "command": command,
+                "command": action,
                 "deploy": self.name,
                 "squad": self.squad,
                 "stack_name": self.stack_name,

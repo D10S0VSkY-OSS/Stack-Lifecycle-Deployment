@@ -1,6 +1,4 @@
 import logging
-import traceback
-
 import redis
 from celery import states
 from celery.exceptions import Ignore
