@@ -57,9 +57,10 @@ def deploy_stream(task_id):
 @login_required
 def stream(task_id):
     def generate():
-        pubsub = s.pubsub()
+        pubsub = s.pubsub(ignore_subscribe_messages=True)
         pubsub.subscribe(f'{task_id}')
         for message in pubsub.listen():
+            logging.info(message)
             yield f"data: {message['data']}\n\n"
     return Response(generate(), mimetype='text/event-stream')
 
