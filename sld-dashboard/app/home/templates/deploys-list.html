@@ -268,7 +268,7 @@
                                     <!-- Output-->
                                     <!-- SSE stream -->
                                     <span class="icon icon-sm">
-                                        <a title="Output Stream" class="dropdown-item" href="{{ url_for('.deploy_stream',task_id=deploy.task_id)}}">
+                                        <a title="Console Log Stream" class="dropdown-item" href="{{ url_for('.deploy_stream',task_id=deploy.task_id)}}">
                                             <span class="fab fa-searchengin mr-0"></span>
                                         </a>
                                     </span>
@@ -531,9 +531,9 @@
     // Función auxiliar para determinar la clase CSS según el contenido de la línea
     function getClassForLine(line) {
         if (/^\s*\+/.test(line)) return 'plus';
-        if (/^\s*-/.test(line)) return 'minus';
+        if (/^\s*-(?!\-)/.test(line)) return 'minus'; // Modificado para un solo guion '-'
         if (/^\s*~/.test(line)) return 'tilde';
-        return 'others';
+            return 'others';
     }
     // Asignar el evento click a los botones para abrir el modal
     document.querySelectorAll('.output-button').forEach(button => {

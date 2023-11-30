@@ -10,7 +10,9 @@ def command(command: str, channel: str):
     try:
         output_lines = []
         command_description = f"Executing command: {command}"
+        output_lines.append("-" * 80)
         output_lines.append(command_description)
+        output_lines.append("-" * 80)
         redis_client.publish(channel, "-" * 80)
         redis_client.publish(channel, command_description)
         redis_client.publish(channel, "-" * 80)

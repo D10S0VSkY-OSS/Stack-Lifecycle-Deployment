@@ -46,15 +46,18 @@ class Actions(StructBase):
             plan_command = f"/tmp/{self.version}/terraform plan -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
             apply_command = f"/tmp/{self.version}/terraform apply -input=false -auto-approve -no-color {self.name}.tfplan"
             destroy_command = f"/tmp/{self.version}/terraform destroy -input=false -auto-approve -no-color -var-file={variables_files}"
-
+            output = []
             if action == "plan":
-                result, output = command(init_command, channel=channel)
-                result, output = self.subprocess_handler(plan_command, channel=channel)
+                result, output_init = command(init_command, channel=channel)
+                result, output_plan = self.subprocess_handler(plan_command, channel=channel)
+                output = output_init + output_plan
             if action == "apply":
-                result, output = self.subprocess_handler(apply_command, channel=channel)
+                result, output_apply = self.subprocess_handler(apply_command, channel=channel)
+                output = output + output_apply
             elif action == "destroy":
-                result, output = command(init_command, channel=channel)
-                result, output = self.subprocess_handler(destroy_command, channel=channel)
+                result, output_init = command(init_command, channel=channel)
+                result, output_destroy = self.subprocess_handler(destroy_command, channel=channel)
+                output = output_init + output_destroy
 
             unsecret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
 
