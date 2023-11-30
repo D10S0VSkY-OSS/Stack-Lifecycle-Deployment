@@ -36,7 +36,7 @@
 <main class="content">
     {% include 'includes/navigation.html' %}
 <div class="beta-version">
-    <span class="beta-icon">BETA</span>
+    <span class="beta-icon">Console Log 💻</span>
     <p>This is a beta version of the feature. Feedback is welcome!</p>
 </div>
     <div class="preloader bg-soft flex-column justify-content-center align-items-center">
@@ -72,15 +72,36 @@
     eventSource.onmessage = function(e) {
         const sseDataElement = document.getElementById('sse-data');
 
-        if (e.data !== '1') {
+        if (e.data !== '1' && e.data !== 'null') {
+            // Handle normal data, excluding 'null'
             sseDataElement.textContent += e.data + '\n';
-            // Delay scroll adjustment to ensure the browser has processed the new content
             setTimeout(() => {
                 const lastLine = document.createElement("div");
                 sseDataElement.appendChild(lastLine);
                 lastLine.scrollIntoView({ behavior: "smooth", block: "end" });
             }, 30); 
-        } 
+        } else if (typeof e.data === 'string') {
+            // Handle the case where '1' is received - fetch additional data
+            fetch('/output/' + taskId)
+                .then(response => response.json()) // Parse the JSON response
+                .then(dataArray => {
+                    if (dataArray && dataArray.length > 0) {
+                        // Iterate over each string in the array and append it, excluding 'null'
+                        dataArray.forEach(item => {
+                            if (item && item !== 'null') {
+                                sseDataElement.textContent += item + '\n';
+                            }
+                        });
+                    } else {
+                        sseDataElement.textContent = 'No additional task data available.';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching additional task data:', error);
+                    sseDataElement.textContent = 'Error fetching data.';
+                });
+        }
     };
 </script>
+
 {% endblock javascripts %}

@@ -41830,8 +41830,8 @@ pre {
 
 .beta-icon {
     font-weight: bold;
-    font-size: 18px;
-    background-color: #d9534f; /* Color de fondo para el ícono */
+    color: var(--bs-dark);
+    font-size: 25px;
     padding: 5px 10px;
     border-radius: 4px;
     margin-right: 5px;
