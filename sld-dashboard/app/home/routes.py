@@ -63,6 +63,7 @@ def deploy_stream(deploy_id):
         deploy = response.get("json")
         return render_template('deploy-stream.html', deploy=deploy)
 
+
 @blueprint.route('/stream/<task_id>')
 @login_required
 def stream(task_id):
@@ -285,6 +286,44 @@ def relaunch_deploy(deploy_id):
     except Exception:
         return render_template("page-500.html"), 500
 
+@blueprint.route("/deploys/console/redeploy/<int:deploy_id>")
+@login_required
+def relaunch_console_deploy(deploy_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        endpoint = f"deploy/{deploy_id}"
+
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        content = response.get("json")
+        data = {
+            "start_time": content["start_time"],
+            "destroy_time": content["destroy_time"],
+            "stack_branch": content["stack_branch"],
+            "tfvar_file": content["tfvar_file"],
+            "project_path": content["project_path"],
+            "variables": content["variables"],
+        }
+        response = request_url(
+            verb="PATCH",
+            uri=f"{endpoint}",
+            headers={"Authorization": f"Bearer {token}"},
+            json=data,
+        )
+
+        if response.get("status_code") == 202:
+            flash("Re-Launch Deploy")
+        else:
+            flash(response["json"]["detail"], "error")
+        return redirect(
+            url_for("home_blueprint.route_template", template=f"deploy-stream/{deploy_id}")
+        )
+    except Exception as err:
+        raise err
+
 
 @blueprint.route("/edit-deploy", methods=["GET", "POST"], defaults={"deploy_id": None})
 @blueprint.route("/edit-deploy/<deploy_id>", methods=["GET", "POST"])
@@ -468,9 +507,54 @@ def get_plan(deploy_id):
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
 
+
 @blueprint.route("/plan/redeploy/<int:deploy_id>")
 @login_required
 def relaunch_plan(deploy_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        endpoint = f"deploy/{deploy_id}"
+
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        content = response.get("json")
+        data = {
+            "start_time": content["start_time"],
+            "destroy_time": content["destroy_time"],
+            "stack_branch": content["stack_branch"],
+            "tfvar_file": content["tfvar_file"],
+            "project_path": content["project_path"],
+            "variables": content["variables"],
+        }
+        endpoint = f"plan/{deploy_id}"
+        response = request_url(
+            verb="PATCH",
+            uri=f"{endpoint}",
+            headers={"Authorization": f"Bearer {token}"},
+            json=data,
+        )
+
+        if response.get("status_code") == 202:
+            flash("planning deploy")
+        else:
+            flash(response["json"]["detail"], "error")
+        return redirect(
+            url_for("home_blueprint.route_template", template="deploys-list")
+        )
+    except TemplateNotFound:
+        return render_template("page-404.html"), 404
+    except TypeError:
+        return redirect(url_for("base_blueprint.logout"))
+    except Exception:
+        return render_template("page-500.html"), 500
+
+
+@blueprint.route("/plan/console/redeploy/<int:deploy_id>")
+@login_required
+def relaunch_console_plan(deploy_id):
     try:
         token = decrypt(r.get(current_user.id))
         # Check if token no expired
@@ -502,7 +586,7 @@ def relaunch_plan(deploy_id):
         else:
             flash(response["json"]["detail"], "error")
         return redirect(
-            url_for("home_blueprint.route_template", template="deploys-list")
+            url_for("home_blueprint.route_template", template=f"deploy-stream/{deploy_id}")
         )
     except TemplateNotFound:
         return render_template("page-404.html"), 404
@@ -510,7 +594,6 @@ def relaunch_plan(deploy_id):
         return redirect(url_for("base_blueprint.logout"))
     except Exception:
         return render_template("page-500.html"), 500
-
 
 @blueprint.route("/clone-deploy", methods=["GET", "POST"], defaults={"deploy_id": None})
 @blueprint.route("/clone-deploy/<deploy_id>", methods=["GET", "POST"])

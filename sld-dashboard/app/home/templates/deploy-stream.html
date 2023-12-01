@@ -29,6 +29,24 @@
         margin-top: 5px; /* Top margin */
         overflow-y: auto;
     }
+.acciones-lineales .dropdown-item {
+    display: inline-block;
+    margin-right: 10px;
+    margin: 0 20px;
+}
+.acciones-lineales a {
+    display: inline-block;
+    margin-right: 10px; /* Ajusta el margen según tus necesidades */
+}
+
+.linea-divisoria {
+    display: inline-block;
+    width: 1px; /* Ancho de la línea */
+    height: 20px; /* Altura de la línea, ajusta según tus necesidades */
+    background-color: #000; /* Color de la línea */
+    margin-right: 10px; /* Espacio después de la línea, ajusta según tus necesidades */
+    vertical-align: middle; /* Alinea verticalmente con los enlaces */
+}
 </style>
 {% endblock stylesheets %}
 
@@ -50,17 +68,23 @@
                 <li class="breadcrumb-item"><a href="/deploys-list"><span class="fas fa-home"></span></a></li>
                 <li class="breadcrumb-item"><a href="/deploys-list">Deploy</a></li>
                 <li class="breadcrumb-item"><span class="fas fa-box-open"></span></li>
-                <li class="breadcrumb-item"><a href="#">{{deploy.name}}</a></li>
+                <li class="breadcrumb-item">
+                <a href="#" onclick="copyToClipboard('{{deploy.name}}')">{{deploy.name}}</a></li>
                 <li class="breadcrumb-item"><span class="fas fa-cloud"></span></li>
-                <li class="breadcrumb-item"><a href="#">{{deploy.squad}}_{{deploy.environment}}</a></li>
+                <li class="breadcrumb-item">
+                <a href="#" onclick="copyToClipboard('{{deploy.suqad}}_{{ deploy.environment}}')">{{deploy.squad}}_{{deploy.environment}}</a></li>
                 <li class="breadcrumb-item"><span class="fas fa-layer-group"></span></li>
-                <li class="breadcrumb-item"><a href="#">{{deploy.stack_name}}</a></li>
+                <li class="breadcrumb-item">
+                <a href="#" onclick="copyToClipboard('{{deploy.stack_name}}')">{{deploy.stack_name}}</a></li>
                 <li class="breadcrumb-item"><span class="fa fa-code-branch"></span></li>
-                <li class="breadcrumb-item"><a href="#">{{deploy.stack_branch}}</a></li>
+                <li class="breadcrumb-item">
+                <a href="#" onclick="copyToClipboard('{{deploy.stack_name}}')">{{deploy.stack_branch}}</a></li>
                 <li class="breadcrumb-item"><span class="fas fa-tasks"></span></li>
-                <li class="breadcrumb-item"><a href="#">{{deploy.task_id}}</a></li>
+                <li class="breadcrumb-item">
+                <a href="#" onclick="copyToClipboard('{{deploy.task_id}}')">{{deploy.task_id}}</a></li>
                 <li class="breadcrumb-item"><span class="fas fa-sitemap"></span></li>
-                <li class="breadcrumb-item"><a href="#">{{deploy.action}}</a></li>
+                <li class="breadcrumb-item">
+                <a href="#" onclick="copyToClipboard('{{deploy.action}}')">{{deploy.action}}</a></li>
 
             </ol>
         </nav>
@@ -71,7 +95,15 @@
             <pre id="sse-data"></pre>
         </div>
     </div>
-
+<div class="acciones-lineales">
+    <a href="{{ url_for('.relaunch_console_plan', deploy_id=deploy.id) }}">
+       <span class="tag-style-status">PLAN</span>
+    </a>
+    <span class="linea-divisoria"></span> <!-- Elemento divisor -->
+    <a href="{{ url_for('.relaunch_console_deploy', deploy_id=deploy.id) }}">
+       <span class="tag-style">APPLY</span>
+    </a>
+</div>
     {% include 'includes/footer.html' %}
     
 </main>
@@ -119,4 +151,5 @@
     };
 </script>
 
+<script src="/static/assets/js/copy_clipboard.js"></script>
 {% endblock javascripts %}
