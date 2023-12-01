@@ -48,10 +48,20 @@ def index():
     )
 
 # stream SSE
-@blueprint.route('/deploy-stream/<task_id>')
+@blueprint.route('/deploy-stream/<deploy_id>')
 @login_required
-def deploy_stream(task_id):
-    return render_template('deploy-stream.html', task_id=task_id)
+def deploy_stream(deploy_id):
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        # Get defaults vars by deploy
+        endpoint = f"deploy/{deploy_id}"
+        # Get deploy data vars and set var for render
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        deploy = response.get("json")
+        return render_template('deploy-stream.html', deploy=deploy)
 
 @blueprint.route('/stream/<task_id>')
 @login_required

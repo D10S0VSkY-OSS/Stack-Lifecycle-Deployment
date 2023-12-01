@@ -47,8 +47,21 @@
     <div class="py-4">
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
-                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item"><a href="/deploys-list"><span class="fas fa-home"></span></a></li>
                 <li class="breadcrumb-item"><a href="/deploys-list">Deploy</a></li>
+                <li class="breadcrumb-item"><span class="fas fa-box-open"></span></li>
+                <li class="breadcrumb-item"><a href="#">{{deploy.name}}</a></li>
+                <li class="breadcrumb-item"><span class="fas fa-cloud"></span></li>
+                <li class="breadcrumb-item"><a href="#">{{deploy.squad}}_{{deploy.environment}}</a></li>
+                <li class="breadcrumb-item"><span class="fas fa-layer-group"></span></li>
+                <li class="breadcrumb-item"><a href="#">{{deploy.stack_name}}</a></li>
+                <li class="breadcrumb-item"><span class="fa fa-code-branch"></span></li>
+                <li class="breadcrumb-item"><a href="#">{{deploy.stack_branch}}</a></li>
+                <li class="breadcrumb-item"><span class="fas fa-tasks"></span></li>
+                <li class="breadcrumb-item"><a href="#">{{deploy.task_id}}</a></li>
+                <li class="breadcrumb-item"><span class="fas fa-sitemap"></span></li>
+                <li class="breadcrumb-item"><a href="#">{{deploy.action}}</a></li>
+
             </ol>
         </nav>
 
@@ -60,13 +73,14 @@
     </div>
 
     {% include 'includes/footer.html' %}
+    
 </main>
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script>
-    const taskId = "{{ task_id }}";
+    const taskId = "{{ deploy.task_id }}";
 
     // Establishes the SSE connection with the correct endpoint
     const eventSource = new EventSource(`/stream/${taskId}`);
