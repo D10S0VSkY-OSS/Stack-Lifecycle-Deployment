@@ -11,7 +11,7 @@
         border-radius: 4px;
         margin-top: 20px;
         overflow-y: auto;
-        max-height: 600px;
+        max-height: 530px;
     }
 
     #console-container h2 {
@@ -103,6 +103,23 @@
     <a href="{{ url_for('.relaunch_console_deploy', deploy_id=deploy.id) }}">
        <span class="tag-style-apply">APPLY</span>
     </a>
+    <span class="linea-divisoria"></span> <!-- Elemento divisor -->
+    <a href="#" id="destroyLink">
+       <span class="tag-style-failure">DESTROY</span>
+    </a>
+</div>
+
+<!-- Modal de confirmación -->
+<!-- Backdrop for Modal -->
+<div id="modalBackdrop" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); z-index: 2;"></div>
+
+<!-- Confirmation Modal -->
+<div id="confirmModal" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); padding: 20px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9; z-index: 3;">
+    <p>To confirm, enter the name of the deploy:</p>
+    <input type="text" id="deploymentNameInput" placeholder="Deploy Name" style="padding: 5px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 3px; width: 100%;">
+    <p id="errorMessage" style="color: red; display: none;">Name does not match.</p>
+    <button id="confirmDestroy" style="background-color: var(--bs-reddit); color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer;">Confirm Destruction</button>
+    <button id="cancelDestroy" style="background-color: var(--bs-soft-green); color: white; padding: 10px 15px; margin-left: 10px; border: none; border-radius: 5px; cursor: pointer;">Cancel</button>
 </div>
     {% include 'includes/footer.html' %}
     
@@ -150,6 +167,28 @@
         }
     };
 </script>
-
 <script src="/static/assets/js/copy_clipboard.js"></script>
+
+<script>
+    document.getElementById('destroyLink').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById('modalBackdrop').style.display = 'block';
+        document.getElementById('confirmModal').style.display = 'block';
+    });
+
+    document.getElementById('confirmDestroy').addEventListener('click', function() {
+        var enteredName = document.getElementById('deploymentNameInput').value;
+        if (enteredName === '{{ deploy.name }}') {
+            window.location.href = '{{ url_for('.destroy_deploy_console', deploy_id=deploy.id) }}';
+        } else {
+            document.getElementById('errorMessage').style.display = 'block';
+        }
+    });
+
+    document.getElementById('cancelDestroy').addEventListener('click', function() {
+        document.getElementById('modalBackdrop').style.display = 'none';
+        document.getElementById('confirmModal').style.display = 'none';
+        document.getElementById('errorMessage').style.display = 'none';
+    });
+</script>
 {% endblock javascripts %}

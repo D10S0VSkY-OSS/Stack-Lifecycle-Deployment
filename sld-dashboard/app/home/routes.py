@@ -218,6 +218,32 @@ def destroy_deploy(deploy_id):
         return render_template("page-500.html"), 500
 
 
+@blueprint.route("/deploys/destroy_console/<int:deploy_id>")
+@login_required
+def destroy_deploy_console(deploy_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        endpoint = f"deploy/{deploy_id}"
+        response = request_url(
+            verb="PUT", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        if response.get("status_code") == 202:
+            flash(f"Destroying infra")
+        else:
+            flash(response["json"]["detail"], "error")
+        return redirect(
+            url_for("home_blueprint.route_template", template=f"deploy-stream/{deploy_id}")
+        )
+    except TemplateNotFound:
+        return render_template("page-404.html"), 404
+    except TypeError:
+        return redirect(url_for("base_blueprint.logout"))
+    except Exception:
+        return render_template("page-500.html"), 500
+
+
 @blueprint.route("/deploys/unlock/<int:deploy_id>")
 @login_required
 def unlock_deploy(deploy_id):
