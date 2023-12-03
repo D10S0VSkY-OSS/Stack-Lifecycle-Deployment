@@ -18,6 +18,7 @@ class StructBase:
 
 @dataclass
 class Actions(StructBase):
+    iac_type: str
     version: str
     secreto: dict
     variables_file: str
@@ -42,10 +43,10 @@ class Actions(StructBase):
             else:
                 os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
 
-            init_command = f"/tmp/{self.version}/terraform init -no-color -input=false --upgrade"
-            plan_command = f"/tmp/{self.version}/terraform plan -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
-            apply_command = f"/tmp/{self.version}/terraform apply -input=false -auto-approve -no-color {self.name}.tfplan"
-            destroy_command = f"/tmp/{self.version}/terraform destroy -input=false -auto-approve -no-color -var-file={variables_files}"
+            init_command = f"/tmp/{self.version}/{self.iac_type} init -no-color -input=false --upgrade"
+            plan_command = f"/tmp/{self.version}/{self.iac_type} plan -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
+            apply_command = f"/tmp/{self.version}/{self.iac_type} apply -input=false -auto-approve -no-color {self.name}.tfplan"
+            destroy_command = f"/tmp/{self.version}/{self.iac_type} destroy -input=false -auto-approve -no-color -var-file={variables_files}"
             output = []
             if action == "plan":
                 result, output_init = command(init_command, channel=channel)

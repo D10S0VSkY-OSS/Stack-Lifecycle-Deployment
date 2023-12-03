@@ -70,6 +70,7 @@ async def destroy_infra(
             squad=squad,
             branch=branch,
             version=tf_ver,
+            iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
             variables=variables,
             secreto=secreto,
             tfvar_file=tfvar_file,

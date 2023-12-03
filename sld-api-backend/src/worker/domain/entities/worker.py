@@ -2,13 +2,8 @@ from pydantic import BaseModel
 from typing import Optional, Any, Dict
 
 
-import logging
-from typing import List, Tuple
-from subprocess import Popen, PIPE
-
-
- 
 class DownloadBinaryParams(BaseModel):
+    iac_type: str
     version: str
  
     # url: Optional[str]
@@ -26,11 +21,14 @@ class DeployParamsBase(BaseModel):
     class config:
         frozenset = True
 
+
 class GetVariablesParams(DeployParamsBase):
     pass
 
+
 class RemoteStateParams(DeployParamsBase):
     pass
+
 
 class TfvarsParams(DeployParamsBase):
     variables: Any
@@ -46,8 +44,9 @@ class DeployParams(BaseModel):
     environment: str
     squad: str
     branch: str
+    iac_type: str
     version: str
-    variables: Optional[Dict[str, Any]] = {} 
+    variables: Optional[Dict[str, Any]] = {}
     secreto: Any
     variables_file: Optional[str] = ""
     project_path: Optional[str] = ""

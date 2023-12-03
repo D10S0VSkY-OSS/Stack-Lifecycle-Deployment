@@ -1,6 +1,6 @@
 # -*- encoding: utf-8 -*-
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, PasswordField, StringField, TextAreaField,
+from wtforms import (BooleanField, PasswordField, StringField, TextAreaField, SelectField,
                      validators)
 from wtforms.fields import EmailField
 
@@ -36,11 +36,16 @@ class StackForm(FlaskForm):
         default="*",
         render_kw={"rows": 1},
     )
-
+    iac_type = SelectField(
+        "IaC Type",
+        choices=[('terraform', 'Terraform'), ('openTofu', 'openTofu')],
+        validators=[validators.DataRequired()],
+        coerce=lambda x: 'tofu' if x == 'openTofu' else x
+    )
     tf_version = StringField(
-        "Terraform version",
+        "IaC version",
         [
-            validators.length(min=5, max=5, message="tf version out of reange."),
+            validators.length(min=5, max=15, message="tf version out of reange."),
             validators.DataRequired(message="tf version requerid."),
         ],
     )

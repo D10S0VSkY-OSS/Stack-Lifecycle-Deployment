@@ -11,7 +11,8 @@ import src.stacks.infrastructure.models as models
 def create_new_stack(
     db: Session,
     stack: schemas.StackCreate,
-    user_id: int,
+    user_id: str,
+    username: str,
     task_id: str,
     var_json: str,
     var_list: str,
@@ -20,14 +21,17 @@ def create_new_stack(
     db_stack = models.Stack(
         stack_name=stack.stack_name,
         git_repo=stack.git_repo,
+        iac_type=stack.iac_type,
         tf_version=stack.tf_version,
         project_path=stack.project_path,
         description=stack.description,
         branch=stack.branch,
         user_id=user_id,
+        username=username,
         created_at=datetime.datetime.now(),
         var_json=var_json,
         var_list=var_list,
+        tags=stack.tags,
         squad_access=squad_access,
         task_id=task_id,
     )
@@ -47,6 +51,7 @@ def update_stack(
     stack: schemas.StackCreate,
     stack_id: int,
     user_id: int,
+    username: str,
     task_id: str,
     var_json: str,
     var_list: str,
@@ -55,9 +60,11 @@ def update_stack(
     db_stack = db.query(models.Stack).filter(models.Stack.id == stack_id).first()
 
     db_stack.user_id = user_id
+    db_stack.username = username
     db_stack.task_id = task_id
     db_stack.var_json = var_json
     db_stack.var_list = var_list
+    db_stack.tags = stack.tags
     db_stack.updated_at = datetime.datetime.now()
     check_None = ["string", ""]
     if db_stack.stack_name not in check_None:
@@ -66,6 +73,8 @@ def update_stack(
         db_stack.git_repo = stack.git_repo
     if db_stack.branch not in check_None:
         db_stack.branch = stack.branch
+    if db_stack.iac_type not in check_None:
+        db_stack.iac_type = stack.iac_type
     if db_stack.tf_version not in check_None:
         db_stack.tf_version = stack.tf_version
     if db_stack.project_path not in check_None:
@@ -90,6 +99,7 @@ def get_all_stacks_by_squad(
         filter_all = (
             db.query(models.Stack)
             .filter(models.Stack.squad_access.contains("*"))
+            .order_by(models.Stack.created_at.desc())
             .offset(skip)
             .limit(limit)
             .all()
@@ -102,6 +112,7 @@ def get_all_stacks_by_squad(
             result.extend(
                 db.query(models.Stack)
                 .filter(func.json_contains(models.Stack.squad_access, a) == 1)
+                .order_by(models.Stack.created_at.desc())
                 .all()
             )
         merge_query = result + filter_all
@@ -112,7 +123,7 @@ def get_all_stacks_by_squad(
 
 def get_all_stacks(db: Session, squad_access: str, skip: int = 0, limit: int = 100):
     try:
-        return db.query(models.Stack).offset(skip).limit(limit).all()
+        return db.query(models.Stack).order_by(models.Stack.created_at.desc()).offset(skip).limit(limit).all()
     except Exception as err:
         raise err
 

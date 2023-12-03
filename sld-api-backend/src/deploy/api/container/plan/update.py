@@ -67,6 +67,7 @@ async def update_plan_by_id(
             environment=environment,
             squad=squad,
             branch=branch,
+            iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
             version=tf_ver,
             variables=deploy_update.variables,
             secreto=secreto,

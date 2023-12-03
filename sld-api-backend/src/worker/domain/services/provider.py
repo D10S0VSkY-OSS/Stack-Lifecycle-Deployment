@@ -3,7 +3,7 @@ from src.worker.providers.hashicorp.actions import Actions, SimpleActions
 from src.worker.providers.hashicorp.artifact import Artifact
 from src.worker.providers.hashicorp.download import BinaryDownload
 from src.worker.providers.hashicorp.templates import Backend, GetVars, Tfvars
-from src.worker.domain.entities.worker import DeployParams
+from src.worker.domain.entities.worker import DeployParams, DownloadBinaryParams
 
 
 class ProviderRequirements:
@@ -11,8 +11,8 @@ class ProviderRequirements:
     In this class, everything that is needed so that ProviderActions can be executed is generated.
     """
 
-    def binary_download(version, binary=BinaryDownload):
-        config_binary = binary(version)
+    def binary_download(params: DownloadBinaryParams , binary: BinaryDownload = BinaryDownload):
+        config_binary = binary(params)
         return config_binary.get()
 
     def artifact_download(
@@ -83,6 +83,7 @@ class ProviderActions:
             params.branch,
             params.environment,
             params.squad,
+            params.iac_type,
             params.version,
             params.secreto,
             params.variables_file,
@@ -98,6 +99,7 @@ class ProviderActions:
             params.branch,
             params.environment,
             params.squad,
+            params.iac_type,
             params.version,
             params.secreto,
             params.variables_file,
@@ -113,6 +115,7 @@ class ProviderActions:
             params.branch,
             params.environment,
             params.squad,
+            params.iac_type,
             params.version,
             params.secreto,
             params.variables_file,
