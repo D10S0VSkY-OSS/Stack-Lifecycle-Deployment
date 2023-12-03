@@ -11,8 +11,7 @@ class ProviderRequirements:
     In this class, everything that is needed so that ProviderActions can be executed is generated.
     """
 
-    def binary_download(params: DownloadBinaryParams , binary=BinaryDownload):
-        print(f"Provider binary iac_type {params.iac_type} version {params.version}")
+    def binary_download(params: DownloadBinaryParams , binary: BinaryDownload = BinaryDownload):
         config_binary = binary(params)
         return config_binary.get()
 
@@ -84,6 +83,7 @@ class ProviderActions:
             params.branch,
             params.environment,
             params.squad,
+            params.iac_type,
             params.version,
             params.secreto,
             params.variables_file,
@@ -99,6 +99,7 @@ class ProviderActions:
             params.branch,
             params.environment,
             params.squad,
+            params.iac_type,
             params.version,
             params.secreto,
             params.variables_file,
@@ -114,6 +115,7 @@ class ProviderActions:
             params.branch,
             params.environment,
             params.squad,
+            params.iac_type,
             params.version,
             params.secreto,
             params.variables_file,

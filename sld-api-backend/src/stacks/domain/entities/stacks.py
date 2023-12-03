@@ -9,7 +9,7 @@ class StackBase(BaseModel):
     git_repo: constr(strip_whitespace=True)
     branch: constr(strip_whitespace=True) = "main"
     squad_access: List[str] = ["*"]
-    iac_type: Optional[Literal["terraform", "opentofu"]] = "terraform"
+    iac_type: Optional[Literal["terraform", "tofu"]] = "terraform"
     tf_version: constr(strip_whitespace=True) = "1.6.5"
     tags: Optional[List[str]] = []
     project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")

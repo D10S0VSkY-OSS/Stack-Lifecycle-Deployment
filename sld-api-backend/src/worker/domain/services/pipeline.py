@@ -38,7 +38,6 @@ class DownloadBinary:
         self.provider = provider
 
     def __call__(self):
-        print(f"pipeline binary iac_type {self.params.iac_type} version {self.params.version}")
         return self.provider.binary_download(self.params)
 
 
