@@ -1,20 +1,22 @@
-from typing import List, Optional
+from typing import List, Optional, Literal, Dict
 
 from pydantic import BaseModel, Field, constr
+from datetime import datetime
 
 
 class StackBase(BaseModel):
     stack_name: constr(strip_whitespace=True)
     git_repo: constr(strip_whitespace=True)
-    branch: constr(strip_whitespace=True) = "master"
+    branch: constr(strip_whitespace=True) = "main"
     squad_access: List[str] = ["*"]
-    tf_version: constr(strip_whitespace=True) = "1.3.2"
+    iac_type: Optional[Literal["terraform", "opentofu"]] = "terraform"
+    tf_version: constr(strip_whitespace=True) = "1.6.5"
+    tags: Optional[List[str]] = []
     project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
     description: constr(strip_whitespace=True)
 
     class Config:
-        """Extra configuration options"""
-
+        freeze = True
         str_strip_whitespace = True  # remove trailing whitespace
 
 
@@ -22,8 +24,19 @@ class StackCreate(StackBase):
     pass
 
     class Config:
-        """Extra configuration options"""
+        freeze = True
+        str_strip_whitespace = True  # remove trailing whitespace
 
+
+class StackResponse(StackBase):
+    id: int
+    task_id: constr(strip_whitespace=True)
+    username: Optional[constr(strip_whitespace=True)]
+    created_at: Optional[datetime]
+    updated_at: Optional[datetime]
+
+    class Config:
+        freeze = True
         str_strip_whitespace = True  # remove trailing whitespace
 
 
@@ -33,4 +46,5 @@ class Stack(StackBase):
     user_id: int
 
     class Config:
+        freeze = True
         from_attributes = True

@@ -53,6 +53,7 @@ def update_stack(
             stack_id=stack_id,
             stack=stack,
             user_id=current_user.id,
+            username=current_user.username,
             task_id=task[0],
             var_json=task[1],
             var_list=variables_list,

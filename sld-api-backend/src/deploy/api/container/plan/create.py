@@ -52,6 +52,7 @@ async def plan_infra_by_stack_name(
             environment=deploy.environment,
             squad=squad,
             branch=branch,
+            iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
             version=tf_ver,
             variables=deploy.variables,
             secreto=secreto,

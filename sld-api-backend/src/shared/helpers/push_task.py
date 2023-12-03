@@ -20,9 +20,8 @@ from src.worker.tasks.terraform_worker import (
 )
 
 
-
 def async_deploy(deploy_params: DeployParams):
-    queue = "any" if not settings.TASK_ROUTE else  deploy_params.squad
+    queue = "any" if not settings.TASK_ROUTE else deploy_params.squad
     pipeline_deploy_result = pipeline_deploy.s(deploy_params.model_dump()).apply_async(
         queue=queue,
         retry=True,
@@ -45,6 +44,7 @@ def async_destroy(destroy_params: DeployParams):
         },
     )
     return pipeline_destroy_result.task_id
+
 
 def async_plan(plan_params: DeployParams):
     queue = "any" if not settings.TASK_ROUTE else plan_params.squad

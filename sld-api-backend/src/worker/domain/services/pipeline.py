@@ -38,9 +38,8 @@ class DownloadBinary:
         self.provider = provider
 
     def __call__(self):
-        return self.provider.binary_download(
-            self.params.version, 
-        )
+        print(f"pipeline binary iac_type {self.params.iac_type} version {self.params.version}")
+        return self.provider.binary_download(self.params)
 
 
 class RemoteState:
@@ -149,10 +148,11 @@ class Pipeline:
     
     # Download terrafom
     def download_binary(self):
-        binari_params = DownloadBinaryParams(
+        binary_params = DownloadBinaryParams(
+            iac_type=self.params.iac_type,
             version=self.params.version
         )
-        download_binary = DownloadBinary(params=binari_params, provider=ProviderRequirements)
+        download_binary = DownloadBinary(params=binary_params, provider=ProviderRequirements)
         download_binary_result = download_binary()
         if download_binary_result["rc"] != 0:
             raise Exception(download_binary_result)
@@ -212,6 +212,7 @@ class Pipeline:
             environment=self.params.environment,
             squad=self.params.squad,
             branch=self.params.branch,
+            iac_type=self.params.iac_type,
             version=self.params.version,
             variables=self.params.variables,
             project_path=self.params.project_path,
@@ -235,6 +236,7 @@ class Pipeline:
             environment=self.params.environment,
             squad=self.params.squad,
             branch=self.params.branch,
+            iac_type=self.params.iac_type,
             version=self.params.version,
             variables=self.params.variables,
             project_path=self.params.project_path,
@@ -259,6 +261,7 @@ class Pipeline:
             squad=self.params.squad,
             branch=self.params.branch,
             version=self.params.version,
+            iac_type=self.params.iac_type,
             variables=self.params.variables,
             project_path=self.params.project_path,
             secreto=self.params.secreto,

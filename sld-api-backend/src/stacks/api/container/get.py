@@ -36,7 +36,7 @@ async def get_stack_by_id_or_name(
                 raise HTTPException(status_code=404, detail="stack id not found")
             if (
                 not check_squad_user(current_user.squad, result.squad_access)
-                and not "*" in result.squad_access
+                and "*" not in result.squad_access
             ):
                 raise HTTPException(
                     status_code=403,
@@ -50,10 +50,11 @@ async def get_stack_by_id_or_name(
     if not crud_users.is_master(db, current_user):
         if (
             not check_squad_user(current_user.squad, result.squad_access)
-            and not "*" in result.squad_access
+            and "*" not in result.squad_access
         ):
             raise HTTPException(
                 status_code=403,
                 detail=f"Not enough permissions in {result.squad_access}",
             )
+
     return result

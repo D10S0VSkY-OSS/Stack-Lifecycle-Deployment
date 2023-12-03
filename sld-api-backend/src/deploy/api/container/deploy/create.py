@@ -23,7 +23,6 @@ from src.users.infrastructure import repositories as crud_users
 from src.worker.domain.entities.worker import DeployParams, DownloadGitRepoParams
 
 
-
 async def deploy_infra_by_stack_name(
     response: Response,
     deploy: schemas_deploy.DeployCreate,
@@ -69,6 +68,7 @@ async def deploy_infra_by_stack_name(
             squad=squad,
             branch=branch,
             version=tf_ver,
+            iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
             variables=deploy.variables,
             secreto=secreto,
             variables_file=deploy.tfvar_file,
