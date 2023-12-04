@@ -76,13 +76,13 @@
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                     <td><span class="font-weight-normal">{{ stack.git_repo }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.branch }}</span></td>
-   <td><span >
-        {% if stack.iac_type == 'terraform' %}
-            <img src="{{ url_for('static', filename='/assets/img/iac_type/tf.svg') }}" alt="Terraform Icon" width="100" height="70">
-        {% elif stack.iac_type == 'tofu' %}
-            <img src="{{ url_for('static', filename='/assets/img/iac_type/tofu.svg') }}" alt="Tofu Icon" width="100" height="70">
-        {% endif %}
-    </span></td>
+                    <td><span >
+                         {% if stack.iac_type == 'terraform' %}
+                             <img src="{{ url_for('static', filename='/assets/img/iac_type/tf.svg') }}" alt="Terraform Icon" width="60" height="60">
+                         {% elif stack.iac_type == 'tofu' %}
+                             <img src="{{ url_for('static', filename='/assets/img/iac_type/tofu.svg') }}" alt="Tofu Icon" width="60" height="60">
+                         {% endif %}
+                     </span></td>
                     <td><span class="tag-style">{{ stack.tf_version }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.squad_access }}</span></td>
                     {% endif %}

@@ -57,11 +57,17 @@ async def get_output(
     return get_output
 
 
-@router.put("/unlock/{deploy_id}", status_code=200)
+@router.delete("/unlock/{deploy_id}", status_code=200)
 async def unlock_deploy(
     unlock_deploy: schemas_deploy.DeployBase = Depends(get.unlock_deploy),
 ):
     return unlock_deploy
+
+@router.put("/lock/{deploy_id}", status_code=200)
+async def unlock_deploy(
+    lock_deploy: schemas_deploy.DeployBase = Depends(get.lock_deploy),
+):
+    return lock_deploy
 
 
 @router.get("/show/{deploy_id}", status_code=202)

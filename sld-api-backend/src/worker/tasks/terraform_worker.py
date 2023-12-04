@@ -136,6 +136,7 @@ def pipeline_plan(
         if not settings.DEBUG:
             Utils.delete_local_folder(dir_path)
 
+
 @celery_app.task(
     bind=True, acks_late=True, time_limit=settings.GIT_TMOUT, name="pipeline git pull"
 )
@@ -164,48 +165,6 @@ def pipeline_git_pull(
     finally:
         dir_path = f"/tmp/{ params.stack_name }/{params.environment}/{params.squad}/{params.name}"
         Utils.delete_local_folder(dir_path)
-
-
-
-@celery_app.task(
-    bind=True,
-    acks_late=True,
-    time_limit=settings.WORKER_TMOUT,
-    max_retries=1,
-    name="terraform output",
-)
-def output(self, stack_name: str, squad: str, environment: str, name: str):
-    try:
-        output_result = ProviderActions.output(stack_name, squad, environment, name)
-        return output_result
-    except Exception as err:
-        return {"stdout": err}
-    finally:
-        dir_path = f"/tmp/{ stack_name }/{environment}/{squad}/{name}"
-        Utils.delete_local_folder(dir_path)
-
-
-@celery_app.task(
-    bind=True,
-    acks_late=True,
-    time_limit=settings.WORKER_TMOUT,
-    max_retries=1,
-    name="terraform unlock",
-)
-def unlock(self, stack_name: str, squad: str, environment: str, name: str):
-    try:
-        unlock_result = ProviderActions.unlock(stack_name, squad, environment, name)
-        return unlock_result
-    except Exception as err:
-        return {"stdout": err}
-
-
-@celery_app.task(
-    bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="terraform show"
-)
-def show(self, stack_name: str, squad: str, environment: str, name: str):
-    show_result = ProviderActions.show(stack_name, squad, environment, name)
-    return show_result
 
 
 @celery_app.task(

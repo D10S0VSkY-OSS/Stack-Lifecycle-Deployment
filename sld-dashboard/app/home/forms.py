@@ -38,7 +38,7 @@ class StackForm(FlaskForm):
     )
     iac_type = SelectField(
         "IaC Type",
-        choices=[('terraform', 'Terraform'), ('openTofu', 'openTofu')],
+        choices=[('', 'Select an IaC Type'), ('terraform', 'Terraform'), ('openTofu', 'openTofu')],
         validators=[validators.DataRequired()],
         coerce=lambda x: 'tofu' if x == 'openTofu' else x
     )
