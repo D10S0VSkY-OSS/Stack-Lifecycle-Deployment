@@ -1,5 +1,5 @@
 # DI terraform provider
-from src.worker.providers.hashicorp.actions import Actions, SimpleActions
+from src.worker.providers.hashicorp.actions import Actions
 from src.worker.providers.hashicorp.artifact import Artifact
 from src.worker.providers.hashicorp.download import BinaryDownload
 from src.worker.providers.hashicorp.templates import Backend, GetVars, Tfvars
@@ -123,21 +123,3 @@ class ProviderActions:
             params.task_id,
         )
         return config_action.execute_terraform_command("destroy")
-
-    def output(
-        stack_name: str, squad: str, environment: str, name: str, action=SimpleActions
-    ) -> dict:
-        config_action = action(stack_name, squad, environment, name)
-        return config_action.output_execute()
-
-    def unlock(
-        stack_name: str, squad: str, environment: str, name: str, action=SimpleActions
-    ) -> dict:
-        config_action = action(stack_name, squad, environment, name)
-        return config_action.unlock_execute()
-
-    def show(
-        stack_name: str, squad: str, environment: str, name: str, action=SimpleActions
-    ) -> dict:
-        config_action = action(stack_name, squad, environment, name)
-        return config_action.show_execute()

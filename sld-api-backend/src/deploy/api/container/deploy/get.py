@@ -1,39 +1,16 @@
-import logging
 import requests
-import jmespath
-from fastapi import Depends, HTTPException, Query
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.deploy.infrastructure import repositories as crud_deploys
 from src.shared.helpers.get_data import check_squad_user, deploy, deploy_squad
-from src.shared.helpers.push_task import async_output, async_show, async_unlock
 from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
 from config.api import settings
 
 
-async def unlock_deploy(
-    deploy_id: int,
-    db: Session = Depends(deps.get_db),
-    current_user: schemas_users.User = Depends(deps.get_current_active_user),
-):
-    # Get info from deploy data
-    deploy_data = deploy(db, deploy_id=deploy_id)
-    squad = deploy_data.squad
-    if not crud_users.is_master(db, current_user):
-        if not check_squad_user(current_user.squad, [squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
-    try:
-        stack_name = deploy_data.stack_name
-        environment = deploy_data.environment
-        name = deploy_data.name
-        # Get  credentials by providers supported
-        return {"task": async_unlock(stack_name, squad, environment, name)}
-    except Exception as err:
-        raise HTTPException(status_code=400, detail=f"{err}")
+
 
 
 async def get_all_deploys(
@@ -70,7 +47,6 @@ async def get_deploy_by_id(
             raise HTTPException(status_code=404, detail="Deploy id Not Found")
         return result
     except Exception as err:
-        print(err)
         raise HTTPException(status_code=404, detail=f"{err}")
 
 
@@ -82,30 +58,22 @@ async def get_show(
     # Get info from deploy data
     if crud_users.is_master(db, current_user):
         deploy_data = deploy(db, deploy_id=deploy_id)
-        squad = deploy_data.squad
     else:
         # Get squad from current user
         squad = current_user.squad
         deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
-    stack_name = deploy_data.stack_name
-    environment = deploy_data.environment
-    name = deploy_data.name
-    try:
-        return {"task": async_show(stack_name, squad, environment, name)}
-    except Exception as err:
-        raise HTTPException(status_code=400, detail=f"{err}")
-
-
-async def check_task_is_dict(
-    task_id: str, deploy_data):
-    if isinstance(task_id.info, dict):
-        return task_id.info.get("stdout", [])
-    else:
-        logging.error(f"Task {deploy_data.id} is not a dict")
+    get_path = f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
+    response = requests.get(
+        f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
+    )
+    result = response.json()
+    if not result:
         raise HTTPException(
             status_code=404, detail=f"Not enough output in {deploy_data.name}"
         )
-    
+    return result
+
+
 async def get_output(
     deploy_id: int,
     db: Session = Depends(deps.get_db),
@@ -128,3 +96,49 @@ async def get_output(
             status_code=404, detail=f"Not enough output in {deploy_data.name}"
         )
     return result
+
+
+async def unlock_deploy(
+    deploy_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: schemas_users.User = Depends(deps.get_current_active_user),
+):
+    # Get info from deploy data
+    deploy_data = deploy(db, deploy_id=deploy_id)
+    squad = deploy_data.squad
+    if not crud_users.is_master(db, current_user):
+        if not check_squad_user(current_user.squad, [squad]):
+            raise HTTPException(
+                status_code=403, detail=f"Not enough permissions in {squad}"
+            )
+    try:
+        get_path = f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
+        response = requests.delete(
+            f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={}
+        )
+        return response.json()
+    except Exception as err:
+        raise err
+    
+
+async def lock_deploy(
+    deploy_id: int,
+    db: Session = Depends(deps.get_db),
+    current_user: schemas_users.User = Depends(deps.get_current_active_user),
+):
+    # Get info from deploy data
+    deploy_data = deploy(db, deploy_id=deploy_id)
+    squad = deploy_data.squad
+    if not crud_users.is_master(db, current_user):
+        if not check_squad_user(current_user.squad, [squad]):
+            raise HTTPException(
+                status_code=403, detail=f"Not enough permissions in {squad}"
+            )
+    try:
+        get_path = f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
+        response = requests.put(
+            f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={}
+        )
+        return response.json()
+    except Exception as err:
+        raise err

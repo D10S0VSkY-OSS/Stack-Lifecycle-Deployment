@@ -5,7 +5,6 @@ from fastapi import HTTPException
 
 from src.worker.domain.entities.worker import DeployParams, DownloadGitRepoParams
 from src.worker.tasks.terraform_worker import (
-    output,
     pipeline_deploy,
     pipeline_destroy,
     pipeline_git_pull,
@@ -15,8 +14,6 @@ from src.worker.tasks.terraform_worker import (
     schedule_get,
     schedule_update,
     schedules_list,
-    show,
-    unlock,
 )
 
 
@@ -59,20 +56,6 @@ def async_plan(plan_params: DeployParams):
     return pipeline_deploy_result.task_id
 
 
-def async_output(stack_name: str, environment: str, squad: str, name: str):
-    output_result = output.s(stack_name, environment, squad, name).apply_async(
-        queue="squad"
-    )
-    return output_result.task_id
-
-
-def async_unlock(stack_name: str, squad: str, environment: str, name: str):
-    unlock_result = unlock.s(stack_name, squad, environment, name).apply_async(
-        queue="squad"
-    )
-    return unlock_result.task_id
-
-
 def async_schedule_delete(deploy_name: str, squad: str):
     deploy_schedule_delete_result = schedule_delete.s(deploy_name).apply_async(
         queue="squad"
@@ -98,13 +81,6 @@ def async_schedule_get(deploy_name, squad: str):
 def async_schedule_update(deploy_name: str):
     schedule_update_result = schedule_update.s(deploy_name).apply_async(queue="squad")
     return schedule_update_result.task_id
-
-
-def async_show(stack_name: str, environment: str, squad: str, name: str):
-    show_result = show.s(stack_name, environment, squad, name).apply_async(
-        queue="squad"
-    )
-    return show_result.task_id
 
 
 def sync_git(
