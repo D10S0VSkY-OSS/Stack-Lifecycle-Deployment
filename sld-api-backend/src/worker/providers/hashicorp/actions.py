@@ -129,7 +129,6 @@ class SimpleActions:
     def show_execute(self):
         try:
             get_path = f"{self.stack_name}-{self.squad}-{self.environment}-{self.name}"
-            print(get_path)
             response = requests.get(
                 f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
             )

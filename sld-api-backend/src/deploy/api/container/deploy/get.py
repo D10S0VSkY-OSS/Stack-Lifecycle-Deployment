@@ -1,4 +1,7 @@
-from fastapi import Depends, HTTPException
+import logging
+import requests
+import jmespath
+from fastapi import Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from src.deploy.infrastructure import repositories as crud_deploys
@@ -7,6 +10,7 @@ from src.shared.helpers.push_task import async_output, async_show, async_unlock
 from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from config.api import settings
 
 
 async def unlock_deploy(
@@ -92,24 +96,35 @@ async def get_show(
         raise HTTPException(status_code=400, detail=f"{err}")
 
 
+async def check_task_is_dict(
+    task_id: str, deploy_data):
+    if isinstance(task_id.info, dict):
+        return task_id.info.get("stdout", [])
+    else:
+        logging.error(f"Task {deploy_data.id} is not a dict")
+        raise HTTPException(
+            status_code=404, detail=f"Not enough output in {deploy_data.name}"
+        )
+    
 async def get_output(
     deploy_id: int,
     db: Session = Depends(deps.get_db),
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
 ):
-    # Get info from deploy data
-    deploy_data = deploy(db, deploy_id=deploy_id)
-    squad = deploy_data.squad
-    if not crud_users.is_master(db, current_user):
-        if not check_squad_user(current_user.squad, [squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
-    try:
-        stack_name = deploy_data.stack_name
-        environment = deploy_data.environment
-        name = deploy_data.name
-        # Get  credentials by providers supported
-        return {"task": async_output(stack_name, squad, environment, name)}
-    except Exception as err:
-        raise HTTPException(status_code=400, detail=f"{err}")
+    if crud_users.is_master(db, current_user):
+        deploy_data = deploy(db, deploy_id=deploy_id)
+    else:
+        # Get squad from current user
+        squad = current_user.squad
+        deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
+    get_path = f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
+    response = requests.get(
+        f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
+    )
+    json_data = response.json()
+    result = json_data.get("outputs")
+    if not result:
+        raise HTTPException(
+            status_code=404, detail=f"Not enough output in {deploy_data.name}"
+        )
+    return result
