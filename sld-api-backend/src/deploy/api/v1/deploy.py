@@ -77,3 +77,10 @@ async def get_show(
     get_show: schemas_deploy.DeployBase = Depends(get.get_show),
 ):
     return get_show
+
+
+@router.get("/metrics/all")
+async def get_metrics(
+    get_metrics: schemas_deploy.DeployBase = Depends(get.get_all_metrics),
+):
+    return get_metrics

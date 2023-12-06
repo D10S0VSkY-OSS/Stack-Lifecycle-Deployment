@@ -9,6 +9,8 @@ from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
 from typing import List
 from src.deploy.domain.entities.repository import DeployFilter, DeployFilterResponse
+from src.deploy.domain.entities.metrics import AllMetricsResponse
+from src.deploy.infrastructure.repositories import MetricsFetcher
 from config.api import settings
 
 
@@ -141,3 +143,29 @@ async def lock_deploy(
         return response.json()
     except Exception as err:
         raise err
+
+
+async def get_all_metrics(
+        db: Session = Depends(deps.get_db),
+        _current_user: schemas_users.User = Depends(deps.get_current_active_user),
+) -> AllMetricsResponse:
+    metrics_fetcher = MetricsFetcher(db)
+    user_activity = metrics_fetcher.get_deploy_count_by_user()
+    action_count = metrics_fetcher.get_deploy_count_by_action()
+    environment_count = metrics_fetcher.get_deploy_count_by_environment()
+    stack_usage = metrics_fetcher.get_deploy_count_by_stack_name()
+    monthly_deploy_count = metrics_fetcher.get_monthly_deploy_count()
+    squad_deploy_count = metrics_fetcher.get_deploy_count_by_squad()
+    cloud_provider_usage = metrics_fetcher.get_cloud_provider_usage()
+    squad_environment_usage = metrics_fetcher.get_squad_environment_usage()
+
+    return AllMetricsResponse(
+        user_activity=user_activity,
+        action_count=action_count,
+        environment_count=environment_count,
+        stack_usage=stack_usage,
+        monthly_deploy_count=monthly_deploy_count,
+        squad_deploy_count=squad_deploy_count,
+        cloud_provider_usage=cloud_provider_usage,
+        squad_environment_usage=squad_environment_usage,
+    )
