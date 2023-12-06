@@ -7,10 +7,9 @@ from src.shared.helpers.get_data import check_squad_user, deploy, deploy_squad
 from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from typing import List
+from src.deploy.domain.entities.repository import DeployFilter, DeployFilterResponse
 from config.api import settings
-
-
-
 
 
 async def get_all_deploys(
@@ -18,16 +17,16 @@ async def get_all_deploys(
     skip: int = 0,
     limit: int = 100,
     db: Session = Depends(deps.get_db),
-):
+    filters: DeployFilter = Depends(DeployFilter),
+) -> List[DeployFilterResponse]:
     try:
+        # Si el usuario no es un maestro, aplicar el filtro de escuadrón
         if not crud_users.is_master(db, current_user):
-            squad = current_user.squad
-            return crud_deploys.get_all_deploys_by_squad(
-                db=db, squad=squad, skip=skip, limit=limit
-            )
-        return crud_deploys.get_all_deploys(db=db, skip=skip, limit=limit)
+            filters.squad = current_user.squad
+
+        return crud_deploys.get_deploys(db=db, filters=filters, skip=skip, limit=limit)
     except Exception as err:
-        raise HTTPException(status_code=400, detail=f"{err}")
+        raise HTTPException(status_code=400, detail=str(err))
 
 
 async def get_deploy_by_id(
