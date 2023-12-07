@@ -49,10 +49,10 @@
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                     <th>Stack Repo</th>
                     <th>Branch</th>
+                    {% endif %}
                     <th>IaC Type</th>
                     <th>IaC version</th>
                     <th>squad_access</th>
-                    {% endif %}
                     <th>Description</th>
                     <th></th>
                 </tr>
@@ -76,6 +76,7 @@
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                     <td><span class="font-weight-normal">{{ stack.git_repo }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.branch }}</span></td>
+                    {% endif %}
                     <td><span >
                          {% if stack.iac_type == 'terraform' %}
                              <img src="{{ url_for('static', filename='/assets/img/iac_type/tf.svg') }}" alt="Terraform Icon" width="60" height="60">
@@ -85,7 +86,6 @@
                      </span></td>
                     <td><span class="tag-style">{{ stack.tf_version }}</span></td>
                     <td><span class="font-weight-normal">{{ stack.squad_access }}</span></td>
-                    {% endif %}
                     <td><span class="font-weight-normal">{{ stack.description}}</span></td>
                     <td>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}

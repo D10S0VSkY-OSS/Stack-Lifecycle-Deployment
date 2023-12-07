@@ -1,9 +1,11 @@
 import datetime
-
+from typing import List
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
+from sqlalchemy import func, extract, desc, case
 
 import src.deploy.domain.entities.deploy as schemas_deploy
+from src.deploy.domain.entities.repository import DeployFilter, DeployFilterResponse
+from src.deploy.domain.entities.metrics import ActionCount, EnvironmentCount, MonthlyDeployCount, SquadDeployCount, StackUsage, UserActivity, CloudProviderUsage, SquadEnvironmentUsage
 import src.deploy.infrastructure.models as models
 
 
@@ -204,3 +206,91 @@ def get_deploy_by_cloud_account(db: Session, squad: str, environment: str):
         )
     except Exception as err:
         raise err
+
+def get_deploys(db: Session, filters: DeployFilter, skip: int = 0, limit: int = 100) -> List[DeployFilterResponse]:
+    query = db.query(models.Deploy)
+
+    for field, value in filters.model_dump().items():
+        if value is not None:
+            if field == 'squad' and isinstance(value, list):
+                query = query.filter(getattr(models.Deploy, field).in_(value))
+            else:
+                query = query.filter(getattr(models.Deploy, field) == value)
+
+    deploys = query.order_by(desc(models.Deploy.id)).offset(skip).limit(limit).all()
+    return [DeployFilterResponse(**deploy.__dict__) for deploy in deploys]
+
+
+class MetricsFetcher:
+    def __init__(self, db: Session):
+        self.db = db
+
+    def get_deploy_count_by_user(self) -> List[UserActivity]:
+        query_result = self.db.query(
+            models.Deploy.username, 
+            func.count(models.Deploy.id)
+        ).group_by(models.Deploy.username).all()
+        return [UserActivity(username=username, deploy_count=count) for username, count in query_result]
+
+    def get_deploy_count_by_action(self) -> List[ActionCount]:
+        query_result = self.db.query(
+            models.Deploy.action, 
+            func.count(models.Deploy.id)
+        ).group_by(models.Deploy.action).all()
+        return [ActionCount(action=action, count=count) for action, count in query_result]
+
+    def get_deploy_count_by_environment(self) -> List[EnvironmentCount]:
+        query_result = self.db.query(
+            models.Deploy.environment, 
+            func.count(models.Deploy.id)
+        ).group_by(models.Deploy.environment).all()
+        return [EnvironmentCount(environment=environment, count=count) for environment, count in query_result]
+
+    def get_deploy_count_by_stack_name(self) -> List[StackUsage]:
+        query_result = self.db.query(
+            models.Deploy.stack_name, 
+            func.count(models.Deploy.id)
+        ).group_by(models.Deploy.stack_name).all()
+        return [StackUsage(stack_name=stack_name, count=count) for stack_name, count in query_result]
+
+    def get_monthly_deploy_count(self) -> List[MonthlyDeployCount]:
+        query_result = self.db.query(
+            extract('month', models.Deploy.created_at), 
+            func.count(models.Deploy.id)
+        ).group_by(extract('month', models.Deploy.created_at)).all()
+        return [MonthlyDeployCount(month=month, count=count) for month, count in query_result]
+
+    def get_deploy_count_by_squad(self) -> List[SquadDeployCount]:
+        query_result = self.db.query(
+            models.Deploy.squad, 
+            func.count(models.Deploy.id)
+        ).group_by(models.Deploy.squad).all()
+        return [SquadDeployCount(squad=squad, count=count) for squad, count in query_result]
+
+    def get_cloud_provider_usage(self) -> List[CloudProviderUsage]:
+        stacks = self.db.query(models.Deploy.stack_name).all()
+        counts = {'aws': 0, 'azure': 0, 'gcp': 0, 'custom': 0}
+
+        for (stack_name,) in stacks:
+            for provider in counts.keys():
+                if stack_name.startswith(provider + '_'):
+                    counts[provider] += 1
+                    break
+
+        return [CloudProviderUsage(provider=provider, count=count) 
+                for provider, count in counts.items() if count > 0]
+
+    def get_squad_environment_usage(self) -> List[SquadEnvironmentUsage]:
+        results = self.db.query(
+            models.Deploy.squad,
+            models.Deploy.environment,
+            func.count(models.Deploy.id)
+        ).group_by(
+            models.Deploy.squad,
+            models.Deploy.environment
+        ).all()
+
+        return [
+            SquadEnvironmentUsage(squad=squad, environment=environment, count=count)
+            for squad, environment, count in results
+        ]

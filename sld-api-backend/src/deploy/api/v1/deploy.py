@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Depends
+from typing import List
 
 from src.deploy.api.container.deploy import create, delete, destroy, get, update
 from src.deploy.domain.entities import deploy as schemas_deploy
+from src.deploy.domain.entities.repository import DeployFilterResponse, DeployFilter
 
 router = APIRouter()
 
@@ -36,9 +38,9 @@ async def delete_infra_by_id(
     return delete_deploy
 
 
-@router.get("/")
+@router.get("/", status_code=200, response_model=List[DeployFilterResponse])
 async def get_all_deploys(
-    get_all_deploys: schemas_deploy.DeployBase = Depends(get.get_all_deploys),
+    get_all_deploys: DeployFilterResponse = Depends(get.get_all_deploys),
 ):
     return get_all_deploys
 
@@ -75,3 +77,10 @@ async def get_show(
     get_show: schemas_deploy.DeployBase = Depends(get.get_show),
 ):
     return get_show
+
+
+@router.get("/metrics/all")
+async def get_metrics(
+    get_metrics: schemas_deploy.DeployBase = Depends(get.get_all_metrics),
+):
+    return get_metrics

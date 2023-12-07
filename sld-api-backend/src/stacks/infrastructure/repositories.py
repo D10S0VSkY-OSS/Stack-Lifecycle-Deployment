@@ -92,19 +92,20 @@ def update_stack(
         raise err
 
 
-def get_all_stacks_by_squad(
-    db: Session, squad_access: str, skip: int = 0, limit: int = 100
-):
+def get_all_stacks_by_squad(db: Session, squad_access: str, skip: int = 0, limit: int = 100):
     try:
+        from sqlalchemy import func
+
+        order_by_clause = models.Stack.id.desc()
+
         filter_all = (
             db.query(models.Stack)
             .filter(models.Stack.squad_access.contains("*"))
-            .order_by(models.Stack.created_at.desc())
+            .order_by(order_by_clause)
             .offset(skip)
             .limit(limit)
             .all()
         )
-        from sqlalchemy import func
 
         result = []
         for i in squad_access:
@@ -112,13 +113,17 @@ def get_all_stacks_by_squad(
             result.extend(
                 db.query(models.Stack)
                 .filter(func.json_contains(models.Stack.squad_access, a) == 1)
-                .order_by(models.Stack.created_at.desc())
+                .order_by(order_by_clause)
                 .all()
             )
-        merge_query = result + filter_all
-        return set(merge_query)
+
+        merge_query = list({v.id: v for v in (result + filter_all)}.values())
+        merge_query.sort(key=lambda x: x.id, reverse=True)
+
+        return merge_query
     except Exception as err:
         raise err
+
 
 
 def get_all_stacks(db: Session, squad_access: str, skip: int = 0, limit: int = 100):
