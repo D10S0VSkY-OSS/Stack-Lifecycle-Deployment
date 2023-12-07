@@ -42,17 +42,22 @@ class MetadataProcessor:
         return self.data
 
     def _parse_description(self, description):
+        # Asegurarse de que description sea una cadena de texto
+        description = str(description)
+        
         key_values = dict(re.findall(r"(\w+): ([^\n]*)", description))
+        
         if all(key in key_values for key in ["order", "vars_group"]):
             return self._process_newline_format(key_values)
-
+    
         if "|" not in description:
             return {"_no_metadata": "Basic configuration"}
-
+    
         if description.count("|") >= 2:
             return self._process_pipe_format(description)
-
+    
         return {"error": "Invalid format"}
+
 
     def _process_pipe_format(self, description):
         parts = [part.strip() for part in description.split("|")]

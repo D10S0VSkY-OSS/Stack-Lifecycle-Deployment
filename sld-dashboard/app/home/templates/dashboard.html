@@ -207,42 +207,74 @@
                     </div>
                     <div><h1>Metrics</h1></div>
    <!-- Fila para Gráficos -->
-    <div class="row">
-        <!-- Columna para el Gráfico de Actividad del Usuario -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-white-alt shadow-sm">
-                <div class="card-body">
-                    <canvas id="userActivityChart"></canvas>
-                </div>
+<!-- Fila para Gráficos -->
+<div class="row">
+    <!-- Columna para el Gráfico de Actividad del Usuario -->
+    <div class="col-md-12 col-lg-6 mb-4"> <!-- Añadir margen inferior -->
+        <div class="card bg-white-alt shadow-sm px-3"> <!-- Añadir relleno horizontal -->
+            <div class="card-body">
+                <canvas id="userActivityChart"></canvas>
             </div>
         </div>
+    </div>
 
-        <!-- Columna para el Gráfico de Acciones -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-white-alt shadow-sm">
-                <div class="card-body">
-                    <canvas id="actionCountChart"></canvas>
-                </div>
+    <!-- Columna para el Gráfico de Acciones -->
+    <div class="col-md-12 col-lg-6 mb-4"> <!-- Añadir margen inferior -->
+        <div class="card bg-white-alt shadow-sm px-3"> <!-- Añadir relleno horizontal -->
+            <div class="card-body">
+                <canvas id="actionCountChart"></canvas>
             </div>
         </div>
+    </div>
 
-        <!-- Columna para el Gráfico de Uso de Entorno -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-white-alt shadow-sm">
-                <div class="card-body">
-                    <canvas id="environmentCountChart"></canvas>
-                </div>
+    <!-- Columna para el Gráfico de Uso de Entorno -->
+    <div class="col-md-12 col-lg-6 mb-4"> <!-- Añadir margen inferior -->
+        <div class="card bg-white-alt shadow-sm px-3"> <!-- Añadir relleno horizontal -->
+            <div class="card-body">
+                <canvas id="environmentCountChart"></canvas>
             </div>
         </div>
+    </div>
 
-        <!-- Columna para el Gráfico de Uso de Stacks -->
-        <div class="col-md-6 col-lg-3">
-            <div class="card bg-white-alt shadow-sm">
-                <div class="card-body">
-                    <canvas id="stackUsageChart"></canvas>
-                </div>
+    <!-- Columna para el Gráfico de Uso de Stacks -->
+    <div class="col-md-12 col-lg-6 mb-4"> <!-- Añadir margen inferior -->
+        <div class="card bg-white-alt shadow-sm px-3"> <!-- Añadir relleno horizontal -->
+            <div class="card-body">
+                <canvas id="stackUsageChart"></canvas>
             </div>
         </div>
+    </div>
+</div>
+
+<!-- Columna para el Gráfico de Conteo de Implementaciones por Escuadrón -->
+<div class="col-md-12 col-lg-6 mb-4"> <!-- Añadir margen inferior -->
+    <div class="card bg-white-alt shadow-sm px-3"> <!-- Añadir relleno horizontal -->
+        <div class="card-body">
+            <canvas id="squadDeployCountChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
+<!-- Columna para el Gráfico de Uso de Proveedor de Nube -->
+<div class="col-md-12 col-lg-6 mb-4"> <!-- Añadir margen inferior -->
+    <div class="card bg-white-alt shadow-sm px-3"> <!-- Añadir relleno horizontal -->
+        <div class="card-body">
+            <canvas id="cloudProviderUsageChart"></canvas>
+        </div>
+    </div>
+</div>
+
+<!-- Columna para el Gráfico de Uso de Entorno por Escuadrón -->
+<div class="col-md-12 col-lg-6 mb-4"> <!-- Añadir margen inferior -->
+    <div class="card bg-white-alt shadow-sm px-3"> <!-- Añadir relleno horizontal -->
+        <div class="card-body">
+            <canvas id="squadEnvironmentUsageChart"></canvas>
+        </div>
+    </div>
+</div>
+
+
     </div>
     </div>
 
@@ -346,6 +378,64 @@
         }
     });
 
+// Gráfico "squad_deploy_count" (Bar Chart)
+var ctx = document.getElementById('squadDeployCountChart').getContext('2d');
+var squadDeployCountChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: metrics.squad_deploy_count.map(function(a) { return a.squad; }),
+        datasets: [{
+            label: 'Deployments by squad',
+            data: metrics.squad_deploy_count.map(function(a) { return a.count; }),
+            backgroundColor: metrics.squad_deploy_count.map(function() { return randomColor(); })
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+
+// Gráfico "cloud_provider_usage" (Pie Chart)
+var ctx = document.getElementById('cloudProviderUsageChart').getContext('2d');
+var cloudProviderUsageChart = new Chart(ctx, {
+    type: 'pie',
+    data: {
+        labels: metrics.cloud_provider_usage.map(function(a) { return a.provider; }),
+        datasets: [{
+            data: metrics.cloud_provider_usage.map(function(a) { return a.count; }),
+            backgroundColor: metrics.cloud_provider_usage.map(function() { return randomColor(); })
+        }]
+    }
+});
+
+// Gráfico "squad_environment_usage" (Bar Chart)
+var ctx = document.getElementById('squadEnvironmentUsageChart').getContext('2d');
+var squadEnvironmentUsageChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+        labels: metrics.squad_environment_usage.map(function(a) { return a.squad + ' - ' + a.environment; }),
+        datasets: [{
+            label: 'Deployments by squad and environment',
+            data: metrics.squad_environment_usage.map(function(a) { return a.count; }),
+            backgroundColor: metrics.squad_environment_usage.map(function() { return randomColor(); })
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
 
 </script>
 
