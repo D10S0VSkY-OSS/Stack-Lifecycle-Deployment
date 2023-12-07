@@ -41,8 +41,8 @@ class DeployDeleteMaster(BaseModel):
 
 
 class DeployUpdate(BaseModel):
-    start_time: constr(strip_whitespace=True)
-    destroy_time: constr(strip_whitespace=True)
+    start_time: Optional[constr(strip_whitespace=True)] = Field("")
+    destroy_time: Optional[constr(strip_whitespace=True)] = Field("")
     stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
     tfvar_file: Optional[constr(strip_whitespace=True)] = Field(
         "", example="terraform.tfvars"

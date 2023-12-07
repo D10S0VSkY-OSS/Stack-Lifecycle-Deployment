@@ -207,13 +207,15 @@ def get_deploy_by_cloud_account(db: Session, squad: str, environment: str):
     except Exception as err:
         raise err
 
-
 def get_deploys(db: Session, filters: DeployFilter, skip: int = 0, limit: int = 100) -> List[DeployFilterResponse]:
     query = db.query(models.Deploy)
 
     for field, value in filters.model_dump().items():
         if value is not None:
-            query = query.filter(getattr(models.Deploy, field) == value)
+            if field == 'squad' and isinstance(value, list):
+                query = query.filter(getattr(models.Deploy, field).in_(value))
+            else:
+                query = query.filter(getattr(models.Deploy, field) == value)
 
     deploys = query.order_by(desc(models.Deploy.id)).offset(skip).limit(limit).all()
     return [DeployFilterResponse(**deploy.__dict__) for deploy in deploys]

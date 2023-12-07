@@ -52,11 +52,8 @@ def index():
 @login_required
 def deploy_stream(deploy_id):
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
-        # Get defaults vars by deploy
         endpoint = f"deploy/{deploy_id}"
-        # Get deploy data vars and set var for render
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -135,7 +132,7 @@ def list_deploys(limit):
         # get stack info
         endpoint = f"stacks/?limit={limit}"
         if limit == 0:
-            endpoint = f"stacks/" 
+            endpoint = "stacks/" 
         stack_response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -1674,26 +1671,33 @@ def route_template(template):
         # Get Api data
         deploy_response = request_url(
             verb="GET",
-            uri=f"deploy",
+            uri="deploy",
             headers={"Authorization": f"Bearer {token}"},
         )
         stack_response = request_url(
             verb="GET",
-            uri=f"stacks/",
+            uri="stacks/",
             headers={"Authorization": f"Bearer {token}"},
         )
         tasks_response = request_url(
             verb="GET",
-            uri=f"tasks/all",
+            uri="tasks/all",
             headers={"Authorization": f"Bearer {token}"},
         )
+
+        metrics = request_url(
+            verb="GET",
+            uri="deploy/metrics/all",
+            headers={"Authorization": f"Bearer {token}"},
+        )
+
         try:
             api_healthy = request_url(verb="GET", uri=f"")
             schedule_healthy = request_url(
-                verb="GET", uri=f"", server=settings.SCHEDULE
+                verb="GET", uri="", server=settings.SCHEDULE
             )
             remote_state_healthy = request_url(
-                verb="GET", uri=f"", server=settings.REMOTE_STATE
+                verb="GET", uri="", server=settings.REMOTE_STATE
             )
         except Exception as err:
             return err
@@ -1713,6 +1717,7 @@ def route_template(template):
             api_healthy=api_healthy["json"],
             schedule_healthy=schedule_healthy["json"],
             remote_state_healthy=remote_state_healthy["json"],
+            metrics=metrics["json"],
         )
     except TemplateNotFound:
         return render_template("page-404.html"), 404

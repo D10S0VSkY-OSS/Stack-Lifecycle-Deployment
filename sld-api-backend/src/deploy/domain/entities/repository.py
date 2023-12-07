@@ -4,6 +4,7 @@ from datetime import datetime
 
 
 class DeployFilter(BaseModel):
+    id: Optional[str] = None
     task_id: Optional[str] = None
     name: Optional[str] = None
     action: Optional[str] = None
