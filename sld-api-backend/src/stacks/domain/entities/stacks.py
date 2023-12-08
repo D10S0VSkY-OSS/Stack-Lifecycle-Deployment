@@ -14,6 +14,7 @@ class StackBase(BaseModel):
     tags: Optional[List[str]] = []
     project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
     description: constr(strip_whitespace=True)
+    icon_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
 
     class Config:
         freeze = True

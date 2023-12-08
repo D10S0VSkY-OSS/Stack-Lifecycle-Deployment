@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+import os
 import ast
 import json
 import time
@@ -20,6 +21,20 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from jinja2 import TemplateNotFound
 
+
+# Icons
+def list_icons():
+    current_path = os.getcwd()
+    base_path = f'{current_path}/app/base/static/assets/img/gallery'
+    icons = {}
+    for root, dirs, files in os.walk(base_path):
+        for file in files:
+            if file.endswith('.svg'):
+                dir_path = os.path.relpath(root, base_path)
+                if dir_path not in icons:
+                    icons[dir_path] = []
+                icons[dir_path].append(file)
+    return icons
 
 @vault_decrypt
 def decrypt(secreto):
@@ -98,6 +113,8 @@ def status(task_id):
         return render_template("page-500.html"), 500
 
 
+
+# Output
 @blueprint.route('/output/<task_id>')
 @login_required
 def output(task_id):
@@ -833,7 +850,15 @@ def edit_schedule(deploy_id):
 @login_required
 def new_stack():
     try:
+        icons = list_icons()
+        choices = []
+        for dir_path, files in icons.items():
+            for file in files:
+                choices.append((os.path.join(dir_path, file), file))
+
         form = StackForm(request.form)
+        form.icon_selector.choices = choices
+
         token = decrypt(r.get(current_user.id))
         # Check if token no expired
         check_unauthorized_token(token)
@@ -849,7 +874,9 @@ def new_stack():
                 "tf_version": form.tf_version.data.replace(" ",""),
                 "project_path": form.project_path.data.replace(" ",""),
                 "description": form.description.data,
+                "icon_path": form.icon_selector.data,
             }
+            print(json.dumps(new_stack))
             response = request_url(
                 verb="POST",
                 uri="stacks/",
@@ -862,7 +889,7 @@ def new_stack():
                 flash(response["json"]["detail"], "error")
 
         return render_template(
-            "/stacks-new.html", title="New Stack", form=form, active="new_Stack"
+            "/stacks-new.html", title="New Stack", form=form, active="new_Stack", icons=icons
         )
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))

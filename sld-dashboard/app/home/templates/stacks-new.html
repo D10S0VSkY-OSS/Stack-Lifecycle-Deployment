@@ -73,6 +73,12 @@
                                     <div class="form-group">
                                         {{ render_field(form.description, autocomplete="off", class='form-control', placeholder='Description') }}
                                     </div>
+    <!-- Otros campos del formulario -->
+    <div class="form-group">
+        {{ form.icon_selector.label }} 
+        {{ form.icon_selector(class='form-control') }}
+    </div>
+    <!-- Botón de envío y otros elementos que necesites -->
 
                                     <input class="btn btn-primary" type="submit" name="stackButton" value="Create Stack">
                                 </form>

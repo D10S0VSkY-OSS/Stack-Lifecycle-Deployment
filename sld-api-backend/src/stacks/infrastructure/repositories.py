@@ -25,6 +25,7 @@ def create_new_stack(
         tf_version=stack.tf_version,
         project_path=stack.project_path,
         description=stack.description,
+        icon_path=stack.icon_path,
         branch=stack.branch,
         user_id=user_id,
         username=username,

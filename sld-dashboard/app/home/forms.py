@@ -3,6 +3,8 @@ from flask_wtf import FlaskForm
 from wtforms import (BooleanField, PasswordField, StringField, TextAreaField, SelectField,
                      validators)
 from wtforms.fields import EmailField
+from wtforms.validators import DataRequired
+
 
 # login and registration
 
@@ -65,6 +67,9 @@ class StackForm(FlaskForm):
         "Squad Access (* share with everyone or pass a list: squad1, squad2)",
         render_kw={"rows": 1},
     )
+
+    icon_selector = SelectField('Icon Selector', choices=[], validators=[DataRequired()])
+
 
 
 class DeployForm(FlaskForm):

@@ -24,4 +24,5 @@ class Stack(Base):
     description = Column(Text())
     user_id = Column(Integer)
     username = Column(String(50))
+    icon_path = Column(String(255))
     deploy = relationship("Deploy")
