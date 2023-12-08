@@ -876,7 +876,6 @@ def new_stack():
                 "description": form.description.data,
                 "icon_path": form.icon_selector.data,
             }
-            print(json.dumps(new_stack))
             response = request_url(
                 verb="POST",
                 uri="stacks/",
