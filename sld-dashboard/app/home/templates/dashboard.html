@@ -274,6 +274,15 @@
     </div>
 </div>
 
+<!-- Columna para el Gráfico de Uso de Entorno por Escuadrón -->
+<div class="col-md-12 col-lg-6 mb-4"> <!-- Añadir margen inferior -->
+    <div class="card bg-white-alt shadow-sm px-3"> <!-- Añadir relleno horizontal -->
+        <div class="card-body">
+            <canvas id="squadEnvironmentUsageChart2"></canvas>
+        </div>
+    </div>
+</div>
+
 
     </div>
     </div>
@@ -343,25 +352,32 @@
         }
     });
 
-    // Gráfico de Uso de Entorno (Line Chart)
-    var ctx = document.getElementById('environmentCountChart').getContext('2d');
-    var environmentCountChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: metrics.environment_count.map(function(a) { return a.environment; }),
-            datasets: [{
-                label: 'Deployments by environment',
-                data: metrics.environment_count.map(function(a) { return a.count; }),
-                backgroundColor: 'rgba(0, 123, 255, 0.5)',
-                fill: false
-            }]
-        }
-    });
+ // Gráfico de Uso de Entorno (Polar Area Chart)
+var ctx = document.getElementById('environmentCountChart').getContext('2d');
+var environmentCountChart = new Chart(ctx, {
+    type: 'polarArea',
+    data: {
+        labels: metrics.environment_count.map(function(a) { return a.environment; }),
+        datasets: [{
+            label: 'Deployments by environment',
+            data: metrics.environment_count.map(function(a) { return a.count; }),
+            // Asignar un color único a cada entorno
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.5)', // Rojo
+                'rgba(54, 162, 235, 0.5)', // Azul
+                'rgba(255, 206, 86, 0.5)',  // Amarillo
+                'rgba(75, 192, 192, 0.5)',  // Verde
+                'rgba(153, 102, 255, 0.5)', // Púrpura
+                // ... añade más colores según el número de entornos
+            ],
+            fill: false
+        }]
+    }
+});
 
     // Gráfico de Uso de Stacks (Bar Chart)
     var ctx = document.getElementById('stackUsageChart').getContext('2d');
 
-    // Ordenar los stacks por count y tomar los primeros 5
     var topStacks = metrics.stack_usage.sort(function(a, b) {
         return b.count - a.count;
     }).slice(0, 5);
@@ -404,7 +420,7 @@ var squadDeployCountChart = new Chart(ctx, {
 // Gráfico "cloud_provider_usage" (Pie Chart)
 var ctx = document.getElementById('cloudProviderUsageChart').getContext('2d');
 var cloudProviderUsageChart = new Chart(ctx, {
-    type: 'pie',
+    type: 'doughnut',
     data: {
         labels: metrics.cloud_provider_usage.map(function(a) { return a.provider; }),
         datasets: [{
@@ -436,6 +452,31 @@ var squadEnvironmentUsageChart = new Chart(ctx, {
         }
     }
 });
+
+var ctx = document.getElementById('squadEnvironmentUsageChart2').getContext('2d');
+var squadEnvironmentUsageChart = new Chart(ctx, {
+    type: 'radar',
+    data: {
+        labels: metrics.squad_environment_usage.map(function(a) { return a.squad + ' - ' + a.environment; }),
+        datasets: [{
+            label: 'Deployments by squad and environment',
+            data: metrics.squad_environment_usage.map(function(a) { return a.count; }),
+            backgroundColor: metrics.squad_environment_usage.map(function() { return randomColor(); }),
+            pointRadius: 5 // Aumenta el tamaño de los puntos aquí
+        }]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero: true
+                }
+            }]
+        }
+    }
+});
+
+
 
 </script>
 
