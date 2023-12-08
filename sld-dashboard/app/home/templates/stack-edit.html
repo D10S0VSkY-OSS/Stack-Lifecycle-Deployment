@@ -70,6 +70,20 @@
                                         {{ render_field(form.description, autocomplete="off", class='form-control',value=stack.description) }}
                                     </div>
 
+<div class="form-group">
+    <label for="iconSelector">Choose an Icon:</label>
+<select id="iconSelector" name="icon_path" class="form-control" onchange="previewIcon()">
+    {% for category, icons in icons.items() %}
+        {% for icon in icons %}
+            {% set fullIconPath = '/static/assets/img/gallery/' ~ category ~ '/' ~ icon %}
+            <option value="{{ fullIconPath }}" {% if fullIconPath == stack.icon_path %} selected {% endif %}>
+                {{ category }}/{{ icon }}
+            </option>
+        {% endfor %}
+    {% endfor %}
+</select>
+                            </div>
+
                                     <input class="btn btn-primary" type="submit" name="stackButton" value="Update Stack">
 
                                 </form>
@@ -101,5 +115,33 @@
     return true;
 }
 
+</script>
+<script type="text/javascript">
+    // Populate the icon selector and implement preview functionality
+    document.addEventListener('DOMContentLoaded', function () {
+        var iconsBasePath = '/static/assets/img/gallery/';
+        var iconsData = {{ icons | safe }};
+        var selector = document.getElementById('iconSelector');
+        var preview = document.getElementById('iconPreview');
+
+        // Populate the dropdown with icons
+        for (var category in iconsData) {
+            if (iconsData.hasOwnProperty(category)) {
+                iconsData[category].forEach(function(iconFilename) {
+                    var fullPath = iconsBasePath + category + '/' + iconFilename;
+                    var option = document.createElement('option');
+                    option.value = fullPath;
+                    option.text = category + '/' + iconFilename; // Displaying category/filename
+                    selector.appendChild(option);
+                });
+            }
+        }
+
+        // Preview selected icon
+        window.previewIcon = function() {
+            var selectedIcon = selector.value;
+            preview.innerHTML = '<img src="' + selectedIcon + '" alt="Icon Preview" style="max-width:100px;"/>'; // Adjust size as needed
+        };
+    });
 </script>
 {% endblock javascripts %}

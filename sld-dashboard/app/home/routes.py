@@ -851,15 +851,9 @@ def edit_schedule(deploy_id):
 def new_stack():
     try:
         icons = list_icons()
-        choices = []
-        for dir_path, files in icons.items():
-            for file in files:
-                choices.append((os.path.join(dir_path, file), file))
-
-        form = StackForm(request.form)
-        form.icon_selector.choices = choices
-
         token = decrypt(r.get(current_user.id))
+        form = StackForm(request.form)
+
         # Check if token no expired
         check_unauthorized_token(token)
         squad_acces_form = form.squad_access.data
@@ -874,7 +868,7 @@ def new_stack():
                 "tf_version": form.tf_version.data.replace(" ",""),
                 "project_path": form.project_path.data.replace(" ",""),
                 "description": form.description.data,
-                "icon_path": form.icon_selector.data,
+                "icon_path": request.form.get("icon_path"),
             }
             response = request_url(
                 verb="POST",
@@ -899,6 +893,7 @@ def new_stack():
 @login_required
 def edit_stack(stack_id):
     try:
+        icons = list_icons()
         token = decrypt(r.get(current_user.id))
         # Check if token no expired
         check_unauthorized_token(token)
@@ -924,6 +919,7 @@ def edit_stack(stack_id):
                 "tf_version": form.tf_version.data.replace(" ",""),
                 "project_path": form.project_path.data.replace(" ",""),
                 "description": form.description.data,
+                "icon_path": request.form.get("icon_path"),
             }
             # Deploy
             response = request_url(
@@ -933,7 +929,7 @@ def edit_stack(stack_id):
                 json=update_stack,
             )
             if response.get("status_code") == 200:
-                flash(f"Updating Stack")
+                flash("Updating Stack")
             else:
                 flash(response.get("json").get("detail"), "error")
             return redirect(
@@ -941,7 +937,7 @@ def edit_stack(stack_id):
             )
 
         return render_template(
-            "stack-edit.html", name="Edit Stack", form=form, stack=stack
+            "stack-edit.html", name="Edit Stack", form=form, stack=stack, icons=icons
         )
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))

@@ -63,11 +63,29 @@
                 <tr>
                     </td>
                     {% if "aws" in stack.stack_name %}
-                    <td><span class="icon icon-sm w-30" ><span class="fab fa-aws"></span></span></td>
+                    <td>
+                        {% if stack.icon_path  %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/aws.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
                     {% elif "gcp" in stack.stack_name %}
-                    <td><span class="icon icon-sm w-30"><span class="fab fa-google"></span></span></td>
+                    <td>
+                        {% if stack.icon_path  %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/gcp.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
                     {% elif "azure" in stack.stack_name %}
-                    <td><span class="icon icon-sm w-30"><span class="fab fa-windows"></span></span></td>
+                    <td>
+                        {% if stack.icon_path  %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/azure.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
                     {% else %}
                     <td><span class="icon icon-sm"><span class="fab fas fa-layer-group"></span></span></td>
                     {% endif %}

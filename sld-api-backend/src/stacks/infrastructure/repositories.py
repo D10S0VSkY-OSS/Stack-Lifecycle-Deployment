@@ -66,6 +66,7 @@ def update_stack(
     db_stack.var_json = var_json
     db_stack.var_list = var_list
     db_stack.tags = stack.tags
+    db_stack.icon_path = stack.icon_path
     db_stack.updated_at = datetime.datetime.now()
     check_None = ["string", ""]
     if db_stack.stack_name not in check_None:
