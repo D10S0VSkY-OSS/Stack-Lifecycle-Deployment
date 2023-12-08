@@ -118,12 +118,12 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>Id</th>
+                        <th>Stack</th>
                         <th>Deploy Name| Stack | Branch</th>
                         <th>Squad</th>
                         <th>Environment</th>
                         <th>Username</th>
-                        <th>Start_time</th>
-                        <th>Destroy_time</th>
+                        <th>Start_time | destroy_time</th>
                         <th>Action</th>
                         <th>Status</th>
                         <th></th>
@@ -138,6 +138,15 @@
                                 <div>{{ deploy.id }}</div>
                             </a>
                         </td>
+                    {% if "aws" in deploy.stack_name %}
+                    <td>
+                        {% if deploy.icon_path  %}
+                        <img src="{{ deploy.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/aws.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
+                        {% endif %}
                         <td>
                             <span class="font-weight-normal">
                                 <div style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
@@ -178,10 +187,12 @@
                             <span class="font-weight-normal">{{ deploy.username}}</span>
                         </td>
                         <td>
+                            <div>
                             <span class="font-weight-bold">{{ deploy.start_time }}</span>
-                        </td>
-                        <td>
+                            </div>
+                            <div>
                             <span class="font-weight-bold">{{ deploy.destroy_time }}</span>
+                            </div>
                         </td>
                         <td>
                             <span class="tag-style">{{ deploy.action}}</span>

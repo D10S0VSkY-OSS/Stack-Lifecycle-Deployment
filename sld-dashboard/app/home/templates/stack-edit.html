@@ -72,17 +72,20 @@
 
 <div class="form-group">
     <label for="iconSelector">Choose an Icon:</label>
-<select id="iconSelector" name="icon_path" class="form-control" onchange="previewIcon()">
-    {% for category, icons in icons.items() %}
-        {% for icon in icons %}
-            {% set fullIconPath = '/static/assets/img/gallery/' ~ category ~ '/' ~ icon %}
-            <option value="{{ fullIconPath }}" {% if fullIconPath == stack.icon_path %} selected {% endif %}>
-                {{ category }}/{{ icon }}
-            </option>
+    <select id="iconSelector" name="icon_path" class="form-control" onchange="previewIcon()">
+        {% for category, icons in icons.items() %}
+            {% for icon in icons %}
+                {% set fullIconPath = '/static/assets/img/gallery/' ~ category ~ '/' ~ icon %}
+                <option value="{{ fullIconPath }}" {% if fullIconPath == stack.icon_path %} selected {% endif %}>
+                    {{ category }}/{{ icon }}
+                </option>
+            {% endfor %}
         {% endfor %}
-    {% endfor %}
-</select>
-                            </div>
+    </select>
+    <div id="iconPreview" class="mt-2">
+        <!-- Icon preview will be displayed here -->
+    </div>
+</div>
 
                                     <input class="btn btn-primary" type="submit" name="stackButton" value="Update Stack">
 
@@ -144,4 +147,5 @@
         };
     });
 </script>
+
 {% endblock javascripts %}

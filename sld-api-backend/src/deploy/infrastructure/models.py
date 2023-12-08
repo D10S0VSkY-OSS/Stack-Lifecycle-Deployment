@@ -28,6 +28,7 @@ class Deploy(Base):
     username = Column(String(50), nullable=False)
     squad = Column(String(50), nullable=False)
     variables = Column(JSON)
+    tags = Column(JSON)
     environment = Column(String(50))
     tfvar_file = Column(String(50))
     project_path = Column(String(500))

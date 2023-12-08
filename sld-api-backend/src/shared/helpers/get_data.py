@@ -25,7 +25,7 @@ r = redis.Redis(
 
 
 def check_squad_user(squad_owner: list, squad_add: list) -> bool:
-    return all(item in squad_owner for item in squad_add)
+    return any(item in squad_owner for item in squad_add)
 
 
 def check_role_user(role_owner: list, role_add: list) -> bool:

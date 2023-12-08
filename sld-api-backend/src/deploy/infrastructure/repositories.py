@@ -7,6 +7,7 @@ import src.deploy.domain.entities.deploy as schemas_deploy
 from src.deploy.domain.entities.repository import DeployFilter, DeployFilterResponse
 from src.deploy.domain.entities.metrics import ActionCount, EnvironmentCount, MonthlyDeployCount, SquadDeployCount, StackUsage, UserActivity, CloudProviderUsage, SquadEnvironmentUsage
 import src.deploy.infrastructure.models as models
+from src.stacks.infrastructure.models import Stack
 
 
 def create_new_deploy(
@@ -196,20 +197,10 @@ def get_all_deploys_by_squad(db: Session, squad: str, skip: int = 0, limit: int 
         raise err
 
 
-def get_deploy_by_cloud_account(db: Session, squad: str, environment: str):
-    try:
-        return (
-            db.query(models.Deploy)
-            .filter(models.Deploy.environment == environment)
-            .filter(models.Deploy.squad == squad)
-            .first()
-        )
-    except Exception as err:
-        raise err
-
 def get_deploys(db: Session, filters: DeployFilter, skip: int = 0, limit: int = 100) -> List[DeployFilterResponse]:
-    query = db.query(models.Deploy)
-
+    query = db.query(models.Deploy, Stack.icon_path).join(
+        Stack, models.Deploy.stack_name == Stack.stack_name
+    )
     for field, value in filters.model_dump().items():
         if value is not None:
             if field == 'squad' and isinstance(value, list):
@@ -217,8 +208,17 @@ def get_deploys(db: Session, filters: DeployFilter, skip: int = 0, limit: int = 
             else:
                 query = query.filter(getattr(models.Deploy, field) == value)
 
-    deploys = query.order_by(desc(models.Deploy.id)).offset(skip).limit(limit).all()
-    return [DeployFilterResponse(**deploy.__dict__) for deploy in deploys]
+    results = query.order_by(desc(models.Deploy.id)).offset(skip).limit(limit).all()
+
+    # Crear una lista de DeployFilterResponse a partir de los resultados
+    deploy_responses = []
+    for deploy, icon_path in results:
+        deploy_dict = deploy.__dict__
+        deploy_dict['icon_path'] = icon_path  # Agregar el icon_path al diccionario
+        deploy_responses.append(DeployFilterResponse(**deploy_dict))
+
+    return deploy_responses
+
 
 
 class MetricsFetcher:

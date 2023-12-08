@@ -43,12 +43,11 @@
         <table class="table table-striped" id="table">
             <thead class="thead-dark">
                 <tr>
-                    <th></th>
+                    <th>Stack</th>
                     <th>Stack id</th>
                     <th>Stack Name</th>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
-                    <th>Stack Repo</th>
-                    <th>Branch</th>
+                    <th>Stack Repo | Branch</th>
                     {% endif %}
                     <th>IaC Type</th>
                     <th>IaC version</th>
@@ -90,10 +89,20 @@
                     <td><span class="icon icon-sm"><span class="fab fas fa-layer-group"></span></span></td>
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.id }}</span></td>
-                    <td><span class="tag-style">{{ stack.stack_name }}</span></td>
+                    <td>
+                        <div class="squad-access">
+                        <span class="tag-style">{{ stack.stack_name }}</span>
+                        </div>
+                    </td>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
-                    <td><span class="font-weight-normal">{{ stack.git_repo }}</span></td>
-                    <td><span class="font-weight-normal">{{ stack.branch }}</span></td>
+                    <td>
+                        <div class="squad-access">
+                        <span class="font-weight-normal">{{ stack.git_repo }}</span>
+                        </div>
+                        <div class="squad-access">
+                        <span class="font-weight-normal">{{ stack.branch }}</span>
+                        </div>
+                    </td>
                     {% endif %}
                     <td><span >
                          {% if stack.iac_type == 'terraform' %}
@@ -103,8 +112,21 @@
                          {% endif %}
                      </span></td>
                     <td><span class="tag-style">{{ stack.tf_version }}</span></td>
-                    <td><span class="font-weight-normal">{{ stack.squad_access }}</span></td>
-                    <td><span class="font-weight-normal">{{ stack.description}}</span></td>
+                    <td>
+                        <div class="squad-access">
+                            {% if "*" in stack.squad_access %}
+                                All Squad
+                            {% else %}
+                               {{ stack.squad_access | join(',') }} 
+                            {% endif %}
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="squad-access">
+                        <span class="font-weight-normal">{{ stack.description}}</span>
+                        </div>
+                    </td>
                     <td>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                         <div class="btn-group">
@@ -217,4 +239,5 @@ function checkForm(form) // Submit button clicked
 
 </script>
 <script src="/static/assets/js/pagination_edit.js"></script>
+
 {% endblock javascripts %}

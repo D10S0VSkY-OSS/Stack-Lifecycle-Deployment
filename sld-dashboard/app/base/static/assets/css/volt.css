@@ -41851,3 +41851,9 @@ pre {
     margin-right: 5px;
 }
 
+.squad-access {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 150px; /* Ajusta esto según el ancho deseado del contenedor */
+}
