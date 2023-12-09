@@ -43,12 +43,11 @@
         <table class="table table-striped" id="table">
             <thead class="thead-dark">
                 <tr>
-                    <th></th>
+                    <th>Stack</th>
                     <th>Stack id</th>
                     <th>Stack Name</th>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
-                    <th>Stack Repo</th>
-                    <th>Branch</th>
+                    <th>Stack Repo | Branch</th>
                     {% endif %}
                     <th>IaC Type</th>
                     <th>IaC version</th>
@@ -63,19 +62,60 @@
                 <tr>
                     </td>
                     {% if "aws" in stack.stack_name %}
-                    <td><span class="icon icon-sm w-30" ><span class="fab fa-aws"></span></span></td>
+                    <td>
+                        {% if stack.icon_path  %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/aws.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
                     {% elif "gcp" in stack.stack_name %}
-                    <td><span class="icon icon-sm w-30"><span class="fab fa-google"></span></span></td>
+                    <td>
+                        {% if stack.icon_path  %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/gcp.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
                     {% elif "azure" in stack.stack_name %}
-                    <td><span class="icon icon-sm w-30"><span class="fab fa-windows"></span></span></td>
+                    <td>
+                        {% if stack.icon_path  %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/azure.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
                     {% else %}
-                    <td><span class="icon icon-sm"><span class="fab fas fa-layer-group"></span></span></td>
+                    <td>
+                        {% if stack.icon_path  %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/custom.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.id }}</span></td>
-                    <td><span class="tag-style">{{ stack.stack_name }}</span></td>
+                    <td>
+                        <div class="limit_words" title="{{stack.stack_name}}">
+                        <span class="tag-style">{{ stack.stack_name }}</span>
+                        </div>
+                    </td>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
-                    <td><span class="font-weight-normal">{{ stack.git_repo }}</span></td>
-                    <td><span class="font-weight-normal">{{ stack.branch }}</span></td>
+                    <td>
+                        <div class="limit_words" title="{{ stack.git_repo }}">
+                        <span style="font-size: 12px; font-weight: bold;">repo:</span>
+                        <span class="font-weight-normal">{{ stack.git_repo.split('/')[-1] | replace('.git', '') }}</span>
+                        </div>
+                        <div class="limit_words" title="{{ stack.branch }}">
+                        <span style="font-size: 12px; font-weight: bold;">branch:</span>
+                        <span class="font-weight-normal">{{ stack.branch }}</span>
+                        <div>
+                        <span class="copy-icon" onclick="copyToClipboard('{{ stack.git_repo | replace('.git', '') }}/tree/{{ stack.branch }}')" title="Copy to clipboard">
+                            <span style="font-size: 12px; font-weight: bold;">copy:</span>
+                            <i class="far fa-copy"></i>
+                        </div>
+                        </div>
+                    </td>
                     {% endif %}
                     <td><span >
                          {% if stack.iac_type == 'terraform' %}
@@ -85,8 +125,21 @@
                          {% endif %}
                      </span></td>
                     <td><span class="tag-style">{{ stack.tf_version }}</span></td>
-                    <td><span class="font-weight-normal">{{ stack.squad_access }}</span></td>
-                    <td><span class="font-weight-normal">{{ stack.description}}</span></td>
+                    <td>
+                        <div class="limit_words">
+                            {% if "*" in stack.squad_access %}
+                                All Squad
+                            {% else %}
+                               {{ stack.squad_access | join(',') }} 
+                            {% endif %}
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="limit_words">
+                        <span class="font-weight-normal">{{ stack.description}}</span>
+                        </div>
+                    </td>
                     <td>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                         <div class="btn-group">
@@ -199,4 +252,6 @@ function checkForm(form) // Submit button clicked
 
 </script>
 <script src="/static/assets/js/pagination_edit.js"></script>
+    <script src="/static/assets/js/copy_clipboard.js"></script>
+
 {% endblock javascripts %}

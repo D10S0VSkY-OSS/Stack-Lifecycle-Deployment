@@ -118,12 +118,11 @@
                 <thead class="thead-dark">
                     <tr>
                         <th>Id</th>
+                        <th>Stack</th>
                         <th>Deploy Name| Stack | Branch</th>
                         <th>Squad</th>
                         <th>Environment</th>
-                        <th>Username</th>
-                        <th>Start_time</th>
-                        <th>Destroy_time</th>
+                        <th>Start_time | destroy_time</th>
                         <th>Action</th>
                         <th>Status</th>
                         <th></th>
@@ -138,30 +137,64 @@
                                 <div>{{ deploy.id }}</div>
                             </a>
                         </td>
+                    {% if "aws" in deploy.stack_name %}
+                    <td>
+                        {% if deploy.icon_path  %}
+                        <img src="{{ deploy.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/aws.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
+                        {% endif %}
+                        {% if "azure" in deploy.stack_name %}
+                    <td>
+                        {% if deploy.icon_path  %}
+                        <img src="{{ deploy.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/azure.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
+                        {% endif %}
+                        {% if "gcp" in deploy.stack_name %}
+                    <td>
+                        {% if deploy.icon_path  %}
+                        <img src="{{ deploy.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/gcp.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
+                        {% endif %}
+                        {% if "custom" in deploy.stack_name %}
+                    <td>
+                        {% if deploy.icon_path  %}
+                        <img src="{{ deploy.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/custom.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
+                        {% endif %}
+
                         <td>
                             <span class="font-weight-normal">
-                                <div style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
-                                <div>
+                                <div class="limit_words" title="{{ deploy.name }}" style="font-size: 17px; font-weight: bold;">{{ deploy.name }}</div>
+                                <div class="limit_words" title="{{ deploy.stack_name }}">
                                     <span style="font-size: 12px; font-weight: bold;">stack</span>
                                     : {{ deploy.stack_name }}
                                 </div>
-                                <div>
+                                <div class="limit_words" title="{{ deploy.stack_branch}}"></div>
                                     <span style="font-size: 12px; font-weight: bold;">branch</span>
-                                    : {{deploy.stack_branch
-                                }}
+                                    : {{deploy.stack_branch}}
+                                </div>
+                                <div class="limit_words" title="{{ deploy.username}}"></div>
+                                    <span style="font-size: 12px; font-weight: bold;">Username:</span>
+                                    {{deploy.username}}
                                 </div>
                                 <div>
-                                    <span class="copy-icon" onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
+                                    <span class="copy-icon" onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}} username={{ deploy.username}}')" title="Copy to clipboard">
                                         <span style="font-size: 12px; font-weight: bold;">copy:</span>
                                         <i class="far fa-copy"></i>
                                     </span>
-                                    <span
-                                        class="download-icon"
-                                        data-variables="{{ deploy.variables }}"
-                                        onclick="downloadTFVars(this)"
-                                        title="Download tfvars"
-                                    >
-                                        |
+                                    <span class="download-icon" data-variables="{{ deploy.variables }}" onclick="downloadTFVars(this)" title="Download tfvars">
                                         <span style="font-size: 12px; font-weight: bold;">tfvars:</span>
                                         <i class="far fa-file"></i>
                                     </span>
@@ -169,19 +202,22 @@
                             </span>
                         </td>
                         <td>
+                        <div class="limit_words">
                             <span class="tag-style">{{ deploy.squad}}</span>
+                        </div>
                         </td>
-                        <td>
+                        <td> 
+                        <div class="limit_words">
                             <span class="tag-style">{{ deploy.environment}}</span>
+                        </div>
                         </td>
                         <td>
-                            <span class="font-weight-normal">{{ deploy.username}}</span>
-                        </td>
-                        <td>
+                            <div>
                             <span class="font-weight-bold">{{ deploy.start_time }}</span>
-                        </td>
-                        <td>
+                            </div>
+                            <div>
                             <span class="font-weight-bold">{{ deploy.destroy_time }}</span>
+                            </div>
                         </td>
                         <td>
                             <span class="tag-style">{{ deploy.action}}</span>
@@ -219,13 +255,17 @@
                                             <span class="fas fa-clone mr-2"></span>
                                             Clone 
                                         </a>
+                                        <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
+                                            <span class="far fa-clock mr-0"></span>
+                                            Schedule
+                                        </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DestroyModalCenter-{{deploy.id}}">
                                             <span class="fas fa-trash-alt mr-2"></span>
                                             Destroy
                                         </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DeleteModalCenter-{{deploy.id}}">
                                             <span class="fas fa-skull-crossbones mr-2"></span>
-                                            delete
+                                            Delete
                                         </a>
                                     </div>
                                     {% else %}
@@ -283,13 +323,6 @@
                                             <span class="far fa-file-code mr-0"></span>
                                         </a>
                                     </span>
-                                    <!-- Schedule -->
-                                    <span class="icon icon-sm">
-                                        <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
-                                            <span class="far fa-clock mr-0"></span>
-                                        </a>
-                                    </span>
-
                                 </div>
                             </td>
                         </tr>

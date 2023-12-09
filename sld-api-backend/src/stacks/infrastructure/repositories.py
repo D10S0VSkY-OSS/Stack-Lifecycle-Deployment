@@ -25,6 +25,7 @@ def create_new_stack(
         tf_version=stack.tf_version,
         project_path=stack.project_path,
         description=stack.description,
+        icon_path=stack.icon_path,
         branch=stack.branch,
         user_id=user_id,
         username=username,
@@ -65,6 +66,7 @@ def update_stack(
     db_stack.var_json = var_json
     db_stack.var_list = var_list
     db_stack.tags = stack.tags
+    db_stack.icon_path = stack.icon_path
     db_stack.updated_at = datetime.datetime.now()
     check_None = ["string", ""]
     if db_stack.stack_name not in check_None:

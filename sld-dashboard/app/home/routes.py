@@ -1,4 +1,5 @@
 # -*- encoding: utf-8 -*-
+import os
 import ast
 import json
 import time
@@ -20,6 +21,20 @@ from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from jinja2 import TemplateNotFound
 
+
+# Icons
+def list_icons():
+    current_path = os.getcwd()
+    base_path = f'{current_path}/app/base/static/assets/img/gallery'
+    icons = {}
+    for root, dirs, files in os.walk(base_path):
+        for file in files:
+            if file.endswith('.svg'):
+                dir_path = os.path.relpath(root, base_path)
+                if dir_path not in icons:
+                    icons[dir_path] = []
+                icons[dir_path].append(file)
+    return icons
 
 @vault_decrypt
 def decrypt(secreto):
@@ -98,6 +113,8 @@ def status(task_id):
         return render_template("page-500.html"), 500
 
 
+
+# Output
 @blueprint.route('/output/<task_id>')
 @login_required
 def output(task_id):
@@ -110,14 +127,26 @@ def output(task_id):
             uri=f"tasks/id/{task_id}",
             headers={"Authorization": f"Bearer {token}"}
         )
-        if response.get("status_code") == 200:
-            data = response.get("json").get("result").get("module").get("stdout")
-            if not isinstance(data, list):
-                data = [data] 
-            return data
+        
+        # Verificar si response es None
+        if response is None:
+            logging.error("No response received.")
+            return "Error: No response received."
+        
+        # Verificar el código de estado
+        if response.get("status_code") != 200:
+            logging.error(f"Unexpected status code: {response.get('status_code')}")
+            return f"Error: Unexpected status code: {response.get('status_code')}"
+
+        # Procesar los datos de respuesta
+        data = response.get("json", {}).get("result", {}).get("module", {}).get("stdout", "")
+        if not isinstance(data, list):
+            data = [data]
+        return data
+
     except Exception as err:
-        print(task_id)
-        raise err
+        logging.error(f"An error occurred: {err}")
+        return str(err)  # O manejar el error de manera más específica
 
 
 # Start Deploy
@@ -833,8 +862,10 @@ def edit_schedule(deploy_id):
 @login_required
 def new_stack():
     try:
-        form = StackForm(request.form)
+        icons = list_icons()
         token = decrypt(r.get(current_user.id))
+        form = StackForm(request.form)
+
         # Check if token no expired
         check_unauthorized_token(token)
         squad_acces_form = form.squad_access.data
@@ -849,6 +880,7 @@ def new_stack():
                 "tf_version": form.tf_version.data.replace(" ",""),
                 "project_path": form.project_path.data.replace(" ",""),
                 "description": form.description.data,
+                "icon_path": request.form.get("icon_path"),
             }
             response = request_url(
                 verb="POST",
@@ -862,7 +894,7 @@ def new_stack():
                 flash(response["json"]["detail"], "error")
 
         return render_template(
-            "/stacks-new.html", title="New Stack", form=form, active="new_Stack"
+            "/stacks-new.html", title="New Stack", form=form, active="new_Stack", icons=icons
         )
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
@@ -873,6 +905,7 @@ def new_stack():
 @login_required
 def edit_stack(stack_id):
     try:
+        icons = list_icons()
         token = decrypt(r.get(current_user.id))
         # Check if token no expired
         check_unauthorized_token(token)
@@ -898,6 +931,7 @@ def edit_stack(stack_id):
                 "tf_version": form.tf_version.data.replace(" ",""),
                 "project_path": form.project_path.data.replace(" ",""),
                 "description": form.description.data,
+                "icon_path": request.form.get("icon_path"),
             }
             # Deploy
             response = request_url(
@@ -907,7 +941,7 @@ def edit_stack(stack_id):
                 json=update_stack,
             )
             if response.get("status_code") == 200:
-                flash(f"Updating Stack")
+                flash("Updating Stack")
             else:
                 flash(response.get("json").get("detail"), "error")
             return redirect(
@@ -915,7 +949,7 @@ def edit_stack(stack_id):
             )
 
         return render_template(
-            "stack-edit.html", name="Edit Stack", form=form, stack=stack
+            "stack-edit.html", name="Edit Stack", form=form, stack=stack, icons=icons
         )
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
