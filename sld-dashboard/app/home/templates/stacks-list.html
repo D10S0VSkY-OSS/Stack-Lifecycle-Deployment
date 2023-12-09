@@ -90,17 +90,24 @@
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.id }}</span></td>
                     <td>
-                        <div class="squad-access">
+                        <div class="limit_words" title="{{stack.stack_name}}">
                         <span class="tag-style">{{ stack.stack_name }}</span>
                         </div>
                     </td>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                     <td>
-                        <div class="squad-access">
-                        <span class="font-weight-normal">{{ stack.git_repo }}</span>
+                        <div class="limit_words" title="{{ stack.git_repo }}">
+                        <span style="font-size: 12px; font-weight: bold;">repo:</span>
+                        <span class="font-weight-normal">{{ stack.git_repo.split('/')[-1] | replace('.git', '') }}</span>
                         </div>
-                        <div class="squad-access">
+                        <div class="limit_words" title="{{ stack.branch }}">
+                        <span style="font-size: 12px; font-weight: bold;">branch:</span>
                         <span class="font-weight-normal">{{ stack.branch }}</span>
+                        <div>
+                        <span class="copy-icon" onclick="copyToClipboard('{{ stack.git_repo | replace('.git', '') }}/tree/{{ stack.branch }}')" title="Copy to clipboard">
+                            <span style="font-size: 12px; font-weight: bold;">copy:</span>
+                            <i class="far fa-copy"></i>
+                        </div>
                         </div>
                     </td>
                     {% endif %}
@@ -113,7 +120,7 @@
                      </span></td>
                     <td><span class="tag-style">{{ stack.tf_version }}</span></td>
                     <td>
-                        <div class="squad-access">
+                        <div class="limit_words">
                             {% if "*" in stack.squad_access %}
                                 All Squad
                             {% else %}
@@ -123,7 +130,7 @@
                     </td>
 
                     <td>
-                        <div class="squad-access">
+                        <div class="limit_words">
                         <span class="font-weight-normal">{{ stack.description}}</span>
                         </div>
                     </td>
@@ -239,5 +246,6 @@ function checkForm(form) // Submit button clicked
 
 </script>
 <script src="/static/assets/js/pagination_edit.js"></script>
+    <script src="/static/assets/js/copy_clipboard.js"></script>
 
 {% endblock javascripts %}

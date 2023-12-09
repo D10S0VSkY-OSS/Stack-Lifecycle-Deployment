@@ -14,7 +14,7 @@ class StackForm(FlaskForm):
     name = StringField(
         "Name",
         [
-            validators.length(min=4, max=50, message="Name out of reange."),
+            validators.length(min=4, max=30, message="Name out of reange."),
             validators.DataRequired(message="Name requerid."),
             validators.Regexp('[\r\n\t\f\v  ]', message="Username must contain only letters numbers or underscore"),
         ],
@@ -60,7 +60,7 @@ class StackForm(FlaskForm):
     description = StringField(
         "Description",
         [
-            validators.length(min=1, max=10, message="Set short Description"),
+            validators.length(min=1, max=50, message="Set short Description"),
         ],
     )
     squad_access_edit = StringField(
@@ -76,7 +76,7 @@ class DeployForm(FlaskForm):
     deploy_name = StringField(
         "Deploy Name",
         [
-            validators.length(min=4, max=50, message="Name out of reange."),
+            validators.length(min=4, max=30, message="Name out of reange."),
             validators.DataRequired(message="Name requerid."),
         ],
     )
@@ -97,7 +97,7 @@ class DeployForm(FlaskForm):
     environment = StringField(
         "Environment",
         [
-            validators.length(min=2, max=250, message="Branch out of reange."),
+            validators.length(min=2, max=25, message="Branch out of reange."),
             validators.DataRequired(message="Environment requerid."),
         ],
     )
@@ -148,7 +148,7 @@ class UserForm(FlaskForm):
     username = StringField(
         "Username",
         [
-            validators.length(min=4, max=50),
+            validators.length(min=4, max=20),
         ],
     )
     fullname = StringField(
@@ -160,7 +160,7 @@ class UserForm(FlaskForm):
     email = EmailField(
         "Email",
         [
-            validators.length(min=6, max=100),
+            validators.length(min=6, max=50),
             validators.DataRequired(message="The email is required."),
             validators.Email(message="Enter a valid email."),
         ],

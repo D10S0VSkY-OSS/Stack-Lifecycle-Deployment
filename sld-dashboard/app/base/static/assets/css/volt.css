@@ -41851,7 +41851,7 @@ pre {
     margin-right: 5px;
 }
 
-.squad-access {
+.limit_words {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
