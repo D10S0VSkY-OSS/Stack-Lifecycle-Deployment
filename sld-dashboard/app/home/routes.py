@@ -127,14 +127,26 @@ def output(task_id):
             uri=f"tasks/id/{task_id}",
             headers={"Authorization": f"Bearer {token}"}
         )
-        if response.get("status_code") == 200:
-            data = response.get("json").get("result").get("module").get("stdout")
-            if not isinstance(data, list):
-                data = [data] 
-            return data
+        
+        # Verificar si response es None
+        if response is None:
+            logging.error("No response received.")
+            return "Error: No response received."
+        
+        # Verificar el código de estado
+        if response.get("status_code") != 200:
+            logging.error(f"Unexpected status code: {response.get('status_code')}")
+            return f"Error: Unexpected status code: {response.get('status_code')}"
+
+        # Procesar los datos de respuesta
+        data = response.get("json", {}).get("result", {}).get("module", {}).get("stdout", "")
+        if not isinstance(data, list):
+            data = [data]
+        return data
+
     except Exception as err:
-        print(task_id)
-        raise err
+        logging.error(f"An error occurred: {err}")
+        return str(err)  # O manejar el error de manera más específica
 
 
 # Start Deploy

@@ -122,7 +122,6 @@
                         <th>Deploy Name| Stack | Branch</th>
                         <th>Squad</th>
                         <th>Environment</th>
-                        <th>Username</th>
                         <th>Start_time | destroy_time</th>
                         <th>Action</th>
                         <th>Status</th>
@@ -186,8 +185,12 @@
                                     <span style="font-size: 12px; font-weight: bold;">branch</span>
                                     : {{deploy.stack_branch}}
                                 </div>
+                                <div class="limit_words" title="{{ deploy.username}}"></div>
+                                    <span style="font-size: 12px; font-weight: bold;">Username:</span>
+                                    {{deploy.username}}
+                                </div>
                                 <div>
-                                    <span class="copy-icon" onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}}')" title="Copy to clipboard">
+                                    <span class="copy-icon" onclick="copyToClipboard('id={{ deploy.id }} deploy_name={{ deploy.name }} environment={{ deploy.environment }} stack/branch={{deploy.stack_name}}/{{deploy.stack_branch}} task_id={{deploy.task_id}} username={{ deploy.username}}')" title="Copy to clipboard">
                                         <span style="font-size: 12px; font-weight: bold;">copy:</span>
                                         <i class="far fa-copy"></i>
                                     </span>
@@ -206,11 +209,6 @@
                         <td> 
                         <div class="limit_words">
                             <span class="tag-style">{{ deploy.environment}}</span>
-                        </div>
-                        </td>
-                        <td>
-                        <div>
-                            <span class="font-weight-normal">{{ deploy.username}}</span>
                         </div>
                         </td>
                         <td>

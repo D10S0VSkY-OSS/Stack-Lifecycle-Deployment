@@ -86,7 +86,13 @@
                         {% endif %}
                     </td>
                     {% else %}
-                    <td><span class="icon icon-sm"><span class="fab fas fa-layer-group"></span></span></td>
+                    <td>
+                        {% if stack.icon_path  %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                        {% else %}
+                        <img src="/static/assets/img/gallery/Providers/custom.svg" alt="Icono" width="40" height="40">
+                        {% endif %}
+                    </td>
                     {% endif %}
                     <td><span class="font-weight-normal">{{ stack.id }}</span></td>
                     <td>
