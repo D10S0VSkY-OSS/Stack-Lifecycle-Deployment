@@ -40,7 +40,7 @@ class StackForm(FlaskForm):
     )
     iac_type = SelectField(
         "IaC Type",
-        choices=[('', 'Select an IaC Type'), ('terraform', 'Terraform'), ('openTofu', 'openTofu')],
+        choices=[('', 'Select an IaC Type'), ('terraform', 'Terraform'), ('openTofu', 'openTofu'), ('terragrunt', 'TerraGrunt')],
         validators=[validators.DataRequired()],
         coerce=lambda x: 'tofu' if x == 'openTofu' else x
     )
@@ -69,7 +69,6 @@ class StackForm(FlaskForm):
     )
 
     icon_selector = SelectField('Icon Selector', choices=[], validators=[DataRequired()])
-
 
 
 class DeployForm(FlaskForm):

@@ -54,7 +54,30 @@ class BinaryDownload():
                     "rc": 0,
                     "stdout": "Download Binary file",
                 }
-    
+            elif self.iac_type == "terragrunt":
+                logging.info(f"Downloading binary iac_type {self.iac_type} version {self.version}")
+                binary_directory = f"/tmp/{self.version}"
+                downloaded_binary_path = f"{binary_directory}/terragrunt_linux_amd64"
+                renamed_binary_path = f"{binary_directory}/terragrunt"
+                # Download Terraform binary if not already downloaded
+                if not os.path.exists(f"/tmp/{self.version}"):
+                    os.mkdir(f"/tmp/{self.version}")
+                if not os.path.isfile(f"/tmp/{self.version}/terragrunt"):
+                    binary_url = f"https://github.com/gruntwork-io/terragrunt/releases/download/{self.version}/terragrunt_linux_amd64"
+                    response = requests.get(binary_url, stream=True, verify=False)
+                    with open(downloaded_binary_path, 'wb') as file:
+                        for chunk in response.iter_content(chunk_size=90000000):
+                            file.write(chunk)
+                    os.chmod(downloaded_binary_path, os.stat(downloaded_binary_path).st_mode | stat.S_IEXEC)
+                    os.rename(downloaded_binary_path, renamed_binary_path)
+            else:
+                logging.error(f"Failed to download Terragrunt binary from {binary_url}")
+                return {"command": "binaryDownload", "rc": 1, "stdout": "Failed to download binary file"}
+            return {
+                "command": "binaryDownload",
+                "rc": 0,
+                "stdout": "Download Binary file",
+            }
         except Exception as err:
+            logging.error(f"Error downloading binary {self.iac_type} error: {err}")
             return {"command": self.iac_type + "Download", "rc": 1, "stdout": err}
-
