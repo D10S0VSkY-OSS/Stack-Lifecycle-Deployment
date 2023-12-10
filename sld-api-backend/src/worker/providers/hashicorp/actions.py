@@ -7,6 +7,7 @@ class Terraform(Actions):
 
     def execute_deployer_command(self, action: str) -> dict:
         channel = self.task_id
+
         try:
             secret(self.stack_name, self.environment, self.squad, self.name, self.secreto)
             deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
@@ -72,7 +73,6 @@ class Terraform(Actions):
                 "stdout": output,
             }
        
-        
 class TerraGrunt(Actions):
 
     def execute_deployer_command(self, action: str) -> dict:

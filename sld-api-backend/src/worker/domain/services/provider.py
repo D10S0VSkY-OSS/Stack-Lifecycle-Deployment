@@ -1,5 +1,5 @@
 # DI terraform provider
-from src.worker.providers.hashicorp.actions import Terraform, Actions
+from src.worker.providers.hashicorp.actions import Terraform, TerraGrunt, Actions
 from src.worker.providers.hashicorp.artifact import Artifact
 from src.worker.providers.hashicorp.download import BinaryDownload
 from src.worker.providers.hashicorp.templates import Backend, GetVars, Tfvars

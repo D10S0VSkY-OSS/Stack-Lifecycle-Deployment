@@ -122,6 +122,8 @@
                              <img src="{{ url_for('static', filename='/assets/img/iac_type/tf.svg') }}" alt="Terraform Icon" width="60" height="60">
                          {% elif stack.iac_type == 'tofu' %}
                              <img src="{{ url_for('static', filename='/assets/img/iac_type/tofu.svg') }}" alt="Tofu Icon" width="60" height="60">
+                         {% elif stack.iac_type == 'terragrunt' %}
+                             <img src="{{ url_for('static', filename='/assets/img/iac_type/terragrunt.svg') }}" alt="Tofu Icon" width="60" height="60">
                          {% endif %}
                      </span></td>
                     <td><span class="tag-style">{{ stack.tf_version }}</span></td>
