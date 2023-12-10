@@ -210,7 +210,7 @@
                                         class='form-control', value='') }}
                                     </div>
                                 <div class="border-top my-4"></div>
-                                    <button type="submit" class="btn btn-success" name="button" value=plan style="width: 20vw;"
+                                    <button type="submit" class="btn w-100 btn-success" name="button" value=plan"
                                         action="{{url_for('.list_deploys')}}">
                                         Plan
                                     </button>
@@ -262,7 +262,7 @@
 <form onsubmit="return cleanFormData()">
 <div class="advanced-variables-section">
     <h4 class="toggle-advanced" style="cursor:pointer;">
-        Advanced Variables <i id="advanced-icon" class="fas fa-chevron-down"></i>
+        Advanced Variables <i id="advanced-icon" class="fas fa-chevron-down" style="font-size: 16px;"></i>
     </h4>
     <div id="advanced-variables-content" style="display:none;">
         {% for key, value in advanced_variables.items() %}
@@ -292,7 +292,7 @@
                                     {% endif %}
                                     <!-- END SLD_SORT False -->
                                  <div class="border-top my-4"></div>
-                                    <button type="submit" class="btn btn-success" name="button" value=plan style="width: 20vw;"
+                                    <button type="submit" class="btn w-100 btn-success" name="button" value=plan;"
                                         action="{{url_for('.list_deploys')}}">
                                         Plan
                                     </button>

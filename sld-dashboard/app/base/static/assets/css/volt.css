@@ -496,7 +496,7 @@ progress {
 }
 
 .display-1 {
-    font-size: calc(1.625rem + 4.5vw);
+    font-size: small;
     font-weight: 600;
     line-height: 1.3;
 }
@@ -41856,4 +41856,13 @@ pre {
     overflow: hidden;
     text-overflow: ellipsis;
     width: 150px; /* Ajusta esto según el ancho deseado del contenedor */
+}
+
+#particles-js{
+  background-color: #262B40;
+  position: static;
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
 }

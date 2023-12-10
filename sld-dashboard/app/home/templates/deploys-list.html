@@ -122,7 +122,7 @@
                         <th>Deploy Name| Stack | Branch</th>
                         <th>Squad</th>
                         <th>Environment</th>
-                        <th>Start_time | destroy_time</th>
+                        <th>Apply_time | Destroy_time</th>
                         <th>Action</th>
                         <th>Status</th>
                         <th></th>
@@ -255,10 +255,6 @@
                                             <span class="fas fa-clone mr-2"></span>
                                             Clone 
                                         </a>
-                                        <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
-                                            <span class="far fa-clock mr-0"></span>
-                                            Schedule
-                                        </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DestroyModalCenter-{{deploy.id}}">
                                             <span class="fas fa-trash-alt mr-2"></span>
                                             Destroy
@@ -285,6 +281,10 @@
                                         <a class="dropdown-item" href="{{ url_for('.clone_deploy',deploy_id=deploy.id)}}">
                                             <span class="fas fa-clone mr-2"></span>
                                             Clone 
+                                        </a>
+                                        <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
+                                            <span class="far fa-clock mr-0"></span>
+                                            Schedule
                                         </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DestroyModalCenter-{{deploy.id}}">
                                             <span class="fas fa-trash-alt mr-2"></span>

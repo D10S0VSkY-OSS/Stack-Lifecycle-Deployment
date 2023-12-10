@@ -102,7 +102,7 @@ class DeployForm(FlaskForm):
         ],
     )
     start_time = StringField(
-        "Start Time",
+        "Apply Time",
         [
             validators.length(min=3, max=30, message="Time out of reange."),
         ],

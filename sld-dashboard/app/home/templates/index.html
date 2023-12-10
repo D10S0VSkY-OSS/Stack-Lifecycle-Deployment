@@ -62,6 +62,7 @@
                         </li>
                     </ul>
                 </div>
+
                 <div class="d-flex align-items-center ml-auto">
                     <a href="{{external_api_dns}}" target="_blank" class="btn btn-secondary text-dark mr-md-3">
                         <span class="fas fa-cubes mr-2"></span>
@@ -79,20 +80,14 @@
         </nav>
 
     </header>
+    
 
     <main>
 
-        <div class="preloader bg-soft flex-column justify-content-center align-items-center">
-            <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg"
-                height="60" alt="stack_logo">
-        </div>
-
         <!-- Hero -->
-        <section class="section-header pb-9 pb-lg-12 bg-primary text-white">
-            <div class="container">
-                <div class="row">
+        <section id="particles-js" class="section-header  text-white">
                     <div class="col-12 text-center">
-                        <img class="navbar-brand-dark mb-4" src="/static/assets/img/brand/light.svg" height="120"
+                        <img class="navbar-brand-dark mb-1" src="/static/assets/img/brand/light.svg" height="80"
                             alt="Logo light">
                         <h1 class="display-1">Stack Lifecycle Deployment </h1>
                         <div class="mb-5">
@@ -106,9 +101,10 @@
                         </div>
                     </div>
                 </div>
-            </div>
+        </section>
     </main>
-    {% include 'includes/scripts.html' %}
 </body>
+<script src="/static/assets/js/particles.js"></script>
+<script src="/static/assets/js/app.js"></script>
 
 </html>
