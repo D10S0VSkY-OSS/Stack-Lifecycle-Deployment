@@ -51,7 +51,7 @@ def aws_config(secreto):
             with open(settings.AWS_SHARED_CONFIG_FILE, "w") as configfile:
                 config.write(configfile)
                 logging.info(
-                    f"create config {profile_name} in {settings.AWS_SHARED_CONFIG_FILE} done"
+                    "created config done"
                 )
             del secreto
             del profile_name
@@ -81,7 +81,7 @@ def aws_credentials(secreto):
             with open(settings.AWS_SHARED_CREDENTIALS_FILE, "w") as credentialsfile:
                 config.write(credentialsfile)
                 logging.info(
-                    f"create credentials {source_profile} in {settings.AWS_SHARED_CREDENTIALS_FILE} done"
+                    "created credentials done"
                 )
             del secreto
             del source_profile
@@ -147,7 +147,7 @@ def unsecret(stack_name, environment, squad, name, secreto):
                 config.remove_section(f"profile {profile_name}")
                 with open(settings.AWS_SHARED_CONFIG_FILE, "w") as configfile:
                     config.write(configfile)
-                logging.info(f"remove config {profile_name} done")
+                logging.info("removed config done")
                 del config
 
             if secreto.get("source_profile"):
@@ -160,7 +160,7 @@ def unsecret(stack_name, environment, squad, name, secreto):
                 config.remove_section(source_profile)
                 with open(settings.AWS_SHARED_CREDENTIALS_FILE, "w") as credentialsfile:
                     config.write(credentialsfile)
-                logging.info(f"remove credentials {source_profile} done")
+                logging.info("removed credentials done")
                 del config
             else:
                 os.environ.pop("AWS_ACCESS_KEY_ID")
