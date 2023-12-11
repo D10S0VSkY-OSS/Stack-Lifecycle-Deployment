@@ -19,12 +19,14 @@ class BinaryDownload():
     def get(self) -> dict:
         try:
             if self.iac_type == "tofu":
-                logging.info(f"Downloading binary iac_type {self.iac_type} version {self.version}")
+                iac_version = self.version.replace("v", "")
+                logging.info(f"Downloading binary iac_type {self.iac_type} version {iac_version}")
                 # Download Terraform binary if not already downloaded
                 if not os.path.exists(f"/tmp/{self.version}"):
                     os.mkdir(f"/tmp/{self.version}")
                     if not os.path.isfile(f"/tmp/{self.version}/tofu"):
-                        binary = f"https://github.com/opentofu/opentofu/releases/download/v{self.version}/tofu_{self.version}_linux_amd64.zip"
+                        binary = f"https://github.com/opentofu/opentofu/releases/download/v{iac_version}/tofu_{iac_version}_linux_amd64.zip"
+                        print(binary)
                         req = requests.get(binary, verify=False)
                         _zipfile = zipfile.ZipFile(BytesIO(req.content))
                         _zipfile.extractall(f"/tmp/{self.version}")
@@ -37,12 +39,13 @@ class BinaryDownload():
                     "stdout": "OpenTofu downloaded and used successfully",
                 }
             elif self.iac_type == "terraform":
-                logging.info(f"Downloading binary iac_type {self.iac_type} version {self.version}")
+                iac_version = self.version.replace("v", "")
+                logging.info(f"Downloading binary iac_type {self.iac_type} version {iac_version}")
                 # Download Terraform binary if not already downloaded
                 if not os.path.exists(f"/tmp/{self.version}"):
                     os.mkdir(f"/tmp/{self.version}")
                     if not os.path.isfile(f"/tmp/{self.version}/terraform"):
-                        binary = f"{settings.TERRAFORM_BIN_REPO}/{self.version}/terraform_{self.version}_linux_amd64.zip"
+                        binary = f"{settings.TERRAFORM_BIN_REPO}/{iac_version}/terraform_{iac_version}_linux_amd64.zip"
                         req = requests.get(binary, verify=False)
                         _zipfile = zipfile.ZipFile(BytesIO(req.content))
                         _zipfile.extractall(f"/tmp/{self.version}")
@@ -72,17 +75,21 @@ class BinaryDownload():
                     os.rename(downloaded_binary_path, renamed_binary_path)
 
                     #terrform
-                    if not os.path.isfile(f"/tmp/{self.version}/terraform"):
-                        binary_terraform = f"{settings.TERRAFORM_BIN_REPO}/{self.version}/terraform_1.6.5_linux_amd64.zip"
-                        req = requests.get(binary_terraform, verify=False)
-                        _zipfile = zipfile.ZipFile(BytesIO(req.content))
-                        _zipfile.extractall(f"/tmp/{self.version}")
-                        st = os.stat(f"/tmp/{self.version}/terraform")
-                        os.chmod(f"/tmp/{self.version}/terraform", st.st_mode | stat.S_IEXEC)
-                        current_path = os.environ.get('PATH', '')
-                        if binary_directory not in current_path.split(os.pathsep):
-                            updated_path = current_path + os.pathsep + binary_directory
-                        os.environ['PATH'] = updated_path
+                    try:
+                        if not os.path.isfile(f"/tmp/{self.version}/terraform"):
+                            binary_terraform = f"{settings.TERRAFORM_BIN_REPO}/1.6.5/terraform_1.6.5_linux_amd64.zip"
+                            req = requests.get(binary_terraform, verify=False)
+                            _zipfile = zipfile.ZipFile(BytesIO(req.content))
+                            _zipfile.extractall(f"/tmp/{self.version}")
+                            st = os.stat(f"/tmp/{self.version}/terraform")
+                            os.chmod(f"/tmp/{self.version}/terraform", st.st_mode | stat.S_IEXEC)
+                            current_path = os.environ.get('PATH', '')
+                            if binary_directory not in current_path.split(os.pathsep):
+                                updated_path = current_path + os.pathsep + binary_directory
+                            os.environ['PATH'] = updated_path
+                    except Exception as err:
+                        logging.error(f"Failed to download Terraform binary from {binary_terraform}")
+                        raise err
 
             else:
                 logging.error(f"Failed to download Terragrunt binary from {binary_url}")
