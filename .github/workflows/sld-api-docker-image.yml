@@ -1,40 +1,38 @@
-name: SLD API backend Docker Image CI
-
 on:
-  # Triggers the workflow on push events but only for the main branch
   push:
     branches: [ master ]
-  # Allows you to run this workflow manually from the Actions tab
+  release:
+    types: [created]
   workflow_dispatch:
 
 jobs:
 
-  build:
-
+  build-and-push:
     runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v2
-    - name: docker login
+
+    # Login to Docker Hub
+    - name: Docker login
       env:
         DOCKER_USER: ${{ secrets.DOCKER_USERNAME }}
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+
+    # Build and push the Docker image with new tag for releases
+    - name: Build and push Docker image with new tag
+      if: github.event_name == 'release'
+      working-directory: ./sld-api-backend
       run: |
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD 
+        TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+        docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-api:$TAG
+        docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:$TAG
 
-    - name: Build the Docker image with tag
+    # Build and push the Docker image with 'latest' tag for master branch
+    - name: Build and push Docker image with latest tag
+      if: github.ref == 'refs/heads/master'
       working-directory: ./sld-api-backend
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-api:3.2.0
-      
-    - name: Docker Push with tag
-      #if: github.event.pull_request.merged == true
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:3.2.0
-
-    - name: Build the Docker image
-      working-directory: ./sld-api-backend
-      run: docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-api:latest
-      
-    - name: Docker Push
-      #if: github.event.pull_request.merged == true
-      run: docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:latest
-
+      run: |
+        docker build . --file Dockerfile --tag ${{ secrets.DOCKER_USERNAME }}/sld-api:latest
+        docker push ${{ secrets.DOCKER_USERNAME }}/sld-api:latest
