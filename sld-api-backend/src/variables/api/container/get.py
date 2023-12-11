@@ -58,7 +58,6 @@ class MetadataProcessor:
     
         return {"error": "Invalid format"}
 
-
     def _process_pipe_format(self, description):
         parts = [part.strip() for part in description.split("|")]
         if parts[0]:
@@ -78,7 +77,7 @@ class MetadataProcessor:
     def _process_newline_format(self, key_values):
         metadata = {k: v.strip('"') for k, v in key_values.items()}
         if "query_type" in metadata and "query" in metadata and "query_key" in metadata:
-            metadata["parameter_type"] = "EzeParams"
+            metadata["parameter_type"] = "QueryParams"
         else:
             metadata["parameter_type"] = "EOF"
         metadata["description"] = metadata.pop("description", "").strip("\"'")

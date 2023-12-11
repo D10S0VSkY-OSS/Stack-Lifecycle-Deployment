@@ -66,7 +66,8 @@
         <table class="table table-striped" id="table">
             <thead class="thead-dark">
                 <tr>
-                    <th></th>
+                    <th>ID</th>
+                    <th>Account Name</th>
                     <th>Squad</th>
                     <th>Environment</th>
                     <th></th>
@@ -78,6 +79,7 @@
                 <tr>
                     </td>
                     <td><span class="font-weight-normal">{{ gcp_account.id }}</span></td>
+                    <td><span class="tag-style">{{ gcp_account.squad }}_{{ gcp_account.environment}}</span></td>
                     <td><span class="font-weight-normal">{{ gcp_account.squad }}</span></td>
                     <td><span class="font-weight-normal">{{ gcp_account.environment }}</span></td>
                     <td>

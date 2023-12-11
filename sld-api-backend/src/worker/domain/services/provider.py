@@ -1,9 +1,11 @@
 # DI terraform provider
-from src.worker.providers.hashicorp.actions import Actions
+from src.worker.providers.hashicorp.actions import Terraform, TerraGrunt, Actions
 from src.worker.providers.hashicorp.artifact import Artifact
 from src.worker.providers.hashicorp.download import BinaryDownload
 from src.worker.providers.hashicorp.templates import Backend, GetVars, Tfvars
 from src.worker.domain.entities.worker import DeployParams, DownloadBinaryParams
+from typing import Type
+
 
 
 class ProviderRequirements:
@@ -73,53 +75,20 @@ class ProviderGetVars:
 
 class ProviderActions:
     """
-    This class contains the typical methods of a deployment
+    This class contains the typical methods of a deployment.
     """
 
-    def plan(params: DeployParams, action: Actions = Actions) -> dict:
-        config_action = action(
-            params.name,
-            params.stack_name,
-            params.branch,
-            params.environment,
-            params.squad,
-            params.iac_type,
-            params.version,
-            params.secreto,
-            params.variables_file,
-            params.project_path,
-            params.task_id,
-        )
-        return config_action.execute_terraform_command("plan")
+    @staticmethod
+    def plan(params: DeployParams, action: Type[Actions] = Terraform) -> dict:
+        config_action = action(params)
+        return config_action.execute_deployer_command("plan")
 
-    def apply(params: DeployParams, action: Actions = Actions) -> dict:
-        config_action = action(
-            params.name,
-            params.stack_name,
-            params.branch,
-            params.environment,
-            params.squad,
-            params.iac_type,
-            params.version,
-            params.secreto,
-            params.variables_file,
-            params.project_path,
-            params.task_id,
-        )
-        return config_action.execute_terraform_command("apply")
+    @staticmethod
+    def apply(params: DeployParams, action: Type[Actions] = Terraform) -> dict:
+        config_action = action(params)
+        return config_action.execute_deployer_command("apply")
 
-    def destroy(params: DeployParams, action: Actions = Actions) -> dict:
-        config_action = action(
-            params.name,
-            params.stack_name,
-            params.branch,
-            params.environment,
-            params.squad,
-            params.iac_type,
-            params.version,
-            params.secreto,
-            params.variables_file,
-            params.project_path,
-            params.task_id,
-        )
-        return config_action.execute_terraform_command("destroy")
+    @staticmethod
+    def destroy(params: DeployParams, action: Type[Actions] = Terraform) -> dict:
+        config_action = action(params)
+        return config_action.execute_deployer_command("destroy")

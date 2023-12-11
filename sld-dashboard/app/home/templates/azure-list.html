@@ -66,7 +66,8 @@
         <table class="table table-striped" id="table">
             <thead class="thead-dark">
                 <tr>
-                    <th></th>
+                    <th>ID</th>
+                    <th>Account name</th>
                     <th>Squad</th>
                     <th>Environment</th>
                     <th>Subscription id</th>
@@ -80,6 +81,7 @@
                 <tr>
                     </td>
                     <td><span class="font-weight-normal">{{ azure_account.id }}</span></td>
+                    <td><span class="tag-style">{{ azure_account.squad }}_{{ azure_account.environment}}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.squad }}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.environment }}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.subscription_id }}</span></td>
