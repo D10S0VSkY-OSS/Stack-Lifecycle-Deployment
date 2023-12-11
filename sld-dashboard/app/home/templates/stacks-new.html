@@ -56,15 +56,13 @@
                                     <div class="form-group">
                                         {{ render_field(form.squad_access, autocomplete="off", class='form-control') }}
                                     </div>
-
                                     <div class="form-group">
-                                        {{ render_field(form.iac_type, autocomplete="off", class='form-control') }}
+                                        {{ render_field(form.iac_type, id='iacTypeSelector', class='form-control') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.tf_version, autocomplete="off", class='form-control', value='1.3.2') }}
+                                        {{ render_field(form.tf_version, id='versionSelector', class='form-control') }}
                                     </div>
-
                                     <div class="form-group">
                                         {{ render_field(form.project_path, autocomplete="off", class='form-control', 
                                            placeholder='Only complete if you use monorepo') }}
@@ -73,16 +71,16 @@
                                     <div class="form-group">
                                         {{ render_field(form.description, autocomplete="off", class='form-control', placeholder='Description') }}
                                     </div>
-<div class="form-group">
-
-    <label for="iconSelector">Choose an Icon:</label>
-    <select id="iconSelector" name="icon_path" class="form-control" onchange="previewIcon()">
-        <!-- JavaScript will populate this -->
-    </select>
-    <div id="iconPreview" class="mt-2">
-        <!-- Icon preview will be displayed here -->
-    </div>
-</div>
+                                    <div class="form-group">
+                                    
+                                        <label for="iconSelector">Choose an Icon:</label>
+                                        <select id="iconSelector" name="icon_path" class="form-control" onchange="previewIcon()">
+                                            <!-- JavaScript will populate this -->
+                                        </select>
+                                        <div id="iconPreview" class="mt-2">
+                                            <!-- Icon preview will be displayed here -->
+                                        </div>
+                                    </div>
 
                                     <input class="btn btn-primary" type="submit" name="stackButton" value="Create Stack">
                                 </form>
@@ -142,4 +140,55 @@
         };
     });
 </script>
+
+<script type="text/javascript">
+    // Función para obtener las versiones de los releases de GitHub
+    function fetchReleaseVersions(repoUrl) {
+        return fetch(repoUrl)
+            .then(response => response.json())
+            .then(data => data.map(release => release.tag_name));
+    }
+
+    // Actualiza las opciones de versión de IaC basadas en el tipo de IaC seleccionado
+    function updateVersionOptions(iacType) {
+        let repoUrl;
+        switch(iacType) {
+            case 'terraform':
+                repoUrl = 'https://api.github.com/repos/hashicorp/terraform/releases';
+                break;
+            case 'terragrunt':
+                repoUrl = 'https://api.github.com/repos/gruntwork-io/terragrunt/releases';
+                break;
+            case 'openTofu':
+                repoUrl = 'https://api.github.com/repos/opentofu/opentofu/releases';
+                break;
+            default:
+                return;
+        }
+
+        fetchReleaseVersions(repoUrl).then(versions => {
+            const versionSelector = document.getElementById('versionSelector'); // Asegúrate de tener este ID en tu selector de versiones
+            versionSelector.innerHTML = ''; // Limpia las opciones existentes
+
+            versions.forEach(version => {
+                const option = document.createElement('option');
+                option.value = version;
+                option.text = version;
+                versionSelector.appendChild(option);
+            });
+        });
+    }
+
+    // Evento al cargar el documento
+    document.addEventListener('DOMContentLoaded', function () {
+        // Agrega un listener al selector de IaC Type
+        const iacTypeSelector = document.getElementById('iacTypeSelector'); // Asegúrate de tener este ID en tu selector de IaC Type
+        iacTypeSelector.addEventListener('change', function() {
+            updateVersionOptions(this.value);
+        });
+
+        // ... código existente para la selección de iconos ...
+    });
+</script>
+
 {% endblock javascripts %}

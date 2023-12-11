@@ -44,13 +44,11 @@ class StackForm(FlaskForm):
         validators=[validators.DataRequired()],
         coerce=lambda x: 'tofu' if x == 'openTofu' else x
     )
-    tf_version = StringField(
-        "IaC version",
-        [
-            validators.length(min=5, max=15, message="tf version out of reange."),
-            validators.DataRequired(message="tf version requerid."),
-        ],
+    tf_version = SelectField(
+        "IaC Version",
+        validators=[validators.DataRequired(message="IaC version required.")]
     )
+
     project_path = StringField(
         "Project_path",
         [

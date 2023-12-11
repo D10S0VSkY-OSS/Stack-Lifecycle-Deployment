@@ -55,11 +55,11 @@
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.iac_type, autocomplete="off", class='form-control',) }}
+                                        {{ render_field(form.iac_type, id='iacTypeSelector',autocomplete="off", class='form-control', value=stack.iac_type) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.tf_version, autocomplete="off", class='form-control', value=stack.tf_version) }}
+                                        {{ render_field(form.tf_version, id='versionSelector',autocomplete="off", class='form-control', value=stack.tf_version) }}
                                     </div>
 
                                     <div class="form-group">
@@ -147,5 +147,67 @@
         };
     });
 </script>
+
+
+<script type="text/javascript">
+    function fetchReleaseVersions(repoUrl) {
+        return fetch(repoUrl)
+            .then(response => response.json())
+            .then(data => data.map(release => release.tag_name));
+    }
+
+    function updateVersionOptions(iacType, callback) {
+        let repoUrl;
+        switch(iacType) {
+            case 'terraform':
+                repoUrl = 'https://api.github.com/repos/hashicorp/terraform/releases';
+                break;
+            case 'terragrunt':
+                repoUrl = 'https://api.github.com/repos/gruntwork-io/terragrunt/releases';
+                break;
+            case 'openTofu':
+                repoUrl = 'https://api.github.com/repos/opentofu/opentofu/releases';
+                break;
+            default:
+                return;
+        }
+
+        fetchReleaseVersions(repoUrl).then(versions => {
+            const versionSelector = document.getElementById('versionSelector');
+            versionSelector.innerHTML = '';
+
+            versions.forEach(version => {
+                const option = document.createElement('option');
+                option.value = version;
+                option.text = version;
+                versionSelector.appendChild(option);
+            });
+
+            if(callback) callback();
+        });
+    }
+
+    function setInitialVersions(iacType, initialVersion) {
+        updateVersionOptions(iacType, function() {
+            const versionInput = document.getElementById('versionInput');
+            versionInput.value = initialVersion;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const iacTypeSelector = document.getElementById('iacTypeSelector'); 
+        const initialIacType = '{{ stack.iac_type }}';
+        const initialVersion = '{{ stack.tf_version }}';
+
+        iacTypeSelector.value = initialIacType;
+        setInitialVersions(initialIacType, initialVersion);
+
+        iacTypeSelector.addEventListener('mouseup', function() {
+            updateVersionOptions(this.value);
+        });
+    });
+</script>
+
+
 
 {% endblock javascripts %}
