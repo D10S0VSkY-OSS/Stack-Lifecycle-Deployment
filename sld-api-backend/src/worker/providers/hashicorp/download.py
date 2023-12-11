@@ -70,6 +70,20 @@ class BinaryDownload():
                             file.write(chunk)
                     os.chmod(downloaded_binary_path, os.stat(downloaded_binary_path).st_mode | stat.S_IEXEC)
                     os.rename(downloaded_binary_path, renamed_binary_path)
+
+                    #terrform
+                    if not os.path.isfile(f"/tmp/{self.version}/terraform"):
+                        binary_terraform = f"{settings.TERRAFORM_BIN_REPO}/{self.version}/terraform_1.6.5_linux_amd64.zip"
+                        req = requests.get(binary_terraform, verify=False)
+                        _zipfile = zipfile.ZipFile(BytesIO(req.content))
+                        _zipfile.extractall(f"/tmp/{self.version}")
+                        st = os.stat(f"/tmp/{self.version}/terraform")
+                        os.chmod(f"/tmp/{self.version}/terraform", st.st_mode | stat.S_IEXEC)
+                        current_path = os.environ.get('PATH', '')
+                        if binary_directory not in current_path.split(os.pathsep):
+                            updated_path = current_path + os.pathsep + binary_directory
+                        os.environ['PATH'] = updated_path
+
             else:
                 logging.error(f"Failed to download Terragrunt binary from {binary_url}")
                 return {"command": "binaryDownload", "rc": 1, "stdout": "Failed to download binary file"}
