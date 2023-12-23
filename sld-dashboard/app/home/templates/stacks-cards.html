@@ -1,0 +1,83 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Stacks {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<style>
+</style>
+{% endblock stylesheets %}
+
+{% block content %}
+
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+        <div class="preloader bg-soft flex-column justify-content-center align-items-center">
+            <img class="loader-element animate__animated animate__jackInTheBox" src="/static/assets/img/brand/light.svg" height="60" alt="Volt logo">
+        </div>
+
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center py-4">
+        <div class="d-block mb-4 mb-md-0">
+            <nav aria-label="breadcrumb" class="d-none d-md-inline-block">
+                <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                    <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                    <li class="breadcrumb-item"><a href="#">Stacks</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">List</li>
+                </ol>
+            </nav>
+            <h2 class="h4">All Stacks</h2>
+            <p class="mb-0">List all stacks for deploy</p>
+        </div>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group">
+            </div>
+        </div>
+    </div>
+    <div class="table-settings mb-4">
+        <div class="row align-items-center justify-content-between">
+            <div class="col col-md-6 col-lg-3 col-xl-4">
+                <div class="input-group">
+                    <span class="input-group-text" id="basic-addon2"><span class="fas fa-search"></span></span>
+                    <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
+                </div>
+            </div>
+            </div>
+            </div>
+
+<div class="card border-light shadow-sm table-wrapper table-responsive pt-0 extra-padding-top">
+    <div class="card-row card-columns">
+    {% for stack in stacks %}
+        {% if "aws" in stack.stack_name or "azure" in stack.stack_name or "gcp" in stack.stack_name or "custom" in stack.stack_name %}
+            <div class="card border-primary mb-3 m-2" style="max-width: 18rem;">
+                <div class="card-header">
+                    {% if stack.icon_path %}
+                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
+                    {% else %}
+                        <img src="/static/assets/img/gallery/Providers/{% if 'aws' in stack.stack_name %}aws{% elif 'azure' in stack.stack_name %}azure{% elif 'gcp' in stack.stack_name %}gcp{% else %}custom{% endif %}.svg" alt="Icono" width="40" height="40">
+                    {% endif %}
+                        <span class="title limit_words">{{stack.stack_name}}</span>
+                </div>
+                <div class="card-body text-primary">
+                    <h5 class="card-title limit_words">{{ stack.stack_name }}</h5>
+                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+                            <a href="#" class="btn btn-secundary">Go somewhere</a>
+
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
+    </div>
+</div>
+
+
+                    
+    {% include 'includes/footer.html' %}
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}

@@ -41866,3 +41866,32 @@ pre {
   background-size: contain;
   background-repeat: no-repeat;
 }
+
+.card-row {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap; 
+    padding-top: 20px;
+ 
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-header img {
+    display: flex;
+
+}
+
+.card-header .title {
+    display: flex;
+
+}
+
+.card-columns {
+    display: flex;
+    justify-content: start;
+}
