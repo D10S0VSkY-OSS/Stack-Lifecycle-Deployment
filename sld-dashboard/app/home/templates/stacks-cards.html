@@ -45,12 +45,12 @@
             </div>
             </div>
 
-<div class="card border-light shadow-sm table-wrapper table-responsive pt-0 extra-padding-top">
+<div class="card border-light shadow-sm table-wrapper table-responsive pt-0 extra-padding-top ">
     <div class="card-row card-columns">
     {% for stack in stacks %}
         {% if "aws" in stack.stack_name or "azure" in stack.stack_name or "gcp" in stack.stack_name or "custom" in stack.stack_name %}
             <a href="{{ url_for('.deploy_stack', stack_id=stack.id)}}" class="card-link">
-            <div class="card border-primary mb-3 m-2" style="max-width: 18rem;">
+            <div class="card border-primary border-1 rounded mb-4 m-4" style="max-width: 28rem; min-width: 28rem; min-height: 18rem;">
                 <div class="card-header">
                     {% if stack.icon_path %}
                         <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
@@ -61,9 +61,7 @@
                 </div>
             </a>
                 <div class="card-body text-primary">
-        <small class="text-muted">
-          <cite title="Source Title">{{ stack.description}}</cite>
-        </small>
+                <p class="card-text">{{stack.description}}</p>
                 <div class="card-row card-columns">
                         <div class="limit_words" title="{{ stack.git_repo }}">
                         <span style="font-size: 12px; font-weight: bold;">repo:</span>
