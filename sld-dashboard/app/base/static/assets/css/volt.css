@@ -41871,8 +41871,7 @@ pre {
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap; 
-    padding-top: 20px;
- 
+    padding-top: 20px; 
 }
 
 .card-header {
@@ -41894,4 +41893,21 @@ pre {
 .card-columns {
     display: flex;
     justify-content: start;
+}
+
+.icon-with-text {
+    display: flex; /* Establece el contenedor como un flexbox */
+    align-items: flex-end; /* Alinea verticalmente los elementos al centro */
+    gap: 35px; /* Ajusta el espacio entre la imagen y el texto */
+}
+
+.icon-with-text img {
+    margin-right: 35px; /* Añade espacio a la derecha de la imagen */
+    display: flex;
+    justify-content: flex-end;
+}
+
+.icon-with-text span {
+    display: block; /* Hace que el span se comporte como un bloque */
+    line-height: 1; /* Ajusta la altura de línea si es necesario */
 }

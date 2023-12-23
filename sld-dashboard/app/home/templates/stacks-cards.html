@@ -49,6 +49,7 @@
     <div class="card-row card-columns">
     {% for stack in stacks %}
         {% if "aws" in stack.stack_name or "azure" in stack.stack_name or "gcp" in stack.stack_name or "custom" in stack.stack_name %}
+            <a href="{{ url_for('.deploy_stack', stack_id=stack.id)}}" class="card-link">
             <div class="card border-primary mb-3 m-2" style="max-width: 18rem;">
                 <div class="card-header">
                     {% if stack.icon_path %}
@@ -56,13 +57,102 @@
                     {% else %}
                         <img src="/static/assets/img/gallery/Providers/{% if 'aws' in stack.stack_name %}aws{% elif 'azure' in stack.stack_name %}azure{% elif 'gcp' in stack.stack_name %}gcp{% else %}custom{% endif %}.svg" alt="Icono" width="40" height="40">
                     {% endif %}
-                        <span class="title limit_words">{{stack.stack_name}}</span>
+                        <h5 class="card-title limit_words">{{stack.stack_name}}</h5>
                 </div>
+            </a>
                 <div class="card-body text-primary">
-                    <h5 class="card-title limit_words">{{ stack.stack_name }}</h5>
-                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                            <a href="#" class="btn btn-secundary">Go somewhere</a>
+        <small class="text-muted">
+          <cite title="Source Title">{{ stack.description}}</cite>
+        </small>
+                <div class="card-row card-columns">
+                        <div class="limit_words" title="{{ stack.git_repo }}">
+                        <span style="font-size: 12px; font-weight: bold;">repo:</span>
+                        <span class="font-weight-normal">{{ stack.git_repo.split('/')[-1] | replace('.git', '') }}</span>
+                        <span class="copy-icon" onclick="copyToClipboard('{{ stack.git_repo | replace('.git', '') }}/tree/{{ stack.branch }}')" title="Copy to clipboard">
+                            <i class="far fa-copy"></i>
+                        </span>
+                        </div>
+                        <div class="limit_words" title="{{ stack.branch }}">
+                        <span style="font-size: 12px; font-weight: bold;">branch:</span>
+                        <span class="font-weight-normal">{{ stack.branch }}</span>
+                        </div>
+                   <span class="icon-with-text">
+                    <img src="/static/assets/img/iac_type/{% if 'terragrunt' in stack.iac_type %}terragrunt{% elif 'tofu' in stack.iac_type %}tofu{% else %}tf{% endif %}.svg" alt="Icono" width="30" height="30">
+                    </span>
+                    {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
+                        <div class="btn-group">
+                            <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="icon icon-sm">
+                                    <span class="fas fa-ellipsis-h icon-dark"></span>
+                                </span>
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" href="{{ url_for('.edit_stack', stack_id=stack.id)}}"><span class="fas fa-edit mr-2"></span>Edit</a>
+                                <a class="dropdown-item" data-toggle="modal" data-target="#SyncModalCenter-{{stack.id}}"><span class="fas fa-sync mr-2"></span>sync</a>
+                                <a class="dropdown-item text-danger" data-toggle="modal" data-target="#RemoveModalCenter-{{stack.stack_name}}"><span class="fas fa-trash-alt mr-2"></span>Remove</a>
+                    {% endif %}
+                            </div>
+                <!-- Modal sync-->
+                <div class="modal fade" id="SyncModalCenter-{{stack.id}}">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="SyncModalLongTitle-{{stack.id}}">Sync Repo
+                                                                                                {{stack.stack_name}}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p> <strong>This will sync the repository again,
+                                    updating any changes to the stack variables and resources,
+                                    that could affect all implementations deployed with this stack.
+                                </strong></p>
+                                <p><strong>Are you sure? </strong></p>
+                            </div>
+                            <div class="modal-footer">
 
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+
+                                <form action="{{ url_for('.resync_stack', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
+                                    <input type="submit" value="Sync Repo" name="stackButton" class="btn btn-danger">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Remove-->
+                <div class="modal fade" id="RemoveModalCenter-{{stack.stack_name}}">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="SyncModalLongTitle-{{stack.stack_name}}">Remove Repo
+                                                                                                {{stack.stack_name}}</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <p> <strong>This change will permanently delete the repository.
+                                            could affect all deployed implementations.
+                                </strong></p>
+                                <p><strong>Are you sure? </strong></p>
+                            </div>
+                            <div class="modal-footer">
+
+                                <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+
+                                <form action="{{ url_for('.delete_stack', stack_name=stack.stack_name)}}">
+                                    <input type="submit" value="Remove Repo" class="btn btn-danger">
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- END Modal -->
+                </div>
+                </div>
                 </div>
             </div>
         {% endif %}
@@ -80,4 +170,36 @@
 
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
+<script type="text/javascript">
+
+function checkForm(form) // Submit button clicked
+  {
+
+    form.stackButton.disabled = true;
+    form.stackButton.value = "Please wait...";
+    return true;
+  }
+
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput = document.getElementById('search');
+
+        searchInput.addEventListener('keyup', function() {
+            var searchTerm = searchInput.value.toLowerCase();
+            var cards = document.getElementsByClassName('card');
+
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                if (card.textContent.toLowerCase().includes(searchTerm)) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            }
+        });
+    });
+</script>
+
+    <script src="/static/assets/js/copy_clipboard.js"></script>
 {% endblock javascripts %}
