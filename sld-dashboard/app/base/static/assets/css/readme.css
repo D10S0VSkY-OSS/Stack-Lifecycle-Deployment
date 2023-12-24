@@ -1,0 +1,49 @@
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+
+td {
+    word-wrap: break-word;
+    max-width: 200px; /* ajusta esto según tus necesidades */
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    color: #333;
+    margin-top: 20px;
+}
+p {
+    line-height: 1.6;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 600px) {
+    table {
+        width: 100%;
+    }
+    td {
+        max-width: 100px; /* ajusta para dispositivos móviles */
+    }
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}

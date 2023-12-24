@@ -6,6 +6,10 @@ import time
 import logging
 from flask import jsonify, render_template, request, url_for, redirect, flash, Response
 
+import requests
+import mistletoe
+from app.helpers.parsers import fetch_url_readme
+
 
 import redis
 from app import login_manager
@@ -950,6 +954,67 @@ def edit_stack(stack_id):
 
         return render_template(
             "stack-edit.html", name="Edit Stack", form=form, stack=stack, icons=icons
+        )
+    except ValueError:
+        return redirect(url_for("base_blueprint.logout"))
+
+@blueprint.route("/details-stack", methods=["GET", "POST"], defaults={"stack_id": None})
+@blueprint.route("/details-stack/<stack_id>", methods=["GET", "POST"])
+@login_required
+def details_stack(stack_id):
+    try:
+        icons = list_icons()
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        form = StackForm(request.form)
+        endpoint = f"stacks/{stack_id}"
+        # Get deploy data vars and set var for render
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        stack = response.get("json")
+        readme_url = fetch_url_readme(stack["git_repo"], stack["branch"])
+        response = requests.get(readme_url)
+        if response.status_code == 200:
+            readme_content = response.text
+            readme_html = mistletoe.markdown(readme_content)  # Convierte el contenido de Markdown a HTML
+        else:
+            readme_html = "<p>Error al cargar el README.md</p>"
+
+        # When user push data with POST verb
+        if request.method == "POST":
+            # Data dend to deploy
+            squad_acces_form = form.squad_access_edit.data
+            squad_acces_form_to_list = squad_acces_form.split(",")
+            update_stack = {
+                "stack_name": form.name.data.replace(" ",""),
+                "git_repo": form.git.data.replace(" ",""),
+                "branch": form.branch.data.replace(" ",""),
+                "squad_access": squad_acces_form_to_list,
+                "iac_type": form.iac_type.data,
+                "tf_version": form.tf_version.data.replace(" ",""),
+                "project_path": form.project_path.data.replace(" ",""),
+                "description": form.description.data,
+                "icon_path": request.form.get("icon_path"),
+            }
+            # Deploy
+            response = request_url(
+                verb="PATCH",
+                uri=f"{endpoint}",
+                headers={"Authorization": f"Bearer {token}"},
+                json=update_stack,
+            )
+            if response.get("status_code") == 200:
+                flash("Updating Stack")
+            else:
+                flash(response.get("json").get("detail"), "error")
+            return redirect(
+                url_for("home_blueprint.route_template", template="stacks-list")
+            )
+
+        return render_template(
+            "stack-details.html", name="Edit Stack", form=form, stack=stack, icons=icons, readme_html=readme_html
         )
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))

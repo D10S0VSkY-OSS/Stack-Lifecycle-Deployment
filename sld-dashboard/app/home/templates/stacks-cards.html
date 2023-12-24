@@ -50,7 +50,7 @@
     {% for stack in stacks %}
         {% if "aws" in stack.stack_name or "azure" in stack.stack_name or "gcp" in stack.stack_name or "custom" in stack.stack_name %}
             <a href="{{ url_for('.deploy_stack', stack_id=stack.id)}}" class="card-link">
-            <div class="card border-primary border-1 rounded mb-4 m-4" style="max-width: 28rem; min-width: 28rem; min-height: 18rem;">
+            <div class="card border-primary border-1 rounded mb-4 m-4" style="max-width: 20rem; min-width: 20rem; min-height: 18rem;">
                 <div class="card-header">
                     {% if stack.icon_path %}
                         <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
