@@ -31,6 +31,11 @@
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
+            <div>
+                <button onclick="changeView('table')" class="btn btn-outline-gray">
+                <i class="fa fa-table" aria-hidden="true"></i>
+                </button>
+            </div>
             </div>
         </div>
     </div>
@@ -44,6 +49,8 @@
             </div>
             </div>
             </div>
+
+
 
 <div class="card border-light shadow-sm table-wrapper table-responsive pt-0 extra-padding-top ">
     <div class="card-row card-columns">
@@ -89,8 +96,6 @@
                                 <a class="dropdown-item" href="{{ url_for('.edit_stack', stack_id=stack.id)}}"><span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item" data-toggle="modal" data-target="#SyncModalCenter-{{stack.id}}"><span class="fas fa-sync mr-2"></span>sync</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal" data-target="#RemoveModalCenter-{{stack.stack_name}}"><span class="fas fa-trash-alt mr-2"></span>Remove</a>
-                    {% endif %}
-                            </div>
                 <!-- Modal sync-->
                 <div class="modal fade" id="SyncModalCenter-{{stack.id}}">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -148,8 +153,10 @@
                         </div>
                     </div>
                 </div>
-                <!-- END Modal -->
                 </div>
+                </div>
+                    {% endif %}
+                <!-- END Modal -->
                 </div>
                 </div>
             </div>
@@ -199,5 +206,7 @@ function checkForm(form) // Submit button clicked
     });
 </script>
 
-    <script src="/static/assets/js/copy_clipboard.js"></script>
+
+<script src="/static/assets/js/copy_clipboard.js"></script>
+<script src="/static/assets/js/selector_stacks.js"></script>
 {% endblock javascripts %}

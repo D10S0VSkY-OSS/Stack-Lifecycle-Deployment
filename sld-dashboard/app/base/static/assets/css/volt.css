@@ -41911,3 +41911,7 @@ pre {
     display: block; /* Hace que el span se comporte como un bloque */
     line-height: 1; /* Ajusta la altura de línea si es necesario */
 }
+
+.gradient-background {
+    background: linear-gradient(to right, #ff6e7f, #bfe9ff); /* De izquierda a derecha */
+}

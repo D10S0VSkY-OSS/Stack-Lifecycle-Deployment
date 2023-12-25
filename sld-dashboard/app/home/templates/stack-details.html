@@ -34,15 +34,29 @@
 
 
 <pre><code class="language-html">
-
+<div class="d-flex justify-content-between w-100 flex-wrap">
+    <div class="card mb-1">
+        <div class="card-body">
+            <h5 class="card-title">{{stack.stack_name}}</h5>
+            <p class="card-text">{{stack.description}}</p>
+        </div>
+    </div>
+    <div class="card mb-1">
+        <div class="card-body">
+            <h6 class="card-subtitle mb-2 text-muted">{{stack.git_repo}}</h6>
+            <p class="card-text">{{stack.branch}}</p>
+        </div>
+    </div>
+    <div class="card mb-1">
+        <div class="card-body">
+            <p class="card-text">{{stack.iac_type}}</p>
+            <p class="card-text">{{stack.tf_version}}</p>
+            <p class="card-text">{{stack.squads}}</p>
+        </div>
+    </div>
+</div>
 <div class="col-lg-4 col-sm-6">
-    <h1>{{stack.name}}</h1>
-    <p><h2>{{stack.description}}</h2></p>
-    <h3>{{stack.git_repo}}</h3>
-    <h3>{{stack.branch}}</h3>
-    {{ stack.iac_type }}
-    {{ stack.tf_version }}
-    {{ stack.squads }}
+
     {{ readme_html | safe }}
 
     </div>

@@ -28,6 +28,11 @@
         </div>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
+            <div>
+                <button onclick="changeView('cards')" class="btn btn-outline-gray">
+                <i class="fa fa-th" aria-hidden="true"></i>
+                </button>
+            </div>
             </div>
         </div>
     </div>
@@ -38,8 +43,9 @@
                     <span class="input-group-text" id="basic-addon2"><span class="fas fa-search"></span></span>
                     <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
                 </div>
+
             </div>
-    <div class="card card-body border-light shadow-sm table-wrapper table-responsive pt-0">
+    <div class="card card-body border-light shadow-sm table-wrapper table-responsive pt-0 m-4">
         <table class="table table-striped" id="table">
             <thead class="thead-dark">
                 <tr>
@@ -256,5 +262,6 @@ function checkForm(form) // Submit button clicked
 </script>
 <script src="/static/assets/js/pagination_edit.js"></script>
     <script src="/static/assets/js/copy_clipboard.js"></script>
+<script src="/static/assets/js/selector_stacks.js"></script>
 
 {% endblock javascripts %}
