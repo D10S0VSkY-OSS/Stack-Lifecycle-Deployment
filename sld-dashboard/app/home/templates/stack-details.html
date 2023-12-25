@@ -50,17 +50,13 @@
 
     </div>
 
-<div class="col-lg-1 col-sm-1 align-items-start">
-<!-- Deploy button -->
-<span class="icon icon-sm">
-    <a title="Deploy Stack" class="dropdown-item" href="{{ url_for('.deploy_stack', stack_id=stack.id)}}"><span class="fas fa-power-off">
- </span>
- <i>Deploy Stack</i>
-</a>
-</span>
-
-</div>
 </code></pre>
+
+<div class="btn btn-primary btn-xl">
+        <a href="{{ url_for('.deploy_stack', stack_id=stack.id)}}" style="color: aliceblue;">
+        <span class="fas fa-cloud"></span>  <i>  Deploy Stack</i>
+    </a>
+</div>
                 {% include 'includes/footer.html' %}
 
 </main>
