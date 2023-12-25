@@ -41869,8 +41869,9 @@ pre {
 
 .card-row {
     display: flex;
-    justify-content: space-around;
+    justify-content: center;
     flex-wrap: wrap; 
+    align-items: center;
     padding-top: 20px; 
 }
 
@@ -41892,8 +41893,16 @@ pre {
 
 .card-columns {
     display: flex;
-    justify-content: start;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
 }
+
+/*.card-columns::before {
+    content: "";
+    width: calc(100% - (100% / 4));
+}
+*/
 
 .icon-with-text {
     display: flex; /* Establece el contenedor como un flexbox */
