@@ -1020,12 +1020,12 @@ def details_stack(stack_id):
         return redirect(url_for("base_blueprint.logout"))
 
 
-@blueprint.route("/stack/delete/<stack_name>")
+@blueprint.route("/stack/delete/<view_mode>/<stack_name>")
 @login_required
-def delete_stack(stack_name):
+def delete_stack(view_mode, stack_name):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
+        # Check if token not expired
         check_unauthorized_token(token)
         response = request_url(
             verb="DELETE",
@@ -1037,19 +1037,27 @@ def delete_stack(stack_name):
             flash(f"Stack {result}")
         else:
             flash(response["json"]["detail"], "error")
-        return redirect(
-            url_for("home_blueprint.route_template", template="stacks-list")
-        )
+
+        # Redirección basada en el parámetro 'view_mode'
+        if view_mode == "table":
+            return redirect(url_for("home_blueprint.route_template", template="stacks-list"))
+        elif view_mode == "cards":
+            return redirect(url_for("home_blueprint.route_template", template="stacks-cards"))
+        else:
+            flash("Invalid view mode", "error")
+            return redirect(url_for("home_blueprint.route_template", template="stacks-list"))
+
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
 
 
-@blueprint.route("/stack/resync/<stack_id>")
+
+@blueprint.route("/stack/resync/<view_mode>/<stack_id>")
 @login_required
-def resync_stack(stack_id):
+def resync_stack(view_mode, stack_id):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
+        # Check if token not expired
         check_unauthorized_token(token)
         endpoint = f"stacks/{stack_id}"
         # Get deploy data vars and set var for render
@@ -1075,14 +1083,21 @@ def resync_stack(stack_id):
                 json=update_stack,
             )
             if response.get("status_code") == 200:
-                flash(f"Updating Stack")
+                flash("Updating Stack")
             else:
                 flash(response.get("json").get("detail"), "error")
         else:
             flash(response.get("json").get("detail"), "error")
-        return redirect(
-            url_for("home_blueprint.route_template", template="stacks-list")
-        )
+
+        # Redirección basada en el parámetro 'view_mode'
+        if view_mode == "table":
+            return redirect(url_for("home_blueprint.route_template", template="stacks-list"))
+        elif view_mode == "cards":
+            return redirect(url_for("home_blueprint.route_template", template="stacks-cards"))
+        else:
+            flash("Invalid view mode", "error")
+            return redirect(url_for("home_blueprint.route_template", template="stacks-list"))
+
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
 

@@ -42,9 +42,12 @@
     <div class="table-settings mb-4">
         <div class="row align-items-center justify-content-between">
             <div class="col col-md-6 col-lg-3 col-xl-4">
+                <div class="input-group" style="height: 0; overflow: hidden;">
+                    <input type="text" autocomplete="off">
+                </div>
                 <div class="input-group">
                     <span class="input-group-text" id="basic-addon2"><span class="fas fa-search"></span></span>
-                    <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" autocomplete="off">
                 </div>
             </div>
             </div>
@@ -83,6 +86,7 @@
                         </div>
                    <span class="icon-with-text">
                     <img src="/static/assets/img/iac_type/{% if 'terragrunt' in stack.iac_type %}terragrunt{% elif 'tofu' in stack.iac_type %}tofu{% else %}tf{% endif %}.svg" alt="Icono" width="30" height="30">
+                                <a href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fa fa-info mr-2"></span></a>
                     </span>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                         <div class="btn-group">
@@ -121,7 +125,7 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.resync_stack', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
+                                <form action="{{ url_for('.resync_stack',view_mode='cards', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
                                     <input type="submit" value="Sync Repo" name="stackButton" class="btn btn-danger">
                                 </form>
                             </div>
@@ -149,7 +153,7 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.delete_stack', stack_name=stack.stack_name)}}">
+                                <form action="{{ url_for('.delete_stack', view_mode='cards', stack_name=stack.stack_name)}}">
                                     <input type="submit" value="Remove Repo" class="btn btn-danger">
                                 </form>
                             </div>

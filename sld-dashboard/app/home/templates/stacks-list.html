@@ -39,11 +39,13 @@
     <div class="table-settings mb-4">
         <div class="row align-items-center justify-content-between">
             <div class="col col-md-6 col-lg-3 col-xl-4">
+               <div class="input-group" style="height: 0; overflow: hidden;">
+                <input type="text" autocomplete="off">
+                </div> 
                 <div class="input-group">
                     <span class="input-group-text" id="basic-addon2"><span class="fas fa-search"></span></span>
-                    <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2">
+                    <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" autocomplete="off">
                 </div>
-
             </div>
     <div class="card card-body border-light shadow-sm table-wrapper table-responsive pt-0 m-4">
         <table class="table table-striped" id="table">
@@ -160,7 +162,6 @@
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{ url_for('.edit_stack', stack_id=stack.id)}}"><span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item" data-toggle="modal" data-target="#SyncModalCenter-{{stack.id}}"><span class="fas fa-sync mr-2"></span>sync</a>
-                                <a class="dropdown-item" href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fa fa-info mr-2"></span>Details</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal" data-target="#RemoveModalCenter-{{stack.stack_name}}"><span class="fas fa-trash-alt mr-2"></span>Remove</a>
                     {% endif %}
                             </div>
@@ -168,6 +169,7 @@
                             <!-- Deploy button -->
                             <span class="icon icon-sm">
                                 <a title="Deploy Stack" class="dropdown-item" href="{{ url_for('.deploy_stack', stack_id=stack.id)}}"><span class="fas fa-power-off"></span></a>
+                                <a title="Details" class="dropdown-item" href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fa fa-info"></span></a>
                     </td>
                 </tr>
                 <!-- Modal sync-->
@@ -192,7 +194,7 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.resync_stack', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
+                                <form action="{{ url_for('.resync_stack',view_mode='cards', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
                                     <input type="submit" value="Sync Repo" name="stackButton" class="btn btn-danger">
                                 </form>
                             </div>
@@ -220,7 +222,7 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.delete_stack', stack_name=stack.stack_name)}}">
+                                <form action="{{ url_for('.delete_stack', view_mode='cards', stack_name=stack.stack_name)}}">
                                     <input type="submit" value="Remove Repo" class="btn btn-danger">
                                 </form>
                             </div>
