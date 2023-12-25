@@ -3,7 +3,7 @@ table {
     width: 100%;
 }
 th, td {
-    border: 1px solid #ddd;
+    border: 1px solid #dddddd;
     padding: 8px;
     text-align: left;
 }
@@ -14,7 +14,7 @@ th {
 
 td {
     word-wrap: break-word;
-    max-width: 200px; /* ajusta esto según tus necesidades */
+    max-width: 300px; /* ajusta esto según tus necesidades */
 }
 
 

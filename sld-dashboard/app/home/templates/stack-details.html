@@ -33,40 +33,34 @@
 
 
 
-<pre><code class="language-html">
-<div class="d-flex justify-content-between w-100 flex-wrap">
-    <div class="card mb-1">
-        <div class="card-body">
-            <h5 class="card-title">{{stack.stack_name}}</h5>
-            <p class="card-text">{{stack.description}}</p>
-        </div>
-    </div>
-    <div class="card mb-1">
-        <div class="card-body">
-            <h6 class="card-subtitle mb-2 text-muted">{{stack.git_repo}}</h6>
-            <p class="card-text">{{stack.branch}}</p>
-        </div>
-    </div>
-    <div class="card mb-1">
-        <div class="card-body">
-            <p class="card-text">{{stack.iac_type}}</p>
-            <p class="card-text">{{stack.tf_version}}</p>
-            <p class="card-text">{{stack.squads}}</p>
-        </div>
-    </div>
+<!-- <div class="d-flex justify-content-between w-100 flex-wrap">
+    {{stack.stack_name}}
+    {{stack.description}}
+    {{stack.git_repo}}
+    {{stack.branch}}
+    {{ stack.iac_type }}
+    {{ stack.tf_version }}
+    {{ stack.squads }}
 </div>
+-->
+<pre><code class="language-html">
 <div class="col-lg-4 col-sm-6">
 
     {{ readme_html | safe }}
 
     </div>
 
-<div class="col-lg-4 col-sm-6">
-    <div class="input-group">
-    </div>
+<div class="col-lg-1 col-sm-1 align-items-start">
+<!-- Deploy button -->
+<span class="icon icon-sm">
+    <a title="Deploy Stack" class="dropdown-item" href="{{ url_for('.deploy_stack', stack_id=stack.id)}}"><span class="fas fa-power-off">
+ </span>
+ <i>Deploy Stack</i>
+</a>
+</span>
+
 </div>
 </code></pre>
-
                 {% include 'includes/footer.html' %}
 
 </main>
