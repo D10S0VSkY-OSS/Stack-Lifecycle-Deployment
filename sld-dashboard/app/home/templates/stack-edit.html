@@ -86,8 +86,11 @@
         <!-- Icon preview will be displayed here -->
     </div>
 </div>
+<form class="" id="stackForm" method="post" onsubmit="return checkForm(this);">
+    <input type="hidden" id="preferredView" name="preferredView">
+    <input class="btn btn-primary" type="submit" name="stackButton" value="Update Stack">
+</form>
 
-                                    <input class="btn btn-primary" type="submit" name="stackButton" value="Update Stack">
 
                                 </form>
                             </div>
@@ -109,47 +112,36 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script type="text/javascript">
-
-    function checkForm(form) // Submit button clicked
-{
-
-    form.stackButton.disabled = true;
-    form.stackButton.value = "Please wait...";
-    return true;
-}
-
+    function checkForm(form) {
+        form.stackButton.disabled = true;
+        form.stackButton.value = "Please wait...";
+        document.getElementById('preferredView').value = localStorage.getItem('preferredView');
+        return true;
+    }
 </script>
+
 <script type="text/javascript">
-    // Populate the icon selector and implement preview functionality
+    // This script is for populating and previewing icons.
+    // Make sure the corresponding elements and event handlers are defined in your HTML.
     document.addEventListener('DOMContentLoaded', function () {
         var iconsBasePath = '/static/assets/img/gallery/';
         var iconsData = {{ icons | safe }};
         var selector = document.getElementById('iconSelector');
         var preview = document.getElementById('iconPreview');
 
-        // Populate the dropdown with icons
-        for (var category in iconsData) {
-            if (iconsData.hasOwnProperty(category)) {
-                iconsData[category].forEach(function(iconFilename) {
-                    var fullPath = iconsBasePath + category + '/' + iconFilename;
-                    var option = document.createElement('option');
-                    option.value = fullPath;
-                    option.text = category + '/' + iconFilename; // Displaying category/filename
-                    selector.appendChild(option);
-                });
-            }
-        }
-
-        // Preview selected icon
+        // Function to preview selected icon
         window.previewIcon = function() {
             var selectedIcon = selector.value;
             preview.innerHTML = '<img src="' + selectedIcon + '" alt="Icon Preview" style="max-width:100px;"/>'; // Adjust size as needed
         };
+
+        // Call previewIcon when the page loads to show the currently selected icon
+        previewIcon();
     });
 </script>
 
-
 <script type="text/javascript">
+    // This script is for fetching release versions based on IaC type and updating the version selector.
     function fetchReleaseVersions(repoUrl) {
         return fetch(repoUrl)
             .then(response => response.json())
@@ -165,7 +157,8 @@
             case 'terragrunt':
                 repoUrl = 'https://api.github.com/repos/gruntwork-io/terragrunt/releases';
                 break;
-            case 'openTofu':
+            // Ensure the case matches the actual string used for openTofu
+            case 'tofu': // Adjust this case as necessary
                 repoUrl = 'https://api.github.com/repos/opentofu/opentofu/releases';
                 break;
             default:
@@ -189,8 +182,8 @@
 
     function setInitialVersions(iacType, initialVersion) {
         updateVersionOptions(iacType, function() {
-            const versionInput = document.getElementById('versionInput');
-            versionInput.value = initialVersion;
+            const versionSelector = document.getElementById('versionSelector');
+            versionSelector.value = initialVersion;
         });
     }
 
@@ -202,12 +195,10 @@
         iacTypeSelector.value = initialIacType;
         setInitialVersions(initialIacType, initialVersion);
 
-        iacTypeSelector.addEventListener('mouseup', function() {
+        iacTypeSelector.addEventListener('change', function() {
             updateVersionOptions(this.value);
         });
     });
 </script>
-
-
-
 {% endblock javascripts %}
+

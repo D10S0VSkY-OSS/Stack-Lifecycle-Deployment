@@ -41866,3 +41866,61 @@ pre {
   background-size: contain;
   background-repeat: no-repeat;
 }
+
+.card-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap; 
+    align-items: center;
+    padding-top: 20px; 
+}
+
+.card-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.card-header img {
+    display: flex;
+
+}
+
+.card-header .title {
+    display: flex;
+
+}
+
+.card-columns {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+}
+
+/*.card-columns::before {
+    content: "";
+    width: calc(100% - (100% / 4));
+}
+*/
+
+.icon-with-text {
+    display: flex; /* Establece el contenedor como un flexbox */
+    align-items: flex-end; /* Alinea verticalmente los elementos al centro */
+    gap: 35px; /* Ajusta el espacio entre la imagen y el texto */
+}
+
+.icon-with-text img {
+    margin-right: 35px; /* Añade espacio a la derecha de la imagen */
+    display: flex;
+    justify-content: flex-end;
+}
+
+.icon-with-text span {
+    display: block; /* Hace que el span se comporte como un bloque */
+    line-height: 1; /* Ajusta la altura de línea si es necesario */
+}
+
+.gradient-background {
+    background: linear-gradient(to right, #ff6e7f, #bfe9ff); /* De izquierda a derecha */
+}

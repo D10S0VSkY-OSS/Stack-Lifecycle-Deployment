@@ -1,0 +1,98 @@
+{% extends "layouts/base.html" %}
+{% from 'helpers/_forms.html' import render_field %}
+
+{% block title %} Edit Stack {% endblock %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+<link rel="stylesheet" href="/static/assets/css/readme.css">
+
+{% endblock stylesheets %}
+{% block content %}
+<main class="content">
+
+    {% include 'includes/navigation.html' %}
+
+    <div class="py-4">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb breadcrumb-dark breadcrumb-transparent">
+                <li class="breadcrumb-item"><a href="#"><span class="fas fa-home"></span></a></li>
+                <li class="breadcrumb-item"><a href="/stacks-list.html">Stack</a></li>
+                <li class="breadcrumb-item active" aria-current="page">Details</li>
+            </ol>
+        </nav>
+        <div class="d-flex justify-content-between w-100 flex-wrap">
+            <div class="mb-3 mb-lg-0">
+                <h1 class="h4">Stack Details</h1>
+            </div>
+            <div>
+                <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Stack Docs</a>
+            </div>
+        </div>
+    </div>
+
+
+
+<pre>
+<code class="language-html">
+<div class="col-lg-4 col-sm-6">
+<h2>Details</h2>
+<table style="border-collapse: collapse; width: 100%;">
+</table>
+<table style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th style="border: 1px solid #000; text-align: left; padding: 8px;">Name</th>
+            <th style="border: 1px solid #000; text-align: left; padding: 8px;">Value</th>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">Name</td>
+            <td style="border: 1px solid #000000; text-align: left; padding: 8px;">{{ stack.stack_name }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000000; text-align: left; padding: 8px;">Branch</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">{{ stack.branch }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">Iac Type</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">{{ stack.iac_type }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">IaC Version</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">{{ stack.tf_version }}</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">Description</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">  {{ stack.description }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">Squad access</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">{{ stack.squad_access }}</td>
+        </tr>
+        <!-- Additional rows can be added here -->
+    </tbody>
+</table>
+
+
+    {{ readme_html | safe }}
+
+    </div>
+</code>
+</pre>
+<div class="btn btn-primary btn-xl">
+        <a href="{{ url_for('.deploy_stack', stack_id=stack.id)}}" style="color: aliceblue;">
+        <span class="fas fa-cloud"></span><i>  Deploy Stack</i>
+    </a>
+</div>
+
+                {% include 'includes/footer.html' %}
+
+</main>
+
+{% endblock content %}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+{% endblock javascripts %}

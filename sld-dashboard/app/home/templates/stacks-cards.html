@@ -3,7 +3,10 @@
 {% block title %} Stacks {% endblock %}
 
 <!-- Specific Page CSS goes HERE  -->
-{% block stylesheets %}{% endblock stylesheets %}
+{% block stylesheets %}
+<style>
+</style>
+{% endblock stylesheets %}
 
 {% block content %}
 
@@ -29,8 +32,8 @@
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
             <div>
-                <button onclick="changeView('cards')" class="btn btn-outline-gray" title="Change cards view">
-                <i class="fa fa-th" aria-hidden="true"></i>
+                <button onclick="changeView('table')" class="btn btn-outline-gray" title="change table view">
+                <i class="fa fa-table" aria-hidden="true"></i>
                 </button>
             </div>
             </div>
@@ -39,121 +42,56 @@
     <div class="table-settings mb-4">
         <div class="row align-items-center justify-content-between">
             <div class="col col-md-6 col-lg-3 col-xl-4">
-               <div class="input-group" style="height: 0; overflow: hidden;">
-                <input type="text" autocomplete="off">
-                </div> 
+                <div class="input-group" style="height: 0; overflow: hidden;">
+                    <input type="text" autocomplete="off">
+                </div>
                 <div class="input-group">
                     <span class="input-group-text" id="basic-addon2"><span class="fas fa-search"></span></span>
                     <input type="text" class="form-control" id="search" onkeyup="search()" placeholder="Search" aria-label="Search" aria-describedby="basic-addon2" autocomplete="off">
                 </div>
             </div>
-    <div class="card card-body border-light shadow-sm table-wrapper table-responsive pt-0 m-4">
-        <table class="table table-striped" id="table">
-            <thead class="thead-dark">
-                <tr>
-                    <th>Stack</th>
-                    <th>Stack id</th>
-                    <th>Stack Name</th>
-                    {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
-                    <th>Stack Repo | Branch</th>
-                    {% endif %}
-                    <th>IaC Type</th>
-                    <th>IaC version</th>
-                    <th>squad_access</th>
-                    <th>Description</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Item -->
-                {% for stack in stacks %}
-                <tr>
-                    </td>
-                    {% if "aws" in stack.stack_name %}
-                    <td>
-                        {% if stack.icon_path  %}
+            </div>
+            </div>
+
+
+
+<div class="card border-light shadow-sm table-wrapper table-responsive pt-0 extra-padding-top ">
+    <div class="card-row card-columns">
+    {% for stack in stacks %}
+        {% if "aws" in stack.stack_name or "azure" in stack.stack_name or "gcp" in stack.stack_name or "custom" in stack.stack_name %}
+            <a href="{{ url_for('.deploy_stack', stack_id=stack.id)}}" class="card-link">
+            <div class="card border-primary border-1 rounded mb-4 m-4" style="max-width: 20rem; min-width: 20rem; min-height: 18rem;">
+                <div class="card-header" title="Click to Deploy">
+                    {% if stack.icon_path %}
                         <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
-                        {% else %}
-                        <img src="/static/assets/img/gallery/Providers/aws.svg" alt="Icono" width="40" height="40">
-                        {% endif %}
-                    </td>
-                    {% elif "gcp" in stack.stack_name %}
-                    <td>
-                        {% if stack.icon_path  %}
-                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
-                        {% else %}
-                        <img src="/static/assets/img/gallery/Providers/gcp.svg" alt="Icono" width="40" height="40">
-                        {% endif %}
-                    </td>
-                    {% elif "azure" in stack.stack_name %}
-                    <td>
-                        {% if stack.icon_path  %}
-                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
-                        {% else %}
-                        <img src="/static/assets/img/gallery/Providers/azure.svg" alt="Icono" width="40" height="40">
-                        {% endif %}
-                    </td>
                     {% else %}
-                    <td>
-                        {% if stack.icon_path  %}
-                        <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
-                        {% else %}
-                        <img src="/static/assets/img/gallery/Providers/custom.svg" alt="Icono" width="40" height="40">
-                        {% endif %}
-                    </td>
+                        <img src="/static/assets/img/gallery/Providers/{% if 'aws' in stack.stack_name %}aws{% elif 'azure' in stack.stack_name %}azure{% elif 'gcp' in stack.stack_name %}gcp{% else %}custom{% endif %}.svg" alt="Icono" width="40" height="40">
                     {% endif %}
-                    <td><span class="font-weight-normal">{{ stack.id }}</span></td>
-                    <td>
-                        <div class="limit_words" title="{{stack.stack_name}}">
-                        <span class="tag-style">{{ stack.stack_name }}</span>
-                        </div>
-                    </td>
-                    {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
-                    <td>
+                        <h5 class="card-title limit_words">{{stack.stack_name}}</h5>
+                </div>
+                <div class="card-body text-primary">
+                <p class="card-text" title="Click to Deploy">{{stack.description}}</p>
+            </a>
+                <div class="card-row card-columns d-flex justify-content-start">
                         <div class="limit_words" title="{{ stack.git_repo }}">
-                        <span style="font-size: 12px; font-weight: bold;">repo:</span>
+                        <span style="font-size: 12px; font-weight: bold;">Repo:</span>
                         <span class="font-weight-normal">{{ stack.git_repo.split('/')[-1] | replace('.git', '') }}</span>
+                        <span class="copy-icon" onclick="copyToClipboard('{{ stack.git_repo | replace('.git', '') }}/tree/{{ stack.branch }}')" title="Copy to clipboard">
+                            <i class="far fa-copy"></i>
+                        </span>
                         </div>
                         <div class="limit_words" title="{{ stack.branch }}">
-                        <span style="font-size: 12px; font-weight: bold;">branch:</span>
-                        <span class="font-weight-normal">{{ stack.branch }}</span>
-                        <div>
-                        <span class="copy-icon" onclick="copyToClipboard('{{ stack.git_repo | replace('.git', '') }}/tree/{{ stack.branch }}')" title="Copy to clipboard">
-                            <span style="font-size: 12px; font-weight: bold;">copy:</span>
-                            <i class="far fa-copy"></i>
+                        <span style="font-size: 12px; font-weight: bold;">Branch:</span>
+                        <span class="font-weight-normal">
+                            {{ stack.branch }}
+                        </span>
                         </div>
-                        </div>
-                    </td>
-                    {% endif %}
-                    <td><span >
-                         {% if stack.iac_type == 'terraform' %}
-                             <img src="{{ url_for('static', filename='/assets/img/iac_type/tf.svg') }}" alt="Terraform Icon" width="60" height="60">
-                         {% elif stack.iac_type == 'tofu' %}
-                             <img src="{{ url_for('static', filename='/assets/img/iac_type/tofu.svg') }}" alt="Tofu Icon" width="60" height="60">
-                         {% elif stack.iac_type == 'terragrunt' %}
-                             <img src="{{ url_for('static', filename='/assets/img/iac_type/terragrunt.svg') }}" alt="Tofu Icon" width="60" height="60">
-                         {% endif %}
-                     </span></td>
-                    <td><span class="tag-style">{{ stack.tf_version }}</span></td>
-                    <td>
-                        <div class="limit_words">
-                            {% if "*" in stack.squad_access %}
-                                All Squad
-                            {% else %}
-                               {{ stack.squad_access | join(',') }} 
-                            {% endif %}
-                        </div>
-                    </td>
-
-                    <td>
-                        <div class="limit_words">
-                        <span class="font-weight-normal">{{ stack.description}}</span>
-                        </div>
-                    </td>
-                    <td>
+                        <div title="Sack Details">
                             <span class="icon icon-sm">
-                                <a title="Deploy Stack" class="dropdown-item" href="{{ url_for('.deploy_stack', stack_id=stack.id)}}"><span class="fas fa-power-off"></span></a>
-                                <a title="Details" class="dropdown-item" href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fa fa-info"></span></a>
+                                <a title="Details Stack" class="dropdown-item" href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fas fa-info"></span></a>
+                        </span>
+                        </div>
+                        
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                         <div class="btn-group">
                             <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -166,12 +104,8 @@
                                 <a class="dropdown-item" href="{{ url_for('.edit_stack', stack_id=stack.id)}}"><span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item" data-toggle="modal" data-target="#SyncModalCenter-{{stack.id}}"><span class="fas fa-sync mr-2"></span>sync</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal" data-target="#RemoveModalCenter-{{stack.stack_name}}"><span class="fas fa-trash-alt mr-2"></span>Remove</a>
-                    {% endif %}
-                            </div>
-                        </div>
-                            <!-- Deploy button -->
-                    </td>
-                </tr>
+                </div>
+                </div>
                 <!-- Modal sync-->
                 <div class="modal fade" id="SyncModalCenter-{{stack.id}}">
                     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -194,7 +128,7 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.resync_stack',view_mode='table', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
+                                <form action="{{ url_for('.resync_stack',view_mode='cards', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
                                     <input type="submit" value="Sync Repo" name="stackButton" class="btn btn-danger">
                                 </form>
                             </div>
@@ -222,27 +156,26 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.delete_stack', view_mode='table', stack_name=stack.stack_name)}}">
+                                <form action="{{ url_for('.delete_stack', view_mode='cards', stack_name=stack.stack_name)}}">
                                     <input type="submit" value="Remove Repo" class="btn btn-danger">
                                 </form>
                             </div>
                         </div>
                     </div>
                 </div>
+                    {% endif %}
                 <!-- END Modal -->
-                {% endfor %}
-            </tbody>
-        </table>
-        </div>
-        <nav aria-label="Page navigation example">
-  <ul class="pagination">
-    <li class="page-item" id="previous-page"><a class="page-link" href="#">Previous</a></li>
-    <!-- Los números de página se insertarán aquí dinámicamente -->
-    <li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>
-  </ul>
-</nav>
+                </div>
+                        <img src="/static/assets/img/iac_type/{% if 'terragrunt' in stack.iac_type %}terragrunt{% elif 'tofu' in stack.iac_type %}tofu{% else %}tf{% endif %}.svg" alt="Icono" width="30" height="30" title="IaC Type">
+                </div>
+            </div>
+        {% endif %}
+    {% endfor %}
     </div>
+</div>
 
+
+                    
     {% include 'includes/footer.html' %}
 
 </main>
@@ -262,8 +195,27 @@ function checkForm(form) // Submit button clicked
   }
 
 </script>
-<script src="/static/assets/js/pagination_edit.js"></script>
-    <script src="/static/assets/js/copy_clipboard.js"></script>
-<script src="/static/assets/js/selector_stacks.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var searchInput = document.getElementById('search');
 
+        searchInput.addEventListener('keyup', function() {
+            var searchTerm = searchInput.value.toLowerCase();
+            var cards = document.getElementsByClassName('card');
+
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                if (card.textContent.toLowerCase().includes(searchTerm)) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            }
+        });
+    });
+</script>
+
+
+<script src="/static/assets/js/copy_clipboard.js"></script>
+<script src="/static/assets/js/selector_stacks.js"></script>
 {% endblock javascripts %}

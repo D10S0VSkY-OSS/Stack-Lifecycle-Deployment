@@ -40,7 +40,7 @@ class StackForm(FlaskForm):
     )
     iac_type = SelectField(
         "IaC Type",
-        choices=[('', 'Select an IaC Type'), ('terraform', 'Terraform'), ('openTofu', 'openTofu'), ('terragrunt', 'TerraGrunt')],
+        choices=[('', 'Select an IaC Type'), ('terraform', 'Terraform'), ('tofu', 'openTofu'), ('terragrunt', 'TerraGrunt')],
         validators=[validators.DataRequired()],
         coerce=lambda x: 'tofu' if x == 'openTofu' else x
     )
@@ -58,7 +58,7 @@ class StackForm(FlaskForm):
     description = StringField(
         "Description",
         [
-            validators.length(min=1, max=50, message="Set short Description"),
+            validators.length(min=30, max=60, message="Set short Description"),
         ],
     )
     squad_access_edit = StringField(

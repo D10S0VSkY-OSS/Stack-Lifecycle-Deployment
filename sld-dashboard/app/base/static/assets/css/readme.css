@@ -1,0 +1,76 @@
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+th, td {
+    border: 1px solid #020116;
+    padding: 8px;
+    text-align: left;
+}
+th {
+    background-color: #f2f2f2;
+}
+
+
+td {
+    word-wrap: break-word;
+    max-width: 300px; /* ajusta esto según tus necesidades */
+}
+
+
+h1, h2, h3, h4, h5, h6 {
+    color: #333;
+    margin-top: 20px;
+}
+p {
+    line-height: 1.6;
+}
+
+a {
+    color: #007bff;
+    text-decoration: none;
+}
+a:hover {
+    text-decoration: underline;
+}
+
+@media screen and (max-width: 600px) {
+    table {
+        width: 100%;
+    }
+    td {
+        max-width: 100px; /* ajusta para dispositivos móviles */
+    }
+}
+
+img {
+    max-width: 150%;
+    height: auto;
+}
+
+
+
+/* offcanvas.css */
+.offcanvas-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.offcanvas-body {
+    padding: 15px;
+    background-color: #f8f9fa;
+}
+
+/* Style for the button that will toggle the offcanvas */
+.offcanvas-toggle-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.offcanvas-toggle-btn:hover {
+    background-color: #0056b3;
+}
