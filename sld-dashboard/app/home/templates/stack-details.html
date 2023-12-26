@@ -33,19 +33,48 @@
 
 
 
-<!-- <div class="d-flex justify-content-between w-100 flex-wrap">
-    {{stack.stack_name}}
-    {{stack.description}}
-    {{stack.git_repo}}
-    {{stack.branch}}
-    {{ stack.iac_type }}
-    {{ stack.tf_version }}
-    {{ stack.squads }}
-</div>
--->
 <pre>
 <code class="language-html">
 <div class="col-lg-4 col-sm-6">
+<h2>Details</h2>
+<table style="border-collapse: collapse; width: 100%;">
+</table>
+<table style="border-collapse: collapse; width: 100%;">
+    <thead>
+        <tr>
+            <th style="border: 1px solid #000; text-align: left; padding: 8px;">Name</th>
+            <th style="border: 1px solid #000; text-align: left; padding: 8px;">Value</th>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">Name</td>
+            <td style="border: 1px solid #000000; text-align: left; padding: 8px;">{{ stack.stack_name }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000000; text-align: left; padding: 8px;">Branch</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">{{ stack.branch }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">Iac Type</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">{{ stack.iac_type }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">IaC Version</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">{{ stack.tf_version }}</td>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">Description</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">  {{ stack.description }}</td>
+        </tr>
+        <tr>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">Squad access</td>
+            <td style="border: 1px solid #000; text-align: left; padding: 8px;">{{ stack.squad_access }}</td>
+        </tr>
+        <!-- Additional rows can be added here -->
+    </tbody>
+</table>
+
 
     {{ readme_html | safe }}
 

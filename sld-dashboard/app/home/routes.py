@@ -1077,6 +1077,7 @@ def resync_stack(view_mode, stack_id):
                 "squad_access": response.get("json").get("squad_access"),
                 "iac_type": response.get("json").get("iac_type"),
                 "tf_version": response.get("json").get("tf_version"),
+                "icon_path": response.get("json").get("icon_path"),
                 "project_path": response.get("json").get("project_path"),
                 "description": response.get("json").get("description"),
             }

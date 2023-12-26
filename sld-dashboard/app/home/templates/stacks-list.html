@@ -194,7 +194,7 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.resync_stack',view_mode='cards', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
+                                <form action="{{ url_for('.resync_stack',view_mode='table', stack_id=stack.id)}}" onsubmit="return checkForm(this);">
                                     <input type="submit" value="Sync Repo" name="stackButton" class="btn btn-danger">
                                 </form>
                             </div>
@@ -222,7 +222,7 @@
 
                                 <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
 
-                                <form action="{{ url_for('.delete_stack', view_mode='cards', stack_name=stack.stack_name)}}">
+                                <form action="{{ url_for('.delete_stack', view_mode='table', stack_name=stack.stack_name)}}">
                                     <input type="submit" value="Remove Repo" class="btn btn-danger">
                                 </form>
                             </div>

@@ -74,14 +74,14 @@
             </a>
                 <div class="card-row card-columns d-flex justify-content-start">
                         <div class="limit_words" title="{{ stack.git_repo }}">
-                        <span style="font-size: 12px; font-weight: bold;">repo:</span>
+                        <span style="font-size: 12px; font-weight: bold;">Repo:</span>
                         <span class="font-weight-normal">{{ stack.git_repo.split('/')[-1] | replace('.git', '') }}</span>
                         <span class="copy-icon" onclick="copyToClipboard('{{ stack.git_repo | replace('.git', '') }}/tree/{{ stack.branch }}')" title="Copy to clipboard">
                             <i class="far fa-copy"></i>
                         </span>
                         </div>
                         <div class="limit_words" title="{{ stack.branch }}">
-                        <span style="font-size: 12px; font-weight: bold;">branch:</span>
+                        <span style="font-size: 12px; font-weight: bold;">Branch:</span>
                         <span class="font-weight-normal">
                             {{ stack.branch }}
                         </span>

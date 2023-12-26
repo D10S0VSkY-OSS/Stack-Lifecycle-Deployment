@@ -47,3 +47,30 @@ img {
     max-width: 150%;
     height: auto;
 }
+
+
+
+/* offcanvas.css */
+.offcanvas-header {
+    background-color: #007bff;
+    color: white;
+}
+
+.offcanvas-body {
+    padding: 15px;
+    background-color: #f8f9fa;
+}
+
+/* Style for the button that will toggle the offcanvas */
+.offcanvas-toggle-btn {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.offcanvas-toggle-btn:hover {
+    background-color: #0056b3;
+}

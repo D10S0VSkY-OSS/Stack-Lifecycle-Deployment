@@ -68,23 +68,14 @@ def update_stack(
     db_stack.tags = stack.tags
     db_stack.icon_path = stack.icon_path
     db_stack.updated_at = datetime.datetime.now()
-    check_None = ["string", ""]
-    if db_stack.stack_name not in check_None:
-        db_stack.stack_name = stack.stack_name
-    if db_stack.git_repo not in check_None:
-        db_stack.git_repo = stack.git_repo
-    if db_stack.branch not in check_None:
-        db_stack.branch = stack.branch
-    if db_stack.iac_type not in check_None:
-        db_stack.iac_type = stack.iac_type
-    if db_stack.tf_version not in check_None:
-        db_stack.tf_version = stack.tf_version
-    if db_stack.project_path not in check_None:
-        db_stack.project_path = stack.project_path
-    if db_stack.description not in check_None:
-        db_stack.description = stack.description
-    if db_stack.squad_access not in check_None:
-        db_stack.squad_access = squad_access
+    db_stack.stack_name = stack.stack_name
+    db_stack.git_repo = stack.git_repo
+    db_stack.branch = stack.branch
+    db_stack.iac_type = stack.iac_type
+    db_stack.tf_version = stack.tf_version
+    db_stack.project_path = stack.project_path
+    db_stack.description = stack.description
+    db_stack.squad_access = squad_access
     try:
         db.add(db_stack)
         db.commit()
