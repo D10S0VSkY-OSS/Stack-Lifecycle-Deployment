@@ -980,7 +980,7 @@ def details_stack(stack_id):
             readme_content = response.text
             readme_html = mistletoe.markdown(readme_content)  # Convierte el contenido de Markdown a HTML
         else:
-            readme_html = "<p>Error al cargar el README.md</p>"
+            readme_html = "<p>Error loading the README.md file, check that it exists in the repository and on the selected branch</p>"
 
         # When user push data with POST verb
         if request.method == "POST":

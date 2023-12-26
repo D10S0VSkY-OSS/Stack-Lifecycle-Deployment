@@ -29,7 +29,7 @@
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
             <div>
-                <button onclick="changeView('cards')" class="btn btn-outline-gray">
+                <button onclick="changeView('cards')" class="btn btn-outline-gray" title="Change cards view">
                 <i class="fa fa-th" aria-hidden="true"></i>
                 </button>
             </div>
@@ -151,6 +151,9 @@
                         </div>
                     </td>
                     <td>
+                            <span class="icon icon-sm">
+                                <a title="Deploy Stack" class="dropdown-item" href="{{ url_for('.deploy_stack', stack_id=stack.id)}}"><span class="fas fa-power-off"></span></a>
+                                <a title="Details" class="dropdown-item" href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fa fa-info"></span></a>
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                         <div class="btn-group">
                             <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -167,9 +170,6 @@
                             </div>
                         </div>
                             <!-- Deploy button -->
-                            <span class="icon icon-sm">
-                                <a title="Deploy Stack" class="dropdown-item" href="{{ url_for('.deploy_stack', stack_id=stack.id)}}"><span class="fas fa-power-off"></span></a>
-                                <a title="Details" class="dropdown-item" href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fa fa-info"></span></a>
                     </td>
                 </tr>
                 <!-- Modal sync-->

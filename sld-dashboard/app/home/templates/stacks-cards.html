@@ -32,7 +32,7 @@
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group">
             <div>
-                <button onclick="changeView('table')" class="btn btn-outline-gray">
+                <button onclick="changeView('table')" class="btn btn-outline-gray" title="change table view">
                 <i class="fa fa-table" aria-hidden="true"></i>
                 </button>
             </div>
@@ -61,7 +61,7 @@
         {% if "aws" in stack.stack_name or "azure" in stack.stack_name or "gcp" in stack.stack_name or "custom" in stack.stack_name %}
             <a href="{{ url_for('.deploy_stack', stack_id=stack.id)}}" class="card-link">
             <div class="card border-primary border-1 rounded mb-4 m-4" style="max-width: 20rem; min-width: 20rem; min-height: 18rem;">
-                <div class="card-header">
+                <div class="card-header" title="Click to Deploy">
                     {% if stack.icon_path %}
                         <img src="{{ stack.icon_path }}" alt="Icono" width="40" height="40">
                     {% else %}
@@ -69,10 +69,10 @@
                     {% endif %}
                         <h5 class="card-title limit_words">{{stack.stack_name}}</h5>
                 </div>
-            </a>
                 <div class="card-body text-primary">
-                <p class="card-text">{{stack.description}}</p>
-                <div class="card-row card-columns">
+                <p class="card-text" title="Click to Deploy">{{stack.description}}</p>
+            </a>
+                <div class="card-row card-columns d-flex justify-content-start">
                         <div class="limit_words" title="{{ stack.git_repo }}">
                         <span style="font-size: 12px; font-weight: bold;">repo:</span>
                         <span class="font-weight-normal">{{ stack.git_repo.split('/')[-1] | replace('.git', '') }}</span>
@@ -82,12 +82,16 @@
                         </div>
                         <div class="limit_words" title="{{ stack.branch }}">
                         <span style="font-size: 12px; font-weight: bold;">branch:</span>
-                        <span class="font-weight-normal">{{ stack.branch }}</span>
+                        <span class="font-weight-normal">
+                            {{ stack.branch }}
+                        </span>
                         </div>
-                   <span class="icon-with-text">
-                    <img src="/static/assets/img/iac_type/{% if 'terragrunt' in stack.iac_type %}terragrunt{% elif 'tofu' in stack.iac_type %}tofu{% else %}tf{% endif %}.svg" alt="Icono" width="30" height="30">
-                                <a href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fa fa-info mr-2"></span></a>
-                    </span>
+                        <div title="Sack Details">
+                            <span class="icon icon-sm">
+                                <a title="Details Stack" class="dropdown-item" href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fas fa-info"></span></a>
+                        </span>
+                        </div>
+                        
                     {% if "yoda" in  current_user.role or "darth_vader" in current_user.role %}
                         <div class="btn-group">
                             <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -99,7 +103,6 @@
                             <div class="dropdown-menu">
                                 <a class="dropdown-item" href="{{ url_for('.edit_stack', stack_id=stack.id)}}"><span class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item" data-toggle="modal" data-target="#SyncModalCenter-{{stack.id}}"><span class="fas fa-sync mr-2"></span>sync</a>
-                                <a class="dropdown-item" href="{{ url_for('.details_stack', stack_id=stack.id)}}"><span class="fa fa-info mr-2"></span>Details</a>
                                 <a class="dropdown-item text-danger" data-toggle="modal" data-target="#RemoveModalCenter-{{stack.stack_name}}"><span class="fas fa-trash-alt mr-2"></span>Remove</a>
                 </div>
                 </div>
@@ -163,6 +166,7 @@
                     {% endif %}
                 <!-- END Modal -->
                 </div>
+                        <img src="/static/assets/img/iac_type/{% if 'terragrunt' in stack.iac_type %}terragrunt{% elif 'tofu' in stack.iac_type %}tofu{% else %}tf{% endif %}.svg" alt="Icono" width="30" height="30" title="IaC Type">
                 </div>
             </div>
         {% endif %}
