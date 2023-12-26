@@ -86,8 +86,11 @@
         <!-- Icon preview will be displayed here -->
     </div>
 </div>
+<form class="" id="stackForm" method="post" onsubmit="return checkForm(this);">
+    <input type="hidden" id="preferredView" name="preferredView">
+    <input class="btn btn-primary" type="submit" name="stackButton" value="Update Stack">
+</form>
 
-                                    <input class="btn btn-primary" type="submit" name="stackButton" value="Update Stack">
 
                                 </form>
                             </div>
@@ -109,16 +112,16 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <script type="text/javascript">
+    function checkForm(form) {
+        form.stackButton.disabled = true;
+        form.stackButton.value = "Please wait...";
 
-    function checkForm(form) // Submit button clicked
-{
+        document.getElementById('preferredView').value = localStorage.getItem('preferredView');
 
-    form.stackButton.disabled = true;
-    form.stackButton.value = "Please wait...";
-    return true;
-}
-
+        return true;
+    }
 </script>
+
 <script type="text/javascript">
     // Populate the icon selector and implement preview functionality
     document.addEventListener('DOMContentLoaded', function () {

@@ -43,20 +43,21 @@
     {{ stack.squads }}
 </div>
 -->
-<pre><code class="language-html">
+<pre>
+<code class="language-html">
 <div class="col-lg-4 col-sm-6">
 
     {{ readme_html | safe }}
 
     </div>
-
-</code></pre>
-
+</code>
+</pre>
 <div class="btn btn-primary btn-xl">
         <a href="{{ url_for('.deploy_stack', stack_id=stack.id)}}" style="color: aliceblue;">
-        <span class="fas fa-cloud"></span>  <i>  Deploy Stack</i>
+        <span class="fas fa-cloud"></span><i>  Deploy Stack</i>
     </a>
 </div>
+
                 {% include 'includes/footer.html' %}
 
 </main>

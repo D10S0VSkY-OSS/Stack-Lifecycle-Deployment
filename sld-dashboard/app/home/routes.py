@@ -938,6 +938,8 @@ def edit_stack(stack_id):
                 "icon_path": request.form.get("icon_path"),
             }
             # Deploy
+            preferred_view = request.form.get('preferredView')
+
             response = request_url(
                 verb="PATCH",
                 uri=f"{endpoint}",
@@ -948,9 +950,11 @@ def edit_stack(stack_id):
                 flash("Updating Stack")
             else:
                 flash(response.get("json").get("detail"), "error")
-            return redirect(
-                url_for("home_blueprint.route_template", template="stacks-list")
-            )
+                
+            if preferred_view == 'cards':
+                return redirect(url_for("home_blueprint.route_template", template="stacks-cards"))
+            else:
+                return redirect(url_for("home_blueprint.route_template", template="stacks-list"))
 
         return render_template(
             "stack-edit.html", name="Edit Stack", form=form, stack=stack, icons=icons
