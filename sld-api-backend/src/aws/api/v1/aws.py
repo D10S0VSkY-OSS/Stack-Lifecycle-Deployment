@@ -17,7 +17,7 @@ async def create_new_aws_profile(
 
 @router.get("/", status_code=200, response_model=list[schemas_aws.AwsAccountResponse])
 async def get_all_aws_accounts(
-    get_aws_profile: schemas_aws.AwsAsumeProfile = Depends(get.get_all_aws_accounts),
+    get_aws_profile: schemas_aws.AwsAccountResponse = Depends(get.get_all_aws_accounts),
 ):
     return get_aws_profile
 

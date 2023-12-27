@@ -210,15 +210,13 @@ def get_deploys(db: Session, filters: DeployFilter, skip: int = 0, limit: int = 
 
     results = query.order_by(desc(models.Deploy.id)).offset(skip).limit(limit).all()
 
-    # Crear una lista de DeployFilterResponse a partir de los resultados
     deploy_responses = []
     for deploy, icon_path in results:
         deploy_dict = deploy.__dict__
-        deploy_dict['icon_path'] = icon_path  # Agregar el icon_path al diccionario
+        deploy_dict['icon_path'] = icon_path
         deploy_responses.append(DeployFilterResponse(**deploy_dict))
 
     return deploy_responses
-
 
 
 class MetricsFetcher:

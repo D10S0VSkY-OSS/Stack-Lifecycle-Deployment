@@ -5,7 +5,16 @@ import logging
 import os
 
 from config.api import settings
+from src.shared.security.vault import vault_decrypt
 
+
+@vault_decrypt
+def decrypt(secreto):
+    try:
+        return secreto
+    except Exception as err:
+        raise err
+    
 
 class SecretsProviders:
     def __init__(self, secret_provider: dict) -> None:
@@ -25,74 +34,6 @@ def createLocalFolder(dir_path: str):
         raise
 
 
-def aws_config(secreto):
-    try:
-        config = configparser.ConfigParser(strict=False)
-        # Check if pass me profile
-        if secreto.get("profile_name"):
-            # Create folder in home user
-            createLocalFolder(settings.AWS_CONGIG_DEFAULT_FOLDER)
-            # Read config
-            config.read(settings.AWS_SHARED_CONFIG_FILE)
-            profile_name = secreto.get("profile_name")
-            if not config.has_section(f"profile {profile_name}"):
-                config.add_section(f"profile {profile_name}")
-            config.set(f"profile {profile_name}", "role_arn", secreto.get("role_arn"))
-            config.set(
-                f"profile {profile_name}",
-                "region",
-                secreto.get("default_region"),
-            )
-            config.set(
-                f"profile {profile_name}",
-                "source_profile",
-                secreto.get("source_profile"),
-            )
-            with open(settings.AWS_SHARED_CONFIG_FILE, "w") as configfile:
-                config.write(configfile)
-                logging.info(
-                    "created config done"
-                )
-            del secreto
-            del profile_name
-            del configfile
-            del config
-            return True
-    except Exception as err:
-        return False
-        logging.warning(err)
-
-
-def aws_credentials(secreto):
-    try:
-        config = configparser.ConfigParser(strict=False)
-        if secreto.get("source_profile"):
-            config.read(settings.AWS_SHARED_CREDENTIALS_FILE)
-            source_profile = secreto.get("source_profile")
-            if not config.has_section(source_profile):
-                config.add_section(source_profile)
-            config.set(source_profile, "region", secreto.get("default_region"))
-            config.set(source_profile, "aws_access_key_id", secreto.get("access_key"))
-            config.set(
-                source_profile,
-                "aws_secret_access_key",
-                secreto.get("secret_access_key"),
-            )
-            with open(settings.AWS_SHARED_CREDENTIALS_FILE, "w") as credentialsfile:
-                config.write(credentialsfile)
-                logging.info(
-                    "created credentials done"
-                )
-            del secreto
-            del source_profile
-            del credentialsfile
-            del config
-            return True
-    except Exception as err:
-        return False
-        logging.warning(err)
-
-
 def secret(
     stack_name,
     environment,
@@ -102,12 +43,16 @@ def secret(
 ):
     if any(i in stack_name.lower() for i in settings.AWS_PREFIX):
         try:
-            if not aws_config(secreto) or not aws_credentials(secreto):
-                os.environ["AWS_ACCESS_KEY_ID"] = secreto.get("access_key")
-                os.environ["AWS_SECRET_ACCESS_KEY"] = secreto.get("secret_access_key")
-                logging.info(
-                    f"Set aws account without asume role {squad}, {environment}, {stack_name}, {name}"
-                )
+            os.environ["AWS_ACCESS_KEY_ID"] = decrypt(secreto.get("access_key_id"))
+            os.environ["AWS_SECRET_ACCESS_KEY"] = decrypt(secreto.get("secret_access_key"))
+            os.environ["AWS_DEFAULT_REGION"] = secreto.get("default_region")
+            if secreto.get("role_arn"):
+                logging.info("Set role_arn for assume role")
+                os.environ["TF_VAR_role_arn"] = secreto.get("role_arn")
+                logging.info(f"TF_VAR_role_arn = {secreto.get('role_arn')}")
+            logging.info(
+                f'Set aws account {squad}, {environment}, {stack_name}, {secreto.get("default_region")}, {name}'
+            )
         except Exception as err:
             logging.warning(err)
 

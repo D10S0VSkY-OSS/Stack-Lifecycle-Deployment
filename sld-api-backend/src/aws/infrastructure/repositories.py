@@ -1,10 +1,13 @@
 import datetime
+from typing import List
 
 from sqlalchemy.orm import Session
+from sqlalchemy import desc, or_
+
 
 import src.aws.infrastructure.models as models
 from src.aws.domain.entities import aws as schemas_aws
-from src.shared.security.vault import vault_decrypt, vault_encrypt
+from src.shared.security.vault import vault_encrypt
 
 
 @vault_encrypt
@@ -15,35 +18,21 @@ def encrypt(secreto):
         raise err
 
 
-@vault_decrypt
-def decrypt(secreto):
-    try:
-        return secreto
-    except Exception as err:
-        raise err
-
-
 def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile):
     encrypt_access_key_id = encrypt(aws.access_key_id)
     encrypt_secret_access_key = encrypt(aws.secret_access_key)
+    encrypted_extra_variables = {key: encrypt(val) for key, val in aws.extra_variables.items()} if aws.extra_variables else None
+
     db_aws = models.Aws_provider(
         access_key_id=encrypt_access_key_id,
         secret_access_key=encrypt_secret_access_key,
         environment=aws.environment,
         default_region=aws.default_region,
-        profile_name=aws.profile_name,
         role_arn=aws.role_arn,
-        source_profile=aws.source_profile,
+        extra_variables=encrypted_extra_variables,
         created_at=datetime.datetime.now(),
         squad=aws.squad,
     )
-    check_None = [None, "string"]
-    if db_aws.role_arn in check_None:
-        db_aws.role_arn = ""
-    if db_aws.profile_name in check_None:
-        db_aws.profile_name = ""
-    if db_aws.source_profile in check_None:
-        db_aws.source_profile = ""
     try:
         db.add(db_aws)
         db.commit()
@@ -53,82 +42,87 @@ def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile):
         raise err
 
 
-def get_credentials_aws_profile(db: Session, environment: str, squad: str):
-    get_access_key = (
-        db.query(models.Aws_provider.access_key_id)
+def get_credentials_aws_profile(db: Session, environment: str, squad: str) -> schemas_aws.AwsAccountResponseRepo:
+    aws_provider_data = (
+        db.query(models.Aws_provider)
         .filter(models.Aws_provider.environment == environment)
         .filter(models.Aws_provider.squad == squad)
         .first()
     )
-    get_secret_access_key = (
-        db.query(models.Aws_provider.secret_access_key)
-        .filter(models.Aws_provider.environment == environment)
-        .filter(models.Aws_provider.squad == squad)
-        .first()
+    return schemas_aws.AwsAccountResponseRepo(
+        id=aws_provider_data.id,
+        squad=aws_provider_data.squad,
+        environment=aws_provider_data.environment,
+        access_key_id=aws_provider_data.access_key_id,
+        secret_access_key=aws_provider_data.secret_access_key,
+        role_arn=aws_provider_data.role_arn,
+        default_region=aws_provider_data.default_region,
+        extra_variables=aws_provider_data.extra_variables,
     )
-    default_region = (
-        db.query(models.Aws_provider.default_region)
-        .filter(models.Aws_provider.environment == environment)
-        .filter(models.Aws_provider.squad == squad)
-        .first()
-    )
-    profile_name = (
-        db.query(models.Aws_provider.profile_name)
-        .filter(models.Aws_provider.environment == environment)
-        .filter(models.Aws_provider.squad == squad)
-        .first()
-    )
-    role_arn = (
-        db.query(models.Aws_provider.role_arn)
-        .filter(models.Aws_provider.environment == environment)
-        .filter(models.Aws_provider.squad == squad)
-        .first()
-    )
-    source_profile = (
-        db.query(models.Aws_provider.source_profile)
-        .filter(models.Aws_provider.environment == environment)
-        .filter(models.Aws_provider.squad == squad)
-        .first()
-    )
-    try:
-        return {
-            "access_key": decrypt(get_access_key[0]),
-            "secret_access_key": decrypt(get_secret_access_key[0]),
-            "default_region": default_region[0],
-            "profile_name": profile_name[0],
-            "role_arn": role_arn[0],
-            "source_profile": source_profile[0],
-        }
-    except Exception as err:
-        raise err
 
 
-def get_squad_aws_profile(db: Session, squad: str, environment: str):
+def get_squad_aws_profile(
+    db: Session, squad: str, filters: schemas_aws.AwsAccountFilter, skip: int = 0, limit: int = 100
+) -> List[schemas_aws.AwsAccountResponse]:
     try:
-        if environment != None:
-            return (
-                db.query(models.Aws_provider)
-                .filter(models.Aws_provider.squad == squad)
-                .filter(models.Aws_provider.environment == environment)
-                .first()
+        query = (
+            db.query(models.Aws_provider)
+            .filter(models.Aws_provider.squad == squad)
+        )
+
+        for field, value in filters.model_dump().items():
+            if value is not None:
+                query = query.filter(getattr(models.Aws_provider, field) == value)
+
+        results = query.order_by(desc(models.Aws_provider.id)).offset(skip).limit(limit).all()
+
+        aws_profiles = []
+        for result in results:
+            aws_profile = schemas_aws.AwsAccountResponse(
+                id=result.id,
+                squad=result.squad,
+                environment=result.environment,
+                default_region=result.default_region,
+                role_arn=result.role_arn,
+                extra_variables=result.extra_variables,
             )
-        result = []
-        for i in squad:
-            result.extend(
-                db.query(models.Aws_provider)
-                .filter(models.Aws_provider.squad == i)
-                .all()
-            )
-        return set(result)
+            aws_profiles.append(aws_profile)
+        return aws_profiles
     except Exception as err:
         raise err
 
 
-def get_all_aws_profile(db: Session):
+def get_all_aws_profile(
+    db: Session, filters: schemas_aws.AwsAccountFilter, skip: int = 0, limit: int = 100
+) -> List[schemas_aws.AwsAccountResponse]:
     try:
-        return db.query(models.Aws_provider).all()
+        query = db.query(models.Aws_provider)
+
+        for field, value in filters.model_dump().items():
+            if value is not None:
+                if field == 'squad' and isinstance(value, list):
+                    or_conditions = [getattr(models.Aws_provider, field).like(f"%{v}%") for v in value]
+                    query = query.filter(or_(*or_conditions))
+                else:
+                    query = query.filter(getattr(models.Aws_provider, field) == value)
+
+        results = query.order_by(desc(models.Aws_provider.id)).offset(skip).limit(limit).all()
+
+        aws_profiles = []
+        for result in results:
+            aws_profile = schemas_aws.AwsAccountResponse(
+                id=result.id,
+                squad=result.squad,
+                environment=result.environment,
+                default_region=result.default_region,
+                role_arn=result.role_arn,
+                extra_variables=result.extra_variables,
+            )
+            aws_profiles.append(aws_profile)
+        return aws_profiles
     except Exception as err:
         raise err
+
 
 
 def delete_aws_profile_by_id(db: Session, aws_profile_id: int):

@@ -22,7 +22,6 @@ async def get_all_deploys(
     filters: DeployFilter = Depends(DeployFilter),
 ) -> List[DeployFilterResponse]:
     try:
-        # Si el usuario no es un maestro, aplicar el filtro de escuadrón
         if not crud_users.is_master(db, current_user):
             filters.squad = current_user.squad
 

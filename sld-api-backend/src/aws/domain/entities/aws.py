@@ -1,23 +1,19 @@
-from typing import Optional
+from typing import Optional, Dict, Any
 
-from pydantic import BaseModel, Field, constr
+from pydantic import BaseModel, constr
 
 
 class AwsBase(BaseModel):
     squad: constr(strip_whitespace=True)
     environment: constr(strip_whitespace=True)
     access_key_id: constr(strip_whitespace=True)
-    secret_access_key: Optional[constr(strip_whitespace=True)] = Field(
-        None, example="string"
-    )
+    secret_access_key: constr(strip_whitespace=True)
     default_region: constr(strip_whitespace=True)
+    extra_variables: Optional[Dict[str, Any]] = None
 
-    default_region: constr(strip_whitespace=True)
 
 class AwsAsumeProfile(AwsBase):
-    profile_name: Optional[constr(strip_whitespace=True)] = None
     role_arn: Optional[constr(strip_whitespace=True)] = None
-    source_profile: Optional[constr(strip_whitespace=True)] = None
 
 
 class Aws(AwsBase):
@@ -26,10 +22,31 @@ class Aws(AwsBase):
     class Config:
         from_attributes = True
 
+
 class AwsAccountResponse(BaseModel):
     id: int
-    squad: constr(strip_whitespace=True)
-    environment: constr(strip_whitespace=True)
-    profile_name: Optional[constr(strip_whitespace=True)] = None
-    role_arn: Optional[constr(strip_whitespace=True)] = None
-    source_profile: Optional[constr(strip_whitespace=True)] = None
+    squad: str
+    environment: str
+    default_region: Optional[str]
+    role_arn: Optional[str]
+    extra_variables: Optional[Dict[str, Any]]
+
+    class Config:
+        from_attributes = True
+
+
+class AwsAccountResponseRepo(AwsAccountResponse):
+    access_key_id: str
+    secret_access_key: str
+
+    class Config:
+        from_attributes = True
+
+
+class AwsAccountFilter(BaseModel):
+    id: Optional[int] = None
+    squad: Optional[str] = None
+    access_key_id: Optional[str] = None
+    environment: Optional[str] = None
+    default_region: Optional[str] = None
+    role_arn: Optional[str] = None
