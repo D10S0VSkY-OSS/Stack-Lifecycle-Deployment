@@ -30,12 +30,13 @@ async def create_new_aws_profile(
     if db_aws_account:
         raise HTTPException(status_code=409, detail="Account already exists")
     try:
+        result = await crud_aws.create_aws_profile(db=db, aws=aws)
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
             action=f"Create AWS account {aws.squad} {aws.environment}",
         )
-        return await crud_aws.create_aws_profile(db=db, aws=aws)
+        return result
     except Exception as err:
         raise HTTPException(status_code=400, detail=str(err))

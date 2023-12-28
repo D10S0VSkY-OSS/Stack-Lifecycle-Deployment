@@ -23,12 +23,13 @@ async def update_aws_account(
         db_aws_account = await crud_aws.get_all_aws_profile(db=db, filters=filters)
         if not db_aws_account:
             raise HTTPException(status_code=404, detail="Account not found")
+        result = await crud_aws.update_aws_profile(db=db, aws_account_id=aws_account_id, updated_aws=aws)
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
             action=f"Update AWS account {aws.squad} {aws.environment}",
         )
-        return await crud_aws.update_aws_profile(db=db, aws_account_id=aws_account_id, updated_aws=aws)
+        return result
     except Exception as err:
         raise err
