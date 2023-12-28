@@ -20,7 +20,7 @@ from src.shared.security import deps
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-from src.worker.domain.entities.worker import DeployParams, DownloadGitRepoParams
+from src.worker.domain.entities.worker import DeployParams
 
 
 async def deploy_infra_by_stack_name(

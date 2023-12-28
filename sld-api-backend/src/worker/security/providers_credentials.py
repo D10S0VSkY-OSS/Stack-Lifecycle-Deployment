@@ -14,7 +14,13 @@ def decrypt(secreto):
         return secreto
     except Exception as err:
         raise err
-    
+
+
+def export_environment_variables(dictionary):
+    if 'extra_variables' in dictionary and isinstance(dictionary['extra_variables'], dict):
+        for key, value in dictionary['extra_variables'].items():
+            os.environ[key] = decrypt(value)
+
 
 class SecretsProviders:
     def __init__(self, secret_provider: dict) -> None:
@@ -43,6 +49,7 @@ def secret(
 ):
     if any(i in stack_name.lower() for i in settings.AWS_PREFIX):
         try:
+            export_environment_variables(secreto)
             os.environ["AWS_ACCESS_KEY_ID"] = decrypt(secreto.get("access_key_id"))
             os.environ["AWS_SECRET_ACCESS_KEY"] = decrypt(secreto.get("secret_access_key"))
             os.environ["AWS_DEFAULT_REGION"] = secreto.get("default_region")
@@ -74,9 +81,6 @@ def secret(
         configuration = ast.literal_eval(secreto.get("custom_provider_keyfile_json"))
         R = SecretsProviders(configuration)
         R.export()
-
-
-#        os.environ["GOOGLE_CLOUD_KEYFILE_JSON"] = gcloud_keyfile
 
 
 def unsecret(stack_name, environment, squad, name, secreto):

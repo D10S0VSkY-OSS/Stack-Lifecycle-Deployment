@@ -1,6 +1,6 @@
 from typing import Optional, Dict, Any
 
-from pydantic import BaseModel, constr
+from pydantic import BaseModel, constr, SecretStr
 
 
 class AwsBase(BaseModel):
@@ -23,21 +23,28 @@ class Aws(AwsBase):
         from_attributes = True
 
 
-class AwsAccountResponse(BaseModel):
+class AwsAccountResponseBase(BaseModel):
     id: int
     squad: str
     environment: str
     default_region: Optional[str]
     role_arn: Optional[str]
-    extra_variables: Optional[Dict[str, Any]]
 
     class Config:
         from_attributes = True
 
 
-class AwsAccountResponseRepo(AwsAccountResponse):
+class AwsAccountResponse(AwsAccountResponseBase):
+    extra_variables: Optional[Dict[str, SecretStr]]
+
+    class Config:
+        from_attributes = True
+
+
+class AwsAccountResponseRepo(AwsAccountResponseBase):
     access_key_id: str
     secret_access_key: str
+    extra_variables: Optional[Dict[str, Any]] = None
 
     class Config:
         from_attributes = True
