@@ -1,3 +1,4 @@
+import datetime
 from typing import Optional, Dict, Any
 
 from pydantic import BaseModel, constr, SecretStr
@@ -29,6 +30,8 @@ class AwsAccountResponseBase(BaseModel):
     environment: str
     default_region: Optional[str]
     role_arn: Optional[str]
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
 
     class Config:
         from_attributes = True
@@ -57,3 +60,8 @@ class AwsAccountFilter(BaseModel):
     environment: Optional[str] = None
     default_region: Optional[str] = None
     role_arn: Optional[str] = None
+
+
+class AwsAccountUpdate(AwsAccountFilter):
+    secret_access_key: Optional[str] = None
+    extra_variables: Optional[Dict[str, Any]] = None

@@ -38,7 +38,7 @@ async def delete_infra_by_id(
     project_path = deploy_data.project_path
     variables = deploy_data.variables
     # Get  credentials by providers supported
-    secreto = check_prefix(
+    secreto = await check_prefix(
         db, stack_name=stack_name, environment=environment, squad=squad
     )
     # Get info from stack data

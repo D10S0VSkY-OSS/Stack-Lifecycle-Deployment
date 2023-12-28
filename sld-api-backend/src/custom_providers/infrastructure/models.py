@@ -11,4 +11,5 @@ class Custom_provider(Base):
     squad = Column(String(200), nullable=False)
     configuration = Column(JSON, nullable=False)
     created_at = Column(DateTime, default=datetime.datetime.now())
+    updated_at = Column(DateTime, nullable=True)
     __table_args__ = (UniqueConstraint("squad", "environment"),)

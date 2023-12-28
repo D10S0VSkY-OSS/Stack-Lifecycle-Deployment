@@ -14,7 +14,6 @@ async def create_new_aws_profile(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-    # Check if the user has privileges
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     if "string" in [aws.squad, aws.environment]:
@@ -25,7 +24,7 @@ async def create_new_aws_profile(
     filters = schemas_aws.AwsAccountFilter()
     filters.squad = aws.squad
     filters.environment = aws.environment
-    db_aws_account = crud_aws.get_all_aws_profile(
+    db_aws_account = await crud_aws.get_all_aws_profile(
         db=db, filters=filters
     )
     if db_aws_account:
@@ -37,6 +36,6 @@ async def create_new_aws_profile(
             squad=current_user.squad,
             action=f"Create AWS account {aws.squad} {aws.environment}",
         )
-        return crud_aws.create_aws_profile(db=db, aws=aws)
+        return await crud_aws.create_aws_profile(db=db, aws=aws)
     except Exception as err:
         raise HTTPException(status_code=400, detail=str(err))

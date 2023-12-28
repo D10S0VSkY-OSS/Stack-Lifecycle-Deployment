@@ -18,7 +18,7 @@ def encrypt(secreto):
         raise err
 
 
-def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> schemas_aws.AwsAccountResponse:
+async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> schemas_aws.AwsAccountResponse:
     encrypt_access_key_id = encrypt(aws.access_key_id)
     encrypt_secret_access_key = encrypt(aws.secret_access_key)
     encrypted_extra_variables = {key: encrypt(val) for key, val in aws.extra_variables.items()} if aws.extra_variables else None
@@ -37,23 +37,16 @@ def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> schemas
         db.add(db_aws)
         db.commit()
         db.refresh(db_aws)
-        return schemas_aws.AwsAccountResponse(
-            id=db_aws.id,
-            squad=db_aws.squad,
-            environment=db_aws.environment,
-            default_region=db_aws.default_region,
-            role_arn=db_aws.role_arn,
-            extra_variables=db_aws.extra_variables,
-        )
+        return schemas_aws.AwsAccountResponse.model_validate(obj=db_aws)
     except Exception as err:
+        db.rollback()
         raise err
 
 
-async def update_aws_profile(db: Session, aws_id: int, updated_aws: schemas_aws.AwsAsumeProfile) -> schemas_aws.AwsAccountResponse:
-    db_aws = db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_id).first()
-
+async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: schemas_aws.AwsAccountUpdate) -> schemas_aws.AwsAccountResponse:
+ 
+    db_aws = db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_account_id).first()
     if db_aws:
-        # Update only the fields that are present in the updated_aws object
         if updated_aws.access_key_id:
             db_aws.access_key_id = encrypt(updated_aws.access_key_id)
         if updated_aws.secret_access_key:
@@ -61,51 +54,34 @@ async def update_aws_profile(db: Session, aws_id: int, updated_aws: schemas_aws.
         if updated_aws.extra_variables:
             db_aws.extra_variables = {key: encrypt(val) for key, val in updated_aws.extra_variables.items()}
 
-        # Update the remaining fields
         db_aws.environment = updated_aws.environment
         db_aws.default_region = updated_aws.default_region
         db_aws.role_arn = updated_aws.role_arn
         db_aws.squad = updated_aws.squad
+        db_aws.updated_at = datetime.datetime.now()
 
         try:
             db.commit()
             db.refresh(db_aws)
-            return schemas_aws.AwsAccountResponse(
-                id=db_aws.id,
-                squad=db_aws.squad,
-                environment=db_aws.environment,
-                default_region=db_aws.default_region,
-                role_arn=db_aws.role_arn,
-                extra_variables=db_aws.extra_variables,
-            )
+            return schemas_aws.AwsAccountResponse.model_validate(db_aws)
         except Exception as err:
+            db.rollback()
             raise err
     else:
-        # Handle the case where the specified AWS profile ID doesn't exist
-        raise ValueError(f"AWS profile with id {aws_id} not found")
+        raise ValueError(f"AWS profile with id {aws_account_id} not found")
 
 
-
-def get_credentials_aws_profile(db: Session, environment: str, squad: str) -> schemas_aws.AwsAccountResponseRepo:
+async def get_credentials_aws_profile(db: Session, environment: str, squad: str) -> schemas_aws.AwsAccountResponseRepo:
     aws_provider_data = (
         db.query(models.Aws_provider)
         .filter(models.Aws_provider.environment == environment)
         .filter(models.Aws_provider.squad == squad)
         .first()
     )
-    return schemas_aws.AwsAccountResponseRepo(
-        id=aws_provider_data.id,
-        squad=aws_provider_data.squad,
-        environment=aws_provider_data.environment,
-        access_key_id=aws_provider_data.access_key_id,
-        secret_access_key=aws_provider_data.secret_access_key,
-        role_arn=aws_provider_data.role_arn,
-        default_region=aws_provider_data.default_region,
-        extra_variables=aws_provider_data.extra_variables,
-    )
+    return schemas_aws.AwsAccountResponseRepo.model_validate(obj=aws_provider_data)
 
 
-def get_all_aws_profile(
+async def get_all_aws_profile(
     db: Session, filters: schemas_aws.AwsAccountFilter, skip: int = 0, limit: int = 100
 ) -> List[schemas_aws.AwsAccountResponse]:
     try:
@@ -130,6 +106,8 @@ def get_all_aws_profile(
                 default_region=result.default_region,
                 role_arn=result.role_arn,
                 extra_variables=result.extra_variables,
+                created_at=result.created_at,
+                updated_at=result.updated_at,
             )
             aws_profiles.append(aws_profile)
         return aws_profiles
@@ -137,23 +115,18 @@ def get_all_aws_profile(
         raise err
 
 
-def delete_aws_profile_by_id(db: Session, aws_profile_id: int):
+async def delete_aws_profile_by_id(db: Session, aws_account_id: int) -> schemas_aws.AwsAccountResponse:
     try:
-        db.query(models.Aws_provider).filter(
-            models.Aws_provider.id == aws_profile_id
-        ).delete()
-        db.commit()
-        return {aws_profile_id: "deleted", "aws_profile_id": aws_profile_id}
+        aws_profile = db.query(models.Aws_provider).filter(
+            models.Aws_provider.id == aws_account_id
+        ).first()
+        if aws_profile:
+            db.delete(aws_profile)
+            db.commit()
+            response_data = schemas_aws.AwsAccountResponse.model_validate(aws_profile)
+            return response_data
+        else:
+            raise f"AWS profile with id {aws_account_id} not found"
     except Exception as err:
-        raise err
-
-
-def get_cloud_account_by_id(db: Session, provider_id: int):
-    try:
-        return (
-            db.query(models.Aws_provider)
-            .filter(models.Aws_provider.id == provider_id)
-            .first()
-        )
-    except Exception as err:
+        db.rollback()
         raise err

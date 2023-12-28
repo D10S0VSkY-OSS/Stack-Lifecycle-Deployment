@@ -18,4 +18,4 @@ async def get_all_aws_accounts(
 ) -> list[schemas_aws.AwsAccountResponse]:
     if not crud_users.is_master(db, current_user):
         filters.squad = current_user.squad
-    return crud_aws.get_all_aws_profile(db=db, filters=filters, skip=skip, limit=limit)
+    return await crud_aws.get_all_aws_profile(db=db, filters=filters, skip=skip, limit=limit)
