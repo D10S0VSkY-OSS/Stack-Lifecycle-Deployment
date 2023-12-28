@@ -29,10 +29,6 @@ $(document).ready(function(){
       displayPage(1);
   }
 
-  // Event Delegation for edit buttons and other interactive elements
-  $(document).on('click', '.edit-button', function() {
-      // Aquí iría el código para manejar la edición
-  });
 
   // Existing search functionality
   $("#myInput").on("keyup", function() {
