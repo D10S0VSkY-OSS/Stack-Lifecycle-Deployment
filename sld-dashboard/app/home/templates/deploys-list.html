@@ -216,7 +216,7 @@
                         </td>
                         <td>
                             <div>
-                            <span style="font-size: 12px; font-weight: bold;">Start:</span>
+                            <span style="font-size: 12px; font-weight: bold;">Apply:</span>
                             <span class="font-weight-bold">{{ deploy.start_time }}</span>
                             </div>
                             <div>
@@ -259,6 +259,10 @@
                                         <a class="dropdown-item" href="{{ url_for('.clone_deploy',deploy_id=deploy.id)}}">
                                             <span class="fas fa-clone mr-2"></span>
                                             Clone 
+                                        </a>
+                                        <a title="Edit Schedule" class="dropdown-item" href="{{ url_for('.edit_schedule',deploy_id=deploy.id)}}">
+                                            <span class="far fa-clock mr-0"></span>
+                                            Schedule
                                         </a>
                                         <a class="dropdown-item text-danger" data-toggle="modal" data-target="#DestroyModalCenter-{{deploy.id}}">
                                             <span class="fas fa-trash-alt mr-2"></span>

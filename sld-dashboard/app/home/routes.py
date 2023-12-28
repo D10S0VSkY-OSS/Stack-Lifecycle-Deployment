@@ -1325,8 +1325,6 @@ def list_activity(limit):
 
 
 # Users
-
-
 @blueprint.route("/users-new", methods=["GET", "POST"])
 @login_required
 def new_user():
@@ -1580,7 +1578,7 @@ def delete_aws_account(aws_account_id):
 
         if response.get("status_code") == 200:
             flash(
-                f"Account Deleted"
+                "Account Deleted"
             )
         elif response.get("status_code") == 409:
             flash(response["json"].get("detail"), "error")
