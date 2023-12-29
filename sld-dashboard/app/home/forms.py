@@ -1,12 +1,26 @@
 # -*- encoding: utf-8 -*-
 from flask_wtf import FlaskForm
 from wtforms import (BooleanField, PasswordField, StringField, TextAreaField, SelectField,
-                     validators)
+                     FormField, FieldList, validators)
 from wtforms.fields import EmailField
 from wtforms.validators import DataRequired
 
 
-# login and registration
+class DictField(StringField):
+    def process_formdata(self, valuelist):
+        if valuelist:
+            data = valuelist[0]
+            try:
+                # Try to parse the input as a dictionary
+                self.data = dict(eval(data))
+            except (SyntaxError, ValueError):
+                self.data = None
+                raise ValueError("Invalid dictionary format")
+
+
+class ExtraVariableForm(FlaskForm):
+    key = StringField('Key')
+    value = StringField('Value')
 
 
 class StackForm(FlaskForm):
@@ -193,6 +207,13 @@ class AwsForm(FlaskForm):
             validators.DataRequired(message="Squad Name requerid."),
         ],
     )
+    environment = StringField(
+        "Environment *",
+        [
+            validators.length(min=2, max=250, message="Environment out of reange."),
+            validators.DataRequired(message="Environment requerid."),
+        ],
+    )
     access_key_id = StringField(
         "Access_key_id *",
         [
@@ -216,31 +237,14 @@ class AwsForm(FlaskForm):
             validators.DataRequired(message="default_region."),
         ],
     )
-    profile_name = StringField(
-        "Profile_name",
-        [
-            validators.length(min=4, max=50, message="profile_name out of reange."),
-        ],
-    )
     role_arn = StringField(
         "Role_arn",
         [
             validators.length(min=4, max=50, message="Role arn out of reange."),
         ],
     )
-    source_profile = StringField(
-        "Source_profile",
-        [
-            validators.length(min=4, max=50, message="source_profile out of reange."),
-        ],
-    )
-    environment = StringField(
-        "Environment *",
-        [
-            validators.length(min=2, max=250, message="Branch out of reange."),
-            validators.DataRequired(message="Environment requerid."),
-        ],
-    )
+    extra_variables = FieldList(FormField(ExtraVariableForm), label='Extra Variables')
+
 
 
 class GcpForm(FlaskForm):

@@ -71,9 +71,8 @@
                     <th>Squad</th>
                     <th>Environment</th>
                     <th>Default Region</th>
-                    <th>Profile Name</th>
                     <th>Role Arn</th>
-                    <th>Source Profile</th>
+                    <th>Extra Variables</th>
                     <th></th>
                 </tr>
             </thead>
@@ -87,9 +86,25 @@
                     <td><span class="font-weight-normal">{{ aws_account.squad }}</span></td>
                     <td><span class="font-weight-normal">{{ aws_account.environment }}</span></td>
                     <td><span class="font-weight-normal">{{ aws_account.default_region }}</span></td>
-                    <td><span class="font-weight-normal">{{ aws_account.profile_name }}</span></td>
-                    <td><span class="font-weight-normal">{{ aws_account.role_arn }}</span></td>
-                    <td><span class="font-weight-normal">{{ aws_account.source_profile }}</span></td>
+<td>
+    <span class="font-weight-normal">
+        {% if aws_account.role_arn %}
+            {{ aws_account.role_arn }}
+        {% else %}
+            -
+        {% endif %}
+    </span>
+</td>
+<td>
+    <span class="font-weight-normal" title="{% if aws_account.extra_variables %}{{ ', '.join(aws_account.extra_variables.keys()) }}{% endif %}">
+        {% if aws_account.extra_variables %}
+            {% set truncated_variables = aws_account.extra_variables.keys() | join(', ') | truncate(30, True, '...') %}
+            {{ truncated_variables }}
+        {% else %}
+            -
+        {% endif %}
+    </span>
+</td>
                     <td>
                         <div class="btn-group">
                             {% if "yoda" in current_user.role %}

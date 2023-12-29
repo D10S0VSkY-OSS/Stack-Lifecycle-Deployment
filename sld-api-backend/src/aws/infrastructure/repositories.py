@@ -44,7 +44,7 @@ async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> s
 
 
 async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: schemas_aws.AwsAccountUpdate) -> schemas_aws.AwsAccountResponse:
- 
+
     db_aws = db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_account_id).first()
     if db_aws:
         if updated_aws.access_key_id:
@@ -72,13 +72,13 @@ async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: sche
 
 
 async def get_credentials_aws_profile(db: Session, environment: str, squad: str) -> schemas_aws.AwsAccountResponseRepo:
-    aws_provider_data = (
+    db_aws = (
         db.query(models.Aws_provider)
         .filter(models.Aws_provider.environment == environment)
         .filter(models.Aws_provider.squad == squad)
         .first()
     )
-    return schemas_aws.AwsAccountResponseRepo.model_validate(obj=aws_provider_data)
+    return schemas_aws.AwsAccountResponseRepo.model_validate(obj=db_aws)
 
 
 async def get_all_aws_profile(
@@ -95,10 +95,10 @@ async def get_all_aws_profile(
                 else:
                     query = query.filter(getattr(models.Aws_provider, field) == value)
 
-        results = query.order_by(desc(models.Aws_provider.id)).offset(skip).limit(limit).all()
+        db_aws = query.order_by(desc(models.Aws_provider.id)).offset(skip).limit(limit).all()
 
         aws_profiles = []
-        for result in results:
+        for result in db_aws:
             aws_profile = schemas_aws.AwsAccountResponse(
                 id=result.id,
                 squad=result.squad,
@@ -117,13 +117,13 @@ async def get_all_aws_profile(
 
 async def delete_aws_profile_by_id(db: Session, aws_account_id: int) -> schemas_aws.AwsAccountResponse:
     try:
-        aws_profile = db.query(models.Aws_provider).filter(
+        db_aws = db.query(models.Aws_provider).filter(
             models.Aws_provider.id == aws_account_id
         ).first()
-        if aws_profile:
-            db.delete(aws_profile)
+        if db_aws:
+            db.delete(db_aws)
             db.commit()
-            response_data = schemas_aws.AwsAccountResponse.model_validate(aws_profile)
+            response_data = schemas_aws.AwsAccountResponse.model_validate(db_aws)
             return response_data
         else:
             raise f"AWS profile with id {aws_account_id} not found"

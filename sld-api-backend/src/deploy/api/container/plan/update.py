@@ -40,7 +40,7 @@ async def update_plan_by_id(
                 status_code=403, detail=f"Not enough permissions in {squad}"
             )
     # Get  credentials by providers supported
-    secreto = check_prefix(
+    secreto = await check_prefix(
         db, stack_name=stack_name, environment=environment, squad=squad
     )
     # Get info from stack data

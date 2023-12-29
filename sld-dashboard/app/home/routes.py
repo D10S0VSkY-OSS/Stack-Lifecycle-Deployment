@@ -1506,15 +1506,17 @@ def new_aws_account():
         # Check if token no expired
         check_unauthorized_token(token)
         if request.method == "POST":
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
             new_user: dict = {
                 "squad": form.squad.data.replace(" ",""),
                 "environment": form.environment.data.replace(" ",""),
                 "access_key_id": form.access_key_id.data.replace(" ",""),
                 "secret_access_key": form.secret_access_key.data.replace(" ",""),
                 "default_region": form.default_region.data.replace(" ",""),
-                "profile_name": form.profile_name.data.replace(" ",""),
                 "role_arn": form.role_arn.data.replace(" ",""),
-                "source_profile": form.source_profile.data.replace(" ",""),
+                "extra_variables": dict(list(zip(key_list, value_list)))
+
             }
             response = request_url(
                 verb="POST",
