@@ -6,12 +6,21 @@ from sqlalchemy import desc, or_
 
 
 import src.aws.infrastructure.models as models
+from src.deploy.infrastructure.models import Deploy
 from src.aws.domain.entities import aws as schemas_aws
-from src.shared.security.vault import vault_encrypt
+from src.shared.domain.exeptions.in_use import ResourceInUseError
+from src.shared.security.vault import vault_encrypt, vault_decrypt
 
 
 @vault_encrypt
 def encrypt(secreto):
+    try:
+        return secreto
+    except Exception as err:
+        raise err
+
+@vault_decrypt
+def decrypt(secreto):
     try:
         return secreto
     except Exception as err:
@@ -44,16 +53,25 @@ async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> s
 
 
 async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: schemas_aws.AwsAccountUpdate) -> schemas_aws.AwsAccountResponse:
-
     db_aws = db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_account_id).first()
+
     if db_aws:
         if updated_aws.access_key_id:
             db_aws.access_key_id = encrypt(updated_aws.access_key_id)
         if updated_aws.secret_access_key:
             db_aws.secret_access_key = encrypt(updated_aws.secret_access_key)
-        if updated_aws.extra_variables:
-            db_aws.extra_variables = {key: encrypt(val) for key, val in updated_aws.extra_variables.items()}
 
+        if updated_aws.extra_variables:
+            current_extra_variables = db_aws.extra_variables or {}
+            for key, value in current_extra_variables.items():
+                current_extra_variables[key] = decrypt(value)
+
+            for key, value in updated_aws.extra_variables.items():
+                if "***" not in value:
+                    current_extra_variables[key] = value
+
+            encrypted_extra_variables = {key: encrypt(value) for key, value in current_extra_variables.items()}
+            db_aws.extra_variables = encrypted_extra_variables
         db_aws.environment = updated_aws.environment
         db_aws.default_region = updated_aws.default_region
         db_aws.role_arn = updated_aws.role_arn
@@ -120,6 +138,13 @@ async def delete_aws_profile_by_id(db: Session, aws_account_id: int) -> schemas_
         db_aws = db.query(models.Aws_provider).filter(
             models.Aws_provider.id == aws_account_id
         ).first()
+        db_deploy = (
+            db.query(Deploy)
+            .filter(Deploy.squad == db_aws.squad)
+            .filter(Deploy.environment == db_aws.environment)
+            .first())
+        if db_deploy:
+            raise ResourceInUseError(aws_account_id)
         if db_aws:
             db.delete(db_aws)
             db.commit()

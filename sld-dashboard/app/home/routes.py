@@ -1444,7 +1444,7 @@ def edit_user(user_id):
                 json=data,
             )
             if response.get("status_code") == 200:
-                flash(f"User Updated ")
+                flash("User Updated ")
             else:
                 flash(response["json"].get("detail"), "error")
             return redirect(
@@ -1508,7 +1508,7 @@ def new_aws_account():
         if request.method == "POST":
             key_list = request.values.getlist("sld_key")
             value_list = request.values.getlist("sld_value")
-            new_user: dict = {
+            aws_account_request: dict = {
                 "squad": form.squad.data.replace(" ",""),
                 "environment": form.environment.data.replace(" ",""),
                 "access_key_id": form.access_key_id.data.replace(" ",""),
@@ -1522,7 +1522,7 @@ def new_aws_account():
                 verb="POST",
                 uri="accounts/aws/",
                 headers={"Authorization": f"Bearer {token}"},
-                json=new_user,
+                json=aws_account_request,
             )
             if response.get("status_code") == 200:
                 flash(
@@ -1544,6 +1544,59 @@ def new_aws_account():
         return redirect(url_for("base_blueprint.logout"))
 
 
+@blueprint.route("/aws-edit", methods=["GET", "POST"], defaults={"account_id": None})
+@blueprint.route("/aws-edit/<account_id>", methods=["GET", "POST"])
+@login_required
+def edit_aws_account(account_id):
+    try:
+        form = AwsForm(request.form)
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        endpoint = f"accounts/aws/?id={account_id}"
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        vars_json = response["json"][0]
+        if request.method == "POST":
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
+            print(request.values)
+            aws_account_request: dict = {
+                "squad": form.squad.data.replace(" ",""),
+                "environment": form.environment.data.replace(" ",""),
+                "access_key_id": form.access_key_id.data.replace(" ","") if "*" not in form.access_key_id.data else None,
+                "secret_access_key": form.secret_access_key.data.replace(" ","") if "*" not in form.secret_access_key.data else None,
+                "default_region": form.default_region.data.replace(" ",""),
+                "role_arn": form.role_arn.data.replace(" ",""),
+                "extra_variables": dict(list(zip(key_list, value_list))),
+            }
+            response = request_url(
+                verb="PATCH",
+                uri=f"accounts/aws/{account_id}",
+                headers={"Authorization": f"Bearer {token}"},
+                json=aws_account_request,
+            )
+            if response.get("status_code") == 200:
+                flash(
+                    f"Updated aws account for environment {form.environment.data} in {form.squad.data} "
+                )
+            elif response.get("status_code") == 409:
+                flash(response["json"].get("detail"), "error")
+            else:
+                flash(response["json"], "error")
+
+        return render_template(
+            "/aws-edit.html",
+            title="Edit aws account",
+            form=form,
+            active="edit_aws_account",
+            data_json=vars_json,
+            external_api_dns=external_api_dns,
+        )
+    except ValueError:
+        return redirect(url_for("base_blueprint.logout"))
+    
 @blueprint.route("/aws-list")
 @login_required
 def list_aws_account():

@@ -42,6 +42,7 @@
                         aria-label="Search" aria-describedby="basic-addon2">
                 </div>
             </div>
+
             <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
                 <div class="btn-group">
                     <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
@@ -119,7 +120,6 @@
                                 <a class="dropdown-item text-danger"
                                     href="{{ url_for('.delete_aws_account', aws_account_id=aws_account.id)}}"><span
                                         class="fas fa-trash-alt mr-2"></span>Remove</a>
-                            </div>
                             {% endif %}
                         </div>
                     </td>

@@ -26,8 +26,8 @@
         </nav>
         <div class="d-flex justify-content-between w-100 flex-wrap">
             <div class="mb-3 mb-lg-0">
-                <h1 class="h4">Add New AWS Account</h1>
-                <p class="mb-0">Add account by squad and environment</p>
+                <h1 class="h4">Edit AWS Account</h1>
+                <p class="mb-0">Edit account by squad and environment</p>
             </div>
             <div>
                 <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Accounts Docs</a>
@@ -42,49 +42,59 @@
                     <div class="row mb-4">
                         <div class="col-lg-4 col-sm-6">
                             <!-- Form -->
+                            {{data_json}}
                             <div class="col-md-12 col-md-offset-1">
                                 <form class="" method="post">
                                     <div class="form-group">
-                                        {{ render_field(form.squad, class='form-control', placeholder='Squad Name') }}
+                                        {{ render_field(form.squad, class='form-control', value=data_json.squad) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.environment, class='form-control', placeholder='Environment Name') }}
+                                        {{ render_field(form.environment, class='form-control', value=data_json.environment) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.access_key_id, class='form-control', placeholder='aws access_key_id') }}
+                                        {{ render_field(form.access_key_id, class='form-control', value="*************", placeholder='aws access_key_id') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.secret_access_key, class='form-control', placeholder='aws secret_access_key') }}
+                                        {{ render_field(form.secret_access_key, class='form-control',value="************", placeholder='aws secret_access_key') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.default_region, class='form-control',value='eu-west-1') }}
+                                        {{ render_field(form.default_region, class='form-control',value=data_json.default_region) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.role_arn, class='form-control', placeholder='role_arn') }}
+                                        {{ render_field(form.role_arn, class='form-control',value=data_json.role_arn,placeholder='role_arn') }}
                                     </div>
+<!-- START Extra variables -->
+<div class="border-top my-4"></div>
+<div class="row">
+    <div class="col-lg-12">
+        <div id="inputFormRow">
+            <!-- Iterar sobre las variables existentes -->
+            {% for key, value in data_json.extra_variables.items() %}
+                <div class="input-group col-sm-8 mb-3">
+                    <div class="col-sm-8 mb-2">
+                        <input type="text" name="sld_key" class="form-control m-input" value="{{ key }}" placeholder="Enter variable name" autocomplete="off">
+                    </div>
+                    <div class="col-sm-8 mb-4">
+                        <input type="text" name="sld_value" class="form-control m-input" value="{{ value }}" placeholder="Enter variable value" autocomplete="off">
+                    </div>
+                    <div class="input-group-append">
+                        <button id="removeRow" type="button" class="btn btn-danger btn-sm">Remove</button>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
 
-                                    <!-- Add custom variables -->
-                                    <div class="border-top my-4"></div>
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div id="inputFormRow">
-                                            </div>
-
-                                            <div id="newRow"></div>
-                                            <button id="addRow"
-                                                    type="button"
-                                                    class="btn btn-info btn-sm"
-                                                    title="Add extra secrets varibles like TF_VAR_secreto: mySeCret">Add
-                                                Extra Variable</button>
-                                        </div>
-                                    </div>
-                                    <div class="border-top my-4"></div>
-                                    <!-- End Add custom variables -->
+        <div id="newRow"></div>
+        <button id="addRow" type="button" class="btn btn-info btn-sm" title="Add extra secrets variables like TF_VAR_secreto: mySecret">Add Extra Variable</button>
+    </div>
+</div>
+<div class="border-top my-4"></div>
+<!-- END Extra variables -->
                                     <button type="submit" class="btn btn-primary" name="button">
                                         Create new Account
                                     </button>
