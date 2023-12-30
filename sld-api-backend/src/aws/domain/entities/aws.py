@@ -17,8 +17,8 @@ class AwsAsumeProfile(AwsBase):
     role_arn: Optional[constr(strip_whitespace=True)] = None
 
 
-class Aws(AwsBase):
-    id: int
+class AwsId(BaseModel):
+    id: Optional[int] = None
 
     class Config:
         from_attributes = True
@@ -53,15 +53,18 @@ class AwsAccountResponseRepo(AwsAccountResponseBase):
         from_attributes = True
 
 
-class AwsAccountFilter(BaseModel):
-    id: Optional[int] = None
+class AwsAccount(BaseModel):
     squad: Optional[str] = None
-    access_key_id: Optional[str] = None
     environment: Optional[str] = None
     default_region: Optional[str] = None
     role_arn: Optional[str] = None
+    access_key_id: Optional[str] = None
 
 
-class AwsAccountUpdate(AwsAccountFilter):
+class AwsAccountFilter(AwsAccount, AwsId):
+    pass
+
+
+class AwsAccountUpdate(AwsAccount):
     secret_access_key: Optional[str] = None
     extra_variables: Optional[Dict[str, Any]] = None

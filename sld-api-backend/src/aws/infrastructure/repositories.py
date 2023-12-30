@@ -6,9 +6,8 @@ from sqlalchemy import desc, or_
 
 
 import src.aws.infrastructure.models as models
-from src.deploy.infrastructure.models import Deploy
 from src.aws.domain.entities import aws as schemas_aws
-from src.shared.domain.exeptions.in_use import ResourceInUseError
+from src.shared.infrastructure.respository import check_deploy_in_use
 from src.shared.security.vault import vault_encrypt, vault_decrypt
 
 
@@ -19,26 +18,13 @@ def encrypt(secreto):
     except Exception as err:
         raise err
 
+
 @vault_decrypt
 def decrypt(secreto):
     try:
         return secreto
     except Exception as err:
         raise err
-
-
-async def check_deploy_in_use(db, db_aws, aws_account_id, updated_aws=None):
-    db_deploy = (
-        db.query(Deploy)
-        .filter(Deploy.squad == db_aws.squad)
-        .filter(Deploy.environment == db_aws.environment)
-        .first())
-
-    if db_deploy:
-        if updated_aws and (updated_aws.squad != db_aws.squad or updated_aws.environment != db_aws.environment):
-            raise ResourceInUseError(aws_account_id)
-        elif not updated_aws:
-            raise ResourceInUseError(aws_account_id)
 
 
 async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> schemas_aws.AwsAccountResponse:
@@ -68,7 +54,7 @@ async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> s
 
 async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: schemas_aws.AwsAccountUpdate) -> schemas_aws.AwsAccountResponse:
     db_aws = db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_account_id).first()
-    await check_deploy_in_use(db=db, db_aws=db_aws, updated_aws=updated_aws, aws_account_id=aws_account_id)
+    await check_deploy_in_use(db=db, db_provider=db_aws, cloud_provider="aws", updated=updated_aws, account_id=aws_account_id)
 
     if db_aws:
         if updated_aws.access_key_id:
@@ -152,7 +138,7 @@ async def delete_aws_profile_by_id(db: Session, aws_account_id: int) -> schemas_
         db_aws = db.query(models.Aws_provider).filter(
             models.Aws_provider.id == aws_account_id
         ).first()
-        await check_deploy_in_use(db, db_aws, aws_account_id)
+        await check_deploy_in_use(db=db, db_provider=db_aws, cloud_provider="aws", account_id=aws_account_id)
         if db_aws:
             db.delete(db_aws)
             db.commit()

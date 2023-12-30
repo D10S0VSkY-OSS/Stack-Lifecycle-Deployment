@@ -5,14 +5,16 @@ from src.azure.infrastructure import repositories as crud_azure
 from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from src.azure.domain.entities import azure as schemas_azure
 
 
 async def get_all_azure_accounts(
-    current_user: schemas_users.User = Depends(deps.get_current_active_user),
+    skip: int = 0,
+    limit: int = 100,
     db: Session = Depends(deps.get_db),
+    current_user: schemas_users.User = Depends(deps.get_current_active_user),
+    filters: schemas_azure.AzureAccountFilter = Depends(schemas_azure.AzureAccountFilter),
 ):
     if not crud_users.is_master(db, current_user):
-        return crud_azure.get_squad_azure_profile(
-            db=db, squad=current_user.squad, environment=None
-        )
-    return crud_azure.get_all_azure_profile(db=db)
+        filters.squad = current_user.squad
+    return await crud_azure.get_all_azure_profile(db=db, filters=filters, skip=skip, limit=limit)
