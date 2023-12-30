@@ -27,6 +27,20 @@ def decrypt(secreto):
         raise err
 
 
+async def check_deploy_in_use(db, db_aws, aws_account_id, updated_aws=None):
+    db_deploy = (
+        db.query(Deploy)
+        .filter(Deploy.squad == db_aws.squad)
+        .filter(Deploy.environment == db_aws.environment)
+        .first())
+
+    if db_deploy:
+        if updated_aws and (updated_aws.squad != db_aws.squad or updated_aws.environment != db_aws.environment):
+            raise ResourceInUseError(aws_account_id)
+        elif not updated_aws:
+            raise ResourceInUseError(aws_account_id)
+
+
 async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> schemas_aws.AwsAccountResponse:
     encrypt_access_key_id = encrypt(aws.access_key_id)
     encrypt_secret_access_key = encrypt(aws.secret_access_key)
@@ -54,20 +68,13 @@ async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> s
 
 async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: schemas_aws.AwsAccountUpdate) -> schemas_aws.AwsAccountResponse:
     db_aws = db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_account_id).first()
-    db_deploy = (
-        db.query(Deploy)
-        .filter(Deploy.squad == db_aws.squad)
-        .filter(Deploy.environment == db_aws.environment)
-        .first())
-    if db_deploy and updated_aws.squad != db_aws.squad or updated_aws.environment != db_aws.environment:
-        raise ResourceInUseError(aws_account_id)
+    await check_deploy_in_use(db=db, db_aws=db_aws, updated_aws=updated_aws, aws_account_id=aws_account_id)
 
     if db_aws:
         if updated_aws.access_key_id:
             db_aws.access_key_id = encrypt(updated_aws.access_key_id)
         if updated_aws.secret_access_key:
             db_aws.secret_access_key = encrypt(updated_aws.secret_access_key)
-
         if updated_aws.extra_variables:
             current_extra_variables = db_aws.extra_variables or {}
             for key, value in current_extra_variables.items():
@@ -145,13 +152,7 @@ async def delete_aws_profile_by_id(db: Session, aws_account_id: int) -> schemas_
         db_aws = db.query(models.Aws_provider).filter(
             models.Aws_provider.id == aws_account_id
         ).first()
-        db_deploy = (
-            db.query(Deploy)
-            .filter(Deploy.squad == db_aws.squad)
-            .filter(Deploy.environment == db_aws.environment)
-            .first())
-        if db_deploy:
-            raise ResourceInUseError(aws_account_id)
+        await check_deploy_in_use(db, db_aws, aws_account_id)
         if db_aws:
             db.delete(db_aws)
             db.commit()
