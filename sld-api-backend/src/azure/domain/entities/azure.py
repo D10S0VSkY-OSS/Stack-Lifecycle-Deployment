@@ -1,5 +1,6 @@
 from pydantic import BaseModel, constr, SecretStr
 from typing import Optional, Dict, Any
+import datetime
 
 
 class AzureBase(BaseModel):
@@ -24,6 +25,8 @@ class AzureAccountResponseBase(AzureId):
     environment: constr(strip_whitespace=True)
     subscription_id: constr(strip_whitespace=True)
     tenant_id: constr(strip_whitespace=True)
+    created_at: Optional[datetime.datetime] = None
+    updated_at: Optional[datetime.datetime] = None
 
 
 class AzureAccountResponse(AzureAccountResponseBase):
