@@ -54,6 +54,13 @@ async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> s
 
 async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: schemas_aws.AwsAccountUpdate) -> schemas_aws.AwsAccountResponse:
     db_aws = db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_account_id).first()
+    db_deploy = (
+        db.query(Deploy)
+        .filter(Deploy.squad == db_aws.squad)
+        .filter(Deploy.environment == db_aws.environment)
+        .first())
+    if db_deploy and updated_aws.squad != db_aws.squad or updated_aws.environment != db_aws.environment:
+        raise ResourceInUseError(aws_account_id)
 
     if db_aws:
         if updated_aws.access_key_id:
@@ -65,11 +72,11 @@ async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: sche
             current_extra_variables = db_aws.extra_variables or {}
             for key, value in current_extra_variables.items():
                 current_extra_variables[key] = decrypt(value)
+            current_extra_variables = {key: value for key, value in current_extra_variables.items() if key in updated_aws.extra_variables}
 
             for key, value in updated_aws.extra_variables.items():
-                if "***" not in value:
+                if key and value and "***" not in value:
                     current_extra_variables[key] = value
-
             encrypted_extra_variables = {key: encrypt(value) for key, value in current_extra_variables.items()}
             db_aws.extra_variables = encrypted_extra_variables
         db_aws.environment = updated_aws.environment

@@ -42,7 +42,6 @@
                     <div class="row mb-4">
                         <div class="col-lg-4 col-sm-6">
                             <!-- Form -->
-                            {{data_json}}
                             <div class="col-md-12 col-md-offset-1">
                                 <form class="" method="post">
                                     <div class="form-group">
@@ -74,19 +73,19 @@
     <div class="col-lg-12">
         <div id="inputFormRow">
             <!-- Iterar sobre las variables existentes -->
-            {% for key, value in data_json.extra_variables.items() %}
-                <div class="input-group col-sm-8 mb-3">
-                    <div class="col-sm-8 mb-2">
-                        <input type="text" name="sld_key" class="form-control m-input" value="{{ key }}" placeholder="Enter variable name" autocomplete="off">
-                    </div>
-                    <div class="col-sm-8 mb-4">
-                        <input type="text" name="sld_value" class="form-control m-input" value="{{ value }}" placeholder="Enter variable value" autocomplete="off">
-                    </div>
-                    <div class="input-group-append">
-                        <button id="removeRow" type="button" class="btn btn-danger btn-sm">Remove</button>
-                    </div>
-                </div>
-            {% endfor %}
+{% for key, value in data_json.extra_variables.items() %}
+    <div class="input-group col-sm-8 mb-3 dynamic-row">
+        <div class="col-sm-8 mb-2">
+            <input type="text" name="sld_key" class="form-control m-input" value="{{ key }}" placeholder="Enter variable name" autocomplete="off" {% if data_json.extra_variables.get(key) %} readonly {% endif %}>
+        </div>
+        <div class="col-sm-8 mb-4">
+            <input type="text" name="sld_value" class="form-control m-input" value="{{ value }}" placeholder="Enter variable value" autocomplete="off">
+        </div>
+        <div class="input-group-append">
+            <button type="button" class="btn btn-danger btn-sm ml-2 removeRow">Remove</button>
+        </div>
+    </div>
+{% endfor %}
         </div>
 
         <div id="newRow"></div>
@@ -95,10 +94,12 @@
 </div>
 <div class="border-top my-4"></div>
 <!-- END Extra variables -->
-                                    <button type="submit" class="btn btn-primary" name="button">
-                                        Create new Account
+                                    <button type="submit" class="btn btn-primary w-30" name="button">
+                                        Update Account
                                     </button>
-
+                                    <button type="button" class="btn btn-danger btn-lock w-30" id="cancelButton">
+                                        Exit         
+                                    </button>
                                 </form>
                                 <!-- End Form -->
 
@@ -119,18 +120,17 @@
 <script type="text/javascript">
     // add row
     $("#addRow").click(function () {
-        var html = '';
-        html += '<div class="row">';
-        html += '<div id="inputFormRow">';
-        html += '<div class="input-group col-sm-8 mb-3">';
-        html += ' <div class="col-sm-8 mb-2">';
+        var html = '<div class="row">';
+        html += '<div class="input-group col-sm-8 mb-3 dynamic-row">';
+        html += '<div class="col-sm-8 mb-2">';
         html += '<input type="text" name="sld_key" class="form-control m-input" placeholder="Enter variable name" autocomplete="off">';
         html += '</div>';
-        html += ' <div class="col-sm-8 mb-4">';
+        html += '<div class="col-sm-8 mb-4">';
         html += '<input type="text" name="sld_value" class="form-control m-input" placeholder="Enter variable value" autocomplete="off">';
         html += '</div>';
         html += '<div class="input-group-append">';
-        html += '<button id="removeRow" type="button" class="btn btn-danger btn-sm">Remove</button>';
+        html += '<button type="button" class="btn btn-danger btn-sm removeRow">Remove</button>';
+        html += '</div>';
         html += '</div>';
         html += '</div>';
 
@@ -138,8 +138,15 @@
     });
 
     // remove row
-    $(document).on('click', '#removeRow', function () {
-        $(this).closest('#inputFormRow').remove();
+    $(document).on('click', '.removeRow', function () {
+        $(this).closest('.dynamic-row').remove();
     });
 </script>
+<script type="text/javascript">
+    document.getElementById('cancelButton').addEventListener('click', function() {
+        // Redirect to /aws-list when the cancel button is clicked
+        window.location.href = '/aws-list';
+    });
+</script>
+
 {% endblock javascripts %}

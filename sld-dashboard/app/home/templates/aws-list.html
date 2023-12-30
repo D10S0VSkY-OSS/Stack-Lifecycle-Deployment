@@ -117,6 +117,9 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu">
+                                <a class="dropdown-item" 
+                                    href="{{ url_for('.edit_aws_account', account_id=aws_account.id)}}"><span 
+                                    class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item text-danger"
                                     href="{{ url_for('.delete_aws_account', aws_account_id=aws_account.id)}}"><span
                                         class="fas fa-trash-alt mr-2"></span>Remove</a>

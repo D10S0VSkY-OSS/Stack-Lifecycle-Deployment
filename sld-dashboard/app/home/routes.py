@@ -1561,7 +1561,6 @@ def edit_aws_account(account_id):
         if request.method == "POST":
             key_list = request.values.getlist("sld_key")
             value_list = request.values.getlist("sld_value")
-            print(request.values)
             aws_account_request: dict = {
                 "squad": form.squad.data.replace(" ",""),
                 "environment": form.environment.data.replace(" ",""),
@@ -1581,6 +1580,8 @@ def edit_aws_account(account_id):
                 flash(
                     f"Updated aws account for environment {form.environment.data} in {form.squad.data} "
                 )
+                return redirect(url_for("home_blueprint.route_template", template="aws-list"))
+
             elif response.get("status_code") == 409:
                 flash(response["json"].get("detail"), "error")
             else:
@@ -1613,7 +1614,6 @@ def list_aws_account():
         return render_template(
             "aws-list.html", name="Name", aws=content, external_api_dns=external_api_dns
         )
-
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
 

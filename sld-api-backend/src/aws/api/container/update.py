@@ -7,6 +7,7 @@ from src.aws.infrastructure import repositories as crud_aws
 from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
+from src.shared.domain.exeptions.in_use import ResourceInUseError
 
 
 async def update_aws_account(
@@ -31,5 +32,7 @@ async def update_aws_account(
             action=f"Update AWS account {aws.squad} {aws.environment}",
         )
         return result
+    except ResourceInUseError as err:
+        raise HTTPException(status_code=409, detail=str(err))
     except Exception as err:
         raise err
