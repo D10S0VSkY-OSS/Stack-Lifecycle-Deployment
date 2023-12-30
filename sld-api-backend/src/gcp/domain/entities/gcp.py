@@ -59,7 +59,7 @@ class GcloudResponseRepo(BaseModel):
     id: int
     squad: str
     environment: str
-    gcloud_keyfile_json: GCloudJson
+    gcloud_keyfile_json: str
     extra_variables: Optional[Dict[str, Any]] = None
 
     class Config:

@@ -189,12 +189,12 @@ async def check_prefix(db, stack_name: str, environment: str, squad: str):
             )
             return secreto
         elif any(i in stack_name.lower() for i in settings.GCLOUD_PREFIX):
-            secreto = crud_gcp.get_credentials_gcloud_profile(
+            secreto = await crud_gcp.get_credentials_gcloud_profile(
                 db=db, environment=environment, squad=squad
             )
             return secreto
         elif any(i in stack_name.lower() for i in settings.AZURE_PREFIX):
-            secreto = crud_azure.get_credentials_azure_profile(
+            secreto = await crud_azure.get_credentials_azure_profile(
                 db=db, environment=environment, squad=squad
             )
             return secreto
