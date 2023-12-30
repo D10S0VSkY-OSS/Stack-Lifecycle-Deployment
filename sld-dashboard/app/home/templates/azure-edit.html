@@ -26,8 +26,8 @@
         </nav>
         <div class="d-flex justify-content-between w-100 flex-wrap">
             <div class="mb-3 mb-lg-0">
-                <h1 class="h4">Add New AZURE Account</h1>
-                <p class="mb-0">Add account by squad and environment</p>
+                <h1 class="h4">Edit AZURE Account</h1>
+                <p class="mb-0">Edit account by squad and environment</p>
             </div>
             <div>
                 <a href="" class="btn btn-outline-gray"><i class="far fa-question-circle mr-1"></i> Accounts Docs</a>
@@ -45,17 +45,19 @@
                             <div class="col-md-12 col-md-offset-1">
                                 <form class="" method="post">
                                     <div class="form-group">
-                                        {{ render_field(form.squad, class='form-control', placeholder='Squad Name') }}
+                                        {{ render_field(form.squad, class='form-control', value=data_json.squad) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.environment, class='form-control', placeholder='Environment
-                                        Name') }}
+                                        {{ render_field(form.environment, class='form-control', value=data_json.environment) }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.subscription_id, class='form-control',
-                                        placeholder='subscription_id') }}
+                                        {{ render_field(form.tenant_id, class='form-control', value=data_json.tenant_id) }}
+                                    </div>
+
+                                    <div class="form-group">
+                                        {{ render_field(form.subscription_id, class='form-control', value=data_json.subscription_id) }}
                                     </div>
 
                                     <div class="form-group">
@@ -68,33 +70,42 @@
                                         placeholder='client_secret') }}
                                     </div>
 
-                                    <div class="form-group">
-                                        {{ render_field(form.tenant_id, class='form-control', placeholder='tenant_id')
-                                        }}
-                                    </div>
+<!-- START Extra variables -->
+<div class="border-top my-4"></div>
+<div class="row">
+    <div class="col-lg-12">
+        <div id="inputFormRow">
+            <!-- Iterar sobre las variables existentes -->
+            {% if data_json.extra_variables %}
+                {% for key, value in data_json.extra_variables.items() %}
+                    <div class="input-group col-sm-8 mb-3 dynamic-row">
+                        <div class="col-sm-8 mb-2">
+                            <input type="text" name="sld_key" class="form-control m-input" value="{{ key }}" placeholder="Enter variable name" autocomplete="off" {% if data_json.extra_variables.get(key) %} readonly {% endif %}>
+                        </div>
+                        <div class="col-sm-8 mb-4">
+                            <input type="text" name="sld_value" class="form-control m-input" value="{{ value }}" placeholder="Enter variable value" autocomplete="off">
+                        </div>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-danger btn-sm ml-2 removeRow">Remove</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
 
-                                  <!-- Add custom variables -->
-                                    <div class="border-top my-4"></div>
-                                    <div class="row">
-                                        <div class="col-lg-12">
-                                            <div id="inputFormRow">
-                                            </div>
-
-                                            <div id="newRow"></div>
-                                            <button id="addRow"
-                                                    type="button"
-                                                    class="btn btn-info btn-sm"
-                                                    title="Add extra secrets varibles like TF_VAR_secreto: mySeCret">Add
-                                                Extra Variable</button>
-                                        </div>
-                                    </div>
-                                    <div class="border-top my-4"></div>
-                                    <!-- End Add custom variables -->
+        <div id="newRow"></div>
+        <button id="addRow" type="button" class="btn btn-info btn-sm" title="Add extra secrets variables like TF_VAR_secreto: mySecret">Add Extra Variable</button>
+    </div>
+</div>
+<div class="border-top my-4"></div>
+<!-- END Extra variables -->
 
                                     <button type="submit" class="btn btn-primary" name="button">
-                                        Create new Account
+                                        Update Account
                                     </button>
-
+                                    <button type="button" class="btn btn-danger" id="cancelButton">
+                                        Exit         
+                                    </button>
                                 </form>
                                 <!-- End Form -->
 
@@ -115,18 +126,17 @@
 <script type="text/javascript">
     // add row
     $("#addRow").click(function () {
-        var html = '';
-        html += '<div class="row">';
-        html += '<div id="inputFormRow">';
-        html += '<div class="input-group col-sm-8 mb-3">';
-        html += ' <div class="col-sm-8 mb-2">';
+        var html = '<div class="row">';
+        html += '<div class="input-group col-sm-8 mb-3 dynamic-row">';
+        html += '<div class="col-sm-8 mb-2">';
         html += '<input type="text" name="sld_key" class="form-control m-input" placeholder="Enter variable name" autocomplete="off">';
         html += '</div>';
-        html += ' <div class="col-sm-8 mb-4">';
+        html += '<div class="col-sm-8 mb-4">';
         html += '<input type="text" name="sld_value" class="form-control m-input" placeholder="Enter variable value" autocomplete="off">';
         html += '</div>';
         html += '<div class="input-group-append">';
-        html += '<button id="removeRow" type="button" class="btn btn-danger btn-sm ml-2">Remove</button>';
+        html += '<button type="button" class="btn btn-danger btn-sm ml-2 removeRow">Remove</button>';
+        html += '</div>';
         html += '</div>';
         html += '</div>';
 
@@ -134,14 +144,20 @@
     });
 
     // remove row
-    $(document).on('click', '#removeRow', function () {
-        $(this).closest('#inputFormRow').remove();
+    $(document).on('click', '.removeRow', function () {
+        if ($('.dynamic-row').length > 1) {
+            $(this).closest('.dynamic-row').remove();
+        } else {
+            $(this).closest('.dynamic-row').find('input[type="text"]').val('');
+        }
     });
 </script>
+
 <script type="text/javascript">
     document.getElementById('cancelButton').addEventListener('click', function() {
-        // Redirect to /aws-list when the cancel button is clicked
+        // Redirect to /azure-list when the cancel button is clicked
         window.location.href = '/azure-list';
     });
 </script>
+
 {% endblock javascripts %}

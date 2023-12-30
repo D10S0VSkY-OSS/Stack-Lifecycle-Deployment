@@ -246,7 +246,6 @@ class AwsForm(FlaskForm):
     extra_variables = FieldList(FormField(ExtraVariableForm), label='Extra Variables')
 
 
-
 class GcpForm(FlaskForm):
     squad = StringField(
         "Squad",
@@ -263,8 +262,29 @@ class GcpForm(FlaskForm):
         ],
     )
     gcloud_keyfile_json = TextAreaField(
-        "gcloud keyfile json",
+        "gcloud keyfile json *",
         [validators.DataRequired(message="The gcloud keyfile json is required.")],
+        render_kw={"rows": 20},
+    )
+
+
+class GcpFormUpdate(FlaskForm):
+    squad = StringField(
+        "Squad",
+        [
+            validators.length(min=4, max=50, message="Squad out of reange."),
+            validators.DataRequired(message="Squad Name requerid."),
+        ],
+    )
+    environment = StringField(
+        "Environment",
+        [
+            validators.length(min=2, max=250, message="Branch out of reange."),
+            validators.DataRequired(message="Environment requerid."),
+        ],
+    )
+    gcloud_keyfile_json = TextAreaField(
+        "gcloud keyfile json",
         render_kw={"rows": 20},
     )
 
@@ -310,6 +330,45 @@ class AzureForm(FlaskForm):
         [
             validators.length(min=4, max=50, message="Tenant id out of reange."),
             validators.DataRequired(message="tenant_id."),
+        ],
+    )
+
+
+class AzureFormUpdate(FlaskForm):
+    squad = StringField(
+        "Squad",
+        [
+            validators.length(min=4, max=50, message="Squad out of reange."),
+        ],
+    )
+    environment = StringField(
+        "Environment",
+        [
+            validators.length(min=2, max=250, message="Branch out of reange."),
+        ],
+    )
+    subscription_id = StringField(
+        "Subscription id",
+        [
+            validators.length(min=4, max=50, message="Subscription id out of reange."),
+        ],
+    )
+    client_id = StringField(
+        "Client id",
+        [
+            validators.length(min=4, max=50, message="Client_id out of reange."),
+        ],
+    )
+    client_secret = StringField(
+        "Client secret",
+        [
+            validators.length(min=4, max=50, message="Client secret out of reange."),
+        ],
+    )
+    tenant_id = StringField(
+        "tenant_id",
+        [
+            validators.length(min=4, max=50, message="Tenant id out of reange."),
         ],
     )
 

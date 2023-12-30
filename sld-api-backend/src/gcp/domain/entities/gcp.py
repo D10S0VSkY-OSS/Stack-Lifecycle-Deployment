@@ -32,10 +32,6 @@ class GcloudAccount(GcloudBase):
     pass
 
 
-class GcloudAccountUpdate(GcloudBase):
-    pass
-
-
 class Gcloud(GcloudBase):
     id: int
 
@@ -73,3 +69,10 @@ class GcloudAccountFilter(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class GcloudAccountUpdate(BaseModel):
+    squad: Optional[str] = None
+    environment: Optional[str] = None
+    gcloud_keyfile_json: Optional[Dict[str, Any]] = None
+    extra_variables: Optional[Dict[str, Any]] = None

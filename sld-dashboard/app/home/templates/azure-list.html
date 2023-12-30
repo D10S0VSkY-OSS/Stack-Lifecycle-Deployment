@@ -72,6 +72,7 @@
                     <th>Environment</th>
                     <th>Subscription id</th>
                     <th>Tenant id</th>
+                    <th>Extra Variables</th>
                     <th></th>
                 </tr>
             </thead>
@@ -86,6 +87,16 @@
                     <td><span class="font-weight-normal">{{ azure_account.environment }}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.subscription_id }}</span></td>
                     <td><span class="font-weight-normal">{{ azure_account.tenant_id }}</span></td>
+<td>
+    <span class="font-weight-normal" title="{% if azure_account.extra_variables %}{{ ', '.join(azure_account.extra_variables.keys()) }}{% endif %}">
+        {% if azure_account.extra_variables %}
+            {% set truncated_variables = azure_account.extra_variables.keys() | join(', ') | truncate(30, True, '...') %}
+            {{ truncated_variables }}
+        {% else %}
+            -
+        {% endif %}
+    </span>
+</td>
                     <td>
                         {% if "yoda" in current_user.role %}
                         <div class="btn-group">
@@ -97,6 +108,9 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu">
+                                <a class="dropdown-item" 
+                                    href="{{ url_for('.edit_azure_account', account_id=azure_account.id)}}"><span 
+                                    class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item text-danger"
                                     href="{{ url_for('.delete_azure_account', azure_account_id=azure_account.id)}}"><span
                                         class="fas fa-trash-alt mr-2"></span>Remove</a>
