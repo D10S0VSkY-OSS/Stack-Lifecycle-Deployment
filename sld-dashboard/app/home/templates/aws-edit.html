@@ -73,19 +73,21 @@
     <div class="col-lg-12">
         <div id="inputFormRow">
             <!-- Iterar sobre las variables existentes -->
-{% for key, value in data_json.extra_variables.items() %}
-    <div class="input-group col-sm-8 mb-3 dynamic-row">
-        <div class="col-sm-8 mb-2">
-            <input type="text" name="sld_key" class="form-control m-input" value="{{ key }}" placeholder="Enter variable name" autocomplete="off" {% if data_json.extra_variables.get(key) %} readonly {% endif %}>
-        </div>
-        <div class="col-sm-8 mb-4">
-            <input type="text" name="sld_value" class="form-control m-input" value="{{ value }}" placeholder="Enter variable value" autocomplete="off">
-        </div>
-        <div class="input-group-append">
-            <button type="button" class="btn btn-danger btn-sm ml-2 removeRow">Remove</button>
-        </div>
-    </div>
-{% endfor %}
+            {% if data_json.extra_variables %}
+                {% for key, value in data_json.extra_variables.items() %}
+                    <div class="input-group col-sm-8 mb-3 dynamic-row">
+                        <div class="col-sm-8 mb-2">
+                            <input type="text" name="sld_key" class="form-control m-input" value="{{ key }}" placeholder="Enter variable name" autocomplete="off" {% if data_json.extra_variables.get(key) %} readonly {% endif %}>
+                        </div>
+                        <div class="col-sm-8 mb-4">
+                            <input type="text" name="sld_value" class="form-control m-input" value="{{ value }}" placeholder="Enter variable value" autocomplete="off">
+                        </div>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-danger btn-sm ml-2 removeRow">Remove</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% endif %}
         </div>
 
         <div id="newRow"></div>
@@ -94,10 +96,11 @@
 </div>
 <div class="border-top my-4"></div>
 <!-- END Extra variables -->
-                                    <button type="submit" class="btn btn-primary w-30" name="button">
+
+                                    <button type="submit" class="btn btn-primary" name="button">
                                         Update Account
                                     </button>
-                                    <button type="button" class="btn btn-danger btn-lock w-30" id="cancelButton">
+                                    <button type="button" class="btn btn-danger" id="cancelButton">
                                         Exit         
                                     </button>
                                 </form>
@@ -129,7 +132,7 @@
         html += '<input type="text" name="sld_value" class="form-control m-input" placeholder="Enter variable value" autocomplete="off">';
         html += '</div>';
         html += '<div class="input-group-append">';
-        html += '<button type="button" class="btn btn-danger btn-sm removeRow">Remove</button>';
+        html += '<button type="button" class="btn btn-danger btn-sm ml-2 removeRow">Remove</button>';
         html += '</div>';
         html += '</div>';
         html += '</div>';
@@ -139,9 +142,14 @@
 
     // remove row
     $(document).on('click', '.removeRow', function () {
-        $(this).closest('.dynamic-row').remove();
+        if ($('.dynamic-row').length > 1) {
+            $(this).closest('.dynamic-row').remove();
+        } else {
+            $(this).closest('.dynamic-row').find('input[type="text"]').val('');
+        }
     });
 </script>
+
 <script type="text/javascript">
     document.getElementById('cancelButton').addEventListener('click', function() {
         // Redirect to /aws-list when the cancel button is clicked

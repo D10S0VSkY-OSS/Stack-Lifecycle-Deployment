@@ -88,6 +88,9 @@
                                     <button type="submit" class="btn btn-primary" name="button">
                                         Create new Account
                                     </button>
+                                    <button type="button" class="btn btn-danger" id="cancelButton">
+                                        Exit         
+                                    </button>
 
                                 </form>
                                 <!-- End Form -->
@@ -120,7 +123,7 @@
         html += '<input type="text" name="sld_value" class="form-control m-input" placeholder="Enter variable value" autocomplete="off">';
         html += '</div>';
         html += '<div class="input-group-append">';
-        html += '<button id="removeRow" type="button" class="btn btn-danger btn-sm">Remove</button>';
+        html += '<button id="removeRow" type="button" class="btn btn-danger btn-sm ml-2">Remove</button>';
         html += '</div>';
         html += '</div>';
 
@@ -130,6 +133,12 @@
     // remove row
     $(document).on('click', '#removeRow', function () {
         $(this).closest('#inputFormRow').remove();
+    });
+</script>
+<script type="text/javascript">
+    document.getElementById('cancelButton').addEventListener('click', function() {
+        // Redirect to /aws-list when the cancel button is clicked
+        window.location.href = '/aws-list';
     });
 </script>
 {% endblock javascripts %}
