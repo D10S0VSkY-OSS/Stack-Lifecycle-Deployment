@@ -64,6 +64,7 @@ def secret(
             logging.warning(err)
 
     elif any(i in stack_name.lower() for i in settings.GCLOUD_PREFIX):
+        export_environment_variables(secreto)
         gcloud_keyfile = f"/tmp/{stack_name}/{environment}/{squad}/{name}/gcp_{environment}_{stack_name}_{name}.json"
         gcloud_keyfile_data = ast.literal_eval(decrypt(secreto.get("gcloud_keyfile_json")))
         with open(gcloud_keyfile, "w") as gcloud_file:
@@ -72,6 +73,7 @@ def secret(
         os.environ["GOOGLE_CLOUD_KEYFILE_JSON"] = gcloud_keyfile
 
     elif any(i in stack_name.lower() for i in settings.AZURE_PREFIX):
+        export_environment_variables(secreto)
         os.environ["ARM_CLIENT_ID"] = decrypt(secreto.get("client_id"))
         os.environ["ARM_CLIENT_SECRET"] = decrypt(secreto.get("client_secret"))
         os.environ["ARM_SUBSCRIPTION_ID"] = secreto.get("subscription_id")
