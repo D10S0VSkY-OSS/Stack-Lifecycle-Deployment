@@ -160,21 +160,17 @@ def output(task_id):
 def list_deploys(limit):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
-        # get stack info
         endpoint = f"stacks/?limit={limit}"
         if limit == 0:
-            endpoint = "stacks/" 
+            endpoint = "stacks/"
         stack_response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
         stack = stack_response.get("json")
-        # Get deploy data vars an d set var for render
-        search_term = request.args.get('search', '')
         endpoint = f"deploy/?limit={limit}"
         if limit == 0:
-            endpoint = "deploy/?name=" + search_term
+            endpoint = "deploy/"
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
