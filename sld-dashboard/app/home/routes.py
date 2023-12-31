@@ -70,14 +70,14 @@ def index():
 @blueprint.route('/deploy-stream/<deploy_id>')
 @login_required
 def deploy_stream(deploy_id):
-        token = decrypt(r.get(current_user.id))
-        check_unauthorized_token(token)
-        endpoint = f"deploy/{deploy_id}"
-        response = request_url(
-            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
-        )
-        deploy = response.get("json")
-        return render_template('deploy-stream.html', deploy=deploy)
+    token = decrypt(r.get(current_user.id))
+    check_unauthorized_token(token)
+    endpoint = f"deploy/{deploy_id}"
+    response = request_url(
+        verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+    )
+    deploy = response.get("json")
+    return render_template('deploy-stream.html', deploy=deploy)
 
 
 @blueprint.route('/stream/<task_id>')
@@ -170,10 +170,11 @@ def list_deploys(limit):
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
         stack = stack_response.get("json")
-        # Get deploy data vars and set var for render
+        # Get deploy data vars an d set var for render
+        search_term = request.args.get('search', '')
         endpoint = f"deploy/?limit={limit}"
         if limit == 0:
-            endpoint = f"deploy/" 
+            endpoint = "deploy/?name=" + search_term
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )

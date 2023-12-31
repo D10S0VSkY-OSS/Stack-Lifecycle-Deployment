@@ -36,7 +36,7 @@ async def create_new_azure_profile(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
-            action=f"Create Azure Account {azure.subscription_id}",
+            action=f"Create Azure Account {azure.squad} {azure.environment}",
         )
         return result
     except Exception as err:

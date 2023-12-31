@@ -215,6 +215,40 @@ function checkForm(form) // Submit button clicked
     });
 </script>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var searchInput = document.getElementById('search');
+        var savedSearchValue = localStorage.getItem('searchValue');
+
+        if (savedSearchValue) {
+            searchInput.value = savedSearchValue;
+            filterCards(savedSearchValue);
+        }
+
+        searchInput.addEventListener('keyup', function () {
+            var searchTerm = searchInput.value.toLowerCase();
+            filterCards(searchTerm);
+
+            // Save the search value to localStorage
+            localStorage.setItem('searchValue', searchTerm);
+        });
+
+        function filterCards(searchTerm) {
+            var cards = document.getElementsByClassName('card');
+
+            for (var i = 0; i < cards.length; i++) {
+                var card = cards[i];
+                var cardText = card.textContent || card.innerText;
+
+                if (cardText.toLowerCase().includes(searchTerm)) {
+                    card.style.display = "";
+                } else {
+                    card.style.display = "none";
+                }
+            }
+        }
+    });
+</script>
 
 <script src="/static/assets/js/copy_clipboard.js"></script>
 <script src="/static/assets/js/selector_stacks.js"></script>
