@@ -688,6 +688,8 @@ def clone_deploy(deploy_id):
             headers={"Authorization": f"Bearer {token}"},
         )
         aws_content = aws_response.get("json")
+        aws_result = [{'squad': entry['squad'], 'environment': entry['environment']} for entry in aws_content]
+
         # Get data from gcp accounts
         gcp_response = request_url(
             verb="GET",
@@ -695,6 +697,8 @@ def clone_deploy(deploy_id):
             headers={"Authorization": f"Bearer {token}"},
         )
         gcp_content = gcp_response.get("json")
+        gcp_result = [{'squad': entry['squad'], 'environment': entry['environment']} for entry in gcp_content]
+
         # Get data from azure accounts
         azure_response = request_url(
             verb="GET",
@@ -702,6 +706,8 @@ def clone_deploy(deploy_id):
             headers={"Authorization": f"Bearer {token}"},
         )
         azure_content = azure_response.get("json")
+        azure_result = [{'squad': entry['squad'], 'environment': entry['environment']} for entry in azure_content]
+
         # Get data from custom providers accounts
         custom_response = request_url(
             verb="GET",
@@ -709,6 +715,7 @@ def clone_deploy(deploy_id):
             headers={"Authorization": f"Bearer {token}"},
         )
         custom_content = custom_response.get("json")
+        custom_result = [{'squad': entry['squad'], 'environment': entry['environment']} for entry in custom_content]
         # Get defaults vars by deploy
         vars_json = request_url(
             verb="GET",
@@ -788,10 +795,10 @@ def clone_deploy(deploy_id):
             name="Edit Deploy",
             form=form,
             deploy=deploy,
-            aws_content=aws_content,
-            gcp_content=gcp_content,
-            azure_content=azure_content,
-            custom_content=custom_content,
+            aws_content=aws_result,
+            gcp_content=gcp_result,
+            azure_content=azure_result,
+            custom_content=custom_result,
             data_json=vars_json["json"],
         )
     except TemplateNotFound:
@@ -833,7 +840,7 @@ def edit_schedule(deploy_id):
             # Deploy
             response = request_url(
                 verb="PATCH",
-                uri="{endpoint}",
+                uri=endpoint,
                 headers={"Authorization": f"Bearer {token}"},
                 json=data,
             )
