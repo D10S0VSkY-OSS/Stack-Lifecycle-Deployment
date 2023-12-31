@@ -29,7 +29,7 @@ async def get_plan_by_id_deploy(
                 status_code=403, detail=f"Not enough permissions in {deploy_data.squad}"
             )
     # Get  credentials by providers supported
-    secreto = check_prefix(
+    secreto = await check_prefix(
         db,
         stack_name=deploy_data.stack_name,
         environment=deploy_data.environment,

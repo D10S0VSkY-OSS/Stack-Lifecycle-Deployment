@@ -181,20 +181,20 @@ def check_cron_schedule(cron_time: str):
     return True
 
 
-def check_prefix(db, stack_name: str, environment: str, squad: str):
+async def check_prefix(db, stack_name: str, environment: str, squad: str):
     try:
         if any(i in stack_name.lower() for i in settings.AWS_PREFIX):
-            secreto = crud_aws.get_credentials_aws_profile(
+            secreto = await crud_aws.get_credentials_aws_profile(
                 db=db, environment=environment, squad=squad
             )
             return secreto
         elif any(i in stack_name.lower() for i in settings.GCLOUD_PREFIX):
-            secreto = crud_gcp.get_credentials_gcloud_profile(
+            secreto = await crud_gcp.get_credentials_gcloud_profile(
                 db=db, environment=environment, squad=squad
             )
             return secreto
         elif any(i in stack_name.lower() for i in settings.AZURE_PREFIX):
-            secreto = crud_azure.get_credentials_azure_profile(
+            secreto = await crud_azure.get_credentials_azure_profile(
                 db=db, environment=environment, squad=squad
             )
             return secreto

@@ -13,7 +13,7 @@ async def create_new_azure_profile(
     azure: schemas_azure.AzureBase,
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
-):
+) -> schemas_azure.AzureAccountResponse:
 
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
@@ -22,19 +22,22 @@ async def create_new_azure_profile(
             status_code=409,
             detail="The squad or environment field must have a value that is not a string.",
         )
-    db_azure_account = crud_azure.get_squad_azure_profile(
-        db=db, squad=azure.squad, environment=azure.environment
+    filters = schemas_azure.AzureAccountFilter()
+    filters.squad = azure.squad
+    filters.environment = azure.environment
+    db_aws_account = await crud_azure.get_all_azure_profile(
+        db=db, filters=filters
     )
-    if db_azure_account:
+    if db_aws_account:
         raise HTTPException(status_code=409, detail="Account already exists")
     try:
-        result = crud_azure.create_azure_profile(db=db, azure=azure)
+        result = await crud_azure.create_azure_profile(db=db, azure=azure)
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
-            action=f"Create Azure Account {azure.subscription_id}",
+            action=f"Create Azure Account {azure.squad} {azure.environment}",
         )
-        return {"result": f"Create Azure account {azure.squad} {azure.environment}"}
+        return result
     except Exception as err:
         raise HTTPException(status_code=400, detail=str(err))

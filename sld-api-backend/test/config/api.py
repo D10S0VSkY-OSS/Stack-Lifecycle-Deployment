@@ -120,9 +120,7 @@ class Settings(BaseSettings):
         "access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
         "secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
         "default_region": "eu-west-1",
-        "profile_name": "string",
-        "role_arn": "string",
-        "source_profile": "string",
+        "extra_variables": {"TF_VAR_aws_account_id": "1234567890", "TF_VAR_aws_secret": "1234"},
     }
     AWS_TEST_ACCOUNT_PRO: dict = {
         "squad": "squad1",
@@ -130,9 +128,8 @@ class Settings(BaseSettings):
         "access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
         "secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
         "default_region": "eu-west-1",
-        "profile_name": "string",
-        "role_arn": "string",
-        "source_profile": "string",
+        "role_arn": "arn:aws:iam::1234567890:role/role_name",
+        "extra_variables": {"TF_VAR_aws_account_id": "1234567890", "TF_VAR_aws_secret": "1234"},
     }
     AWS_TEST_ACCOUNT_SQUAD2: dict = {
         "squad": "squad2",
@@ -140,9 +137,8 @@ class Settings(BaseSettings):
         "access_key_id": os.getenv("AWS_ACCESS_KEY_ID"),
         "secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
         "default_region": "eu-west-1",
-        "profile_name": "string",
-        "role_arn": "string",
-        "source_profile": "string",
+        "role_arn": "arn:aws:iam::1234567890:role/role_name",
+        "extra_variables": {"TF_VAR_aws_account_id": "1234567890", "TF_VAR_aws_secret": "1234", "TF_VAR_db_password": "1234"},
     }
     AWS_TEST_ACCOUNT_SQUAD2_PRO: dict = {
         "squad": "squad2",
@@ -151,7 +147,6 @@ class Settings(BaseSettings):
         "secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
         "default_region": "eu-west-1",
         "profile_name": "string",
-        "role_arn": "string",
         "source_profile": "string",
     }
     DEPLOY_URI: str = "?tf_ver=1.0.7"

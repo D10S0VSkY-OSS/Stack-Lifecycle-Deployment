@@ -49,18 +49,15 @@
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.environment, class='form-control', placeholder='Environment
-                                        Name') }}
+                                        {{ render_field(form.environment, class='form-control', placeholder='Environment Name') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.access_key_id, class='form-control', placeholder='aws
-                                        access_key_id') }}
+                                        {{ render_field(form.access_key_id, class='form-control', placeholder='aws access_key_id') }}
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.secret_access_key, class='form-control', placeholder='aws
-                                        secret_access_key') }}
+                                        {{ render_field(form.secret_access_key, class='form-control', placeholder='aws secret_access_key') }}
                                     </div>
 
                                     <div class="form-group">
@@ -68,19 +65,31 @@
                                     </div>
 
                                     <div class="form-group">
-                                        {{ render_field(form.profile_name, class='form-control',
-                                        placeholder='profile_name') }}
-                                    </div>
-                                    <div class="form-group">
                                         {{ render_field(form.role_arn, class='form-control', placeholder='role_arn') }}
                                     </div>
-                                    <div class="form-group">
-                                        {{ render_field(form.source_profile, class='form-control',
-                                        placeholder='source_profile') }}
-                                    </div>
 
+                                    <!-- Add custom variables -->
+                                    <div class="border-top my-4"></div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div id="inputFormRow">
+                                            </div>
+
+                                            <div id="newRow"></div>
+                                            <button id="addRow"
+                                                    type="button"
+                                                    class="btn btn-info btn-sm"
+                                                    title="Add extra secrets varibles like TF_VAR_secreto: mySeCret">Add
+                                                Extra Variable</button>
+                                        </div>
+                                    </div>
+                                    <div class="border-top my-4"></div>
+                                    <!-- End Add custom variables -->
                                     <button type="submit" class="btn btn-primary" name="button">
                                         Create new Account
+                                    </button>
+                                    <button type="button" class="btn btn-danger" id="cancelButton">
+                                        Exit         
                                     </button>
 
                                 </form>
@@ -99,4 +108,37 @@
 {% endblock content %}
 
 <!-- Specific Page JS goes HERE  -->
-{% block javascripts %}{% endblock javascripts %}
+{% block javascripts %}
+<script type="text/javascript">
+    // add row
+    $("#addRow").click(function () {
+        var html = '';
+        html += '<div class="row">';
+        html += '<div id="inputFormRow">';
+        html += '<div class="input-group col-sm-8 mb-3">';
+        html += ' <div class="col-sm-8 mb-2">';
+        html += '<input type="text" name="sld_key" class="form-control m-input" placeholder="Enter variable name" autocomplete="off">';
+        html += '</div>';
+        html += ' <div class="col-sm-8 mb-4">';
+        html += '<input type="text" name="sld_value" class="form-control m-input" placeholder="Enter variable value" autocomplete="off">';
+        html += '</div>';
+        html += '<div class="input-group-append">';
+        html += '<button id="removeRow" type="button" class="btn btn-danger btn-sm ml-2">Remove</button>';
+        html += '</div>';
+        html += '</div>';
+
+        $('#newRow').append(html);
+    });
+
+    // remove row
+    $(document).on('click', '#removeRow', function () {
+        $(this).closest('#inputFormRow').remove();
+    });
+</script>
+<script type="text/javascript">
+    document.getElementById('cancelButton').addEventListener('click', function() {
+        // Redirect to /aws-list when the cancel button is clicked
+        window.location.href = '/aws-list';
+    });
+</script>
+{% endblock javascripts %}

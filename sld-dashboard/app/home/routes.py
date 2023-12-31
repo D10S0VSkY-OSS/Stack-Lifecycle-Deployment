@@ -19,8 +19,8 @@ from app.helpers.config.api import settings
 from app.helpers.converter import convert_to_dict
 from app.helpers.security import vault_decrypt
 from app.home import blueprint
-from app.home.forms import (AwsForm, AzureForm, DeployForm, GcpForm, StackForm,
-                            UserForm, CustomProviderForm)
+from app.home.forms import (AwsForm, AzureForm, AzureFormUpdate, DeployForm, GcpForm, GcpFormUpdate,
+                            StackForm, UserForm, CustomProviderForm)
 from flask import flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from jinja2 import TemplateNotFound
@@ -70,14 +70,14 @@ def index():
 @blueprint.route('/deploy-stream/<deploy_id>')
 @login_required
 def deploy_stream(deploy_id):
-        token = decrypt(r.get(current_user.id))
-        check_unauthorized_token(token)
-        endpoint = f"deploy/{deploy_id}"
-        response = request_url(
-            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
-        )
-        deploy = response.get("json")
-        return render_template('deploy-stream.html', deploy=deploy)
+    token = decrypt(r.get(current_user.id))
+    check_unauthorized_token(token)
+    endpoint = f"deploy/{deploy_id}"
+    response = request_url(
+        verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+    )
+    deploy = response.get("json")
+    return render_template('deploy-stream.html', deploy=deploy)
 
 
 @blueprint.route('/stream/<task_id>')
@@ -170,10 +170,11 @@ def list_deploys(limit):
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
         stack = stack_response.get("json")
-        # Get deploy data vars and set var for render
+        # Get deploy data vars an d set var for render
+        search_term = request.args.get('search', '')
         endpoint = f"deploy/?limit={limit}"
         if limit == 0:
-            endpoint = f"deploy/" 
+            endpoint = "deploy/?name=" + search_term
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -464,7 +465,7 @@ def edit_deploy(deploy_id):
                 "project_path": form.project_path.data.replace(" ",""),
                 "variables": ast.literal_eval(variables),
             }
-            if not "deploy" in request.form.get("button"):
+            if "deploy" not in request.form.get("button"):
                 endpoint = f"plan/{deploy_id}"
             # Deploy
             response = request_url(
@@ -474,7 +475,7 @@ def edit_deploy(deploy_id):
                 json=data,
             )
             if response.get("status_code") == 202:
-                flash(f"Updating deploy")
+                flash("Updating deploy")
             else:
                 flash(response.get("json").get("detail"), "error")
             return redirect(
@@ -687,28 +688,28 @@ def clone_deploy(deploy_id):
         form = DeployForm(request.form)
         aws_response = request_url(
             verb="GET",
-            uri=f"accounts/aws/",
+            uri="accounts/aws/",
             headers={"Authorization": f"Bearer {token}"},
         )
         aws_content = aws_response.get("json")
         # Get data from gcp accounts
         gcp_response = request_url(
             verb="GET",
-            uri=f"accounts/gcp/",
+            uri="accounts/gcp/",
             headers={"Authorization": f"Bearer {token}"},
         )
         gcp_content = gcp_response.get("json")
         # Get data from azure accounts
         azure_response = request_url(
             verb="GET",
-            uri=f"accounts/azure/",
+            uri="accounts/azure/",
             headers={"Authorization": f"Bearer {token}"},
         )
         azure_content = azure_response.get("json")
         # Get data from custom providers accounts
         custom_response = request_url(
             verb="GET",
-            uri=f"accounts/custom_providers/",
+            uri="accounts/custom_providers/",
             headers={"Authorization": f"Bearer {token}"},
         )
         custom_content = custom_response.get("json")
@@ -769,8 +770,8 @@ def clone_deploy(deploy_id):
                 "project_path": form.project_path.data.replace(" ",""),
                 "variables": ast.literal_eval(variables),
             }
-            if not "deploy" in request.form.get("button"):
-                endpoint = f"plan/"
+            if "deploy" not in request.form.get("button"):
+                endpoint = "plan/"
             # Deploy
             response = request_url(
                 verb="POST",
@@ -779,7 +780,7 @@ def clone_deploy(deploy_id):
                 json=data,
             )
             if response.get("status_code") == 202:
-                flash(f"Updating deploy")
+                flash("Updating deploy")
             else:
                 flash(response.get("json").get("detail"), "error")
             return redirect(
@@ -836,13 +837,13 @@ def edit_schedule(deploy_id):
             # Deploy
             response = request_url(
                 verb="PATCH",
-                uri=f"{endpoint}",
+                uri="{endpoint}",
                 headers={"Authorization": f"Bearer {token}"},
                 json=data,
             )
 
             if response.get("status_code") == 202:
-                flash(f"Updating schedule")
+                flash("Updating schedule")
             else:
                 flash(response.get("json").get("detail"), "error")
             return redirect(
@@ -876,13 +877,13 @@ def new_stack():
         squad_acces_form_to_list = squad_acces_form.split(",")
         if request.method == "POST":
             new_stack: dict = {
-                "stack_name": form.name.data.replace(" ",""),
-                "git_repo": form.git.data.replace(" ",""),
-                "branch": form.branch.data.replace(" ",""),
+                "stack_name": form.name.data.replace(" ", ""),
+                "git_repo": form.git.data.replace(" ", ""),
+                "branch": form.branch.data.replace(" ", ""),
                 "squad_access": squad_acces_form_to_list,
                 "iac_type": form.iac_type.data,
-                "tf_version": form.tf_version.data.replace(" ",""),
-                "project_path": form.project_path.data.replace(" ",""),
+                "tf_version": form.tf_version.data.replace(" ", ""),
+                "project_path": form.project_path.data.replace(" ", ""),
                 "description": form.description.data,
                 "icon_path": request.form.get("icon_path"),
             }
@@ -927,13 +928,13 @@ def edit_stack(stack_id):
             squad_acces_form = form.squad_access_edit.data
             squad_acces_form_to_list = squad_acces_form.split(",")
             update_stack = {
-                "stack_name": form.name.data.replace(" ",""),
-                "git_repo": form.git.data.replace(" ",""),
-                "branch": form.branch.data.replace(" ",""),
+                "stack_name": form.name.data.replace(" ", ""),
+                "git_repo": form.git.data.replace(" ", ""),
+                "branch": form.branch.data.replace(" ", ""),
                 "squad_access": squad_acces_form_to_list,
                 "iac_type": form.iac_type.data,
-                "tf_version": form.tf_version.data.replace(" ",""),
-                "project_path": form.project_path.data.replace(" ",""),
+                "tf_version": form.tf_version.data.replace(" ", ""),
+                "project_path": form.project_path.data.replace(" ", ""),
                 "description": form.description.data,
                 "icon_path": request.form.get("icon_path"),
             }
@@ -969,11 +970,9 @@ def details_stack(stack_id):
     try:
         icons = list_icons()
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         form = StackForm(request.form)
         endpoint = f"stacks/{stack_id}"
-        # Get deploy data vars and set var for render
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -982,23 +981,21 @@ def details_stack(stack_id):
         response = requests.get(readme_url)
         if response.status_code == 200:
             readme_content = response.text
-            readme_html = mistletoe.markdown(readme_content)  # Convierte el contenido de Markdown a HTML
+            readme_html = mistletoe.markdown(readme_content)
         else:
             readme_html = "<p>Error loading the README.md file, check that it exists in the repository and on the selected branch</p>"
 
-        # When user push data with POST verb
         if request.method == "POST":
-            # Data dend to deploy
             squad_acces_form = form.squad_access_edit.data
             squad_acces_form_to_list = squad_acces_form.split(",")
             update_stack = {
-                "stack_name": form.name.data.replace(" ",""),
-                "git_repo": form.git.data.replace(" ",""),
-                "branch": form.branch.data.replace(" ",""),
+                "stack_name": form.name.data.replace(" ", ""),
+                "git_repo": form.git.data.replace(" ", ""),
+                "branch": form.branch.data.replace(" ", ""),
                 "squad_access": squad_acces_form_to_list,
                 "iac_type": form.iac_type.data,
-                "tf_version": form.tf_version.data.replace(" ",""),
-                "project_path": form.project_path.data.replace(" ",""),
+                "tf_version": form.tf_version.data.replace(" ", ""),
+                "project_path": form.project_path.data.replace(" ", ""),
                 "description": form.description.data,
                 "icon_path": request.form.get("icon_path"),
             }
@@ -1042,7 +1039,6 @@ def delete_stack(view_mode, stack_name):
         else:
             flash(response["json"]["detail"], "error")
 
-        # Redirección basada en el parámetro 'view_mode'
         if view_mode == "table":
             return redirect(url_for("home_blueprint.route_template", template="stacks-list"))
         elif view_mode == "cards":
@@ -1061,10 +1057,8 @@ def delete_stack(view_mode, stack_name):
 def resync_stack(view_mode, stack_id):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token not expired
         check_unauthorized_token(token)
         endpoint = f"stacks/{stack_id}"
-        # Get deploy data vars and set var for render
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -1094,7 +1088,6 @@ def resync_stack(view_mode, stack_id):
         else:
             flash(response.get("json").get("detail"), "error")
 
-        # Redirección basada en el parámetro 'view_mode'
         if view_mode == "table":
             return redirect(url_for("home_blueprint.route_template", template="stacks-list"))
         elif view_mode == "cards":
@@ -1113,54 +1106,45 @@ def resync_stack(view_mode, stack_id):
 def deploy_stack(stack_id):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         form = DeployForm(request.form)
-        # Get data from aws accounts
         aws_response = request_url(
             verb="GET",
-            uri=f"accounts/aws/",
+            uri="accounts/aws/",
             headers={"Authorization": f"Bearer {token}"},
         )
         aws_content = aws_response.get("json")
-        # Get data from gcp accounts
         gcp_response = request_url(
             verb="GET",
-            uri=f"accounts/gcp/",
+            uri="accounts/gcp/",
             headers={"Authorization": f"Bearer {token}"},
         )
         gcp_content = gcp_response.get("json")
-        # Get data from azure accounts
         azure_response = request_url(
             verb="GET",
-            uri=f"accounts/azure/",
+            uri="accounts/azure/",
             headers={"Authorization": f"Bearer {token}"},
         )
         azure_content = azure_response.get("json")
-        # Get data from custom providers accounts
         custom_response = request_url(
             verb="GET",
-            uri=f"accounts/custom_providers/",
+            uri="accounts/custom_providers/",
             headers={"Authorization": f"Bearer {token}"},
         )
         custom_content = custom_response.get("json")
-        # Get data from stack
         stack = request_url(
             verb="GET",
             uri=f"stacks/{stack_id}",
             headers={"Authorization": f"Bearer {token}"},
         )
         stack_name = stack["json"]["stack_name"]
-        # Get vars from stack
         data_json = request_url(
             verb="GET",
             uri=f"variables/json?stack={stack_name}",
             headers={"Authorization": f"Bearer {token}"},
         )
         vars_json = data_json["json"]
-        # Push data vars to api for deploy
         if request.method == "POST":
-            # Define list for exclude vars in variables data
             form_vars = [
                 "csrf_token",
                 "environment",
@@ -1182,22 +1166,21 @@ def deploy_stack(stack_id):
                 }
                 variables = ast.literal_eval(json.dumps(convert_to_dict(data_raw)))
             data = {
-                "name": form.deploy_name.data.replace(" ",""),
+                "name": form.deploy_name.data.replace(" ", ""),
                 "stack_name": stack["json"]["stack_name"],
                 "start_time": form.start_time.data,
                 "destroy_time": form.destroy_time.data,
                 "squad": request.form.get("squad"),
                 "environment": request.form.get("environment"),
-                "stack_branch": request.form.get("branch").replace(" ",""),
-                "tfvar_file": request.form.get("tfvar_file").replace(" ",""),
-                "project_path": request.form.get("project_path").replace(" ",""),
+                "stack_branch": request.form.get("branch").replace(" ", ""),
+                "tfvar_file": request.form.get("tfvar_file").replace(" ", ""),
+                "project_path": request.form.get("project_path").replace(" ", ""),
                 "variables": variables,
             }
-            endpoint = f"plan"
-            if not "plan" in request.form.get("button"):
-                endpoint = f"deploy"
+            endpoint = "plan"
+            if "plan" not in request.form.get("button"):
+                endpoint = "deploy"
 
-            # Deploy
             response = request_url(
                 verb="POST",
                 uri=f"{endpoint}",
@@ -1232,7 +1215,6 @@ def deploy_stack(stack_id):
 def get_task(task_id):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         response = request_url(
             verb="GET",
@@ -1261,11 +1243,10 @@ def get_task(task_id):
 def list_tasks(limit):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         endpoint = f"tasks/all?limit={limit}"
         if limit == 0:
-            endpoint = f"tasks/all"
+            endpoint = "tasks/all"
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -1286,7 +1267,6 @@ def list_tasks(limit):
 def list_task(task_id):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         endpoint = f"tasks/id/{task_id}"
         response = request_url(
@@ -1305,11 +1285,10 @@ def list_task(task_id):
 def list_activity(limit):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
-        endpoint = f"activity/all?limit={limit}"
+        endpoint = "activity/all?limit={limit}"
         if limit == 0:
-            endpoint = f"activity/all"
+            endpoint = "activity/all"
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -1331,19 +1310,18 @@ def new_user():
     try:
         form = UserForm(request.form)
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         if request.method == "POST":
             new_user: dict = {
-                "username": form.username.data.replace(" ",""),
+                "username": form.username.data.replace(" ", ""),
                 "fullname": form.fullname.data,
                 "password": form.password.data,
-                "email": form.email.data.replace(" ",""),
+                "email": form.email.data.replace(" ", ""),
                 "squad": form.squad.data.split(","),
                 "role": request.form.get("role").split(","),
                 "is_active": form.is_active.data,
             }
-            endpoint = f"users/"
+            endpoint = "users/"
             response = request_url(
                 verb="POST",
                 uri=f"{endpoint}",
@@ -1372,11 +1350,10 @@ def new_user():
 def list_users(limit):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         endpoint = f"users/?limit={limit}"
         if limit == 0:
-            endpoint = f"users/" 
+            endpoint = "users/"
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
@@ -1396,10 +1373,9 @@ def list_users(limit):
 def delete_user(user_name):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         endpoint = f"users/{user_name}"
-        response = request_url(
+        request_url(
             verb="DELETE",
             uri=f"{endpoint}",
             headers={"Authorization": f"Bearer {token}"},
@@ -1416,9 +1392,7 @@ def edit_user(user_id):
     try:
         form = UserForm(request.form)
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
-        # Get user info by id
         endpoint = f"users/{user_id}"
         response = request_url(
             verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
@@ -1435,7 +1409,6 @@ def edit_user(user_id):
                 "role": request.form.get("role").split(","),
                 "is_active": request.form.get("is_active"),
             }
-            # Apply user change
             endpoint = f"users/{user_id}"
             response = request_url(
                 verb="PATCH",
@@ -1444,7 +1417,7 @@ def edit_user(user_id):
                 json=data,
             )
             if response.get("status_code") == 200:
-                flash(f"User Updated ")
+                flash("User Updated ")
             else:
                 flash(response["json"].get("detail"), "error")
             return redirect(
@@ -1463,7 +1436,6 @@ def setting_user():
     try:
         form = UserForm(request.form)
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         if request.method == "POST":
             user_data: dict = {
@@ -1471,12 +1443,12 @@ def setting_user():
             }
             response = request_url(
                 verb="PATCH",
-                uri=f"users/reset/",
+                uri="users/reset/",
                 headers={"Authorization": f"Bearer {token}"},
                 json=user_data,
             )
             if response.get("status_code") == 200:
-                flash(f"Password Updated ")
+                flash("Password Updated ")
             else:
                 flash(response.get("json").get("detail"), "error")
             return redirect(
@@ -1503,24 +1475,25 @@ def new_aws_account():
     try:
         form = AwsForm(request.form)
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         if request.method == "POST":
-            new_user: dict = {
-                "squad": form.squad.data.replace(" ",""),
-                "environment": form.environment.data.replace(" ",""),
-                "access_key_id": form.access_key_id.data.replace(" ",""),
-                "secret_access_key": form.secret_access_key.data.replace(" ",""),
-                "default_region": form.default_region.data.replace(" ",""),
-                "profile_name": form.profile_name.data.replace(" ",""),
-                "role_arn": form.role_arn.data.replace(" ",""),
-                "source_profile": form.source_profile.data.replace(" ",""),
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
+            aws_account_request: dict = {
+                "squad": form.squad.data.replace(" ", ""),
+                "environment": form.environment.data.replace(" ", ""),
+                "access_key_id": form.access_key_id.data.replace(" ", ""),
+                "secret_access_key": form.secret_access_key.data.replace(" ", ""),
+                "default_region": form.default_region.data.replace(" ", ""),
+                "role_arn": form.role_arn.data.replace(" ", ""),
+                "extra_variables": dict(list(zip(key_list, value_list)))
+
             }
             response = request_url(
                 verb="POST",
                 uri="accounts/aws/",
                 headers={"Authorization": f"Bearer {token}"},
-                json=new_user,
+                json=aws_account_request,
             )
             if response.get("status_code") == 200:
                 flash(
@@ -1542,6 +1515,59 @@ def new_aws_account():
         return redirect(url_for("base_blueprint.logout"))
 
 
+@blueprint.route("/aws-edit", methods=["GET", "POST"], defaults={"account_id": None})
+@blueprint.route("/aws-edit/<account_id>", methods=["GET", "POST"])
+@login_required
+def edit_aws_account(account_id):
+    try:
+        form = AwsForm(request.form)
+        token = decrypt(r.get(current_user.id))
+        check_unauthorized_token(token)
+        endpoint = f"accounts/aws/?id={account_id}"
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        vars_json = response["json"][0]
+        if request.method == "POST":
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
+            aws_account_request: dict = {
+                "squad": form.squad.data.replace(" ", ""),
+                "environment": form.environment.data.replace(" ", ""),
+                "access_key_id": form.access_key_id.data.replace(" ", "") if "*" not in form.access_key_id.data else None,
+                "secret_access_key": form.secret_access_key.data.replace(" ", "") if "*" not in form.secret_access_key.data else None,
+                "default_region": form.default_region.data.replace(" ", ""),
+                "role_arn": form.role_arn.data.replace(" ", ""),
+                "extra_variables": dict(list(zip(key_list, value_list))),
+            }
+            response = request_url(
+                verb="PATCH",
+                uri=f"accounts/aws/{account_id}",
+                headers={"Authorization": f"Bearer {token}"},
+                json=aws_account_request,
+            )
+            if response.get("status_code") == 200:
+                flash(
+                    f"Updated aws account for environment {form.environment.data} in {form.squad.data} "
+                )
+                return redirect(url_for("home_blueprint.route_template", template="aws-list"))
+
+            elif response.get("status_code") == 409:
+                flash(response["json"].get("detail"), "error")
+            else:
+                flash(response["json"], "error")
+
+        return render_template(
+            "/aws-edit.html",
+            title="Edit aws account",
+            form=form,
+            active="edit_aws_account",
+            data_json=vars_json,
+            external_api_dns=external_api_dns,
+        )
+    except ValueError:
+        return redirect(url_for("base_blueprint.logout"))
+    
 @blueprint.route("/aws-list")
 @login_required
 def list_aws_account():
@@ -1551,14 +1577,13 @@ def list_aws_account():
         check_unauthorized_token(token)
         response = request_url(
             verb="GET",
-            uri=f"accounts/aws/",
+            uri="accounts/aws/",
             headers={"Authorization": f"Bearer {token}"},
         )
         content = response.get("json")
         return render_template(
             "aws-list.html", name="Name", aws=content, external_api_dns=external_api_dns
         )
-
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
 
@@ -1600,16 +1625,19 @@ def new_gcp_account():
         # Check if token no expired
         check_unauthorized_token(token)
         if request.method == "POST":
-            new_user: dict = {
-                "squad": form.squad.data.replace(" ",""),
-                "environment": form.environment.data.replace(" ",""),
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
+            new_account: dict = {
+                "squad": form.squad.data.replace(" ", ""),
+                "environment": form.environment.data.replace(" ", ""),
                 "gcloud_keyfile_json": ast.literal_eval(form.gcloud_keyfile_json.data),
+                "extra_variables": dict(list(zip(key_list, value_list))),
             }
             response = request_url(
                 verb="POST",
                 uri="accounts/gcp/",
                 headers={"Authorization": f"Bearer {token}"},
-                json=new_user,
+                json=new_account,
             )
             if response.get("status_code") == 200:
                 flash(
@@ -1631,6 +1659,57 @@ def new_gcp_account():
         return redirect(url_for("base_blueprint.logout"))
 
 
+@blueprint.route("/gcp-edit", methods=["GET", "POST"], defaults={"account_id": None})
+@blueprint.route("/gcp-edit/<account_id>", methods=["GET", "POST"])
+@login_required
+def edit_gcp_account(account_id):
+    try:
+        form = GcpFormUpdate(request.form)
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        endpoint = f"accounts/gcp/?id={account_id}"
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        vars_json = response["json"][0]
+        if request.method == "POST":
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
+            aws_account_request: dict = {
+                "squad": form.squad.data.replace(" ", ""),
+                "environment": form.environment.data.replace(" ", ""),
+                "gcloud_keyfile_json": ast.literal_eval(form.gcloud_keyfile_json.data) if form.gcloud_keyfile_json.data != "" else None,
+                "extra_variables": dict(list(zip(key_list, value_list))),
+            }
+            response = request_url(
+                verb="PATCH",
+                uri=f"accounts/gcp/{account_id}",
+                headers={"Authorization": f"Bearer {token}"},
+                json=aws_account_request,
+            )
+            if response.get("status_code") == 200:
+                flash(
+                    f"Updated gcp account for environment {form.environment.data} in {form.squad.data} "
+                )
+                return redirect(url_for("home_blueprint.route_template", template="gcp-list"))
+
+            elif response.get("status_code") == 409:
+                flash(response["json"].get("detail"), "error")
+            else:
+                flash(response["json"], "error")
+
+        return render_template(
+            "/gcp-edit.html",
+            title="Edit gcp account",
+            form=form,
+            active="edit_gcp_account",
+            data_json=vars_json,
+            external_api_dns=external_api_dns,
+        )
+    except ValueError:
+        return redirect(url_for("base_blueprint.logout"))
+
 @blueprint.route("/gcp-list")
 @login_required
 def list_gcp_account():
@@ -1640,7 +1719,7 @@ def list_gcp_account():
         check_unauthorized_token(token)
         response = request_url(
             verb="GET",
-            uri=f"accounts/gcp/",
+            uri="accounts/gcp/",
             headers={"Authorization": f"Bearer {token}"},
         )
         content = response.get("json")
@@ -1656,7 +1735,6 @@ def list_gcp_account():
 def delete_gcp_account(gcp_account_id):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         response = request_url(
             verb="DELETE",
@@ -1666,7 +1744,7 @@ def delete_gcp_account(gcp_account_id):
 
         if response.get("status_code") == 200:
             flash(
-                f"Account Deleted"
+                "Account Deleted"
             )
         elif response.get("status_code") == 409:
             flash(response["json"].get("detail"), "error")
@@ -1685,16 +1763,18 @@ def new_azure_account():
     try:
         form = AzureForm(request.form)
         if request.method == "POST":
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
             token = decrypt(r.get(current_user.id))
-            # Check if token no expired
             check_unauthorized_token(token)
             new_user: dict = {
-                "squad": form.squad.data.replace(" ",""),
-                "environment": form.environment.data.replace(" ",""),
-                "subscription_id": form.subscription_id.data.replace(" ",""),
-                "client_id": form.client_id.data.replace(" ",""),
-                "client_secret": form.client_secret.data.replace(" ",""),
-                "tenant_id": form.tenant_id.data.replace(" ",""),
+                "squad": form.squad.data.replace(" ", ""),
+                "environment": form.environment.data.replace(" ", ""),
+                "subscription_id": form.subscription_id.data.replace(" ", ""),
+                "client_id": form.client_id.data.replace(" ", ""),
+                "client_secret": form.client_secret.data.replace(" ", ""),
+                "tenant_id": form.tenant_id.data.replace(" ", ""),
+                "extra_variables": dict(list(zip(key_list, value_list)))
             }
             response = request_url(
                 verb="POST",
@@ -1722,16 +1802,69 @@ def new_azure_account():
         return redirect(url_for("base_blueprint.logout"))
 
 
+@blueprint.route("/azure-edit", methods=["GET", "POST"], defaults={"account_id": None})
+@blueprint.route("/azure-edit/<account_id>", methods=["GET", "POST"])
+@login_required
+def edit_azure_account(account_id):
+    try:
+        form = AzureFormUpdate(request.form)
+        token = decrypt(r.get(current_user.id))
+        check_unauthorized_token(token)
+        endpoint = f"accounts/azure/?id={account_id}"
+        response = request_url(
+            verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        vars_json = response["json"][0]
+        if request.method == "POST":
+            key_list = request.values.getlist("sld_key")
+            value_list = request.values.getlist("sld_value")
+            aws_account_request: dict = {
+                "squad": form.squad.data.replace(" ", ""),
+                "environment": form.environment.data.replace(" ", ""),
+                "subscription_id": form.subscription_id.data.replace(" ", ""),
+                "client_id": form.client_id.data.replace(" ", ""),
+                "client_secret": form.client_secret.data.replace(" ", ""),
+                "tenant_id": form.tenant_id.data.replace(" ", ""),
+                "extra_variables": dict(list(zip(key_list, value_list))),
+            }
+            response = request_url(
+                verb="PATCH",
+                uri=f"accounts/azure/{account_id}",
+                headers={"Authorization": f"Bearer {token}"},
+                json=aws_account_request,
+            )
+            if response.get("status_code") == 200:
+                flash(
+                    f"Updated azure account for environment {form.environment.data} in {form.squad.data} "
+                )
+                return redirect(url_for("home_blueprint.route_template", template="azure-list"))
+
+            elif response.get("status_code") == 409:
+                flash(response["json"].get("detail"), "error")
+            else:
+                flash(response["json"], "error")
+
+        return render_template(
+            "/azure-edit.html",
+            title="Edit azure account",
+            form=form,
+            active="edit_azure_account",
+            data_json=vars_json,
+            external_api_dns=external_api_dns,
+        )
+    except ValueError:
+        return redirect(url_for("base_blueprint.logout"))
+    
+
 @blueprint.route("/azure-list")
 @login_required
 def list_azure_account():
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         response = request_url(
             verb="GET",
-            uri=f"accounts/azure/",
+            uri="accounts/azure/",
             headers={"Authorization": f"Bearer {token}"},
         )
         content = response.get("json")
@@ -1750,23 +1883,20 @@ def list_azure_account():
 def delete_azure_account(azure_account_id):
     try:
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
         response = request_url(
             verb="DELETE",
             uri=f"accounts/azure/{azure_account_id}",
             headers={"Authorization": f"Bearer {token}"},
         )
-
         if response.get("status_code") == 200:
             flash(
-                f"Account Deleted"
+                "Account Deleted"
             )
         elif response.get("status_code") == 409:
             flash(response["json"].get("detail"), "error")
         else:
             flash(response["json"], "error")
-
         return redirect(url_for("home_blueprint.route_template", template="azure-list"))
     except ValueError:
         return redirect(url_for("base_blueprint.logout"))
@@ -1779,13 +1909,9 @@ def route_template(template):
     try:
         if not template.endswith(".html"):
             template += ".html"
-        # Detect the current page
         segment = get_segment(request)
-        # Get Token
         token = decrypt(r.get(current_user.id))
-        # Check if token no expired
         check_unauthorized_token(token)
-        # Get Api data
         deploy_response = request_url(
             verb="GET",
             uri="deploy",

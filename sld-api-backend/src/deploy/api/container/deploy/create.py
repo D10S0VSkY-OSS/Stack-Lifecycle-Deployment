@@ -20,7 +20,7 @@ from src.shared.security import deps
 from src.tasks.infrastructure import repositories as crud_tasks
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-from src.worker.domain.entities.worker import DeployParams, DownloadGitRepoParams
+from src.worker.domain.entities.worker import DeployParams
 
 
 async def deploy_infra_by_stack_name(
@@ -41,7 +41,7 @@ async def deploy_infra_by_stack_name(
                 status_code=403, detail=f"Not enough permissions in {squad}"
             )
     # Get  credentials by providers supported
-    secreto = check_prefix(
+    secreto = await check_prefix(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad
     )
     # Get info from stack data

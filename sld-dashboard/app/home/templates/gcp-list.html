@@ -70,6 +70,7 @@
                     <th>Account Name</th>
                     <th>Squad</th>
                     <th>Environment</th>
+                    <th>Extra Variables</th>
                     <th></th>
                 </tr>
             </thead>
@@ -82,6 +83,16 @@
                     <td><span class="tag-style">{{ gcp_account.squad }}_{{ gcp_account.environment}}</span></td>
                     <td><span class="font-weight-normal">{{ gcp_account.squad }}</span></td>
                     <td><span class="font-weight-normal">{{ gcp_account.environment }}</span></td>
+<td>
+    <span class="font-weight-normal" title="{% if gcp_account.extra_variables %}{{ ', '.join(gcp_account.extra_variables.keys()) }}{% endif %}">
+        {% if gcp_account.extra_variables %}
+            {% set truncated_variables = gcp_account.extra_variables.keys() | join(', ') | truncate(30, True, '...') %}
+            {{ truncated_variables }}
+        {% else %}
+            -
+        {% endif %}
+    </span>
+</td>
                     <td>
                         {% if "yoda" in current_user.role %}
                         <div class="btn-group">
@@ -93,6 +104,9 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu">
+                                <a class="dropdown-item" 
+                                    href="{{ url_for('.edit_gcp_account', account_id=gcp_account.id)}}"><span 
+                                    class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item text-danger"
                                     href="{{ url_for('.delete_gcp_account', gcp_account_id=gcp_account.id)}}"><span
                                         class="fas fa-trash-alt mr-2"></span>Remove</a>
@@ -143,4 +157,5 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <!-- <script src="/static/assets/js/pagination.js"></script> -->
+ <script src="/static/assets/js/search.js"></script>
 {% endblock javascripts %}

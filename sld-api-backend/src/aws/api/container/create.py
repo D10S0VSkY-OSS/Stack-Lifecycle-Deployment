@@ -14,7 +14,6 @@ async def create_new_aws_profile(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-    # Check if the user has privileges
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     if "string" in [aws.squad, aws.environment]:
@@ -22,19 +21,22 @@ async def create_new_aws_profile(
             status_code=409,
             detail="The squad or environment field must have a value that is not a string.",
         )
-    db_aws_account = crud_aws.get_squad_aws_profile(
-        db=db, squad=aws.squad, environment=aws.environment
+    filters = schemas_aws.AwsAccountFilter()
+    filters.squad = aws.squad
+    filters.environment = aws.environment
+    db_aws_account = await crud_aws.get_all_aws_profile(
+        db=db, filters=filters
     )
     if db_aws_account:
         raise HTTPException(status_code=409, detail="Account already exists")
     try:
-        result = crud_aws.create_aws_profile(db=db, aws=aws)
+        result = await crud_aws.create_aws_profile(db=db, aws=aws)
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
             action=f"Create AWS account {aws.squad} {aws.environment}",
         )
-        return {"result": f"Create AWS account {aws.squad} {aws.environment}"}
+        return result
     except Exception as err:
         raise HTTPException(status_code=400, detail=str(err))

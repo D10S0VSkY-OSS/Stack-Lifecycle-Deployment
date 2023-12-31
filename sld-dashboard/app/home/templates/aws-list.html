@@ -42,6 +42,7 @@
                         aria-label="Search" aria-describedby="basic-addon2">
                 </div>
             </div>
+
             <div class="col-4 col-md-2 col-xl-1 pl-md-0 text-right">
                 <div class="btn-group">
                     <button class="btn btn-link text-dark dropdown-toggle dropdown-toggle-split m-0 p-0"
@@ -71,9 +72,8 @@
                     <th>Squad</th>
                     <th>Environment</th>
                     <th>Default Region</th>
-                    <th>Profile Name</th>
                     <th>Role Arn</th>
-                    <th>Source Profile</th>
+                    <th>Extra Variables</th>
                     <th></th>
                 </tr>
             </thead>
@@ -87,9 +87,25 @@
                     <td><span class="font-weight-normal">{{ aws_account.squad }}</span></td>
                     <td><span class="font-weight-normal">{{ aws_account.environment }}</span></td>
                     <td><span class="font-weight-normal">{{ aws_account.default_region }}</span></td>
-                    <td><span class="font-weight-normal">{{ aws_account.profile_name }}</span></td>
-                    <td><span class="font-weight-normal">{{ aws_account.role_arn }}</span></td>
-                    <td><span class="font-weight-normal">{{ aws_account.source_profile }}</span></td>
+<td>
+    <span class="font-weight-normal">
+        {% if aws_account.role_arn %}
+            {{ aws_account.role_arn }}
+        {% else %}
+            -
+        {% endif %}
+    </span>
+</td>
+<td>
+    <span class="font-weight-normal" title="{% if aws_account.extra_variables %}{{ ', '.join(aws_account.extra_variables.keys()) }}{% endif %}">
+        {% if aws_account.extra_variables %}
+            {% set truncated_variables = aws_account.extra_variables.keys() | join(', ') | truncate(30, True, '...') %}
+            {{ truncated_variables }}
+        {% else %}
+            -
+        {% endif %}
+    </span>
+</td>
                     <td>
                         <div class="btn-group">
                             {% if "yoda" in current_user.role %}
@@ -101,10 +117,12 @@
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
                             <div class="dropdown-menu">
+                                <a class="dropdown-item" 
+                                    href="{{ url_for('.edit_aws_account', account_id=aws_account.id)}}"><span 
+                                    class="fas fa-edit mr-2"></span>Edit</a>
                                 <a class="dropdown-item text-danger"
                                     href="{{ url_for('.delete_aws_account', aws_account_id=aws_account.id)}}"><span
                                         class="fas fa-trash-alt mr-2"></span>Remove</a>
-                            </div>
                             {% endif %}
                         </div>
                     </td>
@@ -151,5 +169,6 @@
 <!-- Specific Page JS goes HERE  -->
 {% block javascripts %}
 <!-- <script src="/static/assets/js/pagination.js"></script> -->
+<script src="/static/assets/js/search.js"></script>
 {% endblock javascripts %}
 
