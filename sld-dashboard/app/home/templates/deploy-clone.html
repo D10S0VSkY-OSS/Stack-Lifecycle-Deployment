@@ -191,12 +191,10 @@
 </script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Obtener el prefijo del deploy.stack_name
         var stackName = "{{ deploy.stack_name | default('') }}";
         var stackNamePrefix = stackName.split('_')[0];
         console.log("Stack Name Prefix:", stackNamePrefix);
 
-        // Obtener el contenido correspondiente al prefijo
         var contentList;
         if (stackNamePrefix === "aws") {
             contentList = {{ aws_content | safe }};
@@ -207,14 +205,12 @@
         } else if (stackNamePrefix === "custom") {
             contentList = {{ custom_content | safe }};
         } else {
-            contentList = []; // Manejar otros casos según sea necesario
+            contentList = [];
         }
 
-        // Filtrar la lista de squads y entornos según el tipo de contenido
         var squads = Array.from(new Set(contentList.map(item => item.squad)));
         var environments = Array.from(new Set(contentList.map(item => item.environment)));
 
-        // Actualizar los desplegables con los datos filtrados
         var squadSelect = document.getElementById("squadSelect");
         var environmentSelect = document.getElementById("environmentSelect");
 
@@ -232,17 +228,13 @@
             environmentSelect.add(option);
         });
 
-        // Función para actualizar las opciones del campo de entorno según el escuadrón seleccionado
         function updateEnvironmentOptions(selectedSquad) {
-            // Filtrar la lista de entornos para el escuadrón seleccionado
             var filteredEnvironments = contentList
                 .filter(item => item.squad === selectedSquad)
                 .map(item => item.environment);
 
-            // Limpiar las opciones actuales
             environmentSelect.innerHTML = "";
 
-            // Agregar las nuevas opciones
             filteredEnvironments.forEach(function (environment) {
                 var option = document.createElement("option");
                 option.value = environment;
@@ -251,7 +243,6 @@
             });
         }
 
-        // Agregar un evento de cambio al campo de escuadrón
         squadSelect.addEventListener('change', function () {
             var selectedSquad = squadSelect.value;
             updateEnvironmentOptions(selectedSquad);

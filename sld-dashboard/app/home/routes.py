@@ -840,7 +840,7 @@ def edit_schedule(deploy_id):
             # Deploy
             response = request_url(
                 verb="PATCH",
-                uri="{endpoint}",
+                uri=endpoint,
                 headers={"Authorization": f"Bearer {token}"},
                 json=data,
             )
