@@ -9,7 +9,6 @@ services:
       - SYS_NICE 
     volumes:
       - sld-db_dev:/var/lib/mysql
-    restart: always
     ports:
       - 3306:3306
         #    command: --init-file init.sql
@@ -103,7 +102,6 @@ services:
     #image: d10s0vsky/sld-dashboard:latest
     hostname: sld-dashboard
     entrypoint: gunicorn --config gunicorn-cfg.py run:app
-    restart: always
     env_file: ../../sld-dashboard/.env
     ports:
       - "5000:5000"

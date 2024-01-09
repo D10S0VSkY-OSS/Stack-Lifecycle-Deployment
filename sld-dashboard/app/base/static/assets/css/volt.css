@@ -3766,10 +3766,8 @@ progress {
 }
 
 .btn-secondary {
-    color: #f12e58;
-    background-color: #f12e58;
-    border-color: #f12e58;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(46, 54, 80, 0.075);
+    background-image: linear-gradient(to right, #a8b3df, #6d5d9f)
 }
 
 .btn-secondary:hover {
@@ -13751,7 +13749,7 @@ progress {
 }
 
 .bg-primary {
-    background-color: #262B40 !important;
+    background: linear-gradient(to top left, #262b40, #262b40)
 }
 
 .bg-secondary {
@@ -28696,7 +28694,6 @@ label {
 }
 
 .navbar-theme-primary:not(.headroom) {
-    background-color: #262B40;
 }
 
 .navbar-theme-primary.navbar-light:not(.headroom) .navbar-nav .dropdown-item.active, .navbar-theme-primary.navbar-light:not(.headroom) .navbar-nav .dropdown-item:hover,
@@ -32891,7 +32888,7 @@ label {
 
 .sidebar .nav-item.active > .nav-link {
     color: #eaedf2;
-    background-color: #2e3650;
+    background-color: #361f6b;
 }
 
 .sidebar .nav-item .nav-link {
@@ -32900,7 +32897,7 @@ label {
 
 .sidebar .nav-item .nav-link:hover {
     color: #eaedf2;
-    background-color: #2e3650;
+    background-color: #361f6b;
 }
 
 .sidebar .nav-link + .multi-level {
@@ -40350,7 +40347,7 @@ label {
 }
 
 .table .thead-dark th {
-    background-color: #262B40;
+    background-color: #0e1133;
     color: #ffffff;
 }
 
@@ -41859,7 +41856,7 @@ pre {
 }
 
 #particles-js{
-  background-color: #262B40;
+  background: linear-gradient(to bottom left, #09223d, #080308, #282629, #7132a9, #0b0716);
   position: static;
   width: 100%;
   height: 100%;

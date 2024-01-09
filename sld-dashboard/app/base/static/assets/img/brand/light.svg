@@ -1,59 +1,13 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg
-   xmlns:dc="http://purl.org/dc/elements/1.1/"
-   xmlns:cc="http://creativecommons.org/ns#"
-   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
-   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   aria-hidden="true"
-   focusable="false"
-   data-prefix="fas"
-   data-icon="cubes"
-   class="svg-inline--fa fa-cubes fa-w-16"
-   role="img"
-   viewBox="0 0 512 512"
-   version="1.1"
-   id="svg92"
-   sodipodi:docname="light.svg"
-   inkscape:version="1.0.1 (0767f8302a, 2020-10-17)">
-  <metadata
-     id="metadata98">
-    <rdf:RDF>
-      <cc:Work
-         rdf:about="">
-        <dc:format>image/svg+xml</dc:format>
-        <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-      </cc:Work>
-    </rdf:RDF>
-  </metadata>
-  <defs
-     id="defs96" />
-  <sodipodi:namedview
-     pagecolor="#ffffff"
-     bordercolor="#666666"
-     borderopacity="1"
-     objecttolerance="10"
-     gridtolerance="10"
-     guidetolerance="10"
-     inkscape:pageopacity="0"
-     inkscape:pageshadow="2"
-     inkscape:window-width="1280"
-     inkscape:window-height="710"
-     id="namedview94"
-     showgrid="false"
-     inkscape:zoom="1.5019531"
-     inkscape:cx="155.46424"
-     inkscape:cy="256"
-     inkscape:window-x="1512"
-     inkscape:window-y="179"
-     inkscape:window-maximized="0"
-     inkscape:current-layer="svg92" />
-  <path
-     fill="currentColor"
-     d="M 488.6,250.2 392,214 V 105.5 c 0,-15 -9.3,-28.4 -23.4,-33.7 l -100,-37.5 c -8.1,-3.1 -17.1,-3.1 -25.3,0 l -100,37.5 c -14.1,5.3 -23.4,18.7 -23.4,33.7 V 214 L 23.3,250.2 C 9.3,255.5 0,268.9 0,283.9 V 394 c 0,13.6 7.7,26.1 19.9,32.2 l 100,50 c 10.1,5.1 22.1,5.1 32.2,0 l 103.9,-52 103.9,52 c 10.1,5.1 22.1,5.1 32.2,0 l 100,-50 C 504.3,420.1 512,407.6 512,394 V 283.9 c 0,-15 -9.3,-28.4 -23.4,-33.7 z M 358,214.8 273,246.7 v -68.2 l 85,-37 z M 154,104.1 256,65.9 358,104.1 v 0.6 L 256,146.1 154,104.7 Z m 84,291.1 -85,42.5 v -79.1 l 85,-38.8 z m 0,-112 -102,41.4 -102,-41.4 v -0.6 l 102,-38.2 102,38.2 z m 240,112 -85,42.5 v -79.1 l 85,-38.8 z m 0,-112 -102,41.4 -102,-41.4 v -0.6 l 102,-38.2 102,38.2 z"
-     id="path90"
-     style="fill:#f12e58;image-rendering:optimizeQuality" />
+<svg xmlns="http://www.w3.org/2000/svg" height="160" width="180" viewBox="0 0 576 512">
+    <!-- Definir el gradiente -->
+    <defs>
+        <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" style="stop-color: #7f1f99; stop-opacity: 1" />
+            <stop offset="50%" style="stop-color: #fa5252; stop-opacity: 1" />
+            <stop offset="100%" style="stop-color: #3300ff; stop-opacity: 1" />
+        </linearGradient>
+    </defs>
+
+    <!-- Aplicar el gradiente al relleno del path -->
+    <path d="M264.5 5.2c14.9-6.9 32.1-6.9 47 0l218.6 101c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 149.8C37.4 145.8 32 137.3 32 128s5.4-17.9 13.9-21.8L264.5 5.2zM476.9 209.6l53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 277.8C37.4 273.8 32 265.3 32 256s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0l152-70.2zm-152 198.2l152-70.2 53.2 24.6c8.5 3.9 13.9 12.4 13.9 21.8s-5.4 17.9-13.9 21.8l-218.6 101c-14.9 6.9-32.1 6.9-47 0L45.9 405.8C37.4 401.8 32 393.3 32 384s5.4-17.9 13.9-21.8l53.2-24.6 152 70.2c23.4 10.8 50.4 10.8 73.8 0z" fill="url(#gradient)" />
 </svg>
