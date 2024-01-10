@@ -3766,8 +3766,8 @@ progress {
 }
 
 .btn-secondary {
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15), 0 1px 1px rgba(46, 54, 80, 0.075);
-    background-image: linear-gradient(to right, #a8b3df, #6d5d9f)
+    background-image: linear-gradient(to right, #a8b3df, #6d5d9f);
+    border-color: #595769;
 }
 
 .btn-secondary:hover {
