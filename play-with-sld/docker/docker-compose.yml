@@ -8,7 +8,6 @@ services:
       - SYS_NICE 
     volumes:
       - sld-db:/var/lib/mysql
-    restart: always
     ports:
       - 3306:3306
     environment:
@@ -86,7 +85,6 @@ services:
     environment:
       PATH: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
     entrypoint: python -m gunicorn --config gunicorn-cfg.py run:app
-    restart: always
     env_file: ../../sld-dashboard/.env
     ports:
       - "5000:5000"
