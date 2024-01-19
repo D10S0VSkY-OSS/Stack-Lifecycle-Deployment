@@ -3,6 +3,7 @@ import configparser
 import json
 import logging
 import os
+import boto3
 
 from config.api import settings
 from src.shared.security.vault import vault_decrypt
@@ -31,6 +32,29 @@ class SecretsProviders:
             os.environ[k] = v
 
 
+def aws_credentials_context(secreto: dict, session_name: str = "sld-worker"):
+    try:
+        os.environ["AWS_ACCESS_KEY_ID"] = decrypt(secreto.get("access_key_id"))
+        os.environ["AWS_SECRET_ACCESS_KEY"] = decrypt(secreto.get("secret_access_key"))
+        os.environ["AWS_DEFAULT_REGION"] = secreto.get("default_region")
+
+        if secreto.get("role_arn"):
+            sts_client = boto3.client(
+                'sts',
+                aws_access_key_id=decrypt(secreto.get("access_key_id")),
+                aws_secret_access_key=decrypt(secreto.get("secret_access_key")),
+            )
+            assumed_role = sts_client.assume_role(RoleArn=secreto.get("role_arn"), RoleSessionName=session_name)
+            credentials = assumed_role['Credentials']
+            os.environ['AWS_ACCESS_KEY_ID'] = credentials['AccessKeyId']
+            os.environ['AWS_SECRET_ACCESS_KEY'] = credentials['SecretAccessKey']
+            os.environ["AWS_DEFAULT_REGION"] = secreto.get("default_region")
+            os.environ['AWS_SESSION_TOKEN'] = credentials['SessionToken']
+            os.environ["TF_VAR_role_arn"] = secreto.get("role_arn")
+    except Exception as err:
+        logging.error(err)
+
+
 def createLocalFolder(dir_path: str):
     try:
         os.makedirs(dir_path)
@@ -48,20 +72,8 @@ def secret(
     secreto,
 ):
     if any(i in stack_name.lower() for i in settings.AWS_PREFIX):
-        try:
-            export_environment_variables(secreto)
-            os.environ["AWS_ACCESS_KEY_ID"] = decrypt(secreto.get("access_key_id"))
-            os.environ["AWS_SECRET_ACCESS_KEY"] = decrypt(secreto.get("secret_access_key"))
-            os.environ["AWS_DEFAULT_REGION"] = secreto.get("default_region")
-            if secreto.get("role_arn"):
-                logging.info("Set role_arn for assume role")
-                os.environ["TF_VAR_role_arn"] = secreto.get("role_arn")
-                logging.info(f"TF_VAR_role_arn = {secreto.get('role_arn')}")
-            logging.info(
-                f'Set aws account {squad}, {environment}, {stack_name}, {secreto.get("default_region")}, {name}'
-            )
-        except Exception as err:
-            logging.warning(err)
+        session_name = f"{squad}-{environment}-{name}"
+        aws_credentials_context(secreto=secreto, session_name=session_name)
 
     elif any(i in stack_name.lower() for i in settings.GCLOUD_PREFIX):
         export_environment_variables(secreto)
