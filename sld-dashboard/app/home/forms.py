@@ -240,7 +240,7 @@ class AwsForm(FlaskForm):
     role_arn = StringField(
         "Role_arn",
         [
-            validators.length(min=4, max=50, message="Role arn out of reange."),
+            validators.length(min=4, max=300, message="Role arn out of reange."),
         ],
     )
     extra_variables = FieldList(FormField(ExtraVariableForm), label='Extra Variables')
