@@ -53,7 +53,7 @@ async def delete_infra_by_id(
     try:
         # Check deploy state
         if not check_deploy_state(deploy_data.task_id):
-            raise ValueError("Deploy state running, cannot upgrade")
+            raise ValueError("The deployment task is locked and cannot be upgraded. If you wish to proceed with the change, you can force the deletion of the task.")
         # Delete deploy db by id
         crud_deploys.delete_deploy_by_id(db=db, deploy_id=deploy_id, squad=squad)
         # push task destroy to queue and return task_id

@@ -270,7 +270,29 @@ def destroy_deploy_console(deploy_id):
     except Exception:
         return render_template("page-500.html"), 500
 
-
+@blueprint.route("/task/<task_id>")
+@login_required
+def unlock_task(task_id):
+    try:
+        token = decrypt(r.get(current_user.id))
+        # Check if token no expired
+        check_unauthorized_token(token)
+        endpoint = f"tasks/id/{task_id}"
+        response = request_url(
+            verb="DELETE", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
+        )
+        if response.get("status_code") == 200:
+            flash("Delete task id locked")
+        else:
+            flash(response["json"]["detail"], "error")
+        return redirect(
+            url_for("home_blueprint.route_template", template="deploys-list")
+        )
+    except TemplateNotFound:
+        return render_template("page-404.html"), 404
+    except TypeError:
+        return redirect(url_for("base_blueprint.logout"))
+    
 @blueprint.route("/deploys/unlock/<int:deploy_id>")
 @login_required
 def unlock_deploy(deploy_id):

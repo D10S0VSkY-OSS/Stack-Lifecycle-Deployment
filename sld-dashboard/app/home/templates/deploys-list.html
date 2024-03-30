@@ -262,6 +262,16 @@
                                             <span class="fas fa-skull-crossbones mr-2"></span>
                                             Delete
                                         </a>
+                                    <!-- Task Unlock -->
+                                        <a
+                                            title="Force remove task locked {{deploy.task_id}}"
+                                            class="dropdown-item"
+                                            data-toggle="modal"
+                                            data-target="#TaskModalCenter-{{deploy.task_id}}"
+                                        >
+                                            <span class="fas fa-tasks mr-2"></span>
+                                            Task 
+                                        </a>
                                     </div>
                                     {% else %}
                                     <div class="dropdown-menu">
@@ -300,6 +310,16 @@
                                             <span class="fas fa-unlock mr-2"></span>
                                             Unlock
                                         </a>
+                                    <!-- Task Unlock -->
+                                        <a
+                                            title="Force remove task locked {{deploy.task_id}}"
+                                            class="dropdown-item"
+                                            data-toggle="modal"
+                                            data-target="#TaskModalCenter-{{deploy.task_id}}"
+                                        >
+                                            <span class="fas fa-tasks mr-2"></span>
+                                            Task 
+                                        </a>
                                     </span>
                                     {% endif %}
                                     </div>
@@ -321,6 +341,7 @@
                                         >
                                             <span class="far fa-file-code mr-0"></span>
                                         </a>
+    
                                     </span>
                                 </div>
                             </td>
@@ -359,6 +380,45 @@
                                     <div class="modal-footer">
                                         <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
                                         <form action="{{ url_for('.unlock_deploy', deploy_id=deploy.id)}}">
+                                            <input type="submit" value="Unlock" class="btn btn-danger">
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Task-->
+                        <div class="modal fade" id="TaskModalCenter-{{deploy.task_id}}">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="TaskModalLongTitle-{{deploy.task_id}}">
+                                            Unlock Deploy
+                                    {{deploy.name}}
+                                        </h5>
+                                        <button
+                                            type="button"
+                                            class="close"
+                                            data-dismiss="modal"
+                                            aria-label="Close"
+                                        >
+                                            <span aria-hidden="true">&times;</span>
+                                        </button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>
+                                            <strong>
+                                                Force remove task locked {{deploy.task_id}}
+                                        to protect the state from being written by multiple users at the same time.
+
+                                            </strong>
+                                        </p>
+                                        <p>
+                                            <strong>Are you sure?</strong>
+                                        </p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-primary" data-dismiss="modal">Cancel</button>
+                                        <form action="{{ url_for('.unlock_task', task_id=deploy.task_id)}}">
                                             <input type="submit" value="Unlock" class="btn btn-danger">
                                         </form>
                                     </div>
