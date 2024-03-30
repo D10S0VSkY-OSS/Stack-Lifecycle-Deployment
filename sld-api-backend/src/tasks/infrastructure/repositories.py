@@ -70,3 +70,17 @@ def get_tasks_by_deploy_id(db: Session, deploy_id: int):
         return db.query(models.Tasks).filter(models.Tasks.deploy_id == deploy_id).all()
     except Exception as err:
         raise err
+
+
+def delete_celery_task_meta_by_task_id(db: Session, task_id: str):
+    try:
+        db_task_meta = db.query(models.CeleryTaskMeta).filter(models.CeleryTaskMeta.task_id == task_id).first()
+        if db_task_meta is not None:
+            db.delete(db_task_meta)
+            db.commit()
+            return True
+        else:
+            return False
+    except Exception as err:
+        raise err
+

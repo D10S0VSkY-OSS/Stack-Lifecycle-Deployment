@@ -66,7 +66,7 @@ async def deploy_by_id(
         check_cron_schedule(deploy_update.destroy_time)
         # Check deploy state
         if not check_deploy_state(deploy_data.task_id):
-            raise ValueError("Deploy state running, cannot upgrade")
+            raise ValueError("The deployment task is locked and cannot be upgraded. If you wish to proceed with the change, you can force the deletion of the task.")
         # push task Deploy Update to queue and return task_id
         pipeline_deploy = async_deploy(DeployParams(
             git_repo=git_repo,
