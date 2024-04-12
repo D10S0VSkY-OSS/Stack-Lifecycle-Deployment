@@ -22,7 +22,7 @@ google-resumable-media==2.6.0
 googleapis-common-protos==1.61.0
 greenlet==3.0.1
 h11==0.14.0
-idna==3.4
+idna==3.7
 isodate==0.6.1
 jmespath==1.0.1
 msrest==0.7.1
