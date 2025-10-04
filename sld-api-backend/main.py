@@ -1,7 +1,4 @@
-import imp
 import logging
-from pkgutil import ImpImporter
-from statistics import mode
 
 from src.shared.api.v1.api import api_router
 from config.api import settings
