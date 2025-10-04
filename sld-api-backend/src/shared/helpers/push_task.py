@@ -57,9 +57,7 @@ def async_plan(plan_params: DeployParams):
 
 
 def async_schedule_delete(deploy_name: str, squad: str):
-    deploy_schedule_delete_result = schedule_delete.s(deploy_name).apply_async(
-        queue="squad"
-    )
+    deploy_schedule_delete_result = schedule_delete.s(deploy_name).apply_async(queue="squad")
     return deploy_schedule_delete_result.task_id
 
 
@@ -102,7 +100,9 @@ def sync_git(
         project_path=project_path,
     )
     try:
-        pipeline_git_result = pipeline_git_pull.s(git_params.model_dump()).apply_async(queue="squad")
+        pipeline_git_result = pipeline_git_pull.s(git_params.model_dump()).apply_async(
+            queue="squad"
+        )
         task_id = pipeline_git_result.task_id
         get_data = pipeline_git_result.get()
         try:

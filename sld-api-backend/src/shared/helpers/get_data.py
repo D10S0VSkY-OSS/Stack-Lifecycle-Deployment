@@ -89,9 +89,7 @@ def deploy(db, deploy_id: int):
 
 def deploy_squad(db, deploy_id: int, squad: str):
     try:
-        deploy_data = crud_deploys.get_deploy_by_id_squad(
-            db=db, deploy_id=deploy_id, squad=squad
-        )
+        deploy_data = crud_deploys.get_deploy_by_id_squad(db=db, deploy_id=deploy_id, squad=squad)
         if deploy_data is None:
             raise Exception("Deploy id Not Found")
         return deploy_data
@@ -116,7 +114,9 @@ def check_deploy_exist(db, deploy_name: str, squad: str, env: str, stack: str):
             db=db, deploy_name=deploy_name, squad=squad, environment=env
         )
         if db_data is not None:
-            data_db_check = f"{db_data.name}-{db_data.squad}-{db_data.environment}-{db_data.stack_name}"
+            data_db_check = (
+                f"{db_data.name}-{db_data.squad}-{db_data.environment}-{db_data.stack_name}"
+            )
             if data_source_check == data_db_check:
                 raise Exception(
                     "The name of the deployment already exists in the current squad and with specified environment"
@@ -139,9 +139,7 @@ def check_deploy_task_pending_state(deploy_name, squad, environment, task_id=Non
             return True
     try:
         if r.exists(f"{deploy_name}-{squad}-{environment}"):
-            raise Exception(
-                "Task already exists in pending state waiting to be executed"
-            )
+            raise Exception("Task already exists in pending state waiting to be executed")
     except Exception as err:
         raise HTTPException(status_code=409, detail=f"{err}")
     r.set(f"{deploy_name}-{squad}-{environment}", "Locked")
@@ -166,7 +164,7 @@ def activity_log(func):
             db=kwargs["db"],
             username=kwargs["current_user"].username,
             squad=kwargs["current_user"].squad,
-            action=f'Delete User {kwargs["user"]}',
+            action=f"Delete User {kwargs['user']}",
         )
         return await func(*args, **kwargs)
 

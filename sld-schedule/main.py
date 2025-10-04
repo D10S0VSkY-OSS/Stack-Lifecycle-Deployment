@@ -1,6 +1,11 @@
 from fastapi import FastAPI
-from helpers.get_deploy_schedule import (addDeployToSchedule, getJob, getJobs,
-                                         init_check_schedule, removeJob)
+from helpers.get_deploy_schedule import (
+    addDeployToSchedule,
+    getJob,
+    getJobs,
+    init_check_schedule,
+    removeJob,
+)
 
 app = FastAPI(
     title="Schedule Stack Lifecycle Deployment 1.0.0-RC",

@@ -14,7 +14,6 @@ async def get_all_gcp_accounts(
     db: Session = Depends(deps.get_db),
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     filters: schemas_gcp.GcloudAccountFilter = Depends(schemas_gcp.GcloudAccountFilter),
-
 ) -> list[schemas_gcp.GcloudResponse]:
     if not crud_users.is_master(db, current_user):
         filters.squad = current_user.squad

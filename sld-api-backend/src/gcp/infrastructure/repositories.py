@@ -25,8 +25,14 @@ def decrypt(secreto):
         raise err
 
 
-async def create_gcloud_profile(db: Session, gcp: schemas_gcp.GcloudBase) -> schemas_gcp.GcloudResponse:
-    encrypted_extra_variables = {key: encrypt(val) for key, val in gcp.extra_variables.items()} if gcp.extra_variables else None
+async def create_gcloud_profile(
+    db: Session, gcp: schemas_gcp.GcloudBase
+) -> schemas_gcp.GcloudResponse:
+    encrypted_extra_variables = (
+        {key: encrypt(val) for key, val in gcp.extra_variables.items()}
+        if gcp.extra_variables
+        else None
+    )
     encrypt_glcoud_keyfile_json = encrypt(str(gcp.gcloud_keyfile_json))
 
     db_gcp = models.Gcloud_provider(
@@ -46,7 +52,9 @@ async def create_gcloud_profile(db: Session, gcp: schemas_gcp.GcloudBase) -> sch
         raise err
 
 
-async def get_credentials_gcloud_profile(db: Session, environment: str, squad: str) -> schemas_gcp.GcloudResponseRepo:
+async def get_credentials_gcloud_profile(
+    db: Session, environment: str, squad: str
+) -> schemas_gcp.GcloudResponseRepo:
     try:
         db_gcp = (
             db.query(models.Gcloud_provider)
@@ -59,9 +67,19 @@ async def get_credentials_gcloud_profile(db: Session, environment: str, squad: s
         raise err
 
 
-async def update_gcloud_profile(db: Session, gcp_account_id: int, updated_gcp: schemas_gcp.GcloudAccountUpdate) -> schemas_gcp.GcloudResponse:
-    db_gcp = db.query(models.Gcloud_provider).filter(models.Gcloud_provider.id == gcp_account_id).first()
-    await check_deploy_in_use(db=db, db_provider=db_gcp, cloud_provider="gcp", updated=updated_gcp, account_id=gcp_account_id)
+async def update_gcloud_profile(
+    db: Session, gcp_account_id: int, updated_gcp: schemas_gcp.GcloudAccountUpdate
+) -> schemas_gcp.GcloudResponse:
+    db_gcp = (
+        db.query(models.Gcloud_provider).filter(models.Gcloud_provider.id == gcp_account_id).first()
+    )
+    await check_deploy_in_use(
+        db=db,
+        db_provider=db_gcp,
+        cloud_provider="gcp",
+        updated=updated_gcp,
+        account_id=gcp_account_id,
+    )
 
     if db_gcp:
         if updated_gcp.gcloud_keyfile_json:
@@ -70,12 +88,18 @@ async def update_gcloud_profile(db: Session, gcp_account_id: int, updated_gcp: s
             current_extra_variables = db_gcp.extra_variables or {}
             for key, value in current_extra_variables.items():
                 current_extra_variables[key] = decrypt(value)
-            current_extra_variables = {key: value for key, value in current_extra_variables.items() if key in updated_gcp.extra_variables}
+            current_extra_variables = {
+                key: value
+                for key, value in current_extra_variables.items()
+                if key in updated_gcp.extra_variables
+            }
 
             for key, value in updated_gcp.extra_variables.items():
                 if key and value and "***" not in value:
                     current_extra_variables[key] = value
-            encrypted_extra_variables = {key: encrypt(value) for key, value in current_extra_variables.items()}
+            encrypted_extra_variables = {
+                key: encrypt(value) for key, value in current_extra_variables.items()
+            }
             db_gcp.extra_variables = encrypted_extra_variables
         db_gcp.environment = updated_gcp.environment
         db_gcp.squad = updated_gcp.squad
@@ -100,8 +124,10 @@ async def get_all_gcloud_profile(
 
         for field, value in filters.model_dump().items():
             if value is not None:
-                if field == 'squad' and isinstance(value, list):
-                    or_conditions = [getattr(models.Gcloud_provider, field).like(f"%{v}%") for v in value]
+                if field == "squad" and isinstance(value, list):
+                    or_conditions = [
+                        getattr(models.Gcloud_provider, field).like(f"%{v}%") for v in value
+                    ]
                     query = query.filter(or_(*or_conditions))
                 else:
                     query = query.filter(getattr(models.Gcloud_provider, field) == value)
@@ -124,12 +150,18 @@ async def get_all_gcloud_profile(
         raise err
 
 
-async def delete_gcloud_profile_by_id(db: Session, gcp_account_id: int) -> schemas_gcp.GcloudResponse:
+async def delete_gcloud_profile_by_id(
+    db: Session, gcp_account_id: int
+) -> schemas_gcp.GcloudResponse:
     try:
-        db_gcp = db.query(models.Gcloud_provider).filter(
-            models.Gcloud_provider.id == gcp_account_id
-        ).first()
-        await check_deploy_in_use(db=db, db_provider=db_gcp, cloud_provider="gcp", account_id=gcp_account_id)
+        db_gcp = (
+            db.query(models.Gcloud_provider)
+            .filter(models.Gcloud_provider.id == gcp_account_id)
+            .first()
+        )
+        await check_deploy_in_use(
+            db=db, db_provider=db_gcp, cloud_provider="gcp", account_id=gcp_account_id
+        )
         if db_gcp:
             db.delete(db_gcp)
             db.commit()

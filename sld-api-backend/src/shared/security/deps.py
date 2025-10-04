@@ -15,9 +15,7 @@ from src.users.domain.entities import users as schemas
 from src.users.infrastructure import models
 from src.users.infrastructure import repositories as crud_users
 
-reusable_oauth2 = OAuth2PasswordBearer(
-    tokenUrl=f"{settings.API_V1_STR}/authenticate/access-token"
-)
+reusable_oauth2 = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_STR}/authenticate/access-token")
 
 
 def get_db() -> Generator:
@@ -64,16 +62,12 @@ def get_current_active_superuser(
     current_user: models.User = Depends(get_current_user),
 ) -> models.User:
     if not crud_users.is_superuser(current_user):
-        raise HTTPException(
-            status_code=400, detail="The user doesn't have enough privileges"
-        )
+        raise HTTPException(status_code=400, detail="The user doesn't have enough privileges")
     return current_user
 
 
 @inject
-def validate_password(
-    username: str, password: str, user_service=Provide[Container.user_service]
-):
+def validate_password(username: str, password: str, user_service=Provide[Container.user_service]):
     (result, aditional_info) = user_service.validate(username, password)
     if not result:
         raise HTTPException(

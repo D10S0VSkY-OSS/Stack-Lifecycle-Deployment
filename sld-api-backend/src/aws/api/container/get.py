@@ -14,7 +14,6 @@ async def get_all_aws_accounts(
     db: Session = Depends(deps.get_db),
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     filters: schemas_aws.AwsAccountFilter = Depends(schemas_aws.AwsAccountFilter),
-
 ) -> list[schemas_aws.AwsAccountResponse]:
     if not crud_users.is_master(db, current_user):
         filters.squad = current_user.squad

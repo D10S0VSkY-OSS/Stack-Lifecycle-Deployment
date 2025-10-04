@@ -28,7 +28,6 @@ async def get_stack_by_id_or_name(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     if not stack.isdigit():
         result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
         if not crud_users.is_master(db, current_user):

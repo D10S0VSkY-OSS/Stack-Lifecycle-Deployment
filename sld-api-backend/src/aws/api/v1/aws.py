@@ -8,18 +8,14 @@ router = APIRouter()
 
 @router.post("/", status_code=200)
 async def create_new_aws_account(
-    create_aws_profile: schemas_aws.AwsAsumeProfile = Depends(
-        create.create_new_aws_profile
-    ),
+    create_aws_profile: schemas_aws.AwsAsumeProfile = Depends(create.create_new_aws_profile),
 ):
     return create_aws_profile
 
 
 @router.patch("/{aws_account_id}", status_code=200)
 async def update_aws_account(
-        update_account: schemas_aws.AwsAsumeProfile = Depends(
-            update.update_aws_account
-        ),
+    update_account: schemas_aws.AwsAsumeProfile = Depends(update.update_aws_account),
 ):
     return update_account
 

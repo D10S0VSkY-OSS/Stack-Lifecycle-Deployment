@@ -26,8 +26,14 @@ def decrypt(secreto):
         raise err
 
 
-async def create_azure_profile(db: Session, azure: schemas_azure.AzureBase) -> schemas_azure.AzureAccountResponse:
-    encrypted_extra_variables = {key: encrypt(val) for key, val in azure.extra_variables.items()} if azure.extra_variables else None
+async def create_azure_profile(
+    db: Session, azure: schemas_azure.AzureBase
+) -> schemas_azure.AzureAccountResponse:
+    encrypted_extra_variables = (
+        {key: encrypt(val) for key, val in azure.extra_variables.items()}
+        if azure.extra_variables
+        else None
+    )
     encrypt_client_id = encrypt(azure.client_id)
     encrypt_client_secret = encrypt(azure.client_secret)
 
@@ -52,9 +58,19 @@ async def create_azure_profile(db: Session, azure: schemas_azure.AzureBase) -> s
         raise err
 
 
-async def update_azure_profile(db: Session, azure_account_id: int, updated_azure: schemas_azure.AzureAccountUpdate) -> schemas_azure.AzureAccountResponse:
-    db_azure = db.query(models.Azure_provider).filter(models.Azure_provider.id == azure_account_id).first()
-    await check_deploy_in_use(db=db, db_provider=db_azure, cloud_provider="azure", updated=updated_azure, account_id=azure_account_id)
+async def update_azure_profile(
+    db: Session, azure_account_id: int, updated_azure: schemas_azure.AzureAccountUpdate
+) -> schemas_azure.AzureAccountResponse:
+    db_azure = (
+        db.query(models.Azure_provider).filter(models.Azure_provider.id == azure_account_id).first()
+    )
+    await check_deploy_in_use(
+        db=db,
+        db_provider=db_azure,
+        cloud_provider="azure",
+        updated=updated_azure,
+        account_id=azure_account_id,
+    )
 
     if db_azure:
         if updated_azure.client_id:
@@ -65,12 +81,18 @@ async def update_azure_profile(db: Session, azure_account_id: int, updated_azure
             current_extra_variables = db_azure.extra_variables or {}
             for key, value in current_extra_variables.items():
                 current_extra_variables[key] = decrypt(value)
-            current_extra_variables = {key: value for key, value in current_extra_variables.items() if key in updated_azure.extra_variables}
+            current_extra_variables = {
+                key: value
+                for key, value in current_extra_variables.items()
+                if key in updated_azure.extra_variables
+            }
 
             for key, value in updated_azure.extra_variables.items():
                 if key and value and "***" not in value:
                     current_extra_variables[key] = value
-            encrypted_extra_variables = {key: encrypt(value) for key, value in current_extra_variables.items()}
+            encrypted_extra_variables = {
+                key: encrypt(value) for key, value in current_extra_variables.items()
+            }
             db_azure.extra_variables = encrypted_extra_variables
         db_azure.environment = updated_azure.environment
         db_azure.subscription_id = updated_azure.subscription_id
@@ -89,7 +111,9 @@ async def update_azure_profile(db: Session, azure_account_id: int, updated_azure
         raise ValueError(f"azure profile with id {azure_account_id} not found")
 
 
-async def get_credentials_azure_profile(db: Session, environment: str, squad: str) -> schemas_azure.AzureAccountResponseRepo:
+async def get_credentials_azure_profile(
+    db: Session, environment: str, squad: str
+) -> schemas_azure.AzureAccountResponseRepo:
     db_azure = (
         db.query(models.Azure_provider)
         .filter(models.Azure_provider.environment == environment)
@@ -107,8 +131,10 @@ async def get_all_azure_profile(
 
         for field, value in filters.model_dump().items():
             if value is not None:
-                if field == 'squad' and isinstance(value, list):
-                    or_conditions = [getattr(models.Azure_provider, field).like(f"%{v}%") for v in value]
+                if field == "squad" and isinstance(value, list):
+                    or_conditions = [
+                        getattr(models.Azure_provider, field).like(f"%{v}%") for v in value
+                    ]
                     query = query.filter(or_(*or_conditions))
                 else:
                     query = query.filter(getattr(models.Azure_provider, field) == value)
@@ -133,12 +159,18 @@ async def get_all_azure_profile(
         raise err
 
 
-async def delete_azure_profile_by_id(db: Session, azure_account_id: int) -> schemas_azure.AzureAccountResponse:
+async def delete_azure_profile_by_id(
+    db: Session, azure_account_id: int
+) -> schemas_azure.AzureAccountResponse:
     try:
-        db_azure = db.query(models.Azure_provider).filter(
-            models.Azure_provider.id == azure_account_id
-        ).first()
-        await check_deploy_in_use(db=db, db_provider=db_azure, cloud_provider="azure", account_id=azure_account_id)
+        db_azure = (
+            db.query(models.Azure_provider)
+            .filter(models.Azure_provider.id == azure_account_id)
+            .first()
+        )
+        await check_deploy_in_use(
+            db=db, db_provider=db_azure, cloud_provider="azure", account_id=azure_account_id
+        )
         if db_azure:
             db.delete(db_azure)
             db.commit()

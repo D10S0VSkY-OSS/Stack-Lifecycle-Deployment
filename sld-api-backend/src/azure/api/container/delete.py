@@ -15,7 +15,6 @@ async def azure_account_by_id(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ) -> schemas_azure.AzureAccountResponse:
-
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     filters = schemas_azure.AzureAccountFilter()
@@ -24,7 +23,9 @@ async def azure_account_by_id(
     if not db_Azure_account:
         raise HTTPException(status_code=404, detail="Account not found")
     try:
-        result = await crud_azure.delete_azure_profile_by_id(db=db, azure_account_id=azure_account_id)
+        result = await crud_azure.delete_azure_profile_by_id(
+            db=db, azure_account_id=azure_account_id
+        )
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,

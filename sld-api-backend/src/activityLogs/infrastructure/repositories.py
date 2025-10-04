@@ -25,10 +25,7 @@ def get_all_activity(db: Session, skip: int = 0, limit: int = 100):
     try:
         db_query = db.query(models.ActivityLogs)
         return (
-            db_query.order_by(models.ActivityLogs.created_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
+            db_query.order_by(models.ActivityLogs.created_at.desc()).offset(skip).limit(limit).all()
         )
     except Exception as err:
         raise err
@@ -56,11 +53,7 @@ def get_all_activity_by_squad(db: Session, squad: str, skip: int = 0, limit: int
 
 def get_activity_by_username(db: Session, username: int):
     try:
-        return (
-            db.query(models.ActivityLogs)
-            .filter(models.ActivityLogs.username == username)
-            .all()
-        )
+        return db.query(models.ActivityLogs).filter(models.ActivityLogs.username == username).all()
     except Exception as err:
         raise err
 

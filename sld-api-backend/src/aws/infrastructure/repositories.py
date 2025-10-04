@@ -27,10 +27,16 @@ def decrypt(secreto):
         raise err
 
 
-async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> schemas_aws.AwsAccountResponse:
+async def create_aws_profile(
+    db: Session, aws: schemas_aws.AwsAsumeProfile
+) -> schemas_aws.AwsAccountResponse:
     encrypt_access_key_id = encrypt(aws.access_key_id)
     encrypt_secret_access_key = encrypt(aws.secret_access_key)
-    encrypted_extra_variables = {key: encrypt(val) for key, val in aws.extra_variables.items()} if aws.extra_variables else None
+    encrypted_extra_variables = (
+        {key: encrypt(val) for key, val in aws.extra_variables.items()}
+        if aws.extra_variables
+        else None
+    )
 
     db_aws = models.Aws_provider(
         access_key_id=encrypt_access_key_id,
@@ -52,9 +58,17 @@ async def create_aws_profile(db: Session, aws: schemas_aws.AwsAsumeProfile) -> s
         raise err
 
 
-async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: schemas_aws.AwsAccountUpdate) -> schemas_aws.AwsAccountResponse:
+async def update_aws_profile(
+    db: Session, aws_account_id: int, updated_aws: schemas_aws.AwsAccountUpdate
+) -> schemas_aws.AwsAccountResponse:
     db_aws = db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_account_id).first()
-    await check_deploy_in_use(db=db, db_provider=db_aws, cloud_provider="aws", updated=updated_aws, account_id=aws_account_id)
+    await check_deploy_in_use(
+        db=db,
+        db_provider=db_aws,
+        cloud_provider="aws",
+        updated=updated_aws,
+        account_id=aws_account_id,
+    )
 
     if db_aws:
         if updated_aws.access_key_id:
@@ -65,12 +79,18 @@ async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: sche
             current_extra_variables = db_aws.extra_variables or {}
             for key, value in current_extra_variables.items():
                 current_extra_variables[key] = decrypt(value)
-            current_extra_variables = {key: value for key, value in current_extra_variables.items() if key in updated_aws.extra_variables}
+            current_extra_variables = {
+                key: value
+                for key, value in current_extra_variables.items()
+                if key in updated_aws.extra_variables
+            }
 
             for key, value in updated_aws.extra_variables.items():
                 if key and value and "***" not in value:
                     current_extra_variables[key] = value
-            encrypted_extra_variables = {key: encrypt(value) for key, value in current_extra_variables.items()}
+            encrypted_extra_variables = {
+                key: encrypt(value) for key, value in current_extra_variables.items()
+            }
             db_aws.extra_variables = encrypted_extra_variables
         db_aws.environment = updated_aws.environment
         db_aws.default_region = updated_aws.default_region
@@ -89,7 +109,9 @@ async def update_aws_profile(db: Session, aws_account_id: int, updated_aws: sche
         raise ValueError(f"AWS profile with id {aws_account_id} not found")
 
 
-async def get_credentials_aws_profile(db: Session, environment: str, squad: str) -> schemas_aws.AwsAccountResponseRepo:
+async def get_credentials_aws_profile(
+    db: Session, environment: str, squad: str
+) -> schemas_aws.AwsAccountResponseRepo:
     db_aws = (
         db.query(models.Aws_provider)
         .filter(models.Aws_provider.environment == environment)
@@ -107,8 +129,10 @@ async def get_all_aws_profile(
 
         for field, value in filters.model_dump().items():
             if value is not None:
-                if field == 'squad' and isinstance(value, list):
-                    or_conditions = [getattr(models.Aws_provider, field).like(f"%{v}%") for v in value]
+                if field == "squad" and isinstance(value, list):
+                    or_conditions = [
+                        getattr(models.Aws_provider, field).like(f"%{v}%") for v in value
+                    ]
                     query = query.filter(or_(*or_conditions))
                 else:
                     query = query.filter(getattr(models.Aws_provider, field) == value)
@@ -133,12 +157,16 @@ async def get_all_aws_profile(
         raise err
 
 
-async def delete_aws_profile_by_id(db: Session, aws_account_id: int) -> schemas_aws.AwsAccountResponse:
+async def delete_aws_profile_by_id(
+    db: Session, aws_account_id: int
+) -> schemas_aws.AwsAccountResponse:
     try:
-        db_aws = db.query(models.Aws_provider).filter(
-            models.Aws_provider.id == aws_account_id
-        ).first()
-        await check_deploy_in_use(db=db, db_provider=db_aws, cloud_provider="aws", account_id=aws_account_id)
+        db_aws = (
+            db.query(models.Aws_provider).filter(models.Aws_provider.id == aws_account_id).first()
+        )
+        await check_deploy_in_use(
+            db=db, db_provider=db_aws, cloud_provider="aws", account_id=aws_account_id
+        )
         if db_aws:
             db.delete(db_aws)
             db.commit()

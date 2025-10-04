@@ -14,7 +14,6 @@ async def create_new_azure_profile(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ) -> schemas_azure.AzureAccountResponse:
-
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     if "string" in [azure.squad, azure.environment]:
@@ -25,9 +24,7 @@ async def create_new_azure_profile(
     filters = schemas_azure.AzureAccountFilter()
     filters.squad = azure.squad
     filters.environment = azure.environment
-    db_aws_account = await crud_azure.get_all_azure_profile(
-        db=db, filters=filters
-    )
+    db_aws_account = await crud_azure.get_all_azure_profile(db=db, filters=filters)
     if db_aws_account:
         raise HTTPException(status_code=409, detail="Account already exists")
     try:

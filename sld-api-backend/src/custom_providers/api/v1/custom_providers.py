@@ -17,7 +17,9 @@ async def create_custom_provider_account(
     return create_custom_provider_account
 
 
-@router.get("/", status_code=200, response_model=list[schemas_custom_provider.CustomProviderResponse])
+@router.get(
+    "/", status_code=200, response_model=list[schemas_custom_provider.CustomProviderResponse]
+)
 async def get_all_custom_providers_accounts(
     get_custom_provider_account: schemas_custom_provider.CustomProviderBase = Depends(
         get.all_custom_providers_accounts

@@ -62,7 +62,7 @@ def get_deploy_by_id(deploy_id):
         if response.get("status_code") != 200:
             raise Exception(response)
         logging.info(
-            f'Get deploy by id {deploy_id} - {response.get("status_code")} - {response.get("json").get("squad")} - {response.get("json").get("name")}'
+            f"Get deploy by id {deploy_id} - {response.get('status_code')} - {response.get('json').get('squad')} - {response.get('json').get('name')}"
         )
         data = {
             "deploy_id": deploy_id,
@@ -80,16 +80,14 @@ def get_deploy_by_id(deploy_id):
         raise HTTPException(status_code=404, detail=f"{err}")
 
 
-@retry(
-    stop_max_attempt_number=settings.STOP_MAX_ATTEMPT, wait_fixed=settings.WAIT_FIXED
-)
+@retry(stop_max_attempt_number=settings.STOP_MAX_ATTEMPT, wait_fixed=settings.WAIT_FIXED)
 def update_deploy(deploy_id):
     token = get_token(settings.CREDENTIALS_BOT)
     endpoint = f"deploy/{deploy_id}"
     response = request_url(
         verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
     )
-    logging.info(f'Get deploy info by id {deploy_id} - {response["status_code"]}')
+    logging.info(f"Get deploy info by id {deploy_id} - {response['status_code']}")
     content = response.get("json")
     data = {
         "start_time": content["start_time"],
@@ -101,16 +99,14 @@ def update_deploy(deploy_id):
     }
     response = request_url(
         verb="PATCH",
-        uri=f'deploy/{content.get("id")}',
+        uri=f"deploy/{content.get('id')}",
         headers={"Authorization": f"Bearer {token}"},
         json=data,
     )
-    logging.info(f'Update deploy info by id {deploy_id} - {response["status_code"]}')
+    logging.info(f"Update deploy info by id {deploy_id} - {response['status_code']}")
 
 
-@retry(
-    stop_max_attempt_number=settings.STOP_MAX_ATTEMPT, wait_fixed=settings.WAIT_FIXED
-)
+@retry(stop_max_attempt_number=settings.STOP_MAX_ATTEMPT, wait_fixed=settings.WAIT_FIXED)
 def destroy_deploy(deploy_id):
     token = get_token(settings.CREDENTIALS_BOT)
     endpoint = f"deploy/{deploy_id}"
@@ -118,7 +114,7 @@ def destroy_deploy(deploy_id):
         verb="GET", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
     )
     content = response.get("json")
-    logging.info(f'Get deploy info by id {deploy_id} - {response["status_code"]}')
+    logging.info(f"Get deploy info by id {deploy_id} - {response['status_code']}")
     data = {
         "start_time": content["start_time"],
         "destroy_time": content["destroy_time"],
@@ -129,11 +125,11 @@ def destroy_deploy(deploy_id):
     }
     response = request_url(
         verb="PUT",
-        uri=f'deploy/{content.get("id")}',
+        uri=f"deploy/{content.get('id')}",
         headers={"Authorization": f"Bearer {token}"},
         json=data,
     )
-    logging.info(f'Destroy deploy info by id {deploy_id} - {response["status_code"]}')
+    logging.info(f"Destroy deploy info by id {deploy_id} - {response['status_code']}")
 
 
 def getJob(deploy_id):
@@ -208,9 +204,7 @@ def destroy_job(
 
 def _check_schedules():
     token = get_token(settings.CREDENTIALS_BOT)
-    response = request_url(
-        verb="GET", uri=f"deploy/", headers={"Authorization": f"Bearer {token}"}
-    )
+    response = request_url(verb="GET", uri=f"deploy/", headers={"Authorization": f"Bearer {token}"})
     data_json = response.get("json")
     deploy_list = jmespath.search("[*].id", data_json)
     for i in deploy_list:
@@ -234,9 +228,7 @@ def addDeployToSchedule(deploy_id: int):
     start_time = data["start"]
     destroy_time = data["destroy"]
     # Add start job to scheduler state pending
-    update = add_job(
-        func=update_deploy, start_time=start_time, job_name=name, job_id=deploy_id
-    )
+    update = add_job(func=update_deploy, start_time=start_time, job_name=name, job_id=deploy_id)
     destroy = destroy_job(
         func=destroy_deploy, destroy_time=destroy_time, job_name=name, job_id=deploy_id
     )

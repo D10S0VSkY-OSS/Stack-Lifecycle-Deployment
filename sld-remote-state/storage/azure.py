@@ -33,9 +33,7 @@ class Storage(object):
         try:
             logging.info(f"{content}")
             blob_name = f"logs/{id}/{now.year}/{now.month}/{now.day}/{now.hour}/{action}_{id}.log"
-            blob_service_client.get_blob_client(
-                container=container_name, blob=blob_name
-            )
+            blob_service_client.get_blob_client(container=container_name, blob=blob_name)
         except Exception as err:
             raise err
 
@@ -97,9 +95,7 @@ class Storage(object):
             # Delete object if exists
             if blob_client.exists():
                 blob_client.delete_blob()
-                self._activity_log(
-                    id, "unlock", json.dumps(info, indent=4, sort_keys=True)
-                )
+                self._activity_log(id, "unlock", json.dumps(info, indent=4, sort_keys=True))
                 return True
             return False
         except Exception as err:

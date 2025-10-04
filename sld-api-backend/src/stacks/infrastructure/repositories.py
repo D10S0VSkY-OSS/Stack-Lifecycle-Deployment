@@ -118,10 +118,15 @@ def get_all_stacks_by_squad(db: Session, squad_access: str, skip: int = 0, limit
         raise err
 
 
-
 def get_all_stacks(db: Session, squad_access: str, skip: int = 0, limit: int = 100):
     try:
-        return db.query(models.Stack).order_by(models.Stack.created_at.desc()).offset(skip).limit(limit).all()
+        return (
+            db.query(models.Stack)
+            .order_by(models.Stack.created_at.desc())
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )
     except Exception as err:
         raise err
 
@@ -149,9 +154,7 @@ def delete_stack_by_id(db: Session, stack_id: int):
 
 def get_stack_by_name(db: Session, stack_name: str):
     try:
-        return (
-            db.query(models.Stack).filter(models.Stack.stack_name == stack_name).first()
-        )
+        return db.query(models.Stack).filter(models.Stack.stack_name == stack_name).first()
     except Exception as err:
         raise err
 

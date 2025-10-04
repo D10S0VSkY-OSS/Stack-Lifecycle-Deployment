@@ -4,7 +4,6 @@ from src.worker.security.providers_credentials import secret, unsecret
 
 
 class Terraform(Actions):
-
     def execute_deployer_command(self, action: str) -> dict:
         channel = self.task_id
 
@@ -13,17 +12,19 @@ class Terraform(Actions):
             deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
 
             variables_files = (
-                f"{self.name}.tfvars.json"
-                if not self.variables_file
-                else self.variables_file
+                f"{self.name}.tfvars.json" if not self.variables_file else self.variables_file
             )
 
             if not self.project_path:
                 os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}")
             else:
-                os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
+                os.chdir(
+                    f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
+                )
 
-            init_command = f"/tmp/{self.version}/{self.iac_type} init -no-color -input=false --upgrade"
+            init_command = (
+                f"/tmp/{self.version}/{self.iac_type} init -no-color -input=false --upgrade"
+            )
             plan_command = f"/tmp/{self.version}/{self.iac_type} plan -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
             apply_command = f"/tmp/{self.version}/{self.iac_type} apply -input=false -auto-approve -no-color {self.name}.tfplan"
             destroy_command = f"/tmp/{self.version}/{self.iac_type} destroy -input=false -auto-approve -no-color -var-file={variables_files}"
@@ -72,9 +73,9 @@ class Terraform(Actions):
                 "remote_state": f"http://remote-state:8080/terraform_state/{deploy_state}",
                 "stdout": output,
             }
-       
-class TerraGrunt(Actions):
 
+
+class TerraGrunt(Actions):
     def execute_deployer_command(self, action: str) -> dict:
         channel = self.task_id
         try:
@@ -82,17 +83,19 @@ class TerraGrunt(Actions):
             deploy_state = f"{self.environment}_{self.stack_name}_{self.squad}_{self.name}"
 
             variables_files = (
-                f"{self.name}.tfvars.json"
-                if not self.variables_file
-                else self.variables_file
+                f"{self.name}.tfvars.json" if not self.variables_file else self.variables_file
             )
 
             if not self.project_path:
                 os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}")
             else:
-                os.chdir(f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}")
+                os.chdir(
+                    f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}"
+                )
 
-            init_command = f"/tmp/{self.version}/{self.iac_type} init -no-color -input=false --upgrade"
+            init_command = (
+                f"/tmp/{self.version}/{self.iac_type} init -no-color -input=false --upgrade"
+            )
             plan_command = f"/tmp/{self.version}/{self.iac_type} plan -input=false -refresh -no-color -var-file={variables_files} -out={self.name}.tfplan"
             apply_command = f"/tmp/{self.version}/{self.iac_type} apply -input=false -auto-approve -no-color {self.name}.tfplan"
             destroy_command = f"/tmp/{self.version}/{self.iac_type} destroy -input=false -auto-approve -no-color -var-file={variables_files}"

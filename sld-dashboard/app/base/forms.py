@@ -12,10 +12,6 @@ class LoginForm(FlaskForm):
 
 
 class CreateAccountForm(FlaskForm):
-    username = StringField(
-        "Username", id="username_create", validators=[DataRequired()]
-    )
-    email = StringField(
-        "Email", id="email_create", validators=[DataRequired(), Email()]
-    )
+    username = StringField("Username", id="username_create", validators=[DataRequired()])
+    email = StringField("Email", id="email_create", validators=[DataRequired(), Email()])
     password = PasswordField("Password", id="pwd_create", validators=[DataRequired()])

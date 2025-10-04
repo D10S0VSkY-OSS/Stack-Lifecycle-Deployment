@@ -7,13 +7,12 @@ from src.worker.domain.entities.worker import DeployParams, DownloadBinaryParams
 from typing import Type
 
 
-
 class ProviderRequirements:
     """
     In this class, everything that is needed so that ProviderActions can be executed is generated.
     """
 
-    def binary_download(params: DownloadBinaryParams , binary: BinaryDownload = BinaryDownload):
+    def binary_download(params: DownloadBinaryParams, binary: BinaryDownload = BinaryDownload):
         config_binary = binary(params)
         return config_binary.get()
 

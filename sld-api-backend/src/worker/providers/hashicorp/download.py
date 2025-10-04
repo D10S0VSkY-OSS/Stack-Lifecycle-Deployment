@@ -7,11 +7,12 @@ import requests
 from urllib3.exceptions import InsecureRequestWarning
 from src.worker.domain.entities.worker import DownloadBinaryParams
 import logging
+
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 from config.api import settings
 
 
-class BinaryDownload():
+class BinaryDownload:
     def __init__(self, params: DownloadBinaryParams):
         self.iac_type = params.iac_type
         self.version = params.version
@@ -32,7 +33,7 @@ class BinaryDownload():
                         _zipfile.extractall(f"/tmp/{self.version}")
                         st = os.stat(f"/tmp/{self.version}/tofu")
                         os.chmod(f"/tmp/{self.version}/tofu", st.st_mode | stat.S_IEXEC)
-    
+
                 return {
                     "command": "opentofuDownload",
                     "rc": 0,
@@ -51,7 +52,7 @@ class BinaryDownload():
                         _zipfile.extractall(f"/tmp/{self.version}")
                         st = os.stat(f"/tmp/{self.version}/terraform")
                         os.chmod(f"/tmp/{self.version}/terraform", st.st_mode | stat.S_IEXEC)
-    
+
                 return {
                     "command": "binaryDownload",
                     "rc": 0,
@@ -68,13 +69,16 @@ class BinaryDownload():
                 if not os.path.isfile(f"/tmp/{self.version}/terragrunt"):
                     binary_url = f"https://github.com/gruntwork-io/terragrunt/releases/download/{self.version}/terragrunt_linux_amd64"
                     response = requests.get(binary_url, stream=True, verify=False)
-                    with open(downloaded_binary_path, 'wb') as file:
+                    with open(downloaded_binary_path, "wb") as file:
                         for chunk in response.iter_content(chunk_size=90000000):
                             file.write(chunk)
-                    os.chmod(downloaded_binary_path, os.stat(downloaded_binary_path).st_mode | stat.S_IEXEC)
+                    os.chmod(
+                        downloaded_binary_path,
+                        os.stat(downloaded_binary_path).st_mode | stat.S_IEXEC,
+                    )
                     os.rename(downloaded_binary_path, renamed_binary_path)
 
-                    #terrform
+                    # terrform
                     try:
                         if not os.path.isfile(f"/tmp/{self.version}/terraform"):
                             binary_terraform = f"{settings.TERRAFORM_BIN_REPO}/1.6.5/terraform_1.6.5_linux_amd64.zip"
@@ -83,17 +87,23 @@ class BinaryDownload():
                             _zipfile.extractall(f"/tmp/{self.version}")
                             st = os.stat(f"/tmp/{self.version}/terraform")
                             os.chmod(f"/tmp/{self.version}/terraform", st.st_mode | stat.S_IEXEC)
-                            current_path = os.environ.get('PATH', '')
+                            current_path = os.environ.get("PATH", "")
                             if binary_directory not in current_path.split(os.pathsep):
                                 updated_path = current_path + os.pathsep + binary_directory
-                            os.environ['PATH'] = updated_path
+                            os.environ["PATH"] = updated_path
                     except Exception as err:
-                        logging.error(f"Failed to download Terraform binary from {binary_terraform}")
+                        logging.error(
+                            f"Failed to download Terraform binary from {binary_terraform}"
+                        )
                         raise err
 
             else:
                 logging.error(f"Failed to download Terragrunt binary from {binary_url}")
-                return {"command": "binaryDownload", "rc": 1, "stdout": "Failed to download binary file"}
+                return {
+                    "command": "binaryDownload",
+                    "rc": 1,
+                    "stdout": "Failed to download binary file",
+                }
             return {
                 "command": "binaryDownload",
                 "rc": 0,

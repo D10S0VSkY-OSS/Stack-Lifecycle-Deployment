@@ -181,9 +181,7 @@ class Deploy(db.Model):
     squad = db.Column(db.String(50), nullable=False)
     variables = db.Column(db.JSON)
     environment = db.Column(db.String(50))
-    __table_args__ = (
-        db.UniqueConstraint("squad", "environment", "name", "stack_name"),
-    )
+    __table_args__ = (db.UniqueConstraint("squad", "environment", "name", "stack_name"),)
 
 
 class Tasks(db.Model):

@@ -33,9 +33,7 @@ async def get_all_tasks(
     try:
         if not crud_users.is_master(db, current_user):
             squad = current_user.squad
-            result = crud_tasks.get_all_tasks_by_squad(
-                db=db, squad=squad, skip=skip, limit=limit
-            )
+            result = crud_tasks.get_all_tasks_by_squad(db=db, squad=squad, skip=skip, limit=limit)
             return result
         result = crud_tasks.get_all_tasks(db=db, skip=skip, limit=limit)
         return result

@@ -16,9 +16,7 @@ async def get_activity_logs_by_username(
         raise HTTPException(status_code=403, detail="Not enough permissions")
     if not crud_users.is_master(db, current_user):
         squad = current_user.squad
-        return crud_activity.get_activity_by_username_squad(
-            db=db, username=username, squad=squad
-        )
+        return crud_activity.get_activity_by_username_squad(db=db, username=username, squad=squad)
     return crud_activity.get_activity_by_username(db, username=username)
 
 

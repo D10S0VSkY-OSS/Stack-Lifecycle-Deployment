@@ -13,6 +13,7 @@ class CustomProvider(CustomProviderBase):
     class Config:
         from_attributes = True
 
+
 class CustomProviderResponse(BaseModel):
     id: int
     squad: constr(strip_whitespace=True)

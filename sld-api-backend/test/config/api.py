@@ -2,6 +2,7 @@ import os
 
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     SERVER: str = "http://localhost"
     PORT: str = "8000"
@@ -138,7 +139,11 @@ class Settings(BaseSettings):
         "secret_access_key": os.getenv("AWS_SECRET_ACCESS_KEY"),
         "default_region": "eu-west-1",
         "role_arn": "arn:aws:iam::1234567890:role/role_name",
-        "extra_variables": {"TF_VAR_aws_account_id": "1234567890", "TF_VAR_aws_secret": "1234", "TF_VAR_db_password": "1234"},
+        "extra_variables": {
+            "TF_VAR_aws_account_id": "1234567890",
+            "TF_VAR_aws_secret": "1234",
+            "TF_VAR_db_password": "1234",
+        },
     }
     AWS_TEST_ACCOUNT_SQUAD2_PRO: dict = {
         "squad": "squad2",

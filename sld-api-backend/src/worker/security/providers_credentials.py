@@ -18,8 +18,8 @@ def decrypt(secreto):
 
 
 def export_environment_variables(dictionary):
-    if 'extra_variables' in dictionary and isinstance(dictionary['extra_variables'], dict):
-        for key, value in dictionary['extra_variables'].items():
+    if "extra_variables" in dictionary and isinstance(dictionary["extra_variables"], dict):
+        for key, value in dictionary["extra_variables"].items():
             os.environ[key] = decrypt(value)
 
 
@@ -40,16 +40,18 @@ def aws_credentials_context(secreto: dict, session_name: str = "sld-worker"):
 
         if secreto.get("role_arn"):
             sts_client = boto3.client(
-                'sts',
+                "sts",
                 aws_access_key_id=decrypt(secreto.get("access_key_id")),
                 aws_secret_access_key=decrypt(secreto.get("secret_access_key")),
             )
-            assumed_role = sts_client.assume_role(RoleArn=secreto.get("role_arn"), RoleSessionName=session_name)
-            credentials = assumed_role['Credentials']
-            os.environ['AWS_ACCESS_KEY_ID'] = credentials['AccessKeyId']
-            os.environ['AWS_SECRET_ACCESS_KEY'] = credentials['SecretAccessKey']
+            assumed_role = sts_client.assume_role(
+                RoleArn=secreto.get("role_arn"), RoleSessionName=session_name
+            )
+            credentials = assumed_role["Credentials"]
+            os.environ["AWS_ACCESS_KEY_ID"] = credentials["AccessKeyId"]
+            os.environ["AWS_SECRET_ACCESS_KEY"] = credentials["SecretAccessKey"]
             os.environ["AWS_DEFAULT_REGION"] = secreto.get("default_region")
-            os.environ['AWS_SESSION_TOKEN'] = credentials['SessionToken']
+            os.environ["AWS_SESSION_TOKEN"] = credentials["SessionToken"]
             os.environ["TF_VAR_role_arn"] = secreto.get("role_arn")
     except Exception as err:
         logging.error(err)

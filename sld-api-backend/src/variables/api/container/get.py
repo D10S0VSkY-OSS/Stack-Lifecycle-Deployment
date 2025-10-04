@@ -15,9 +15,7 @@ from src.users.infrastructure import repositories as crud_users
 class MetadataProcessor:
     def __init__(self, data):
         self.data = data
-        self.grouped_metadata = defaultdict(
-            lambda: {"vars_group": "", "descriptions": []}
-        )
+        self.grouped_metadata = defaultdict(lambda: {"vars_group": "", "descriptions": []})
 
     def add_metadata(self):
         for key, value in self.data.items():
@@ -44,26 +42,24 @@ class MetadataProcessor:
     def _parse_description(self, description):
         # Asegurarse de que description sea una cadena de texto
         description = str(description)
-        
+
         key_values = dict(re.findall(r"(\w+): ([^\n]*)", description))
-        
+
         if all(key in key_values for key in ["order", "vars_group"]):
             return self._process_newline_format(key_values)
-    
+
         if "|" not in description:
             return {"_no_metadata": "Basic configuration"}
-    
+
         if description.count("|") >= 2:
             return self._process_pipe_format(description)
-    
+
         return {"error": "Invalid format"}
 
     def _process_pipe_format(self, description):
         parts = [part.strip() for part in description.split("|")]
         if parts[0]:
-            group_key = (
-                re.match(r"([A-Za-z])\d*", parts[0]).group(1) if parts[0] else ""
-            )
+            group_key = re.match(r"([A-Za-z])\d*", parts[0]).group(1) if parts[0] else ""
             return {
                 "order": parts[0],
                 "vars_group": parts[1]
@@ -87,12 +83,8 @@ class MetadataProcessor:
         if "order" in metadata and not metadata.get("error"):
             group_key = re.match(r"([A-Za-z])\d*", metadata["order"]).group(1)
             if not self.grouped_metadata[group_key]["vars_group"]:
-                self.grouped_metadata[group_key]["vars_group"] = metadata.get(
-                    "vars_group", ""
-                )
-            self.grouped_metadata[group_key]["descriptions"].append(
-                metadata.get("description", "")
-            )
+                self.grouped_metadata[group_key]["vars_group"] = metadata.get("vars_group", "")
+            self.grouped_metadata[group_key]["descriptions"].append(metadata.get("description", ""))
 
     def _update_group_descriptions(self):
         for key, group in self.grouped_metadata.items():
@@ -111,29 +103,21 @@ async def get_json(
         if stack.isdigit():
             result = crud_stacks.get_stack_by_id(db=db, stack_id=stack)
             if result is None:
-                raise HTTPException(
-                    status_code=404, detail="Not found"
-                )
+                raise HTTPException(status_code=404, detail="Not found")
             if not crud_users.is_master(db, current_user):
                 if "*" not in result.squad_access:
                     if not check_squad_user(current_user.squad, result.squad_access):
-                        raise HTTPException(
-                            status_code=403, detail=f"Not enough permissions"
-                        )
+                        raise HTTPException(status_code=403, detail=f"Not enough permissions")
             metadata_result = MetadataProcessor(result.var_json.get("variable"))
             return metadata_result.add_metadata()
         else:
             result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
             if result is None:
-                raise HTTPException(
-                    status_code=404, detail="Not found"
-                )
+                raise HTTPException(status_code=404, detail="Not found")
             if not crud_users.is_master(db, current_user):
                 if "*" not in result.squad_access:
                     if not check_squad_user(current_user.squad, result.squad_access):
-                        raise HTTPException(
-                            status_code=403, detail="Not enough permissions"
-                        )
+                        raise HTTPException(status_code=403, detail="Not enough permissions")
             metadata_result = MetadataProcessor(result.var_json.get("variable"))
             return metadata_result.add_metadata()
     except Exception as err:
@@ -152,28 +136,20 @@ async def get_list(
         if stack.isdigit():
             result = crud_stacks.get_stack_by_id(db=db, stack_id=stack)
             if result == None:
-                raise HTTPException(
-                    status_code=404, detail=f"Not found"
-                )
+                raise HTTPException(status_code=404, detail=f"Not found")
             if not crud_users.is_master(db, current_user):
                 if "*" not in result.squad_access:
                     if not check_squad_user(current_user.squad, result.squad_access):
-                        raise HTTPException(
-                            status_code=403, detail=f"Not enough permissions"
-                        )
+                        raise HTTPException(status_code=403, detail=f"Not enough permissions")
             return result.var_list
         else:
             result = crud_stacks.get_stack_by_name(db=db, stack_name=stack)
             if result == None:
-                raise HTTPException(
-                    status_code=404, detail=f"Not found"
-                )
+                raise HTTPException(status_code=404, detail=f"Not found")
             if not crud_users.is_master(db, current_user):
                 if "*" not in result.squad_access:
                     if not check_squad_user(current_user.squad, result.squad_access):
-                        raise HTTPException(
-                            status_code=403, detail=f"Not enough permissions"
-                        )
+                        raise HTTPException(status_code=403, detail=f"Not enough permissions")
             return result.var_list
     except Exception as err:
         raise err
@@ -184,18 +160,13 @@ async def get_deploy_by_id(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     try:
         result = crud_deploys.get_deploy_by_id(db=db, deploy_id=deploy_id)
         if result == None:
-            raise HTTPException(
-                status_code=404, detail=f"Not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Not found")
         if not crud_users.is_master(db, current_user):
             if not check_squad_user(current_user.squad, [result.squad]):
-                raise HTTPException(
-                    status_code=403, detail=f"Not enough permissions"
-                )
+                raise HTTPException(status_code=403, detail=f"Not enough permissions")
         return result.variables
     except Exception as err:
         raise err
