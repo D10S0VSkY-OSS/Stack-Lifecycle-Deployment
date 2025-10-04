@@ -46,7 +46,10 @@ class CheckPasswd:
 
     def verify_password(self) -> bool:
         pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-        return pwd_context.verify(self.plain_passwd, self.hashed_password)
+        # Truncate password to 72 bytes to avoid bcrypt ValueError
+        # bcrypt has a maximum password length of 72 bytes
+        truncated_passwd = self.plain_passwd.encode('utf-8')[:72].decode('utf-8', errors='ignore')
+        return pwd_context.verify(truncated_passwd, self.hashed_password)
 
 
 class UserExist:

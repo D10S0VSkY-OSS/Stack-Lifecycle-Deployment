@@ -108,6 +108,10 @@ env.bak/
 venv.bak/
 .vscode/
 
+# UV package manager
+.uv/
+uv.lock
+
 # Spyder project settings
 .spyderproject
 .spyproject

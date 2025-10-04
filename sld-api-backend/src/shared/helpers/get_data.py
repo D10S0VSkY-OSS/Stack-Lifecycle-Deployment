@@ -19,7 +19,6 @@ r = redis.Redis(
     host=settings.CACHE_SERVER,
     port=6379,
     db=2,
-    charset="utf-8",
     decode_responses=True,
 )
 

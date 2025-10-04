@@ -19,7 +19,7 @@ def encrypt(secreto):
 
 
 # Move to config
-r = redis.Redis(host="redis", port=6379, db=1, charset="utf-8", decode_responses=True)
+r = redis.Redis(host="redis", port=6379, db=1, decode_responses=True)
 
 
 @blueprint.route("/")
@@ -51,7 +51,7 @@ def login():
             if not current_user.is_active:
                 return render_template(
                     "accounts/login.html",
-                    msg="Inactive user ¯\_(ツ)_/¯",
+                    msg=r"Inactive user ¯\_(ツ)_/¯",
                     form=login_form,
                 )
             # Get token user

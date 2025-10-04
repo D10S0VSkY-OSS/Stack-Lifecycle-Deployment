@@ -1,0 +1,606 @@
+sld-dashboard-1  | [2025-10-05 01:06:51 +0200] [1] [INFO] Starting gunicorn 23.0.0
+sld-dashboard-1  | [2025-10-05 01:06:51 +0200] [1] [INFO] Listening at: http://0.0.0.0:5000 (1)
+sld-dashboard-1  | [2025-10-05 01:06:51 +0200] [1] [INFO] Using worker: gthread
+sld-dashboard-1  | [2025-10-05 01:06:51 +0200] [7] [INFO] Booting worker with pid: 7
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [8] [INFO] Booting worker with pid: 8
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [9] [INFO] Booting worker with pid: 9
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [10] [INFO] Booting worker with pid: 10
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [11] [INFO] Booting worker with pid: 11
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [12] [INFO] Booting worker with pid: 12
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [13] [INFO] Booting worker with pid: 13
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [14] [INFO] Booting worker with pid: 14
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [15] [INFO] Booting worker with pid: 15
+sld-dashboard-1  | [2025-10-05 01:06:52 +0200] [16] [INFO] Booting worker with pid: 16
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [7] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [7] [INFO] Worker exiting (pid: 7)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [8] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [8] [INFO] Worker exiting (pid: 8)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [9] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [9] [INFO] Worker exiting (pid: 9)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [10] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [10] [INFO] Worker exiting (pid: 10)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [11] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [11] [INFO] Worker exiting (pid: 11)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [13] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [13] [INFO] Worker exiting (pid: 13)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [12] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [12] [INFO] Worker exiting (pid: 12)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [1] [ERROR] Worker (pid:7) exited with code 3
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [1] [ERROR] Worker (pid:12) was sent SIGTERM!
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [1] [ERROR] Worker (pid:8) was sent SIGTERM!
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [1] [ERROR] Worker (pid:13) was sent SIGTERM!
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [1] [ERROR] Worker (pid:9) was sent SIGTERM!
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [1] [ERROR] Worker (pid:10) was sent SIGTERM!
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [1] [ERROR] Worker (pid:11) was sent SIGTERM!
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [16] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [16] [INFO] Worker exiting (pid: 16)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [14] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [14] [INFO] Worker exiting (pid: 14)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [15] [ERROR] Exception in worker process
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 608, in spawn_worker
+sld-dashboard-1  |     worker.init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/gthread.py", line 94, in init_process
+sld-dashboard-1  |     super().init_process()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 135, in init_process
+sld-dashboard-1  |     self.load_wsgi()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/workers/base.py", line 147, in load_wsgi
+sld-dashboard-1  |     self.wsgi = self.app.wsgi()
+sld-dashboard-1  |                 ~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 66, in wsgi
+sld-dashboard-1  |     self.callable = self.load()
+sld-dashboard-1  |                     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 57, in load
+sld-dashboard-1  |     return self.load_wsgiapp()
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 47, in load_wsgiapp
+sld-dashboard-1  |     return util.import_app(self.app_uri)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/util.py", line 370, in import_app
+sld-dashboard-1  |     mod = importlib.import_module(module)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/run.py", line 23, in <module>
+sld-dashboard-1  |     app = create_app(app_config)
+sld-dashboard-1  |   File "/app/app/__init__.py", line 42, in create_app
+sld-dashboard-1  |     register_blueprints(app)
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/app/app/__init__.py", line 21, in register_blueprints
+sld-dashboard-1  |     module = import_module("app.{}.routes".format(module_name))
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/importlib/__init__.py", line 88, in import_module
+sld-dashboard-1  |     return _bootstrap._gcd_import(name[level:], package, level)
+sld-dashboard-1  |            ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 1331, in _find_and_load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 935, in _load_unlocked
+sld-dashboard-1  |   File "<frozen importlib._bootstrap_external>", line 1026, in exec_module
+sld-dashboard-1  |   File "<frozen importlib._bootstrap>", line 488, in _call_with_frames_removed
+sld-dashboard-1  |   File "/app/app/home/routes.py", line 10, in <module>
+sld-dashboard-1  |     import mistletoe
+sld-dashboard-1  | ModuleNotFoundError: No module named 'mistletoe'
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [15] [INFO] Worker exiting (pid: 15)
+sld-dashboard-1  | [2025-10-05 01:06:55 +0200] [1] [ERROR] Worker (pid:16) exited with code 3
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 208, in run
+sld-dashboard-1  |     self.sleep()
+sld-dashboard-1  |     ~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 359, in sleep
+sld-dashboard-1  |     ready = select.select([self.PIPE[0]], [], [], 1.0)
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+sld-dashboard-1  |     self.reap_workers()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 529, in reap_workers
+sld-dashboard-1  |     raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+sld-dashboard-1  | gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>
+sld-dashboard-1  | 
+sld-dashboard-1  | During handling of the above exception, another exception occurred:
+sld-dashboard-1  | 
+sld-dashboard-1  | Traceback (most recent call last):
+sld-dashboard-1  |   File "<frozen runpy>", line 198, in _run_module_as_main
+sld-dashboard-1  |   File "<frozen runpy>", line 88, in _run_code
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/__main__.py", line 10, in <module>
+sld-dashboard-1  |     run(prog="gunicorn")
+sld-dashboard-1  |     ~~~^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/wsgiapp.py", line 66, in run
+sld-dashboard-1  |     WSGIApplication("%(prog)s [OPTIONS] [APP_MODULE]", prog=prog).run()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 235, in run
+sld-dashboard-1  |     super().run()
+sld-dashboard-1  |     ~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/app/base.py", line 71, in run
+sld-dashboard-1  |     Arbiter(self).run()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 228, in run
+sld-dashboard-1  |     self.halt(reason=inst.reason, exit_status=inst.exit_status)
+sld-dashboard-1  |     ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 341, in halt
+sld-dashboard-1  |     self.stop()
+sld-dashboard-1  |     ~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 395, in stop
+sld-dashboard-1  |     time.sleep(0.1)
+sld-dashboard-1  |     ~~~~~~~~~~^^^^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 241, in handle_chld
+sld-dashboard-1  |     self.reap_workers()
+sld-dashboard-1  |     ~~~~~~~~~~~~~~~~~^^
+sld-dashboard-1  |   File "/usr/local/lib/python3.13/site-packages/gunicorn/arbiter.py", line 529, in reap_workers
+sld-dashboard-1  |     raise HaltServer(reason, self.WORKER_BOOT_ERROR)
+sld-dashboard-1  | gunicorn.errors.HaltServer: <HaltServer 'Worker failed to boot.' 3>

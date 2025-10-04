@@ -49,8 +49,8 @@ def decrypt(secreto):
 
 
 # Move to config file after testing
-r = redis.Redis(host="redis", port=6379, db=1, charset="utf-8", decode_responses=True)
-s = redis.Redis(host="redis", port=6379, db=15, charset="utf-8", decode_responses=True)
+r = redis.Redis(host="redis", port=6379, db=1, decode_responses=True)
+s = redis.Redis(host="redis", port=6379, db=15, decode_responses=True)
 
 external_api_dns = settings.EXTERNAL_DNS_API
 
