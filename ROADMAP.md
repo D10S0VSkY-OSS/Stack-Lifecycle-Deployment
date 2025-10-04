@@ -1,113 +1,113 @@
 # 🗺️ SLD Roadmap
 
-Este documento describe las próximas características y mejoras planificadas para Stack Lifecycle Deployment.
+This document describes the upcoming features and improvements planned for Stack Lifecycle Deployment.
 
-## 📊 Estado Actual
+## 📊 Current Status
 
-- ✅ Migración de pip a uv (v3.7.0)
-- ✅ CLI de testing con Python + Click
-- ✅ Soporte Docker Compose
-- ✅ Soporte Kubernetes (kind)
-- ✅ API REST con FastAPI
-- ✅ Dashboard Web
-- ✅ Workers distribuidos con Celery
-- ✅ Soporte AWS, Azure, GCP
+- ✅ Migration from pip to uv (v3.7.0)
+- ✅ Testing CLI with Python + Click
+- ✅ Docker Compose support
+- ✅ Kubernetes support (kind)
+- ✅ REST API with FastAPI
+- ✅ Web Dashboard
+- ✅ Distributed Workers with Celery
+- ✅ AWS, Azure, GCP support
 - ✅ Remote State Management
 
 ---
 
-## 🎯 Roadmap por Versión
+## 🎯 Roadmap by Version
 
-### v3.8.0 - Autenticación y Autorización Avanzada (Q1 2026)
+### v3.8.0 - Advanced Authentication and Authorization (Q1 2026)
 
-#### 🔐 Integración LDAP/Active Directory
-- [ ] Autenticación contra LDAP
-- [ ] Sincronización de grupos y roles
-- [ ] Mapeo de permisos desde AD
-- [ ] SSO con LDAP
-- [ ] Configuración multi-tenant
+#### 🔐 LDAP/Active Directory Integration
+- [ ] LDAP authentication
+- [ ] Group and role synchronization
+- [ ] Permission mapping from AD
+- [ ] SSO with LDAP
+- [ ] Multi-tenant configuration
 
-**Prioridad:** Alta  
-**Esfuerzo:** 3 semanas
+**Priority:** High  
+**Effort:** 3 weeks
 
-#### 🌐 OAuth2 y Social Login
+#### 🌐 OAuth2 and Social Login
 - [ ] Google OAuth
 - [ ] GitHub OAuth
 - [ ] Microsoft Azure AD
 - [ ] GitLab OAuth
 - [ ] Generic OAuth2 provider
-- [ ] Social login en Dashboard
+- [ ] Social login in Dashboard
 
-**Prioridad:** Media  
-**Esfuerzo:** 2 semanas
+**Priority:** Medium  
+**Effort:** 2 weeks
 
 #### 🏢 SaaS Multi-tenant
-- [ ] Aislamiento de datos por tenant
-- [ ] Gestión de suscripciones
-- [ ] Límites por plan (free, pro, enterprise)
-- [ ] Billing y facturación
-- [ ] Dashboard de administración SaaS
-- [ ] Métricas por tenant
+- [ ] Data isolation per tenant
+- [ ] Subscription management
+- [ ] Plan limits (free, pro, enterprise)
+- [ ] Billing and invoicing
+- [ ] SaaS administration dashboard
+- [ ] Metrics per tenant
 
-**Prioridad:** Media  
-**Esfuerzo:** 4 semanas
+**Priority:** Medium  
+**Effort:** 4 weeks
 
 ---
 
-### v3.9.0 - Refactoring y Modernización (Q2 2026)
+### v3.9.0 - Refactoring and Modernization (Q2 2026)
 
-#### 🔨 Refactoring de Arquitectura
-- [ ] Migrar a arquitectura hexagonal/clean architecture
-- [ ] Separar domain logic de infrastructure
-- [ ] Implementar Repository pattern
-- [ ] Mejorar dependency injection
+#### 🔨 Architecture Refactoring
+- [ ] Migrate to hexagonal/clean architecture
+- [ ] Separate domain logic from infrastructure
+- [ ] Implement Repository pattern
+- [ ] Improve dependency injection
 - [ ] Unit tests coverage >80%
-- [ ] Integration tests automatizados
+- [ ] Automated integration tests
 
-**Prioridad:** Alta  
-**Esfuerzo:** 6 semanas
+**Priority:** High  
+**Effort:** 6 weeks
 
-#### ⚡ Mejoras de Performance
-- [ ] Implementar caching con Redis (mejorado)
-- [ ] Query optimization en DB
-- [ ] Lazy loading de recursos
+#### ⚡ Performance Improvements
+- [ ] Implement enhanced caching with Redis
+- [ ] DB query optimization
+- [ ] Lazy loading of resources
 - [ ] Background job optimization
 - [ ] Async improvements
 - [ ] Connection pooling
 
-**Prioridad:** Media  
-**Esfuerzo:** 3 semanas
+**Priority:** Medium  
+**Effort:** 3 weeks
 
-#### 🧪 Testing y QA
-- [ ] E2E tests con Playwright
-- [ ] Performance testing con Locust
-- [ ] Security scanning automatizado
+#### 🧪 Testing and QA
+- [ ] E2E tests with Playwright
+- [ ] Performance testing with Locust
+- [ ] Automated security scanning
 - [ ] Code quality gates
 - [ ] Mutation testing
 
-**Prioridad:** Media  
-**Esfuerzo:** 2 semanas
+**Priority:** Medium  
+**Effort:** 2 weeks
 
 ---
 
-### v4.0.0 - MCP Server y AI Integration (Q3 2026)
+### v4.0.0 - MCP Server and AI Integration (Q3 2026)
 
 #### 🤖 Model Context Protocol (MCP) Server
-- [ ] Implementar MCP server para SLD
-- [ ] Exponse SLD resources via MCP
-- [ ] Tools para:
-  - Crear y gestionar stacks
+- [ ] Implement MCP server for SLD
+- [ ] Expose SLD resources via MCP
+- [ ] Tools for:
+  - Create and manage stacks
   - Deploy/destroy infrastructure
-  - Consultar estado de recursos
-  - Gestionar variables y secretos
-- [ ] Integración con Claude Desktop
-- [ ] Integración con otros MCP clients
-- [ ] Documentación MCP tools
+  - Query resource status
+  - Manage variables and secrets
+- [ ] Integration with Claude Desktop
+- [ ] Integration with other MCP clients
+- [ ] MCP tools documentation
 
-**Prioridad:** Alta  
-**Esfuerzo:** 4 semanas
+**Priority:** High  
+**Effort:** 4 weeks
 
-**Ejemplo de uso:**
+**Usage example:**
 ```json
 {
   "tools": [
@@ -125,88 +125,88 @@ Este documento describe las próximas características y mejoras planificadas pa
 }
 ```
 
-#### 🧠 Integración con LLMs
-- [ ] **Asistente AI para IaC**
-  - Generación de código Terraform desde lenguaje natural
-  - Revisión y sugerencias de mejora
-  - Detección de problemas de seguridad
-  - Optimización de costos sugerida
+#### 🧠 LLM Integration
+- [ ] **AI Assistant for IaC**
+  - Terraform code generation from natural language
+  - Review and improvement suggestions
+  - Security issue detection
+  - Suggested cost optimization
 
 - [ ] **Chat Interface**
-  - Chat en Dashboard para consultas
-  - "Muestra el estado de mis stacks"
-  - "¿Cuánto estoy gastando en AWS?"
-  - "Crea un nuevo stack para una app web"
+  - Chat in Dashboard for queries
+  - "Show me my stacks status"
+  - "How much am I spending on AWS?"
+  - "Create a new stack for a web app"
 
-- [ ] **Análisis Predictivo**
-  - Predicción de costos futuros
-  - Detección de anomalías
-  - Recomendaciones de optimización
+- [ ] **Predictive Analysis**
+  - Future cost prediction
+  - Anomaly detection
+  - Optimization recommendations
 
-- [ ] **Providers de LLM**
+- [ ] **LLM Providers**
   - OpenAI GPT-4
   - Anthropic Claude
   - Google Gemini
   - Azure OpenAI
-  - Modelos locales (Ollama)
+  - Local models (Ollama)
 
-**Prioridad:** Alta  
-**Esfuerzo:** 6 semanas
+**Priority:** High  
+**Effort:** 6 weeks
 
 ---
 
-### v4.1.0 - Deployment Wizard y UX Improvements (Q4 2026)
+### v4.1.0 - Deployment Wizard and UX Improvements (Q4 2026)
 
-#### 🧙 Wizard de Deployment
-- [ ] Flujo guiado paso a paso
-- [ ] Templates pre-configurados:
+#### 🧙 Deployment Wizard
+- [ ] Step-by-step guided flow
+- [ ] Pre-configured templates:
   - Web Application (3-tier)
   - Microservices Architecture
   - Data Pipeline
   - ML Infrastructure
   - Serverless API
-- [ ] Validación en tiempo real
-- [ ] Preview de recursos a crear
-- [ ] Estimación de costos
-- [ ] Best practices integradas
-- [ ] Drag & Drop UI para arquitecturas
+- [ ] Real-time validation
+- [ ] Preview of resources to create
+- [ ] Cost estimation
+- [ ] Integrated best practices
+- [ ] Drag & Drop UI for architectures
 
-**Prioridad:** Alta  
-**Esfuerzo:** 5 semanas
+**Priority:** High  
+**Effort:** 5 weeks
 
 #### 🎨 UI/UX Improvements
-- [ ] Rediseño completo del Dashboard
+- [ ] Complete Dashboard redesign
 - [ ] Dark mode
-- [ ] Responsive design mejorado
-- [ ] Gráficos interactivos
+- [ ] Improved responsive design
+- [ ] Interactive charts
 - [ ] Real-time updates (WebSockets)
 - [ ] Keyboard shortcuts
 - [ ] Command palette (Cmd+K)
 
-**Prioridad:** Media  
-**Esfuerzo:** 4 semanas
+**Priority:** Medium  
+**Effort:** 4 weeks
 
 ---
 
-### v4.2.0 - Helm Charts y Kubernetes Native (Q1 2027)
+### v4.2.0 - Helm Charts and Kubernetes Native (Q1 2027)
 
 #### ⎈ Helm Charts
-- [ ] Chart oficial de SLD
-- [ ] Configuración flexible via values.yaml
-- [ ] Sub-charts para componentes:
+- [ ] Official SLD chart
+- [ ] Flexible configuration via values.yaml
+- [ ] Sub-charts for components:
   - API Backend
   - Dashboard
   - Workers
   - Remote State
   - Schedule
-- [ ] Helm hooks para migrations
-- [ ] CRDs para SLD resources
+- [ ] Helm hooks for migrations
+- [ ] CRDs for SLD resources
 - [ ] Operators pattern
 
-**Prioridad:** Alta  
-**Esfuerzo:** 3 semanas
+**Priority:** High  
+**Effort:** 3 weeks
 
-**Ejemplo de instalación:**
+**Installation example:**
 ```bash
 helm repo add sld https://charts.sld.io
 helm install my-sld sld/stack-lifecycle-deployment \
@@ -222,31 +222,31 @@ helm install my-sld sld/stack-lifecycle-deployment \
   - CloudAccount
 - [ ] Reconciliation loops
 - [ ] GitOps ready
-- [ ] Integration con ArgoCD/Flux
+- [ ] Integration with ArgoCD/Flux
 
-**Prioridad:** Media  
-**Esfuerzo:** 4 semanas
+**Priority:** Medium  
+**Effort:** 4 weeks
 
 ---
 
 ### v4.3.0 - CI/CD Runners (Q2 2027)
 
 #### 🏃 GitHub Actions Runner
-- [ ] Runner específico para SLD
-- [ ] Actions pre-construidas:
+- [ ] SLD-specific runner
+- [ ] Pre-built actions:
   - sld-deploy
   - sld-plan
   - sld-destroy
   - sld-validate
-- [ ] Integración con GitHub Environments
+- [ ] Integration with GitHub Environments
 - [ ] Approval workflows
 - [ ] Secrets management
-- [ ] Matrix builds para multi-cloud
+- [ ] Matrix builds for multi-cloud
 
-**Prioridad:** Alta  
-**Esfuerzo:** 3 semanas
+**Priority:** High  
+**Effort:** 3 weeks
 
-**Ejemplo de uso:**
+**Usage example:**
 ```yaml
 name: Deploy to Production
 on:
@@ -263,27 +263,27 @@ jobs:
 ```
 
 #### ☁️ Cloud Run Runner
-- [ ] Deployment en Google Cloud Run
-- [ ] Auto-scaling de runners
+- [ ] Deployment on Google Cloud Run
+- [ ] Auto-scaling of runners
 - [ ] Pay-per-use model
-- [ ] Integración con Cloud Build
+- [ ] Integration with Cloud Build
 - [ ] Secret Manager integration
 
-**Prioridad:** Media  
-**Esfuerzo:** 2 semanas
+**Priority:** Medium  
+**Effort:** 2 weeks
 
 #### 🐳 AWS ECS Runner
 - [ ] Fargate runner tasks
-- [ ] ECS Service para workers
-- [ ] Integration con CodePipeline
+- [ ] ECS Service for workers
+- [ ] Integration with CodePipeline
 - [ ] Secrets via Parameter Store
 - [ ] IAM roles integration
 
-**Prioridad:** Media  
-**Esfuerzo:** 2 semanas
+**Priority:** Medium  
+**Effort:** 2 weeks
 
 #### ⚡ Cloud Functions Runner
-- [ ] Serverless runner en:
+- [ ] Serverless runner on:
   - AWS Lambda
   - Google Cloud Functions
   - Azure Functions
@@ -291,36 +291,36 @@ jobs:
 - [ ] Cost optimization
 - [ ] Cold start mitigation
 
-**Prioridad:** Baja  
-**Esfuerzo:** 3 semanas
+**Priority:** Low  
+**Effort:** 3 weeks
 
 ---
 
-## 🔮 Futuro (2027+)
+## 🔮 Future (2027+)
 
-### Características a Explorar
+### Features to Explore
 
 #### 🌍 Multi-Cloud Orchestration
-- [ ] Deploy simultáneo en múltiples clouds
-- [ ] Disaster recovery cross-cloud
-- [ ] Cost optimization cross-cloud
+- [ ] Simultaneous deployment across multiple clouds
+- [ ] Cross-cloud disaster recovery
+- [ ] Cross-cloud cost optimization
 - [ ] Unified billing dashboard
 
-#### 📊 Observability Avanzada
-- [ ] Integración con Prometheus/Grafana
+#### 📊 Advanced Observability
+- [ ] Integration with Prometheus/Grafana
 - [ ] Distributed tracing (Jaeger)
 - [ ] Log aggregation (ELK/Loki)
 - [ ] APM integration
-- [ ] Custom metrics y alerting
+- [ ] Custom metrics and alerting
 
 #### 🔒 Security Enhancements
 - [ ] Policy as Code (OPA)
 - [ ] Compliance checking (CIS, SOC2)
 - [ ] Vulnerability scanning
-- [ ] Secret rotation automatizada
-- [ ] Audit logging mejorado
+- [ ] Automated secret rotation
+- [ ] Enhanced audit logging
 
-#### 🤝 Integraciones
+#### 🤝 Integrations
 - [ ] Slack notifications
 - [ ] Microsoft Teams
 - [ ] PagerDuty
@@ -329,65 +329,65 @@ jobs:
 - [ ] Datadog
 
 #### 🔄 GitOps
-- [ ] Git como source of truth
+- [ ] Git as source of truth
 - [ ] Automatic drift detection
 - [ ] PR-based workflows
-- [ ] Rollback automatizado
+- [ ] Automated rollback
 
 #### 🎓 Marketplace
 - [ ] Template marketplace
 - [ ] Community modules
 - [ ] Verified providers
-- [ ] Rating y reviews
+- [ ] Ratings and reviews
 
 ---
 
-## 📈 Métricas de Éxito
+## 📈 Success Metrics
 
-### KPIs por Versión
+### KPIs by Version
 
 **v3.8.0 (Auth)**
-- Tiempo de onboarding < 5 minutos
-- 80% de usuarios usando SSO
+- Onboarding time < 5 minutes
+- 80% of users using SSO
 - Zero security incidents
 
 **v4.0.0 (AI/MCP)**
-- 50% de deployments asistidos por AI
-- 30% reducción en errores de configuración
-- MCP adoption por comunidad
+- 50% of deployments AI-assisted
+- 30% reduction in configuration errors
+- MCP adoption by community
 
 **v4.2.0 (Helm)**
-- 1000+ instalaciones via Helm
-- Deployment time < 5 minutos
+- 1000+ installations via Helm
+- Deployment time < 5 minutes
 - Community contributions
 
 **v4.3.0 (Runners)**
-- 10+ runners activos
+- 10+ active runners
 - 99.9% uptime
-- Integration con top 3 CI/CD platforms
+- Integration with top 3 CI/CD platforms
 
 ---
 
-## 🤝 Contribuciones
+## 🤝 Contributions
 
-¿Quieres contribuir al roadmap?
+Want to contribute to the roadmap?
 
-1. **Vota por features:** Crea un issue con label `feature-request`
-2. **Propón nuevas ideas:** Abre un discussion en GitHub
-3. **Contribuye código:** Submit PRs para features en desarrollo
-4. **Feedback:** Comparte tu experiencia y necesidades
+1. **Vote for features:** Create an issue with label `feature-request`
+2. **Propose new ideas:** Open a discussion on GitHub
+3. **Contribute code:** Submit PRs for features in development
+4. **Feedback:** Share your experience and needs
 
-### Cómo Priorizar
+### How to Prioritize
 
-Las prioridades se determinan por:
-- **Votos de la comunidad** (30%)
-- **Impacto en usuarios** (30%)
-- **Alineación estratégica** (20%)
-- **Esfuerzo vs valor** (20%)
+Priorities are determined by:
+- **Community votes** (30%)
+- **User impact** (30%)
+- **Strategic alignment** (20%)
+- **Effort vs value** (20%)
 
 ---
 
-## 📅 Timeline Visual
+## 📅 Visual Timeline
 
 ```
 2026 Q1  ████████░░░░░░░░  LDAP/OAuth/SaaS
@@ -401,7 +401,7 @@ Las prioridades se determinan por:
 
 ---
 
-## 📞 Contacto
+## 📞 Contact
 
 - **Issues:** [GitHub Issues](https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment/issues)
 - **Discussions:** [GitHub Discussions](https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment/discussions)
@@ -411,24 +411,24 @@ Las prioridades se determinan por:
 
 ## 📝 Changelog
 
-Este roadmap es un documento vivo y se actualizará según:
-- Feedback de la comunidad
-- Necesidades del mercado
-- Evolución tecnológica
-- Recursos disponibles
+This roadmap is a living document and will be updated based on:
+- Community feedback
+- Market needs
+- Technological evolution
+- Available resources
 
-**Última actualización:** Octubre 2025  
-**Próxima revisión:** Enero 2026
-
----
-
-## 🎯 Misión
-
-> Hacer que la gestión de infraestructura como código sea accesible, segura y eficiente para todos los equipos, con el poder de la AI y la simplicidad de un click.
+**Last updated:** October 2025  
+**Next review:** January 2026
 
 ---
 
-## 💡 Ideas Bienvenidas
+## 🎯 Mission
 
-¿Tienes una idea que no está en el roadmap?  
-¡Nos encantaría escucharla! Abre un issue con el tag `idea` 💭
+> Make infrastructure as code management accessible, secure, and efficient for all teams, with the power of AI and the simplicity of a click.
+
+---
+
+## 💡 Ideas Welcome
+
+Have an idea that's not on the roadmap?  
+We'd love to hear it! Open an issue with the tag `idea` 💭
