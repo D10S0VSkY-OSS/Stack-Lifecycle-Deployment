@@ -28,7 +28,7 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
     cp /root/.local/bin/uv /usr/local/bin/uv && \
     chmod +x /usr/local/bin/uv
 
-# Copy requirements and install Python packages
+# Copy dependency files
 WORKDIR /app
 COPY ./requirements.txt .
 

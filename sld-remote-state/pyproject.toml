@@ -1,13 +1,13 @@
 [project]
-name = "sld-api-backend"
+name = "sld-remote-state"
 version = "2.7.0"
-description = "Stack Lifecycle Deployment API Backend"
+description = "Stack Lifecycle Deployment Remote State Service"
 requires-python = ">=3.11"
 license = { text = "GPL-3.0" }
 authors = [
     { name = "D10S0VSkY" }
 ]
-keywords = ["terraform", "ansible", "cloud", "deployment", "lifecycle"]
+keywords = ["terraform", "remote-state", "cloud", "deployment", "lifecycle"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
@@ -19,39 +19,20 @@ classifiers = [
 ]
 
 dependencies = [
-    "bcrypt==4.2.1",
+    "azure-storage-blob==12.24.0",
     "boto3==1.35.80",
-    "celery==5.5.3",
-    "click==8.1.8",
-    "cryptography==46.0.2",
-    "dependency-injector==4.43.0",
-    "email-validator==2.2.0",
     "fastapi==0.118.0",
-    "Jinja2==3.1.4",
-    "mysqlclient==2.2.6",
-    "passlib[bcrypt]==1.7.4",
-    "password-strength==0.0.3.post2",
+    "google-cloud-storage==3.4.0",
+    "pymongo==4.11.0",
     "pydantic==2.10.3",
     "pydantic-settings==2.6.1",
-    "pyhcl==0.4.5",
-    "python-dateutil==2.9.0.post0",
-    "python-dotenv==1.0.1",
-    "python-hcl2==7.3.1",
-    "python-jose==3.5.0",
-    "python-multipart==0.0.20",
-    "PyYAML==6.0.2",
-    "redis==6.4.0",
-    "requests==2.32.3",
-    "SQLAlchemy==2.0.36",
     "uvicorn==0.37.0",
-    "croniter==6.0.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest==8.3.4",
+    "pytest",
     "pytest-cov",
-    "pytest-asyncio",
     "black",
     "ruff",
     "mypy",
@@ -63,7 +44,7 @@ build-backend = "hatchling.build"
 
 [tool.uv]
 dev-dependencies = [
-    "pytest==8.3.4",
+    "pytest",
 ]
 
 [tool.ruff]
@@ -93,13 +74,6 @@ ignore = [
 line-length = 100
 target-version = ['py311']
 include = '\.pyi?$'
-
-[tool.pytest.ini_options]
-testpaths = ["test"]
-python_files = "test_*.py"
-python_classes = "Test*"
-python_functions = "test_*"
-addopts = "-v --strict-markers"
 
 [tool.mypy]
 python_version = "3.11"

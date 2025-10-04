@@ -30,11 +30,9 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh && \
 
 # Copy dependency files
 WORKDIR /app
-COPY ./pyproject.toml .
 COPY ./requirements.txt .
 
 # Install dependencies with uv using cache mount
-# Using requirements.txt for now until we can properly structure the package
 RUN --mount=type=cache,target=/root/.cache/uv \
     /usr/local/bin/uv pip install --system -r requirements.txt
 
