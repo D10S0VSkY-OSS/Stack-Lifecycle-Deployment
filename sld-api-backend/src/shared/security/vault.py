@@ -1,6 +1,7 @@
-from config.api import settings
 from cryptography.fernet import Fernet
 from passlib.context import CryptContext
+
+from config.api import settings
 
 
 def vault_encrypt(func):

@@ -182,17 +182,23 @@ def build(service, tag, no_cache, parallel, max_workers):
 
 
 @cli.command()
-@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes']),
-              default='docker', help='Deployment mode')
+@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes', 'k8s']),
+              default='docker', help='Deployment mode (k8s = kubernetes)')
+@click.option('--env', '-e', type=click.Choice(['dev', 'prod']),
+              default='dev', help='Environment for Kubernetes (dev=latest, prod=versioned)')
 @click.option('--build-first', '-b', is_flag=True, help='Build images before starting')
-def start(mode, build_first):
+def start(mode, env, build_first):
     """Start SLD locally"""
     project_root = get_project_root()
+    
+    # Normalize mode
+    if mode == 'k8s':
+        mode = 'kubernetes'
     
     if build_first:
         click.echo(f"{Colors.YELLOW}📦 Building images first...{Colors.NC}\n")
         ctx = click.get_current_context()
-        ctx.invoke(build, service='all', tag='latest', no_cache=False)
+        ctx.invoke(build, service='all', tag='latest', no_cache=False, parallel=False, max_workers=4)
         click.echo()
     
     if mode == 'docker':
@@ -217,7 +223,7 @@ def start(mode, build_first):
         click.echo(f"\n{Colors.GREEN}✅ Services started!{Colors.NC}\n")
         
     else:  # kubernetes
-        click.echo(f"{Colors.BOLD}☸️  Starting SLD with Kubernetes (kind)...{Colors.NC}\n")
+        click.echo(f"{Colors.BOLD}☸️  Starting SLD with Kubernetes (kind) - {env.upper()} environment{Colors.NC}\n")
         
         # Check prerequisites
         missing = [r for r in ['kind', 'kubectl'] if subprocess.run(
@@ -226,42 +232,90 @@ def start(mode, build_first):
         
         if missing:
             click.echo(f"{Colors.RED}❌ Missing prerequisites: {', '.join(missing)}{Colors.NC}")
+            click.echo(f"\n{Colors.YELLOW}Install missing tools:{Colors.NC}")
+            if 'kind' in missing:
+                click.echo("  Kind: https://kind.sigs.k8s.io/docs/user/quick-start/#installation")
+            if 'kubectl' in missing:
+                click.echo("  kubectl: https://kubernetes.io/docs/tasks/tools/")
             sys.exit(1)
         
         k8s_dir = project_root / 'play-with-sld' / 'kubernetes'
         
-        click.echo("Creating kind cluster...")
-        run_command("kind create cluster --config kind.yml", cwd=k8s_dir, check=False)
+        # Check if cluster exists
+        cluster_exists = subprocess.run(
+            "kind get clusters | grep -q '^kind$'",
+            shell=True,
+            capture_output=True
+        ).returncode == 0
         
-        click.echo("\nLoading images into kind...")
-        images = [
-            'd10s0vsky/sld-api:latest',
-            'd10s0vsky/sld-dashboard:latest',
-            'd10s0vsky/sld-remote-state:latest',
-            'd10s0vsky/sld-schedule:latest'
-        ]
+        if not cluster_exists:
+            click.echo(f"{Colors.YELLOW}⚠️  No Kind cluster found. Creating one...{Colors.NC}\n")
+            
+            # Create cluster
+            click.echo("Creating Kind cluster with configuration...")
+            result = run_command("kind create cluster --config kind.yml", cwd=k8s_dir, check=False)
+            
+            if not result:
+                click.echo(f"\n{Colors.RED}❌ Failed to create Kind cluster{Colors.NC}")
+                sys.exit(1)
+            
+            click.echo(f"\n{Colors.GREEN}✓{Colors.NC} Kind cluster created successfully\n")
+        else:
+            click.echo(f"{Colors.GREEN}✓{Colors.NC} Kind cluster is running\n")
         
-        for img in images:
-            click.echo(f"  Loading {img}...")
-            run_command(f"kind load docker-image {img}", check=False)
+        # Load images into kind if using dev
+        if env == 'dev':
+            click.echo("Loading latest images into kind...")
+            images = [
+                'd10s0vsky/sld-api:latest',
+                'd10s0vsky/sld-dashboard:latest',
+                'd10s0vsky/sld-remote-state:latest',
+                'd10s0vsky/sld-schedule:latest'
+            ]
+            
+            for img in images:
+                # Check if image exists locally
+                result = subprocess.run(
+                    f"docker images -q {img}",
+                    shell=True,
+                    capture_output=True,
+                    text=True
+                )
+                
+                if result.stdout.strip():
+                    click.echo(f"  Loading {img}...")
+                    run_command(f"kind load docker-image {img}", check=False)
+                else:
+                    click.echo(f"  {Colors.YELLOW}⚠️  {img} not found locally{Colors.NC}")
+            
+            click.echo()
         
-        click.echo("\nDeploying application...")
-        run_command("kubectl apply -k k8s/", cwd=k8s_dir)
+        # Deploy using kustomize overlays
+        overlay_path = f"overlays/{env}"
+        click.echo(f"Deploying {env.upper()} environment with Kustomize...")
+        run_command(f"kubectl apply -k {overlay_path}/", cwd=k8s_dir)
         
-        click.echo(f"\n{Colors.GREEN}✅ Cluster created and application deployed!{Colors.NC}\n")
+        click.echo(f"\n{Colors.GREEN}✅ {env.upper()} environment deployed!{Colors.NC}\n")
+        click.echo(f"{Colors.YELLOW}💡 Namespace: default{Colors.NC}\n")
     
     click.echo(f"{Colors.BOLD}Available endpoints:{Colors.NC}")
     click.echo(f"  • Dashboard: {Colors.BLUE}http://localhost:5000/{Colors.NC}")
     click.echo(f"  • API Docs:  {Colors.BLUE}http://localhost:8000/docs{Colors.NC}")
-    click.echo(f"\n{Colors.YELLOW}Run 'sld-cli init' to create initial user{Colors.NC}")
+    click.echo(f"\n{Colors.YELLOW}Run './sld_cli.py init' to create initial user{Colors.NC}")
 
 
 @cli.command()
-@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes']),
-              default='docker', help='Deployment mode')
-def stop(mode):
+@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes', 'k8s']),
+              default='docker', help='Deployment mode (k8s = kubernetes)')
+@click.option('--env', '-e', type=click.Choice(['dev', 'prod']),
+              default='dev', help='Environment for Kubernetes')
+def stop(mode, env):
     """Stop SLD services"""
     project_root = get_project_root()
+    
+    # Normalize mode
+    if mode == 'k8s':
+        mode = 'kubernetes'
     
     if mode == 'docker':
         click.echo(f"{Colors.BOLD}🛑 Stopping Docker Compose services...{Colors.NC}\n")
@@ -269,17 +323,29 @@ def stop(mode):
         run_command("docker compose down", cwd=docker_dir)
         
     else:  # kubernetes
-        click.echo(f"{Colors.BOLD}🛑 Deleting kind cluster...{Colors.NC}\n")
-        run_command("kind delete cluster")
+        click.echo(f"{Colors.BOLD}🛑 Stopping Kubernetes {env.upper()} environment...{Colors.NC}\n")
+        
+        if click.confirm('Delete the entire kind cluster?'):
+            run_command("kind delete cluster")
+        else:
+            # Delete resources from default namespace
+            k8s_dir = project_root / 'play-with-sld' / 'kubernetes'
+            overlay_path = f"overlays/{env}"
+            click.echo(f"Deleting {env.upper()} resources from default namespace...")
+            run_command(f"kubectl delete -k {overlay_path}/", cwd=k8s_dir, check=False)
     
     click.echo(f"{Colors.GREEN}✅ Services stopped!{Colors.NC}")
 
 
 @cli.command()
-@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes']),
-              default='docker', help='Deployment mode')
+@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes', 'k8s']),
+              default='docker', help='Deployment mode (k8s = kubernetes)')
 def init(mode):
     """Initialize admin user and credentials"""
+    # Normalize mode
+    if mode == 'k8s':
+        mode = 'kubernetes'
+    
     click.echo(f"{Colors.BOLD}🔑 Initializing credentials...{Colors.NC}\n")
     
     # Wait for API to be ready
@@ -357,13 +423,19 @@ def init(mode):
 
 
 @cli.command()
-@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes']),
-              default='docker', help='Deployment mode')
+@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes', 'k8s']),
+              default='docker', help='Deployment mode (k8s = kubernetes)')
+@click.option('--env', '-e', type=click.Choice(['dev', 'prod']),
+              default='dev', help='Environment for Kubernetes')
 @click.option('--service', '-s', help='Specific service (for kubernetes)')
 @click.option('--follow', '-f', is_flag=True, help='Follow logs')
-def logs(mode, service, follow):
+def logs(mode, env, service, follow):
     """View service logs"""
     project_root = get_project_root()
+    
+    # Normalize mode
+    if mode == 'k8s':
+        mode = 'kubernetes'
     
     if mode == 'docker':
         docker_dir = project_root / 'play-with-sld' / 'docker'
@@ -375,20 +447,27 @@ def logs(mode, service, follow):
             run_command(f"docker compose logs {follow_flag}", cwd=docker_dir)
     else:  # kubernetes
         follow_flag = '-f' if follow else ''
+        namespace = "default"
         
         if service:
-            run_command(f"kubectl logs {follow_flag} deployment/{service}")
+            run_command(f"kubectl logs {follow_flag} -n {namespace} deployment/{service}")
         else:
-            click.echo("Available services:")
-            run_command("kubectl get deployments")
+            click.echo(f"Available services in {namespace}:")
+            run_command(f"kubectl get deployments -n {namespace}")
 
 
 @cli.command()
-@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes']),
-              default='docker', help='Deployment mode')
-def status(mode):
+@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes', 'k8s']),
+              default='docker', help='Deployment mode (k8s = kubernetes)')
+@click.option('--env', '-e', type=click.Choice(['dev', 'prod']),
+              default='dev', help='Environment for Kubernetes')
+def status(mode, env):
     """View services status"""
     project_root = get_project_root()
+    
+    # Normalize mode
+    if mode == 'k8s':
+        mode = 'kubernetes'
     
     click.echo(f"{Colors.BOLD}📊 Services status:{Colors.NC}\n")
     
@@ -396,12 +475,14 @@ def status(mode):
         docker_dir = project_root / 'play-with-sld' / 'docker'
         run_command("docker compose ps", cwd=docker_dir)
     else:  # kubernetes
+        namespace = "default"
+        click.echo(f"{Colors.BOLD}Environment: {env.upper()} (namespace: {namespace}){Colors.NC}\n")
         click.echo(f"{Colors.BOLD}Pods:{Colors.NC}")
-        run_command("kubectl get pods")
+        run_command(f"kubectl get pods -n {namespace}")
         click.echo(f"\n{Colors.BOLD}Deployments:{Colors.NC}")
-        run_command("kubectl get deployments")
+        run_command(f"kubectl get deployments -n {namespace}")
         click.echo(f"\n{Colors.BOLD}Services:{Colors.NC}")
-        run_command("kubectl get services")
+        run_command(f"kubectl get services -n {namespace}")
 
 
 @cli.command()
@@ -517,10 +598,318 @@ def clean():
 
 
 @cli.command()
-@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes']),
-              default='docker', help='Deployment mode')
+@click.option('--service', '-s', type=click.Choice(['api', 'dashboard', 'remote-state', 'schedule', 'all']),
+              default='all', help='Service to format')
+@click.option('--check', is_flag=True, help='Check only, do not modify files')
+def format(service, check):
+    """
+    Format code with Black
+    
+    This command runs Black code formatter on the selected service(s).
+    """
+    project_root = get_project_root()
+    
+    click.echo(f"{Colors.BOLD}🎨 Formatting code with Black...{Colors.NC}\n")
+    
+    services = {
+        'api': 'sld-api-backend',
+        'dashboard': 'sld-dashboard',
+        'remote-state': 'sld-remote-state',
+        'schedule': 'sld-schedule',
+    }
+    
+    if service == 'all':
+        to_format = list(services.values())
+    else:
+        to_format = [services[service]]
+    
+    total = len(to_format)
+    failed = []
+    
+    for idx, svc_dir in enumerate(to_format, 1):
+        svc_path = project_root / svc_dir
+        
+        if not svc_path.exists():
+            click.echo(f"{Colors.RED}✗ [{idx}/{total}] {svc_dir} not found{Colors.NC}\n")
+            failed.append(svc_dir)
+            continue
+        
+        click.echo(f"{Colors.BLUE}[{idx}/{total}]{Colors.NC} Formatting {Colors.BOLD}{svc_dir}{Colors.NC}...")
+        
+        # Run Black
+        check_flag = '--check --diff' if check else ''
+        black_result = run_command(
+            f"uv run black {check_flag} .",
+            cwd=svc_path,
+            check=False
+        )
+        
+        if black_result:
+            click.echo(f"  {Colors.GREEN}✓ Black completed{Colors.NC}")
+        else:
+            click.echo(f"  {Colors.YELLOW}⚠ Black had issues{Colors.NC}")
+            failed.append(svc_dir)
+        
+        click.echo()
+    
+    if failed:
+        click.echo(f"{Colors.YELLOW}⚠️  Some services had issues: {', '.join(failed)}{Colors.NC}\n")
+    else:
+        if check:
+            click.echo(f"{Colors.GREEN}✅ All code is properly formatted!{Colors.NC}\n")
+        else:
+            click.echo(f"{Colors.GREEN}✅ Code formatting completed!{Colors.NC}\n")
+
+
+@cli.command()
+@click.option('--service', '-s', type=click.Choice(['api', 'dashboard', 'remote-state', 'schedule', 'all']),
+              default='all', help='Service to lint')
+def lint(service):
+    """
+    Run linting checks with Ruff
+    
+    Fast Python linter that checks for code quality issues.
+    """
+    project_root = get_project_root()
+    
+    click.echo(f"{Colors.BOLD}🔍 Running linter...{Colors.NC}\n")
+    
+    services = {
+        'api': 'sld-api-backend',
+        'dashboard': 'sld-dashboard',
+        'remote-state': 'sld-remote-state',
+        'schedule': 'sld-schedule',
+    }
+    
+    if service == 'all':
+        to_lint = list(services.values())
+    else:
+        to_lint = [services[service]]
+    
+    total = len(to_lint)
+    failed = []
+    
+    for idx, svc_dir in enumerate(to_lint, 1):
+        svc_path = project_root / svc_dir
+        
+        if not svc_path.exists():
+            click.echo(f"{Colors.RED}✗ [{idx}/{total}] {svc_dir} not found{Colors.NC}\n")
+            failed.append(svc_dir)
+            continue
+        
+        click.echo(f"{Colors.BLUE}[{idx}/{total}]{Colors.NC} Linting {Colors.BOLD}{svc_dir}{Colors.NC}...")
+        
+        result = run_command(
+            "uv run ruff check .",
+            cwd=svc_path,
+            check=False
+        )
+        
+        if result:
+            click.echo(f"{Colors.GREEN}✓ No issues found{Colors.NC}\n")
+        else:
+            click.echo(f"{Colors.YELLOW}⚠ Issues found (run './sld_cli.py format -s {list(services.keys())[list(services.values()).index(svc_dir)]}' to fix){Colors.NC}\n")
+            failed.append(svc_dir)
+    
+    if failed:
+        click.echo(f"{Colors.RED}❌ Linting failed for: {', '.join(failed)}{Colors.NC}\n")
+        sys.exit(1)
+    else:
+        click.echo(f"{Colors.GREEN}✅ All code passes linting checks!{Colors.NC}\n")
+
+
+@cli.group()
+def kind():
+    """Manage Kind (Kubernetes in Docker) cluster"""
+    pass
+
+
+@kind.command('create')
+def kind_create():
+    """Create a Kind cluster for SLD"""
+    project_root = get_project_root()
+    k8s_dir = project_root / 'play-with-sld' / 'kubernetes'
+    
+    click.echo(f"{Colors.BOLD}☸️  Creating Kind cluster...{Colors.NC}\n")
+    
+    # Check if kind is installed
+    result = subprocess.run('which kind', shell=True, capture_output=True)
+    if result.returncode != 0:
+        click.echo(f"{Colors.RED}❌ Kind is not installed{Colors.NC}")
+        click.echo(f"\n{Colors.YELLOW}Install Kind:{Colors.NC}")
+        click.echo("  curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64")
+        click.echo("  chmod +x ./kind")
+        click.echo("  sudo mv ./kind /usr/local/bin/kind")
+        sys.exit(1)
+    
+    # Check if cluster already exists
+    cluster_exists = subprocess.run(
+        "kind get clusters | grep -q '^kind$'",
+        shell=True,
+        capture_output=True
+    ).returncode == 0
+    
+    if cluster_exists:
+        click.echo(f"{Colors.YELLOW}⚠️  Kind cluster already exists{Colors.NC}")
+        if not click.confirm('Do you want to delete and recreate it?'):
+            click.echo("Operation cancelled.")
+            return
+        
+        click.echo("\nDeleting existing cluster...")
+        run_command("kind delete cluster")
+        click.echo()
+    
+    # Create cluster
+    click.echo("Creating cluster with configuration...")
+    run_command("kind create cluster --config kind.yml", cwd=k8s_dir)
+    
+    # Verify cluster
+    click.echo("\nVerifying cluster...")
+    run_command("kubectl cluster-info --context kind-kind")
+    
+    click.echo(f"\n{Colors.GREEN}✅ Kind cluster created successfully!{Colors.NC}\n")
+    click.echo(f"{Colors.BOLD}Next steps:{Colors.NC}")
+    click.echo(f"  • Deploy DEV:  {Colors.YELLOW}./sld_cli.py start -m kubernetes -e dev{Colors.NC}")
+    click.echo(f"  • Deploy PROD: {Colors.YELLOW}./sld_cli.py start -m kubernetes -e prod{Colors.NC}")
+
+
+@kind.command('delete')
+def kind_delete():
+    """Delete the Kind cluster"""
+    click.echo(f"{Colors.BOLD}🛑 Deleting Kind cluster...{Colors.NC}\n")
+    
+    # Check if cluster exists
+    cluster_exists = subprocess.run(
+        "kind get clusters | grep -q '^kind$'",
+        shell=True,
+        capture_output=True
+    ).returncode == 0
+    
+    if not cluster_exists:
+        click.echo(f"{Colors.YELLOW}⚠️  No Kind cluster found{Colors.NC}")
+        return
+    
+    if click.confirm('Are you sure you want to delete the cluster?'):
+        run_command("kind delete cluster")
+        click.echo(f"\n{Colors.GREEN}✅ Cluster deleted!{Colors.NC}")
+    else:
+        click.echo("Operation cancelled.")
+
+
+@kind.command('status')
+def kind_status():
+    """Show Kind cluster status"""
+    click.echo(f"{Colors.BOLD}☸️  Kind Cluster Status{Colors.NC}\n")
+    
+    # Check if kind is installed
+    result = subprocess.run('which kind', shell=True, capture_output=True)
+    if result.returncode != 0:
+        click.echo(f"{Colors.RED}❌ Kind is not installed{Colors.NC}")
+        return
+    
+    # List clusters
+    click.echo(f"{Colors.BOLD}Clusters:{Colors.NC}")
+    result = subprocess.run("kind get clusters", shell=True, capture_output=True, text=True)
+    
+    if result.returncode == 0 and result.stdout.strip():
+        click.echo(result.stdout)
+        
+        # Check if 'kind' cluster exists
+        if 'kind' in result.stdout:
+            click.echo(f"\n{Colors.BOLD}Nodes:{Colors.NC}")
+            run_command("kubectl get nodes", check=False)
+            
+            click.echo(f"\n{Colors.BOLD}Namespaces:{Colors.NC}")
+            run_command("kubectl get namespaces | grep -E '(NAME|sld-)'", check=False)
+    else:
+        click.echo(f"{Colors.YELLOW}No clusters found{Colors.NC}")
+
+
+@kind.command('load-images')
+@click.option('--tag', '-t', default='latest', help='Image tag to load')
+def kind_load_images(tag):
+    """Load Docker images into Kind cluster"""
+    click.echo(f"{Colors.BOLD}📦 Loading images into Kind cluster...{Colors.NC}\n")
+    
+    # Check if cluster exists
+    cluster_exists = subprocess.run(
+        "kind get clusters | grep -q '^kind$'",
+        shell=True,
+        capture_output=True
+    ).returncode == 0
+    
+    if not cluster_exists:
+        click.echo(f"{Colors.RED}❌ No Kind cluster found. Create one first with: ./sld_cli.py kind create{Colors.NC}")
+        sys.exit(1)
+    
+    images = [
+        f'd10s0vsky/sld-api:{tag}',
+        f'd10s0vsky/sld-dashboard:{tag}',
+        f'd10s0vsky/sld-remote-state:{tag}',
+        f'd10s0vsky/sld-schedule:{tag}'
+    ]
+    
+    failed = []
+    for img in images:
+        # Check if image exists locally
+        result = subprocess.run(
+            f"docker images -q {img}",
+            shell=True,
+            capture_output=True,
+            text=True
+        )
+        
+        if not result.stdout.strip():
+            click.echo(f"{Colors.YELLOW}⚠️  {img} not found locally, skipping...{Colors.NC}")
+            failed.append(img)
+            continue
+        
+        click.echo(f"Loading {img}...")
+        if not run_command(f"kind load docker-image {img}", check=False):
+            failed.append(img)
+    
+    if failed:
+        click.echo(f"\n{Colors.YELLOW}⚠️  Some images failed to load: {', '.join(failed)}{Colors.NC}")
+        click.echo(f"\n{Colors.BOLD}Build them first:{Colors.NC} ./sld_cli.py build --tag {tag}")
+    else:
+        click.echo(f"\n{Colors.GREEN}✅ All images loaded successfully!{Colors.NC}")
+
+
+@cli.command()
+@click.option('--env', '-e', type=click.Choice(['dev', 'prod']),
+              required=True, help='Environment to build manifest for')
+@click.option('--output', '-o', help='Output file (default: print to stdout)')
+def kustomize(env, output):
+    """
+    Build Kustomize manifests for dev or prod environment
+    
+    Examples:
+      ./sld_cli.py kustomize -e dev              # Show dev manifest
+      ./sld_cli.py kustomize -e prod -o prod.yml # Save prod manifest
+    """
+    project_root = get_project_root()
+    k8s_dir = project_root / 'play-with-sld' / 'kubernetes'
+    overlay_path = f"overlays/{env}"
+    
+    click.echo(f"{Colors.BOLD}🔧 Building Kustomize manifest for {env.upper()}...{Colors.NC}\n")
+    
+    if output:
+        # Save to file
+        cmd = f"kubectl kustomize {overlay_path}/ > {output}"
+        run_command(cmd, cwd=k8s_dir)
+        click.echo(f"{Colors.GREEN}✓{Colors.NC} Manifest saved to: {output}\n")
+    else:
+        # Print to stdout
+        run_command(f"kubectl kustomize {overlay_path}/", cwd=k8s_dir)
+
+
+@cli.command()
+@click.option('--mode', '-m', type=click.Choice(['docker', 'kubernetes', 'k8s']),
+              default='docker', help='Deployment mode (k8s = kubernetes)')
 @click.option('--skip-check', is_flag=True, help='Skip prerequisites check')
-def quickstart(mode, skip_check):
+@click.option('--env', '-e', type=click.Choice(['dev', 'prod']),
+              default='dev', help='Environment for Kubernetes (dev=latest, prod=versioned)')
+def quickstart(mode, skip_check, env):
     """
     🚀 Quick start: build, start and initialize everything at once
     
@@ -531,8 +920,14 @@ def quickstart(mode, skip_check):
     4. Waits for services to be ready
     5. Initializes admin user
     """
+    # Normalize mode
+    if mode == 'k8s':
+        mode = 'kubernetes'
+    
     click.echo(f"{Colors.BOLD}{'=' * 60}{Colors.NC}")
     click.echo(f"{Colors.BOLD}🚀 SLD QuickStart - All in one!{Colors.NC}")
+    if mode == 'kubernetes':
+        click.echo(f"{Colors.BOLD}   Environment: {env.upper()}{Colors.NC}")
     click.echo(f"{Colors.BOLD}{'=' * 60}{Colors.NC}\n")
     
     # Step 1: Check prerequisites
@@ -556,7 +951,7 @@ def quickstart(mode, skip_check):
     
     ctx = click.get_current_context()
     try:
-        ctx.invoke(build, service='all', tag='latest', no_cache=False)
+        ctx.invoke(build, service='all', tag='latest', no_cache=False, parallel=False, max_workers=4)
     except SystemExit:
         click.echo(f"\n{Colors.RED}❌ Error building images{Colors.NC}")
         sys.exit(1)
@@ -567,7 +962,7 @@ def quickstart(mode, skip_check):
     click.echo(f"{Colors.BLUE}[Step 3/5]{Colors.NC} Starting services ({mode})...\n")
     
     try:
-        ctx.invoke(start, mode=mode, build_first=False)
+        ctx.invoke(start, mode=mode, env=env, build_first=False)
     except SystemExit:
         click.echo(f"\n{Colors.RED}❌ Error starting services{Colors.NC}")
         sys.exit(1)
@@ -588,7 +983,7 @@ def quickstart(mode, skip_check):
         click.echo("Waiting for pods to be ready...")
         time.sleep(30)
         click.echo("\nChecking pod status...")
-        run_command("kubectl get pods", check=False)
+        run_command("kubectl get pods -n default", check=False)
         time.sleep(20)
     
     click.echo(f"\n{Colors.GREEN}✓ Services ready{Colors.NC}\n")
@@ -617,15 +1012,19 @@ def quickstart(mode, skip_check):
     click.echo(f"  • Password: {Colors.GREEN}{Colors.BOLD}Password08@{Colors.NC}\n")
     
     click.echo(f"{Colors.BOLD}Useful commands:{Colors.NC}")
-    click.echo(f"  • View status:    {Colors.YELLOW}./sld_cli.py status{Colors.NC}")
-    click.echo(f"  • View logs:      {Colors.YELLOW}./sld_cli.py logs -f{Colors.NC}")
+    if mode == 'kubernetes':
+        click.echo(f"  • View status:    {Colors.YELLOW}./sld_cli.py status -m kubernetes -e {env}{Colors.NC}")
+        click.echo(f"  • View logs:      {Colors.YELLOW}./sld_cli.py logs -m kubernetes -e {env} -f{Colors.NC}")
+    else:
+        click.echo(f"  • View status:    {Colors.YELLOW}./sld_cli.py status{Colors.NC}")
+        click.echo(f"  • View logs:      {Colors.YELLOW}./sld_cli.py logs -f{Colors.NC}")
     click.echo(f"  • Verify UV:      {Colors.YELLOW}./sld_cli.py verify{Colors.NC}")
-    click.echo(f"  • Stop:           {Colors.YELLOW}./sld_cli.py stop{Colors.NC}\n")
+    click.echo(f"  • Stop:           {Colors.YELLOW}./sld_cli.py stop -m {mode}{Colors.NC}\n")
     
     if mode == 'docker':
         click.echo(f"{Colors.BOLD}💡 Tip:{Colors.NC} Open the links in your browser and start using SLD!")
     else:
-        click.echo(f"{Colors.BOLD}💡 Tip:{Colors.NC} Run 'kubectl get pods' to see all running pods")
+        click.echo(f"{Colors.BOLD}💡 Tip:{Colors.NC} Run './sld_cli.py status -m kubernetes -e {env}' to see all running pods")
 
 
 if __name__ == '__main__':

@@ -2,7 +2,6 @@ import datetime
 
 from sqlalchemy import desc, or_
 from sqlalchemy.orm import Session
-from typing import List
 
 import src.azure.infrastructure.models as models
 from src.azure.domain.entities import azure as schemas_azure
@@ -125,7 +124,7 @@ async def get_credentials_azure_profile(
 
 async def get_all_azure_profile(
     db: Session, filters: schemas_azure.AzureAccountFilter, skip: int = 0, limit: int = 100
-) -> List[schemas_azure.AzureAccountResponse]:
+) -> list[schemas_azure.AzureAccountResponse]:
     try:
         query = db.query(models.Azure_provider)
 

@@ -2,16 +2,15 @@ import requests
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from config.api import settings
+from src.deploy.domain.entities.metrics import AllMetricsResponse
+from src.deploy.domain.entities.repository import DeployFilter, DeployFilterResponse
 from src.deploy.infrastructure import repositories as crud_deploys
+from src.deploy.infrastructure.repositories import MetricsFetcher
 from src.shared.helpers.get_data import check_squad_user, deploy, deploy_squad
 from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users
-from typing import List
-from src.deploy.domain.entities.repository import DeployFilter, DeployFilterResponse
-from src.deploy.domain.entities.metrics import AllMetricsResponse
-from src.deploy.infrastructure.repositories import MetricsFetcher
-from config.api import settings
 
 
 async def get_all_deploys(
@@ -20,7 +19,7 @@ async def get_all_deploys(
     limit: int = 100,
     db: Session = Depends(deps.get_db),
     filters: DeployFilter = Depends(DeployFilter),
-) -> List[DeployFilterResponse]:
+) -> list[DeployFilterResponse]:
     try:
         if not crud_users.is_master(db, current_user):
             filters.squad = current_user.squad

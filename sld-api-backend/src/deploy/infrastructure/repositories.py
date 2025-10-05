@@ -1,21 +1,21 @@
 import datetime
-from typing import List
+
+from sqlalchemy import desc, extract, func
 from sqlalchemy.orm import Session
-from sqlalchemy import func, extract, desc, case
 
 import src.deploy.domain.entities.deploy as schemas_deploy
-from src.deploy.domain.entities.repository import DeployFilter, DeployFilterResponse
+import src.deploy.infrastructure.models as models
 from src.deploy.domain.entities.metrics import (
     ActionCount,
+    CloudProviderUsage,
     EnvironmentCount,
     MonthlyDeployCount,
     SquadDeployCount,
+    SquadEnvironmentUsage,
     StackUsage,
     UserActivity,
-    CloudProviderUsage,
-    SquadEnvironmentUsage,
 )
-import src.deploy.infrastructure.models as models
+from src.deploy.domain.entities.repository import DeployFilter, DeployFilterResponse
 from src.stacks.infrastructure.models import Stack
 
 
@@ -200,7 +200,7 @@ def get_all_deploys_by_squad(db: Session, squad: str, skip: int = 0, limit: int 
 
 def get_deploys(
     db: Session, filters: DeployFilter, skip: int = 0, limit: int = 100
-) -> List[DeployFilterResponse]:
+) -> list[DeployFilterResponse]:
     query = db.query(models.Deploy, Stack.icon_path).join(
         Stack, models.Deploy.stack_name == Stack.stack_name
     )
@@ -226,7 +226,7 @@ class MetricsFetcher:
     def __init__(self, db: Session):
         self.db = db
 
-    def get_deploy_count_by_user(self) -> List[UserActivity]:
+    def get_deploy_count_by_user(self) -> list[UserActivity]:
         query_result = (
             self.db.query(models.Deploy.username, func.count(models.Deploy.id))
             .group_by(models.Deploy.username)
@@ -236,7 +236,7 @@ class MetricsFetcher:
             UserActivity(username=username, deploy_count=count) for username, count in query_result
         ]
 
-    def get_deploy_count_by_action(self) -> List[ActionCount]:
+    def get_deploy_count_by_action(self) -> list[ActionCount]:
         query_result = (
             self.db.query(models.Deploy.action, func.count(models.Deploy.id))
             .group_by(models.Deploy.action)
@@ -244,7 +244,7 @@ class MetricsFetcher:
         )
         return [ActionCount(action=action, count=count) for action, count in query_result]
 
-    def get_deploy_count_by_environment(self) -> List[EnvironmentCount]:
+    def get_deploy_count_by_environment(self) -> list[EnvironmentCount]:
         query_result = (
             self.db.query(models.Deploy.environment, func.count(models.Deploy.id))
             .group_by(models.Deploy.environment)
@@ -255,7 +255,7 @@ class MetricsFetcher:
             for environment, count in query_result
         ]
 
-    def get_deploy_count_by_stack_name(self) -> List[StackUsage]:
+    def get_deploy_count_by_stack_name(self) -> list[StackUsage]:
         query_result = (
             self.db.query(models.Deploy.stack_name, func.count(models.Deploy.id))
             .group_by(models.Deploy.stack_name)
@@ -265,7 +265,7 @@ class MetricsFetcher:
             StackUsage(stack_name=stack_name, count=count) for stack_name, count in query_result
         ]
 
-    def get_monthly_deploy_count(self) -> List[MonthlyDeployCount]:
+    def get_monthly_deploy_count(self) -> list[MonthlyDeployCount]:
         query_result = (
             self.db.query(extract("month", models.Deploy.created_at), func.count(models.Deploy.id))
             .group_by(extract("month", models.Deploy.created_at))
@@ -273,7 +273,7 @@ class MetricsFetcher:
         )
         return [MonthlyDeployCount(month=month, count=count) for month, count in query_result]
 
-    def get_deploy_count_by_squad(self) -> List[SquadDeployCount]:
+    def get_deploy_count_by_squad(self) -> list[SquadDeployCount]:
         query_result = (
             self.db.query(models.Deploy.squad, func.count(models.Deploy.id))
             .group_by(models.Deploy.squad)
@@ -281,7 +281,7 @@ class MetricsFetcher:
         )
         return [SquadDeployCount(squad=squad, count=count) for squad, count in query_result]
 
-    def get_cloud_provider_usage(self) -> List[CloudProviderUsage]:
+    def get_cloud_provider_usage(self) -> list[CloudProviderUsage]:
         stacks = self.db.query(models.Deploy.stack_name).all()
         counts = {"aws": 0, "azure": 0, "gcp": 0, "custom": 0}
 
@@ -297,7 +297,7 @@ class MetricsFetcher:
             if count > 0
         ]
 
-    def get_squad_environment_usage(self) -> List[SquadEnvironmentUsage]:
+    def get_squad_environment_usage(self) -> list[SquadEnvironmentUsage]:
         results = (
             self.db.query(
                 models.Deploy.squad, models.Deploy.environment, func.count(models.Deploy.id)

@@ -1,7 +1,7 @@
-# -*- encoding: utf-8 -*-
 import requests
-from app.helpers.api_request import request_url
 from flask import Blueprint
+
+from app.helpers.api_request import request_url
 
 blueprint = Blueprint(
     "home_blueprint",
@@ -30,7 +30,7 @@ def status_utility():
                 return {"result": "SUCCESS"}
             else:
                 return {"result": "ERROR"}
-        except Exception as err:
+        except Exception:
             return {"result": "ERROR"}
 
     return dict(task_status=get_status)
@@ -59,7 +59,7 @@ def log_utility():
             if not isinstance(data, list):
                 return {"result": content.get("result").get("module").get("stdout")}
             return {"result": content.get("result").get("module").get("stdout")}
-        except Exception as err:
+        except Exception:
             return {"result": response}
 
     return dict(task_log=get_output)

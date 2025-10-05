@@ -1,4 +1,5 @@
 import boto3
+
 from configs.bucket_s3 import settings
 
 s3 = boto3.resource(

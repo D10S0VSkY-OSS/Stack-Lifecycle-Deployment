@@ -1,7 +1,8 @@
 import datetime
 
+from sqlalchemy import JSON, Column, DateTime, Integer, String, UniqueConstraint
+
 from config.database import Base
-from sqlalchemy import Column, DateTime, Integer, String, UniqueConstraint, JSON
 
 
 class Aws_provider(Base):

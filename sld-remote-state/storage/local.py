@@ -5,7 +5,7 @@ import os
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
 
-class Storage(object):
+class Storage:
     def __init__(self, path):
         self.path = path
         os.makedirs(self.path, exist_ok=True)

@@ -1,12 +1,12 @@
 import datetime
-from typing import List
-from sqlalchemy.orm import Session
+
 from sqlalchemy import desc, or_
+from sqlalchemy.orm import Session
 
 import src.gcp.infrastructure.models as models
 from src.gcp.domain.entities import gcp as schemas_gcp
-from src.shared.security.vault import vault_decrypt, vault_encrypt
 from src.shared.infrastructure.respository import check_deploy_in_use
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 
 
 @vault_encrypt
@@ -118,7 +118,7 @@ async def update_gcloud_profile(
 
 async def get_all_gcloud_profile(
     db: Session, filters: schemas_gcp.GcloudAccountFilter, skip: int = 0, limit: int = 100
-) -> List[schemas_gcp.GcloudResponse]:
+) -> list[schemas_gcp.GcloudResponse]:
     try:
         query = db.query(models.Gcloud_provider)
 

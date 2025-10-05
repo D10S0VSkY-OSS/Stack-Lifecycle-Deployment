@@ -1,23 +1,23 @@
+import logging
+
+import redis
+
+from config.api import settings
 from src.worker.domain.entities.worker import (
+    ApplyParams,
     DeployParams,
-    DownloadGitRepoParams,
     DownloadBinaryParams,
+    DownloadGitRepoParams,
+    GetVariablesParams,
+    PlanParams,
     RemoteStateParams,
     TfvarsParams,
-    PlanParams,
-    ApplyParams,
-    DestroyParams,
-    GetVariablesParams,
 )
 from src.worker.domain.services.provider import (
     ProviderActions,
     ProviderGetVars,
     ProviderRequirements,
 )
-import redis
-from config.api import settings
-import logging
-
 
 r = redis.Redis(
     host=settings.CACHE_SERVER,

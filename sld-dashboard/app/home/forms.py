@@ -1,13 +1,12 @@
-# -*- encoding: utf-8 -*-
 from flask_wtf import FlaskForm
 from wtforms import (
     BooleanField,
+    FieldList,
+    FormField,
     PasswordField,
+    SelectField,
     StringField,
     TextAreaField,
-    SelectField,
-    FormField,
-    FieldList,
     validators,
 )
 from wtforms.fields import EmailField

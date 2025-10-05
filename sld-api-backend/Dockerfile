@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.4
 # ===== Stage 1: Builder =====
-FROM python:3.13-slim as builder
+FROM python:3.12-slim as builder
 
 LABEL maintainer="D10S0VSkY"
 
@@ -37,7 +37,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     /usr/local/bin/uv pip install --system -r requirements.txt
 
 # ===== Stage 2: Runtime =====
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 LABEL maintainer="D10S0VSkY"
 
@@ -70,7 +70,7 @@ RUN groupadd --gid 10000 sld && \
 WORKDIR /app
 
 # Copy Python packages from builder
-COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
+COPY --from=builder /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code

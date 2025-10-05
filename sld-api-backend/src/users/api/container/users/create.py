@@ -1,7 +1,7 @@
-from config.api import settings
 from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
+from config.api import settings
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.shared.helpers.get_data import check_role_user, check_squad_user
 from src.shared.security import deps

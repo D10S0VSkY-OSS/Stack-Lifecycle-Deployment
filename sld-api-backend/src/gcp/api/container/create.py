@@ -1,4 +1,4 @@
-from fastapi import Depends, HTTPException, Response
+from fastapi import Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.activityLogs.infrastructure import repositories as crud_activity

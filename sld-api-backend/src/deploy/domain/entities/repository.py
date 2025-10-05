@@ -1,21 +1,21 @@
-from pydantic import BaseModel
-from typing import Optional
 from datetime import datetime
+
+from pydantic import BaseModel
 
 
 class DeployFilter(BaseModel):
-    id: Optional[str] = None
-    task_id: Optional[str] = None
-    name: Optional[str] = None
-    action: Optional[str] = None
-    stack_name: Optional[str] = None
-    stack_branch: Optional[str] = None
-    user_id: Optional[int] = None
-    username: Optional[str] = None
-    squad: Optional[str] = None
-    environment: Optional[str] = None
-    tfvar_file: Optional[str] = None
-    project_path: Optional[str] = None
+    id: str | None = None
+    task_id: str | None = None
+    name: str | None = None
+    action: str | None = None
+    stack_name: str | None = None
+    stack_branch: str | None = None
+    user_id: int | None = None
+    username: str | None = None
+    squad: str | None = None
+    environment: str | None = None
+    tfvar_file: str | None = None
+    project_path: str | None = None
 
 
 class DeployFilterResponse(BaseModel):
@@ -23,17 +23,17 @@ class DeployFilterResponse(BaseModel):
     task_id: str
     name: str
     action: str
-    start_time: Optional[str]
-    destroy_time: Optional[str]
+    start_time: str | None
+    destroy_time: str | None
     stack_name: str
     stack_branch: str
     created_at: datetime
-    updated_at: Optional[datetime]
+    updated_at: datetime | None
     user_id: int
     username: str
     squad: str
     variables: dict
     environment: str
-    tfvar_file: Optional[str]
-    project_path: Optional[str]
-    icon_path: Optional[str]
+    tfvar_file: str | None
+    project_path: str | None
+    icon_path: str | None

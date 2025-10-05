@@ -1,7 +1,8 @@
 import datetime
 
+from sqlalchemy import Column, DateTime, Integer, LargeBinary, String, Text
+
 from config.database import Base
-from sqlalchemy import Column, DateTime, Integer, String, Text, LargeBinary
 
 
 class Tasks(Base):

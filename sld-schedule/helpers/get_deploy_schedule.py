@@ -5,11 +5,12 @@ import jmespath
 from apscheduler.executors.pool import ProcessPoolExecutor, ThreadPoolExecutor
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from config.api import settings
 from fastapi import HTTPException
+from retrying import retry
+
+from config.api import settings
 from helpers.api_request import request_url
 from helpers.api_token import get_token
-from retrying import retry
 
 logging.basicConfig(
     format="%(levelname)-8s  %(message)s",
@@ -35,7 +36,7 @@ def init_check_schedule():
             time.sleep(3)
             token = get_token(settings.CREDENTIALS_BOT)
             response = request_url(
-                verb="GET", uri=f"deploy/", headers={"Authorization": f"Bearer {token}"}
+                verb="GET", uri="deploy/", headers={"Authorization": f"Bearer {token}"}
             )
             if response.get("status_code") == 200:
                 break
@@ -140,7 +141,7 @@ def getJob(deploy_id):
 
 
 def getJobs():
-    logging.info(f"Get job all jobs")
+    logging.info("Get job all jobs")
     return scheduler.get_jobs()
 
 
@@ -204,7 +205,7 @@ def destroy_job(
 
 def _check_schedules():
     token = get_token(settings.CREDENTIALS_BOT)
-    response = request_url(verb="GET", uri=f"deploy/", headers={"Authorization": f"Bearer {token}"})
+    response = request_url(verb="GET", uri="deploy/", headers={"Authorization": f"Bearer {token}"})
     data_json = response.get("json")
     deploy_list = jmespath.search("[*].id", data_json)
     for i in deploy_list:

@@ -1,9 +1,9 @@
 [project]
 name = "sld-dashboard"
-version = "3.6.2"
+version = "3.6.3"
 description = "Stack Lifecycle Deployment Dashboard"
 requires-python = ">=3.11"
-license = { text = "GPL-3.0" }
+license = { text = "MIT" }
 authors = [
     { name = "D10S0VSkY" }
 ]
@@ -11,11 +11,10 @@ keywords = ["terraform", "ansible", "cloud", "deployment", "lifecycle", "dashboa
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
 ]
 
 dependencies = [

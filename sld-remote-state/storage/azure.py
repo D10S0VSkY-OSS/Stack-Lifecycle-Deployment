@@ -5,6 +5,7 @@ import logging
 from datetime import datetime
 
 from azure.storage.blob import BlobServiceClient
+
 from configs.azure_blob_storage import settings
 
 connect_str = settings.AZURE_STORAGE_CONNECTION_STRING
@@ -23,7 +24,7 @@ def check_container(container_name=settings.CONTAINER):
 check_container()
 
 
-class Storage(object):
+class Storage:
     def __init__(self, path):
         self.path = path
 

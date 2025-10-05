@@ -1,8 +1,8 @@
 import json
 
-from config.api import settings
 from fastapi import HTTPException
 
+from config.api import settings
 from src.worker.domain.entities.worker import DeployParams, DownloadGitRepoParams
 from src.worker.tasks.terraform_worker import (
     pipeline_deploy,

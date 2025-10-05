@@ -1,5 +1,3 @@
-from typing import List, Optional
-
 from pydantic import BaseModel, EmailStr, constr
 
 
@@ -12,8 +10,8 @@ class UserCreate(UserBase):
     password: str
     email: EmailStr = None
     is_active: bool = True
-    squad: List[str] = []
-    role: List[str] = []
+    squad: list[str] = []
+    role: list[str] = []
 
 
 class UserCreateMaster(UserCreate):
@@ -52,7 +50,7 @@ class Token(BaseModel):
 
 
 class TokenPayload(BaseModel):
-    sub: Optional[int] = None
+    sub: int | None = None
 
 
 class TokenData(BaseModel):

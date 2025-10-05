@@ -33,7 +33,7 @@ def request_url(
 
 def check_unauthorized_token(token):
     response = request_url(
-        verb="GET", uri=f"deploy?limit=1", headers={"Authorization": f"Bearer {token}"}
+        verb="GET", uri="deploy?limit=1", headers={"Authorization": f"Bearer {token}"}
     )
     if response["status_code"] == 401:
         raise ValueError(response["json"]["detail"])

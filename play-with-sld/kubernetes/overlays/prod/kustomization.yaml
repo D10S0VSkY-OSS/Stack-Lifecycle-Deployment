@@ -3,11 +3,11 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namespace: sld-prod
+namespace: default
 
 commonLabels:
   environment: prod
-  version: "3.6.2"
+  version: "3.6.3"
 
 bases:
   - ../../base
@@ -16,13 +16,13 @@ bases:
 # These tags are automatically updated by the release workflow
 images:
   - name: d10s0vsky/sld-api
-    newTag: v3.6.2
+    newTag: v3.6.3
   - name: d10s0vsky/sld-dashboard
-    newTag: v3.6.2
+    newTag: v3.6.3
   - name: d10s0vsky/sld-remote-state
-    newTag: v3.6.2
+    newTag: v3.6.3
   - name: d10s0vsky/sld-schedule
-    newTag: v3.6.2
+    newTag: v3.6.3
 
 # Production-specific patches
 patches:

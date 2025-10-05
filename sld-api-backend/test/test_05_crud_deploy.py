@@ -1,8 +1,9 @@
 import time
 
-from config.api import settings
 from helpers.api_request import request_url
 from helpers.api_token import get_token
+
+from config.api import settings
 
 token = get_token(settings.CREDENTIALS_ADM)
 token_user_squad = get_token(settings.CREDENTIALS_ADM_SQUAD)

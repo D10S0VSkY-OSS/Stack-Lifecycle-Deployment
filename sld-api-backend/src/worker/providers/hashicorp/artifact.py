@@ -43,7 +43,7 @@ class Artifact(StructBase):
                 encoding="utf8",
             )
 
-            logging.info(f"Check if variable.tf file exist")
+            logging.info("Check if variable.tf file exist")
 
             tfvars_files = [
                 f

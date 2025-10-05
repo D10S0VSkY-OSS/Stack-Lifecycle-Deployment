@@ -1,7 +1,8 @@
 import datetime
 
-from config.database import Base
 from sqlalchemy import JSON, Column, DateTime, Integer, String
+
+from config.database import Base
 
 
 class ActivityLogs(Base):

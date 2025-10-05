@@ -4,8 +4,9 @@ import json
 import logging
 from datetime import datetime
 
-from configs.gcp_cloud_storage import settings
 from google.cloud import storage
+
+from configs.gcp_cloud_storage import settings
 
 storage_client = storage.Client()
 bucket_name = settings.BUCKET
@@ -22,7 +23,7 @@ def check_bucket(bucket_name=settings.BUCKET):
 check_bucket()
 
 
-class Storage(object):
+class Storage:
     def __init__(self, path):
         self.path = path
 

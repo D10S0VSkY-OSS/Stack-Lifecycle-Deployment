@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends
-from typing import List
 
 from src.deploy.api.container.deploy import create, delete, destroy, get, update
 from src.deploy.domain.entities import deploy as schemas_deploy
-from src.deploy.domain.entities.repository import DeployFilterResponse, DeployFilter
+from src.deploy.domain.entities.repository import DeployFilterResponse
 
 router = APIRouter()
 
@@ -36,7 +35,7 @@ async def delete_infra_by_id(
     return delete_deploy
 
 
-@router.get("/", status_code=200, response_model=List[DeployFilterResponse])
+@router.get("/", status_code=200, response_model=list[DeployFilterResponse])
 async def get_all_deploys(
     get_all_deploys: DeployFilterResponse = Depends(get.get_all_deploys),
 ):

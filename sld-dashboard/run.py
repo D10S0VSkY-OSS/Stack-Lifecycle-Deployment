@@ -1,10 +1,10 @@
-# -*- encoding: utf-8 -*-
 from sys import exit
+
+from decouple import config
+from flask_migrate import Migrate
 
 from app import create_app, db
 from config import config_dict
-from decouple import config
-from flask_migrate import Migrate
 
 # WARNING: Don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=True)
