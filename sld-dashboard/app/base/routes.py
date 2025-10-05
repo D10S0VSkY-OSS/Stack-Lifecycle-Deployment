@@ -19,7 +19,7 @@ def encrypt(secreto):
 
 
 # Move to config
-r = redis.Redis(host="redis", port=6379, db=1, charset="utf-8", decode_responses=True)
+r = redis.Redis(host="redis", port=6379, db=1, decode_responses=True)
 
 
 @blueprint.route("/")
@@ -34,7 +34,6 @@ def route_default():
 def login():
     login_form = LoginForm(request.form)
     if "login" in request.form:
-
         # read form data
         username = request.form["username"]
         password = request.form["password"]
@@ -51,7 +50,7 @@ def login():
             if not current_user.is_active:
                 return render_template(
                     "accounts/login.html",
-                    msg="Inactive user ¯\_(ツ)_/¯",
+                    msg=r"Inactive user ¯\_(ツ)_/¯",
                     form=login_form,
                 )
             # Get token user
@@ -63,9 +62,7 @@ def login():
             return redirect(url_for("base_blueprint.route_default"))
 
         # Something (user or pass) is not ok
-        return render_template(
-            "accounts/login.html", msg="Wrong user or password", form=login_form
-        )
+        return render_template("accounts/login.html", msg="Wrong user or password", form=login_form)
     if not current_user.is_authenticated:
         return render_template("accounts/login.html", form=login_form)
     return redirect(url_for("home_blueprint.index"))

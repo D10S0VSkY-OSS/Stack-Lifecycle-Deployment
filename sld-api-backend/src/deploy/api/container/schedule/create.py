@@ -19,9 +19,7 @@ async def add_schedule(
     deploy_name = deploy_data.id
     if not crud_users.is_master(db, current_user):
         if not check_squad_user(current_user.squad, [squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     try:
         return {"task_id": async_schedule_add(deploy_name=deploy_name, squad=squad)}
     except Exception as err:

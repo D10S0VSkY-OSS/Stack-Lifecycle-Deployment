@@ -15,7 +15,6 @@ async def gcp_account_by_id(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ) -> schemas_gcp.GcloudResponse:
-
     if not crud_users.is_master(db, current_user):
         raise HTTPException(status_code=403, detail="Not enough permissions")
     filters = schemas_gcp.GcloudAccountFilter()

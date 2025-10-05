@@ -19,7 +19,6 @@ async def update_schedule(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     response.status_code = status.HTTP_202_ACCEPTED
 
     # Get info from deploy data
@@ -30,9 +29,7 @@ async def update_schedule(
     name = deploy_data.name
     if not crud_users.is_master(db, current_user):
         if not check_squad_user(current_user.squad, [squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     try:
         # check crontime
         check_cron_schedule(deploy_update.start_time)

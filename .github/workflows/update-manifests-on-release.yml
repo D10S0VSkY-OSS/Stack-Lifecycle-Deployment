@@ -1,0 +1,138 @@
+name: Update K8s Manifests on Release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  update-manifests:
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          # Install yq for YAML manipulation
+          sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64
+          sudo chmod +x /usr/local/bin/yq
+          
+          # Install toml parser
+          pip install toml
+
+      - name: Extract version from release tag
+        id: version
+        run: |
+          # Remove 'v' prefix if exists: v2.7.0 -> 2.7.0
+          VERSION=$(echo ${{ github.event.release.tag_name }} | sed 's/^v//')
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 Release version: ${VERSION}"
+
+      - name: Update all pyproject.toml files
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          
+          echo "🔄 Updating pyproject.toml files to version ${VERSION}"
+          
+          # Update each service
+          for service in sld-api-backend sld-dashboard sld-remote-state sld-schedule; do
+            if [ -f "${service}/pyproject.toml" ]; then
+              sed -i "s/^version = .*/version = \"${VERSION}\"/" "${service}/pyproject.toml"
+              echo "  ✅ Updated ${service}/pyproject.toml"
+            fi
+          done
+
+      - name: Update production Kustomize overlay
+        run: |
+          VERSION=${{ steps.version.outputs.VERSION }}
+          TAG_VERSION="${{ github.event.release.tag_name }}"
+          
+          echo "🔄 Updating production overlay to ${TAG_VERSION}"
+          
+          KUSTOMIZE_FILE="play-with-sld/kubernetes/overlays/prod/kustomization.yaml"
+          
+          # Update version label
+          yq eval -i ".commonLabels.version = \"${VERSION}\"" "$KUSTOMIZE_FILE"
+          
+          # Update all image tags
+          yq eval -i "(.images[] | select(.name == \"d10s0vsky/sld-api\")).newTag = \"${TAG_VERSION}\"" "$KUSTOMIZE_FILE"
+          yq eval -i "(.images[] | select(.name == \"d10s0vsky/sld-dashboard\")).newTag = \"${TAG_VERSION}\"" "$KUSTOMIZE_FILE"
+          yq eval -i "(.images[] | select(.name == \"d10s0vsky/sld-remote-state\")).newTag = \"${TAG_VERSION}\"" "$KUSTOMIZE_FILE"
+          yq eval -i "(.images[] | select(.name == \"d10s0vsky/sld-schedule\")).newTag = \"${TAG_VERSION}\"" "$KUSTOMIZE_FILE"
+          
+          echo "✅ Production overlay updated"
+
+      - name: Verify changes
+        run: |
+          echo "📋 Changed files:"
+          git diff --name-only
+          echo ""
+          echo "📄 Diff summary:"
+          git diff --stat
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: bump version to ${{ github.event.release.tag_name }}"
+          title: "🚀 Release ${{ github.event.release.tag_name }} - Update manifests"
+          body: |
+            ## 🎯 Automatic Version Update
+            
+            This PR automatically updates all configuration files to version **${{ github.event.release.tag_name }}**.
+            
+            ### 📦 Changes:
+            
+            #### Updated Files:
+            - ✅ `sld-api-backend/pyproject.toml` → ${{ steps.version.outputs.VERSION }}
+            - ✅ `sld-dashboard/pyproject.toml` → ${{ steps.version.outputs.VERSION }}
+            - ✅ `sld-remote-state/pyproject.toml` → ${{ steps.version.outputs.VERSION }}
+            - ✅ `sld-schedule/pyproject.toml` → ${{ steps.version.outputs.VERSION }}
+            
+            #### Kubernetes Manifests:
+            - ✅ Production overlay updated with image tags: ${{ github.event.release.tag_name }}
+            - 📦 `d10s0vsky/sld-api:${{ github.event.release.tag_name }}`
+            - 📦 `d10s0vsky/sld-dashboard:${{ github.event.release.tag_name }}`
+            - 📦 `d10s0vsky/sld-remote-state:${{ github.event.release.tag_name }}`
+            - 📦 `d10s0vsky/sld-schedule:${{ github.event.release.tag_name }}`
+            
+            ### 🔗 Related:
+            - Release: ${{ github.event.release.html_url }}
+            - Docker images: Available on Docker Hub with tag `${{ github.event.release.tag_name }}`
+            
+            ### ✅ Ready to Deploy:
+            After merging this PR, you can deploy to production using:
+            ```bash
+            kubectl apply -k play-with-sld/kubernetes/overlays/prod
+            ```
+            
+            ### 🤖 Automated by:
+            GitHub Actions workflow triggered by release ${{ github.event.release.tag_name }}
+          branch: release/${{ github.event.release.tag_name }}-manifests
+          delete-branch: true
+          labels: |
+            release
+            automated
+            version-bump
+          assignees: ${{ github.event.release.author.login }}
+          draft: false
+
+      - name: PR Summary
+        run: |
+          echo "✅ Pull Request created successfully!"
+          echo "📦 Version: ${{ steps.version.outputs.VERSION }}"
+          echo "🏷️  Tag: ${{ github.event.release.tag_name }}"
+          echo ""
+          echo "Next steps:"
+          echo "1. Review the PR"
+          echo "2. Merge to apply changes"
+          echo "3. Deploy with: kubectl apply -k play-with-sld/kubernetes/overlays/prod"

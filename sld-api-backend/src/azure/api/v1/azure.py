@@ -17,9 +17,7 @@ async def create_new_azure_subscription(
 
 @router.patch("/{azure_account_id}", status_code=200)
 async def update_azure_subscription(
-        update_account: schemas_azure.AzureAccountResponse = Depends(
-            update.update_azure_account
-        ),
+    update_account: schemas_azure.AzureAccountResponse = Depends(update.update_azure_account),
 ):
     return update_account
 

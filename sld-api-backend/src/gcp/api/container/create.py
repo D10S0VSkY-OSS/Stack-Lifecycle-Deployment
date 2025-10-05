@@ -24,9 +24,7 @@ async def new_gcp_account(
     filters = schemas_gcp.GcloudAccountFilter()
     filters.squad = gcp.squad
     filters.environment = gcp.environment
-    db_aws_account = await crud_gcp.get_all_gcloud_profile(
-        db=db, filters=filters
-    )
+    db_aws_account = await crud_gcp.get_all_gcloud_profile(db=db, filters=filters)
     if db_aws_account:
         raise HTTPException(status_code=409, detail="Account already exists")
     try:

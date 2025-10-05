@@ -29,13 +29,9 @@ class TokenCreate:
         if self.expires_delta:
             expire = datetime.utcnow() + self.expires_delta
         else:
-            expire = datetime.utcnow() + timedelta(
-                minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-            )
+            expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
         to_encode = {"exp": expire, "sub": str(self.subject)}
-        encoded_jwt = jwt.encode(
-            to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM
-        )
+        encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
         return encoded_jwt
 
 
@@ -46,7 +42,10 @@ class CheckPasswd:
 
     def verify_password(self) -> bool:
         pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-        return pwd_context.verify(self.plain_passwd, self.hashed_password)
+        # Truncate password to 72 bytes to avoid bcrypt ValueError
+        # bcrypt has a maximum password length of 72 bytes
+        truncated_passwd = self.plain_passwd.encode("utf-8")[:72].decode("utf-8", errors="ignore")
+        return pwd_context.verify(truncated_passwd, self.hashed_password)
 
 
 class UserExist:
@@ -74,21 +73,15 @@ class UserExist:
             config_check_password = self.check_password(self.plain_passwd, hash_passwd)
 
             # Set token time expire form global config
-            access_token_expires = timedelta(
-                minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-            )
+            access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
             config_token = self.token(user.id, expires_delta=access_token_expires)
 
         except Exception:
             pass
         if not user:
-            raise HTTPException(
-                status_code=404, detail="Incorrect username or password"
-            )
+            raise HTTPException(status_code=404, detail="Incorrect username or password")
         elif not config_check_password.verify_password():
-            raise HTTPException(
-                status_code=403, detail="Incorrect username or password"
-            )
+            raise HTTPException(status_code=403, detail="Incorrect username or password")
         elif not user.is_active:
             raise HTTPException(status_code=403, detail="Inactive user")
         return {

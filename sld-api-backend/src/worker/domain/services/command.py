@@ -32,7 +32,7 @@ def command(command: str, channel: str):
                 output_lines.append(cleaned_line)
                 logging.info(cleaned_line)
                 try:
-                    redis_client.publish(f'{channel}', cleaned_line)
+                    redis_client.publish(f"{channel}", cleaned_line)
                 except Exception as err:
                     logging.error(f"Error publish redis: {err}")
 
@@ -43,12 +43,8 @@ def command(command: str, channel: str):
         if process.returncode == 0:
             logging.info(f"Command {command} executed successfully.")
         else:
-            logging.error(
-                f"Error executing the command {command}. Exit code: {process.returncode}"
-            )
+            logging.error(f"Error executing the command {command}. Exit code: {process.returncode}")
         return process.returncode, output_lines
     except subprocess.CalledProcessError as err:
-        logging.error(
-            f"Error execute command code: {err.returncode}. Error:\n{err.stderr}"
-        )
+        logging.error(f"Error execute command code: {err.returncode}. Error:\n{err.stderr}")
         return err.returncode, err.stderr

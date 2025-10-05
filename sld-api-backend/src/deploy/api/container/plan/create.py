@@ -1,4 +1,4 @@
-from fastapi import  Depends, HTTPException, Response, status
+from fastapi import Depends, HTTPException, Response, status
 from sqlalchemy.orm import Session
 
 from src.deploy.domain.entities import plan as schemas_plan
@@ -30,9 +30,7 @@ async def plan_infra_by_stack_name(
     if not crud_users.is_master(db, current_user):
         current_squad = current_user.squad
         if not check_squad_user(current_squad, [deploy.squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     # Get  credentials by providers supported
     secreto = await check_prefix(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad
@@ -45,21 +43,23 @@ async def plan_infra_by_stack_name(
     check_deploy_exist(db, deploy.name, squad, deploy.environment, deploy.stack_name)
     try:
         # push task Deploy to queue and return task_id
-        pipeline_plan = async_plan(DeployParams(
-            git_repo=git_repo,
-            name=deploy.name,
-            stack_name=deploy.stack_name,
-            environment=deploy.environment,
-            squad=squad,
-            branch=branch,
-            iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
-            version=tf_ver,
-            variables=deploy.variables,
-            secreto=secreto,
-            variables_file=deploy.tfvar_file,
-            project_path=deploy.project_path,
-            user=current_user.username,
-        ))
+        pipeline_plan = async_plan(
+            DeployParams(
+                git_repo=git_repo,
+                name=deploy.name,
+                stack_name=deploy.stack_name,
+                environment=deploy.environment,
+                squad=squad,
+                branch=branch,
+                iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
+                version=tf_ver,
+                variables=deploy.variables,
+                secreto=secreto,
+                variables_file=deploy.tfvar_file,
+                project_path=deploy.project_path,
+                user=current_user.username,
+            )
+        )
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
             db=db,

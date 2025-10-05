@@ -20,7 +20,6 @@ async def get_plan_by_id_deploy(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     response.status_code = status.HTTP_202_ACCEPTED
     deploy_data = deploy(db, deploy_id=deploy_id)
     if not crud_users.is_master(db, current_user):
@@ -43,7 +42,9 @@ async def get_plan_by_id_deploy(
     try:
         # Check deploy state
         if not check_deploy_state(deploy_data.task_id):
-            raise ValueError("The deployment task is locked and cannot be upgraded. If you wish to proceed with the change, you can force the deletion of the task.")
+            raise ValueError(
+                "The deployment task is locked and cannot be upgraded. If you wish to proceed with the change, you can force the deletion of the task."
+            )
         # push task Deploy to queue and return task_id
         pipeline_plan = async_plan(
             git_repo,

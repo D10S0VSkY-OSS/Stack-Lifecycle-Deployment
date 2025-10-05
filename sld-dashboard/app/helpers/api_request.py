@@ -15,9 +15,7 @@ def request_url(
     server: str = f"{server}:{port}{api}",
 ):
     try:
-        response = requests.request(
-            verb, headers=headers, url=f"{server}/{uri}", json=json
-        )
+        response = requests.request(verb, headers=headers, url=f"{server}/{uri}", json=json)
         result = {
             "status_code": response.status_code,
             "content": response.content.decode("utf-8"),

@@ -10,9 +10,7 @@ router = APIRouter()
 
 @router.post("/", status_code=202)
 async def deploy_infra_by_stack_name(
-    create_deploy: schemas_deploy.DeployCreate = Depends(
-        create.deploy_infra_by_stack_name
-    ),
+    create_deploy: schemas_deploy.DeployCreate = Depends(create.deploy_infra_by_stack_name),
 ):
     return create_deploy
 
@@ -64,6 +62,7 @@ async def unlock_deploy(
     unlock_deploy: schemas_deploy.DeployBase = Depends(get.unlock_deploy),
 ):
     return unlock_deploy
+
 
 @router.put("/lock/{deploy_id}", status_code=200)
 async def unlock_deploy(

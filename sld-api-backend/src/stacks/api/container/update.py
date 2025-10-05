@@ -32,9 +32,7 @@ def update_stack(
     if db_stack.stack_name != stack.stack_name:
         deploy = crud_deploy.get_deploy_by_stack(db=db, stack_name=db_stack.stack_name)
         if deploy is not None:
-            raise HTTPException(
-                status_code=409, detail=f"The stack is being used by {deploy.name}"
-            )
+            raise HTTPException(status_code=409, detail=f"The stack is being used by {deploy.name}")
     # Push git task to queue squad, all workers are subscribed to this queue
     task = sync_git(
         stack_name=stack.stack_name,

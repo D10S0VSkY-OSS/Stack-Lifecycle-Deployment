@@ -17,7 +17,6 @@ r = redis.Redis(
     host=settings.CACHE_SERVER,
     port=6379,
     db=2,
-    charset="utf-8",
     decode_responses=True,
 )
 
@@ -31,7 +30,6 @@ logger = get_task_logger(__name__)
 def pipeline_deploy(
     self,
     params: DeployParams,
-
 ):
     try:
         params["task_id"] = self.request.id
@@ -95,7 +93,7 @@ def pipeline_destroy(
         self.update_state(state=states.FAILURE, meta={"exc": destroy_result})
         raise Ignore()
     finally:
-        dir_path = f"/tmp/{ params.stack_name }/{ params.environment}/{ params.squad}/{ params.name}"
+        dir_path = f"/tmp/{params.stack_name}/{params.environment}/{params.squad}/{params.name}"
         Utils.delete_local_folder(dir_path)
         pipeline.unlock_task()
 
@@ -137,9 +135,7 @@ def pipeline_plan(
             Utils.delete_local_folder(dir_path)
 
 
-@celery_app.task(
-    bind=True, acks_late=True, time_limit=settings.GIT_TMOUT, name="pipeline git pull"
-)
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.GIT_TMOUT, name="pipeline git pull")
 def pipeline_git_pull(
     self,
     params: DownloadGitRepoParams,
@@ -163,13 +159,11 @@ def pipeline_git_pull(
         self.update_state(state=states.FAILURE, meta={"exc": get_vars_result})
         raise Ignore()
     finally:
-        dir_path = f"/tmp/{ params.stack_name }/{params.environment}/{params.squad}/{params.name}"
+        dir_path = f"/tmp/{params.stack_name}/{params.environment}/{params.squad}/{params.name}"
         Utils.delete_local_folder(dir_path)
 
 
-@celery_app.task(
-    bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="schedules list"
-)
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="schedules list")
 def schedules_list(self):
     try:
         return request_url(verb="GET", uri=f"schedules/").get("json")
@@ -177,9 +171,7 @@ def schedules_list(self):
         pass
 
 
-@celery_app.task(
-    bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="schedule get"
-)
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="schedule get")
 def schedule_get(self, deploy_name: str):
     try:
         return request_url(verb="GET", uri=f"schedule/{deploy_name}").get("json")
@@ -197,9 +189,7 @@ def schedule_delete(self, deploy_name: str):
         pass
 
 
-@celery_app.task(
-    bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="schedule add"
-)
+@celery_app.task(bind=True, acks_late=True, time_limit=settings.WORKER_TMOUT, name="schedule add")
 def schedule_add(self, deploy_name: str):
     try:
         return request_url(verb="POST", uri=f"schedule/{deploy_name}").get("json")

@@ -3,6 +3,7 @@ from typing import List
 
 from pydantic_settings import BaseSettings
 
+
 class Settings(BaseSettings):
     # Schedle config
     SCHEDULE_SERVER: str = os.getenv("SLD_SCHEDULE_SERVER", "http://schedule:10000")

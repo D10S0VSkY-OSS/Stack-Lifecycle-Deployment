@@ -24,7 +24,9 @@ async def update_azure_account(
         db_azure_account = await crud_azure.get_all_azure_profile(db=db, filters=filters)
         if not db_azure_account:
             raise HTTPException(status_code=404, detail="Account not found")
-        result = await crud_azure.update_azure_profile(db=db, azure_account_id=azure_account_id, updated_azure=azure)
+        result = await crud_azure.update_azure_profile(
+            db=db, azure_account_id=azure_account_id, updated_azure=azure
+        )
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,

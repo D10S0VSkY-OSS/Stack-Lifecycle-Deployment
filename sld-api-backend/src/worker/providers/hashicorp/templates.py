@@ -76,7 +76,9 @@ class GetVars(StructProject):
 
     def __set_path(self):
         if not self.project_path:
-            return f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/variables.tf"
+            return (
+                f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/variables.tf"
+            )
         return f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/{self.name}/{self.project_path}/variables.tf"
 
     def process_dict(self, d):

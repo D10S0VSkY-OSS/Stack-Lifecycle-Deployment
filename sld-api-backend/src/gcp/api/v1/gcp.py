@@ -15,12 +15,9 @@ async def create_new_gcp_project(
 
 @router.patch("/{gcp_account_id}", status_code=200)
 async def update_gcp_project(
-        update_account: schemas_gcp.GcloudResponse = Depends(
-            update.update_gcp_account
-        ),
+    update_account: schemas_gcp.GcloudResponse = Depends(update.update_gcp_account),
 ):
     return update_account
-
 
 
 @router.get("/", status_code=200, response_model=list[schemas_gcp.GcloudResponse])

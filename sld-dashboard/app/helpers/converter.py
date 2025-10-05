@@ -19,6 +19,7 @@ def convert_to_dict(data):
         return data
     return result[0]
 
+
 def trim_dict(valor):
     try:
         obj = json.loads(valor)

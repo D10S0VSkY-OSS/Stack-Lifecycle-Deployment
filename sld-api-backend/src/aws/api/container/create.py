@@ -24,9 +24,7 @@ async def create_new_aws_profile(
     filters = schemas_aws.AwsAccountFilter()
     filters.squad = aws.squad
     filters.environment = aws.environment
-    db_aws_account = await crud_aws.get_all_aws_profile(
-        db=db, filters=filters
-    )
+    db_aws_account = await crud_aws.get_all_aws_profile(db=db, filters=filters)
     if db_aws_account:
         raise HTTPException(status_code=409, detail="Account already exists")
     try:

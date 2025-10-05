@@ -1,0 +1,103 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [ master ]
+  release:
+    types: [published]
+  workflow_dispatch:
+
+env:
+  DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        service:
+          - name: api
+            context: ./sld-api-backend
+            image: sld-api
+          - name: dashboard
+            context: ./sld-dashboard
+            image: sld-dashboard
+          - name: remote-state
+            context: ./sld-remote-state
+            image: sld-remote-state
+          - name: schedule
+            context: ./sld-schedule
+            image: sld-schedule
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Extract version from pyproject.toml
+        id: version
+        working-directory: ${{ matrix.service.context }}
+        run: |
+          # Extract version from pyproject.toml
+          VERSION=$(grep -E '^version = ' pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+          echo "VERSION=${VERSION}" >> $GITHUB_OUTPUT
+          echo "📦 Building version: ${VERSION}"
+
+      - name: Extract release tag (if release event)
+        id: release_tag
+        if: github.event_name == 'release'
+        run: |
+          TAG=$(echo $GITHUB_REF | sed 's/refs\/tags\///')
+          echo "RELEASE_TAG=${TAG}" >> $GITHUB_OUTPUT
+          echo "🏷️  Release tag: ${TAG}"
+
+      - name: Docker login
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build and push (Release)
+        if: github.event_name == 'release'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/${{ matrix.service.image }}:${{ steps.release_tag.outputs.RELEASE_TAG }}
+            ${{ env.DOCKER_USERNAME }}/${{ matrix.service.image }}:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build and push (Master branch)
+        if: github.ref == 'refs/heads/master' && github.event_name != 'release'
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ matrix.service.context }}
+          push: true
+          tags: |
+            ${{ env.DOCKER_USERNAME }}/${{ matrix.service.image }}:latest
+            ${{ env.DOCKER_USERNAME }}/${{ matrix.service.image }}:v${{ steps.version.outputs.VERSION }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  summary:
+    needs: build-and-push
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Build summary
+        run: |
+          echo "✅ All Docker images built and pushed successfully!"
+          echo "📦 Services: api, dashboard, remote-state, schedule"
+          if [ "${{ github.event_name }}" == "release" ]; then
+            echo "🏷️  Release: ${{ github.ref_name }}"
+          else
+            echo "🌿 Branch: ${{ github.ref_name }}"
+          fi

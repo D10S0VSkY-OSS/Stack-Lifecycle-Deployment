@@ -24,16 +24,13 @@ async def destroy_infra(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     response.status_code = status.HTTP_202_ACCEPTED
     # Get info from deploy data
     deploy_data = deploy(db, deploy_id=deploy_id)
     squad = deploy_data.squad
     if not crud_users.is_master(db, current_user):
         if not check_squad_user(current_user.squad, [deploy_data.squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     stack_name = deploy_data.stack_name
     environment = deploy_data.environment
     start_time = deploy_data.start_time
@@ -43,9 +40,7 @@ async def destroy_infra(
     project_path = deploy_data.project_path
     name = deploy_data.name
     # Get  credentials by providers supported
-    secreto = await check_prefix(
-        db, stack_name=stack_name, environment=environment, squad=squad
-    )
+    secreto = await check_prefix(db, stack_name=stack_name, environment=environment, squad=squad)
     # Get info from stack data
     stack_data = stack(db, stack_name=stack_name)
     branch = (
@@ -60,23 +55,27 @@ async def destroy_infra(
     try:
         # Check deploy state
         if not check_deploy_state(deploy_data.task_id):
-            raise ValueError("The deployment task is locked and cannot be upgraded. If you wish to proceed with the change, you can force the deletion of the task.")
+            raise ValueError(
+                "The deployment task is locked and cannot be upgraded. If you wish to proceed with the change, you can force the deletion of the task."
+            )
         # push task destroy to queue and return task_id
-        pipeline_destroy = async_destroy(DeployParams(
-            git_repo=git_repo,
-            name=name,
-            stack_name=stack_name,
-            environment=environment,
-            squad=squad,
-            branch=branch,
-            version=tf_ver,
-            iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
-            variables=variables,
-            secreto=secreto,
-            tfvar_file=tfvar_file,
-            project_path=project_path,
-            user=current_user.username,
-        ))
+        pipeline_destroy = async_destroy(
+            DeployParams(
+                git_repo=git_repo,
+                name=name,
+                stack_name=stack_name,
+                environment=environment,
+                squad=squad,
+                branch=branch,
+                version=tf_ver,
+                iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
+                variables=variables,
+                secreto=secreto,
+                tfvar_file=tfvar_file,
+                project_path=project_path,
+                user=current_user.username,
+            )
+        )
         # Push deploy task data
         crud_deploys.update_deploy(
             db=db,

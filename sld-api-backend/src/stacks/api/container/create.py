@@ -17,7 +17,6 @@ def create_new_stack(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     name = "default"
     environment = "default"
     squad = "squad"

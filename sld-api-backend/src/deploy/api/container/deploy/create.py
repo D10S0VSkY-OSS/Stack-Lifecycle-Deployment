@@ -29,7 +29,6 @@ async def deploy_infra_by_stack_name(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     response.status_code = status.HTTP_202_ACCEPTED
     # Get squad from current user
     squad = deploy.squad
@@ -37,9 +36,7 @@ async def deploy_infra_by_stack_name(
     if not crud_users.is_master(db, current_user):
         current_squad = current_user.squad
         if not check_squad_user(current_squad, [deploy.squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     # Get  credentials by providers supported
     secreto = await check_prefix(
         db, stack_name=deploy.stack_name, environment=deploy.environment, squad=squad
@@ -60,21 +57,23 @@ async def deploy_infra_by_stack_name(
         check_cron_schedule(deploy.start_time)
         check_cron_schedule(deploy.destroy_time)
         # push task Deploy to queue and return task_id
-        pipeline_deploy = async_deploy(DeployParams(
-            git_repo=git_repo,
-            name=deploy.name,
-            stack_name=deploy.stack_name,
-            environment=deploy.environment,
-            squad=squad,
-            branch=branch,
-            version=tf_ver,
-            iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
-            variables=deploy.variables,
-            secreto=secreto,
-            variables_file=deploy.tfvar_file,
-            project_path=deploy.project_path,
-            user=current_user.username,
-        ))
+        pipeline_deploy = async_deploy(
+            DeployParams(
+                git_repo=git_repo,
+                name=deploy.name,
+                stack_name=deploy.stack_name,
+                environment=deploy.environment,
+                squad=squad,
+                branch=branch,
+                version=tf_ver,
+                iac_type=stack_data.iac_type if stack_data.iac_type else "terraform",
+                variables=deploy.variables,
+                secreto=secreto,
+                variables_file=deploy.tfvar_file,
+                project_path=deploy.project_path,
+                user=current_user.username,
+            )
+        )
         # Push deploy task data
         db_deploy = crud_deploys.create_new_deploy(
             db=db,

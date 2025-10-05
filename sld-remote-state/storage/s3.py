@@ -93,9 +93,7 @@ class Storage(object):
             # Delete object if exists
             if bucket.Object(lock_object).get():
                 s3.Object(bucket_name, lock_object).delete()
-                self._activity_log(
-                    id, "unlock", json.dumps(info, indent=4, sort_keys=True)
-                )
+                self._activity_log(id, "unlock", json.dumps(info, indent=4, sort_keys=True))
                 return True
             return False
         except ClientError as err:

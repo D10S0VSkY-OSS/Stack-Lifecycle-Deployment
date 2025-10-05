@@ -93,9 +93,7 @@ def get_users_by_squad(db: Session, squad: str, skip: int = 0, limit: int = 100)
         for i in squad:
             a = f'["{i}"]'
             result.extend(
-                db.query(models.User)
-                .filter(func.json_contains(models.User.squad, a) == 1)
-                .all()
+                db.query(models.User).filter(func.json_contains(models.User.squad, a) == 1).all()
             )
         return set(result)
     except Exception as err:
@@ -221,8 +219,6 @@ def delete_user_by_name(db: Session, username: str):
 def check_username_password(db: Session, user: schemas.UserAuthenticate):
     db_user_info: models.User = get_user_by_username(db, username=user.username)
     try:
-        return bcrypt.checkpw(
-            user.password.encode("utf-8"), db_user_info.password.encode("utf-8")
-        )
+        return bcrypt.checkpw(user.password.encode("utf-8"), db_user_info.password.encode("utf-8"))
     except Exception as err:
         raise err

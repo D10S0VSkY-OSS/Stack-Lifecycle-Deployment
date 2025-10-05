@@ -5,7 +5,9 @@ from configs.mongo_db import settings
 
 logging.basicConfig(format="%(levelname)s:     %(message)s", level=logging.INFO)
 
-connection_url = f"mongodb://{settings.MONGODB_USER}:{settings.MONGODB_PASSWD}@{settings.MONGODB_URL}"
+connection_url = (
+    f"mongodb://{settings.MONGODB_USER}:{settings.MONGODB_PASSWD}@{settings.MONGODB_URL}"
+)
 
 
 class Storage(object):

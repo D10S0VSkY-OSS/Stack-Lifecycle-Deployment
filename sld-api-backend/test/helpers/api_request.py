@@ -7,9 +7,7 @@ api = settings.API
 
 
 def request_url(verb: str, headers: dict = "", uri: str = "", json: dict = ""):
-    response = requests.request(
-        verb, headers=headers, url=f"{server}:{port}{api}/{uri}", json=json
-    )
+    response = requests.request(verb, headers=headers, url=f"{server}:{port}{api}/{uri}", json=json)
     result = {
         "status_code": response.status_code,
         "content": response.content.decode("utf-8"),

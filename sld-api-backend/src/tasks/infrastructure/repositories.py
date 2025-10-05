@@ -38,12 +38,7 @@ def get_all_tasks(db: Session, skip: int = 0, limit: int = 100):
     try:
         db_query = db.query(models.Tasks)
 
-        return (
-            db_query.order_by(models.Tasks.created_at.desc())
-            .offset(skip)
-            .limit(limit)
-            .all()
-        )
+        return db_query.order_by(models.Tasks.created_at.desc()).offset(skip).limit(limit).all()
     except Exception as err:
         raise err
 
@@ -74,7 +69,9 @@ def get_tasks_by_deploy_id(db: Session, deploy_id: int):
 
 def delete_celery_task_meta_by_task_id(db: Session, task_id: str):
     try:
-        db_task_meta = db.query(models.CeleryTaskMeta).filter(models.CeleryTaskMeta.task_id == task_id).first()
+        db_task_meta = (
+            db.query(models.CeleryTaskMeta).filter(models.CeleryTaskMeta.task_id == task_id).first()
+        )
         if db_task_meta is not None:
             db.delete(db_task_meta)
             db.commit()
@@ -83,4 +80,3 @@ def delete_celery_task_meta_by_task_id(db: Session, task_id: str):
             return False
     except Exception as err:
         raise err
-

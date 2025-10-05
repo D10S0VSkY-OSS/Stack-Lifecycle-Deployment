@@ -1,0 +1,120 @@
+# Production Overlay - Uses specific version tags
+# Version is automatically updated by CI/CD pipeline
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sld-prod
+
+commonLabels:
+  environment: prod
+  version: "3.6.2"
+
+bases:
+  - ../../base
+
+# Production images with specific versions
+# These tags are automatically updated by the release workflow
+images:
+  - name: d10s0vsky/sld-api
+    newTag: v3.6.2
+  - name: d10s0vsky/sld-dashboard
+    newTag: v3.6.2
+  - name: d10s0vsky/sld-remote-state
+    newTag: v3.6.2
+  - name: d10s0vsky/sld-schedule
+    newTag: v3.6.2
+
+# Production-specific patches
+patches:
+  # Disable debug mode for dashboard
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: sld-dashboard
+      spec:
+        template:
+          spec:
+            containers:
+              - name: sld-dashboard
+                env:
+                  - name: DEBUG
+                    value: "False"
+    target:
+      kind: Deployment
+      name: sld-dashboard
+  
+  # Add resource limits for production
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: api-backend
+      spec:
+        template:
+          spec:
+            containers:
+              - name: api-backend
+                resources:
+                  requests:
+                    memory: "512Mi"
+                    cpu: "250m"
+                  limits:
+                    memory: "1Gi"
+                    cpu: "500m"
+    target:
+      kind: Deployment
+      name: api-backend
+  
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: sld-dashboard
+      spec:
+        template:
+          spec:
+            containers:
+              - name: sld-dashboard
+                resources:
+                  requests:
+                    memory: "256Mi"
+                    cpu: "100m"
+                  limits:
+                    memory: "512Mi"
+                    cpu: "250m"
+    target:
+      kind: Deployment
+      name: sld-dashboard
+  
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: remote-state
+      spec:
+        template:
+          spec:
+            containers:
+              - name: remote-state
+                resources:
+                  requests:
+                    memory: "256Mi"
+                    cpu: "100m"
+                  limits:
+                    memory: "512Mi"
+                    cpu: "250m"
+    target:
+      kind: Deployment
+      name: remote-state
+
+# Production replicas (can scale horizontally)
+replicas:
+  - name: api-backend
+    count: 2
+  - name: sld-dashboard
+    count: 2
+  - name: remote-state
+    count: 1
+  - name: schedule
+    count: 1

@@ -1,7 +1,15 @@
 # -*- encoding: utf-8 -*-
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, PasswordField, StringField, TextAreaField, SelectField,
-                     FormField, FieldList, validators)
+from wtforms import (
+    BooleanField,
+    PasswordField,
+    StringField,
+    TextAreaField,
+    SelectField,
+    FormField,
+    FieldList,
+    validators,
+)
 from wtforms.fields import EmailField
 from wtforms.validators import DataRequired
 
@@ -19,18 +27,19 @@ class DictField(StringField):
 
 
 class ExtraVariableForm(FlaskForm):
-    key = StringField('Key')
-    value = StringField('Value')
+    key = StringField("Key")
+    value = StringField("Value")
 
 
 class StackForm(FlaskForm):
-
     name = StringField(
         "Name",
         [
             validators.length(min=4, max=30, message="Name out of reange."),
             validators.DataRequired(message="Name requerid."),
-            validators.Regexp('[\r\n\t\f\v  ]', message="Username must contain only letters numbers or underscore"),
+            validators.Regexp(
+                "[\r\n\t\f\v  ]", message="Username must contain only letters numbers or underscore"
+            ),
         ],
     )
     git = StringField(
@@ -54,13 +63,17 @@ class StackForm(FlaskForm):
     )
     iac_type = SelectField(
         "IaC Type",
-        choices=[('', 'Select an IaC Type'), ('terraform', 'Terraform'), ('tofu', 'openTofu'), ('terragrunt', 'TerraGrunt')],
+        choices=[
+            ("", "Select an IaC Type"),
+            ("terraform", "Terraform"),
+            ("tofu", "openTofu"),
+            ("terragrunt", "TerraGrunt"),
+        ],
         validators=[validators.DataRequired()],
-        coerce=lambda x: 'tofu' if x == 'openTofu' else x
+        coerce=lambda x: "tofu" if x == "openTofu" else x,
     )
     tf_version = SelectField(
-        "IaC Version",
-        validators=[validators.DataRequired(message="IaC version required.")]
+        "IaC Version", validators=[validators.DataRequired(message="IaC version required.")]
     )
 
     project_path = StringField(
@@ -80,7 +93,7 @@ class StackForm(FlaskForm):
         render_kw={"rows": 1},
     )
 
-    icon_selector = SelectField('Icon Selector', choices=[], validators=[DataRequired()])
+    icon_selector = SelectField("Icon Selector", choices=[], validators=[DataRequired()])
 
 
 class DeployForm(FlaskForm):
@@ -188,9 +201,7 @@ class UserForm(FlaskForm):
         [
             validators.length(min=8, max=50),
             validators.DataRequired("The password is required."),
-            validators.EqualTo(
-                "confirm_password", message="The password does not match."
-            ),
+            validators.EqualTo("confirm_password", message="The password does not match."),
         ],
     )
     confirm_password = PasswordField("Confirm password")
@@ -224,9 +235,7 @@ class AwsForm(FlaskForm):
     secret_access_key = StringField(
         "Secret_access_key *",
         [
-            validators.length(
-                min=4, max=50, message="Secret Access Key out of reange."
-            ),
+            validators.length(min=4, max=50, message="Secret Access Key out of reange."),
             validators.DataRequired(message="Secret_access_key."),
         ],
     )
@@ -243,7 +252,7 @@ class AwsForm(FlaskForm):
             validators.length(min=4, max=300, message="Role arn out of reange."),
         ],
     )
-    extra_variables = FieldList(FormField(ExtraVariableForm), label='Extra Variables')
+    extra_variables = FieldList(FormField(ExtraVariableForm), label="Extra Variables")
 
 
 class GcpForm(FlaskForm):

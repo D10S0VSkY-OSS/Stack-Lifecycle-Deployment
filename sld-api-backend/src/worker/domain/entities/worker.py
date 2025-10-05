@@ -5,7 +5,7 @@ from typing import Optional, Any, Dict
 class DownloadBinaryParams(BaseModel):
     iac_type: str
     version: str
- 
+
     # url: Optional[str]
     class Config:
         frozenset = True

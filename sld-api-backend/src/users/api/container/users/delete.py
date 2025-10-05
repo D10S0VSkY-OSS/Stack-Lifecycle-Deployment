@@ -13,7 +13,6 @@ async def delete_user_by_id_or_username(
     current_user: User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     if crud_users.is_master(db, current_user):
         if not user.isdigit():
             return crud_users.delete_user_by_name(db=db, username=user)

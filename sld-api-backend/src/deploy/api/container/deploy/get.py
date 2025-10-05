@@ -35,13 +35,10 @@ async def get_deploy_by_id(
     current_user: schemas_users.User = Depends(deps.get_current_active_user),
     db: Session = Depends(deps.get_db),
 ):
-
     result = crud_deploys.get_deploy_by_id(db=db, deploy_id=deploy_id)
     if not crud_users.is_master(db, current_user):
         if not check_squad_user(current_user.squad, [result.squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {result.squad}"
-            )
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {result.squad}")
     try:
         if result is None:
             raise HTTPException(status_code=404, detail="Deploy id Not Found")
@@ -62,15 +59,13 @@ async def get_show(
         # Get squad from current user
         squad = current_user.squad
         deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
-    get_path = f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
-    response = requests.get(
-        f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
+    get_path = (
+        f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
     )
+    response = requests.get(f"{settings.REMOTE_STATE}/terraform_state/{get_path}")
     result = response.json()
     if not result:
-        raise HTTPException(
-            status_code=404, detail=f"Not enough output in {deploy_data.name}"
-        )
+        raise HTTPException(status_code=404, detail=f"Not enough output in {deploy_data.name}")
     return result
 
 
@@ -85,16 +80,14 @@ async def get_output(
         # Get squad from current user
         squad = current_user.squad
         deploy_data = deploy_squad(db, deploy_id=deploy_id, squad=squad)
-    get_path = f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
-    response = requests.get(
-        f"{settings.REMOTE_STATE}/terraform_state/{get_path}"
+    get_path = (
+        f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
     )
+    response = requests.get(f"{settings.REMOTE_STATE}/terraform_state/{get_path}")
     json_data = response.json()
     result = json_data.get("outputs")
     if not result:
-        raise HTTPException(
-            status_code=404, detail=f"Not enough output in {deploy_data.name}"
-        )
+        raise HTTPException(status_code=404, detail=f"Not enough output in {deploy_data.name}")
     return result
 
 
@@ -108,18 +101,14 @@ async def unlock_deploy(
     squad = deploy_data.squad
     if not crud_users.is_master(db, current_user):
         if not check_squad_user(current_user.squad, [squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     try:
         get_path = f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
-        response = requests.delete(
-            f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={}
-        )
+        response = requests.delete(f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={})
         return response.json()
     except Exception as err:
         raise err
-    
+
 
 async def lock_deploy(
     deploy_id: int,
@@ -131,22 +120,18 @@ async def lock_deploy(
     squad = deploy_data.squad
     if not crud_users.is_master(db, current_user):
         if not check_squad_user(current_user.squad, [squad]):
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions in {squad}"
-            )
+            raise HTTPException(status_code=403, detail=f"Not enough permissions in {squad}")
     try:
         get_path = f"{deploy_data.stack_name}-{deploy_data.squad}-{deploy_data.environment}-{deploy_data.name}"
-        response = requests.put(
-            f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={}
-        )
+        response = requests.put(f"{settings.REMOTE_STATE}/terraform_lock/{get_path}", json={})
         return response.json()
     except Exception as err:
         raise err
 
 
 async def get_all_metrics(
-        db: Session = Depends(deps.get_db),
-        _current_user: schemas_users.User = Depends(deps.get_current_active_user),
+    db: Session = Depends(deps.get_db),
+    _current_user: schemas_users.User = Depends(deps.get_current_active_user),
 ) -> AllMetricsResponse:
     metrics_fetcher = MetricsFetcher(db)
     user_activity = metrics_fetcher.get_deploy_count_by_user()

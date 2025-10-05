@@ -22,7 +22,6 @@ class Artifact(StructBase):
     project_path: str
 
     def get(self):
-
         try:
             directory = f"/tmp/{self.stack_name}/{self.environment}/{self.squad}/"
             os.makedirs(directory, exist_ok=True)

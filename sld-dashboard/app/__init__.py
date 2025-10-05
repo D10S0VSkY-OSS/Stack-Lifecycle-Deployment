@@ -24,6 +24,7 @@ def register_blueprints(app):
 
 def configure_database(app):
     with app.app_context():
+
         def initialize_database():
             try:
                 pass

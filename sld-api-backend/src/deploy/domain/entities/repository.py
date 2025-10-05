@@ -37,5 +37,3 @@ class DeployFilterResponse(BaseModel):
     tfvar_file: Optional[str]
     project_path: Optional[str]
     icon_path: Optional[str]
-
-

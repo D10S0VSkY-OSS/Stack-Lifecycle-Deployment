@@ -70,9 +70,7 @@ def get_squad_custom_provider_profile(db: Session, squad: str, environment: str)
         result = []
         for i in squad:
             result.extend(
-                db.query(models.Custom_provider)
-                .filter(models.Custom_provider.squad == i)
-                .all()
+                db.query(models.Custom_provider).filter(models.Custom_provider.squad == i).all()
             )
         return set(result)
     except Exception as err:

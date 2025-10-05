@@ -1,8 +1,45 @@
 from typing import Tuple
+import re
 
 from dependency_injector import containers, providers
 from password_strength import PasswordPolicy
-from python_usernames import is_safe_username
+
+
+def is_safe_username(
+    username: str, whitelist: list = None, blacklist: list = None, max_length: int = 20
+) -> bool:
+    """
+    Validate username safety.
+    Replacement for python_usernames.is_safe_username
+
+    Rules:
+    - Only alphanumeric characters, underscore, and hyphen
+    - Must start with a letter
+    - Length between 3 and max_length
+    - Not in blacklist (unless in whitelist)
+    """
+    if not username:
+        return False
+
+    # Check whitelist first (bypasses all other checks)
+    if whitelist and username.lower() in [w.lower() for w in whitelist]:
+        return True
+
+    # Check blacklist
+    if blacklist and username.lower() in [b.lower() for b in blacklist]:
+        return False
+
+    # Length validation
+    if len(username) < 3 or len(username) > max_length:
+        return False
+
+    # Pattern validation: alphanumeric, underscore, hyphen
+    # Must start with a letter
+    pattern = r"^[a-zA-Z][a-zA-Z0-9_-]*$"
+    if not re.match(pattern, username):
+        return False
+
+    return True
 
 
 class PasswordValidator:
@@ -56,6 +93,4 @@ class Container(containers.DeclarativeContainer):
     username_validator = providers.Singleton(UsernameValidator)
     password_validator = providers.Singleton(PasswordValidator)
 
-    user_service = providers.Singleton(
-        UserService, username_validator, password_validator
-    )
+    user_service = providers.Singleton(UserService, username_validator, password_validator)

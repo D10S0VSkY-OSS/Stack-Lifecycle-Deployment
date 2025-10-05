@@ -24,7 +24,9 @@ async def update_gcp_account(
         db_gcp_account = await crud_gcp.get_all_gcloud_profile(db=db, filters=filters)
         if not db_gcp_account:
             raise HTTPException(status_code=404, detail="Account not found")
-        result = await crud_gcp.update_gcloud_profile(db=db, gcp_account_id=gcp_account_id, updated_gcp=gcp)
+        result = await crud_gcp.update_gcloud_profile(
+            db=db, gcp_account_id=gcp_account_id, updated_gcp=gcp
+        )
         crud_activity.create_activity_log(
             db=db,
             username=current_user.username,
