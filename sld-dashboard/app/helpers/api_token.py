@@ -10,4 +10,6 @@ def get_token(data):
     )
     if response.get("status_code") == 200:
         result = response.get("json")
-        return result.get("access_token")
+        if result:
+            return result.get("access_token")
+    return None

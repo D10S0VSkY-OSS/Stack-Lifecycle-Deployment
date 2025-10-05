@@ -99,79 +99,107 @@ You need docker and docker-compse or kind ( recomended ).
 * [Docker-compose](https://docs.docker.com/compose/install/)
 * [Kind](https://kind.sigs.k8s.io/docs/user/quick-start/#installation)
 * [kubectl](https://kubernetes.io/es/docs/tasks/tools/install-kubectl/)
+* [Python 3.8+](https://www.python.org/downloads/) (for CLI tool)
 
 ### Installation
+
+#### Option 1: Quick Start with SLD CLI (Recommended) 🚀
 
 1. Clone the SLD repo
    ```sh
    git clone https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment.git
+   cd Stack-Lifecycle-Deployment
    ```
-2. Deploy SLD in k8s with kind
+
+2. Install CLI dependencies
    ```sh
-   cd Stack-Lifecycle-Deployment/play-with-sld/kubernetes 
-   sh kplay.sh start
+   pip install -r requirements.txt
    ```
+
+3. Start SLD with a single command
+   ```sh
+   python sld_cli.py start
+   ```
+
+   The CLI will:
+   - ✅ Check all prerequisites
+   - 🏗️ Create a Kind cluster
+   - 🚀 Deploy all SLD services
+   - 👤 Initialize the admin user
+   - 📝 Display access credentials
+
    Result:
    ```sh
-   Starting SLD for play
-   Creating cluster "kind" ...
-   ✓ Ensuring node image (kindest/node:v1.20.2) 🖼
-   ✓ Preparing nodes 📦 📦  
-   ✓ Writing configuration 📜 
-   ✓ Starting control-plane 🕹️ 
-   ✓ Installing CNI 🔌 
-   ✓ Installing StorageClass 💾 
-   ✓ Joining worker nodes 🚜 
-   Set kubectl context to "kind-kind"
-   You can now use your cluster with:
-
-   kubectl cluster-info --context kind-kind
-      ```
-
-3. Create init user
-
-   ```sh
-   sh kplay.sh init
-   ```
-
-   Result:
-
-   ```bash
-   kind ok
-   docker ok
-   kubectl ok
-   jq ok
-   curl ok
-
-   init SLD
+   🚀 Starting SLD deployment...
+   
+   ✓ Checking prerequisites...
+   ✓ Creating Kind cluster...
+   ✓ Deploying SLD services...
+   ✓ Initializing admin user...
+   
    #################################################
    #  Now, you can play with SLD 🕹️                #
    #################################################
-   API: http://localhost:5000/docs
+   API: http://localhost:8000/docs
    DASHBOARD: http://localhost:5000/
    ---------------------------------------------
    username: admin
    password: Password08@
    ---------------------------------------------
-
    ```
 
-   List endopints
-
+   Other CLI commands:
    ```sh
-   sh kplay.sh list
+   python sld_cli.py status    # Check deployment status
+   python sld_cli.py stop      # Stop all services
+   python sld_cli.py restart   # Restart services
+   python sld_cli.py logs      # View logs
+   ```
+
+#### Option 2: Installation with Kubernetes (Kind)
+
+1. Clone the SLD repo
+   ```sh
+   git clone https://github.com/D10S0VSkY-OSS/Stack-Lifecycle-Deployment.git
+   cd Stack-Lifecycle-Deployment
+   ```
+
+2. Install CLI dependencies
+   ```sh
+   pip install -r requirements.txt
+   ```
+
+3. Deploy SLD in k8s with kind
+   ```sh
+   python sld_cli.py start -m k8s
    ```
 
    Result:
-
-   ```bash
-   kind ok
-   docker ok
-   kubectl ok
-
-   List endpoints
+   ```sh
+   🚀 Starting SLD deployment in Kubernetes mode...
+   
+   ✓ Checking prerequisites...
+   ✓ Creating Kind cluster...
+   ✓ Deploying SLD services...
+   ✓ Initializing admin user...
+   
+   #################################################
+   #  Now, you can play with SLD 🕹️                #
+   #################################################
    API: http://localhost:8000/docs
    DASHBOARD: http://localhost:5000/
+   ---------------------------------------------
+   username: admin
+   password: Password08@
+   ---------------------------------------------
+   ```
+
+   Other Kubernetes commands:
+   ```sh
+   python sld_cli.py status -m k8s    # Check deployment status
+   python sld_cli.py stop -m k8s      # Stop all services
+   python sld_cli.py restart -m k8s   # Restart services
+   python sld_cli.py logs -m k8s      # View logs
    ```
 <!-- USAGE EXAMPLES -->
 ## Usage

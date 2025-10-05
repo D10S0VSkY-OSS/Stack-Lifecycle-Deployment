@@ -55,6 +55,15 @@ def login():
                 )
             # Get token user
             token = get_token(data_credentials)
+
+            # Validate token before encrypting
+            if not token:
+                return render_template(
+                    "accounts/login.html",
+                    msg="Error obtaining authentication token",
+                    form=login_form,
+                )
+
             # Store session in redis by user id
             r.set(current_user.id, encrypt(token))
 

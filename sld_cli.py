@@ -5,6 +5,7 @@ SLD CLI - Tool to test Stack Lifecycle Deployment locally with UV
 import sys
 import time
 import subprocess
+import re
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import click
@@ -78,6 +79,26 @@ def get_project_root():
     """Get project root directory"""
     script_dir = Path(__file__).parent.absolute()
     return script_dir
+
+
+def extract_version_from_pyproject(service_path):
+    """Extract version from pyproject.toml file"""
+    pyproject_file = service_path / "pyproject.toml"
+    
+    if not pyproject_file.exists():
+        return None
+    
+    try:
+        with open(pyproject_file, 'r') as f:
+            content = f.read()
+            # Match: version = "X.Y.Z"
+            match = re.search(r'^version\s*=\s*["\']([^"\']+)["\']', content, re.MULTILINE)
+            if match:
+                return match.group(1)
+    except Exception as e:
+        click.echo(f"{Colors.YELLOW}⚠ Warning: Could not read version from {pyproject_file}: {e}{Colors.NC}")
+    
+    return None
 
 
 @click.group()
@@ -179,6 +200,142 @@ def build(service, tag, no_cache, parallel, max_workers):
     # Show created images
     click.echo("Created images:")
     run_command(f"docker images | grep 'd10s0vsky/sld-' | grep '{tag}'", check=False)
+
+
+@cli.command()
+@click.option('--service', '-s', type=click.Choice(['api', 'dashboard', 'remote-state', 'schedule', 'all']),
+              default='all', help='Service to push')
+@click.option('--build-first', '-b', is_flag=True, help='Build images before pushing')
+@click.option('--parallel', '-p', is_flag=True, help='Push images in parallel (faster)')
+@click.option('--max-workers', default=4, help='Maximum parallel pushes (default: 4)')
+def push(service, build_first, parallel, max_workers):
+    """
+    Push Docker images to registry with version tags
+    
+    Mimics GitHub Actions behavior:
+    - Reads version from each service's pyproject.toml
+    - Tags and pushes: latest + v{VERSION}
+    - Uses your current Docker login session
+    
+    Example:
+        ./sld_cli.py push --service all
+        ./sld_cli.py push -s api --build-first
+    """
+    project_root = get_project_root()
+    
+    click.echo(f"{Colors.BOLD}🚀 Pushing Docker images with version tags{Colors.NC}\n")
+    
+    services = {
+        'api': ('sld-api-backend', 'sld-api'),
+        'dashboard': ('sld-dashboard', 'sld-dashboard'),
+        'remote-state': ('sld-remote-state', 'sld-remote-state'),
+        'schedule': ('sld-schedule', 'sld-schedule'),
+    }
+    
+    if service == 'all':
+        to_push = list(services.items())
+    else:
+        to_push = [(service, services[service])]
+    
+    total = len(to_push)
+    
+    # Build first if requested
+    if build_first:
+        click.echo(f"{Colors.YELLOW}📦 Building images first...{Colors.NC}\n")
+        ctx = click.get_current_context()
+        ctx.invoke(build, service=service, tag='latest', no_cache=False, parallel=parallel, max_workers=max_workers)
+        click.echo()
+    
+    failed_services = []
+    
+    # Helper function for pushing a single service
+    def push_service(svc_info):
+        svc, (directory, image_name) = svc_info
+        service_path = project_root / directory
+        
+        # Extract version from pyproject.toml
+        version = extract_version_from_pyproject(service_path)
+        
+        if not version:
+            click.echo(f"{Colors.YELLOW}⚠ Warning: Could not extract version for {svc}, skipping version tag{Colors.NC}")
+            tags = ['latest']
+        else:
+            tags = ['latest', f'v{version}']
+        
+        full_image_name = f"d10s0vsky/{image_name}"
+        
+        # Tag and push each version
+        success = True
+        for tag in tags:
+            # Tag the image
+            tag_cmd = f"docker tag {full_image_name}:latest {full_image_name}:{tag}"
+            if not run_command(tag_cmd, check=False):
+                click.echo(f"{Colors.RED}✗ Failed to tag {svc} as {tag}{Colors.NC}")
+                success = False
+                continue
+            
+            # Push the image
+            push_cmd = f"docker push {full_image_name}:{tag}"
+            click.echo(f"  Pushing {full_image_name}:{tag}...")
+            if not run_command(push_cmd, check=False):
+                click.echo(f"{Colors.RED}✗ Failed to push {svc}:{tag}{Colors.NC}")
+                success = False
+            else:
+                click.echo(f"{Colors.GREEN}✓ Pushed {full_image_name}:{tag}{Colors.NC}")
+        
+        return svc, success, version
+    
+    if parallel and service == 'all':
+        # Push in parallel
+        click.echo(f"{Colors.YELLOW}⚡ Pushing {total} services in parallel (max {max_workers} workers)...{Colors.NC}\n")
+        
+        with ThreadPoolExecutor(max_workers=max_workers) as executor:
+            # Submit all push tasks
+            future_to_service = {
+                executor.submit(push_service, svc_info): svc_info[0]
+                for svc_info in to_push
+            }
+            
+            # Process results as they complete
+            completed = 0
+            for future in as_completed(future_to_service):
+                svc_name = future_to_service[future]
+                completed += 1
+                
+                try:
+                    svc, success, version = future.result()
+                    version_str = f"v{version}" if version else "latest"
+                    if success:
+                        click.echo(f"{Colors.GREEN}✓ [{completed}/{total}]{Colors.NC} {Colors.BOLD}{svc}{Colors.NC} ({version_str}) completed")
+                    else:
+                        click.echo(f"{Colors.RED}✗ [{completed}/{total}]{Colors.NC} {Colors.BOLD}{svc}{Colors.NC} failed")
+                        failed_services.append(svc)
+                except Exception as e:
+                    click.echo(f"{Colors.RED}✗ [{completed}/{total}]{Colors.NC} {Colors.BOLD}{svc_name}{Colors.NC} exception: {str(e)}")
+                    failed_services.append(svc_name)
+    else:
+        # Push sequentially
+        for idx, svc_info in enumerate(to_push, 1):
+            svc, (directory, image_name) = svc_info
+            click.echo(f"{Colors.BLUE}[{idx}/{total}]{Colors.NC} Pushing {Colors.BOLD}{svc}{Colors.NC}...")
+            
+            svc, success, version = push_service(svc_info)
+            
+            version_str = f"v{version}" if version else "latest"
+            if success:
+                click.echo(f"{Colors.GREEN}✓{Colors.NC} {svc} ({version_str}) completed\n")
+            else:
+                click.echo(f"{Colors.RED}✗{Colors.NC} {svc} failed\n")
+                failed_services.append(svc)
+                if service != 'all':
+                    sys.exit(1)
+    
+    if failed_services:
+        click.echo(f"\n{Colors.RED}❌ Push failed for: {', '.join(failed_services)}{Colors.NC}\n")
+        sys.exit(1)
+    
+    click.echo(f"\n{Colors.GREEN}✅ Push completed!{Colors.NC}\n")
+    click.echo("📦 Images pushed to Docker Hub: d10s0vsky/sld-*")
 
 
 @cli.command()
