@@ -1,3 +1,4 @@
+import logging
 import os
 import stat
 import zipfile
@@ -5,8 +6,8 @@ from io import BytesIO
 
 import requests
 from urllib3.exceptions import InsecureRequestWarning
+
 from src.worker.domain.entities.worker import DownloadBinaryParams
-import logging
 
 requests.packages.urllib3.disable_warnings(category=InsecureRequestWarning)
 from config.api import settings

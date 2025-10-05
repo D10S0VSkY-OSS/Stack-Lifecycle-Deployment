@@ -1,7 +1,8 @@
 import json
 
-from configs.storage import settings
 from fastapi import FastAPI, HTTPException
+
+from configs.storage import settings
 
 print(
     f"""

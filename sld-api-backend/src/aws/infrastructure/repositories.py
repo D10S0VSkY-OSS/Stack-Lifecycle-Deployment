@@ -1,14 +1,12 @@
 import datetime
-from typing import List
 
-from sqlalchemy.orm import Session
 from sqlalchemy import desc, or_
-
+from sqlalchemy.orm import Session
 
 import src.aws.infrastructure.models as models
 from src.aws.domain.entities import aws as schemas_aws
 from src.shared.infrastructure.respository import check_deploy_in_use
-from src.shared.security.vault import vault_encrypt, vault_decrypt
+from src.shared.security.vault import vault_decrypt, vault_encrypt
 
 
 @vault_encrypt
@@ -123,7 +121,7 @@ async def get_credentials_aws_profile(
 
 async def get_all_aws_profile(
     db: Session, filters: schemas_aws.AwsAccountFilter, skip: int = 0, limit: int = 100
-) -> List[schemas_aws.AwsAccountResponse]:
+) -> list[schemas_aws.AwsAccountResponse]:
     try:
         query = db.query(models.Aws_provider)
 

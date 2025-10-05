@@ -3,9 +3,11 @@ kind: Service
 metadata:
   name: api
 spec:
+  type: NodePort
   selector:
     name: api-backend
   ports:
     - protocol: TCP
       port: 8000
       targetPort: 8000
+      nodePort: 30003

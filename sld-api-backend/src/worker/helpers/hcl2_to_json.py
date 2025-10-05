@@ -2,7 +2,7 @@ import hcl2
 
 
 def convert_to_json(file_path):
-    with open(file_path, "r") as f:
+    with open(file_path) as f:
         hcl_data = hcl2.load(f)
         clean_data = remove_interpolations(hcl_data)
         json_data = list_to_dict(clean_data["variable"])

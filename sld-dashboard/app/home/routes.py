@@ -1,37 +1,34 @@
-# -*- encoding: utf-8 -*-
-import os
 import ast
 import json
-import time
 import logging
-from flask import jsonify, render_template, request, url_for, redirect, flash, Response
+import os
+import time
 
-import requests
 import mistletoe
-from app.helpers.parsers import fetch_url_readme
-
-
 import redis
+import requests
+from flask import Response, flash, jsonify, redirect, render_template, request, url_for
+from flask_login import current_user, login_required
+from jinja2 import TemplateNotFound
+
 from app import login_manager
 from app.helpers.api_request import check_unauthorized_token, get_task_id, request_url
 from app.helpers.config.api import settings
 from app.helpers.converter import convert_to_dict
+from app.helpers.parsers import fetch_url_readme
 from app.helpers.security import vault_decrypt
 from app.home import blueprint
 from app.home.forms import (
     AwsForm,
     AzureForm,
     AzureFormUpdate,
+    CustomProviderForm,
     DeployForm,
     GcpForm,
     GcpFormUpdate,
     StackForm,
     UserForm,
-    CustomProviderForm,
 )
-from flask import flash, redirect, render_template, request, url_for
-from flask_login import current_user, login_required
-from jinja2 import TemplateNotFound
 
 
 # Icons
@@ -209,7 +206,7 @@ def delete_deploy(deploy_id):
             headers={"Authorization": f"Bearer {token}"},
         )
         if response.get("status_code") == 200:
-            flash(f"Deleting infra")
+            flash("Deleting infra")
         else:
             flash(response.get("json").get("detail"), "error")
         return redirect(url_for("home_blueprint.route_template", template="deploys-list"))
@@ -233,7 +230,7 @@ def destroy_deploy(deploy_id):
             verb="PUT", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
         if response.get("status_code") == 202:
-            flash(f"Destroying infra")
+            flash("Destroying infra")
         else:
             flash(response["json"]["detail"], "error")
         return redirect(url_for("home_blueprint.route_template", template="deploys-list"))
@@ -257,7 +254,7 @@ def destroy_deploy_console(deploy_id):
             verb="PUT", uri=f"{endpoint}", headers={"Authorization": f"Bearer {token}"}
         )
         if response.get("status_code") == 202:
-            flash(f"Destroying infra")
+            flash("Destroying infra")
         else:
             flash(response["json"]["detail"], "error")
         return redirect(
@@ -370,7 +367,7 @@ def relaunch_deploy(deploy_id):
         )
 
         if response.get("status_code") == 202:
-            flash(f"Re-Launch Deploy")
+            flash("Re-Launch Deploy")
         else:
             flash(response["json"]["detail"], "error")
         return redirect(url_for("home_blueprint.route_template", template="deploys-list"))
@@ -463,7 +460,7 @@ def edit_deploy(deploy_id):
             # Add custom variables from form
             key_list = request.values.getlist("sld_key")
             value_list = request.values.getlist("sld_value")
-            data_raw.update(dict(list(zip(key_list, value_list))))
+            data_raw.update(dict(list(zip(key_list, value_list, strict=False))))
             # Set vars to json
             variables = json.dumps(convert_to_dict(data_raw))
             # Data dend to deploy
@@ -665,7 +662,7 @@ def relaunch_console_plan(deploy_id):
         )
 
         if response.get("status_code") == 202:
-            flash(f"planning deploy")
+            flash("planning deploy")
         else:
             flash(response["json"]["detail"], "error")
         return redirect(
@@ -769,7 +766,7 @@ def clone_deploy(deploy_id):
             # Add custom variables from form
             key_list = request.values.getlist("sld_key")
             value_list = request.values.getlist("sld_value")
-            data_raw.update(dict(list(zip(key_list, value_list))))
+            data_raw.update(dict(list(zip(key_list, value_list, strict=False))))
             # Set vars to json
             variables = json.dumps(convert_to_dict(data_raw))
             # Data dend to deploy
@@ -1486,7 +1483,7 @@ def new_aws_account():
                 "secret_access_key": form.secret_access_key.data.replace(" ", ""),
                 "default_region": form.default_region.data.replace(" ", ""),
                 "role_arn": form.role_arn.data.replace(" ", ""),
-                "extra_variables": dict(list(zip(key_list, value_list))),
+                "extra_variables": dict(list(zip(key_list, value_list, strict=False))),
             }
             response = request_url(
                 verb="POST",
@@ -1533,15 +1530,19 @@ def edit_aws_account(account_id):
             aws_account_request: dict = {
                 "squad": form.squad.data.replace(" ", ""),
                 "environment": form.environment.data.replace(" ", ""),
-                "access_key_id": form.access_key_id.data.replace(" ", "")
-                if "*" not in form.access_key_id.data
-                else None,
-                "secret_access_key": form.secret_access_key.data.replace(" ", "")
-                if "*" not in form.secret_access_key.data
-                else None,
+                "access_key_id": (
+                    form.access_key_id.data.replace(" ", "")
+                    if "*" not in form.access_key_id.data
+                    else None
+                ),
+                "secret_access_key": (
+                    form.secret_access_key.data.replace(" ", "")
+                    if "*" not in form.secret_access_key.data
+                    else None
+                ),
                 "default_region": form.default_region.data.replace(" ", ""),
                 "role_arn": form.role_arn.data.replace(" ", ""),
-                "extra_variables": dict(list(zip(key_list, value_list))),
+                "extra_variables": dict(list(zip(key_list, value_list, strict=False))),
             }
             response = request_url(
                 verb="PATCH",
@@ -1633,7 +1634,7 @@ def new_gcp_account():
                 "squad": form.squad.data.replace(" ", ""),
                 "environment": form.environment.data.replace(" ", ""),
                 "gcloud_keyfile_json": ast.literal_eval(form.gcloud_keyfile_json.data),
-                "extra_variables": dict(list(zip(key_list, value_list))),
+                "extra_variables": dict(list(zip(key_list, value_list, strict=False))),
             }
             response = request_url(
                 verb="POST",
@@ -1681,10 +1682,12 @@ def edit_gcp_account(account_id):
             aws_account_request: dict = {
                 "squad": form.squad.data.replace(" ", ""),
                 "environment": form.environment.data.replace(" ", ""),
-                "gcloud_keyfile_json": ast.literal_eval(form.gcloud_keyfile_json.data)
-                if form.gcloud_keyfile_json.data != ""
-                else None,
-                "extra_variables": dict(list(zip(key_list, value_list))),
+                "gcloud_keyfile_json": (
+                    ast.literal_eval(form.gcloud_keyfile_json.data)
+                    if form.gcloud_keyfile_json.data != ""
+                    else None
+                ),
+                "extra_variables": dict(list(zip(key_list, value_list, strict=False))),
             }
             response = request_url(
                 verb="PATCH",
@@ -1777,7 +1780,7 @@ def new_azure_account():
                 "client_id": form.client_id.data.replace(" ", ""),
                 "client_secret": form.client_secret.data.replace(" ", ""),
                 "tenant_id": form.tenant_id.data.replace(" ", ""),
-                "extra_variables": dict(list(zip(key_list, value_list))),
+                "extra_variables": dict(list(zip(key_list, value_list, strict=False))),
             }
             response = request_url(
                 verb="POST",
@@ -1828,7 +1831,7 @@ def edit_azure_account(account_id):
                 "client_id": form.client_id.data.replace(" ", ""),
                 "client_secret": form.client_secret.data.replace(" ", ""),
                 "tenant_id": form.tenant_id.data.replace(" ", ""),
-                "extra_variables": dict(list(zip(key_list, value_list))),
+                "extra_variables": dict(list(zip(key_list, value_list, strict=False))),
             }
             response = request_url(
                 verb="PATCH",
@@ -1936,7 +1939,7 @@ def route_template(template):
         )
 
         try:
-            api_healthy = request_url(verb="GET", uri=f"")
+            api_healthy = request_url(verb="GET", uri="")
             schedule_healthy = request_url(verb="GET", uri="", server=settings.SCHEDULE)
             remote_state_healthy = request_url(verb="GET", uri="", server=settings.REMOTE_STATE)
         except Exception as err:
@@ -2017,7 +2020,7 @@ def list_custom_providers_account():
         check_unauthorized_token(token)
         response = request_url(
             verb="GET",
-            uri=f"accounts/custom_providers/",
+            uri="accounts/custom_providers/",
             headers={"Authorization": f"Bearer {token}"},
         )
         content = response.get("json")
@@ -2045,7 +2048,7 @@ def delete_custom_providers_account(custom_provider_id):
         )
 
         if response.get("status_code") == 200:
-            flash(f"Account Deleted")
+            flash("Account Deleted")
         elif response.get("status_code") == 409:
             flash(response["json"].get("detail"), "error")
         else:

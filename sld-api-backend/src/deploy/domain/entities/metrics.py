@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import List
 
 
 class UserActivity(BaseModel):
@@ -44,11 +43,11 @@ class SquadEnvironmentUsage(BaseModel):
 
 
 class AllMetricsResponse(BaseModel):
-    user_activity: List[UserActivity]
-    action_count: List[ActionCount]
-    environment_count: List[EnvironmentCount]
-    stack_usage: List[StackUsage]
-    monthly_deploy_count: List[MonthlyDeployCount]
-    squad_deploy_count: List[SquadDeployCount]
-    cloud_provider_usage: List[CloudProviderUsage]
-    squad_environment_usage: List[SquadEnvironmentUsage]
+    user_activity: list[UserActivity]
+    action_count: list[ActionCount]
+    environment_count: list[EnvironmentCount]
+    stack_usage: list[StackUsage]
+    monthly_deploy_count: list[MonthlyDeployCount]
+    squad_deploy_count: list[SquadDeployCount]
+    cloud_provider_usage: list[CloudProviderUsage]
+    squad_environment_usage: list[SquadEnvironmentUsage]

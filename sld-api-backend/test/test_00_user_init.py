@@ -1,5 +1,6 @@
-from config.api import settings
 from helpers.api_request import request_url
+
+from config.api import settings
 
 
 def test_check_status_code_equals_200():

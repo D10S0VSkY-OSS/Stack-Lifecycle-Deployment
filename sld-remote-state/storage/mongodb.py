@@ -1,6 +1,7 @@
 import logging
 
 import pymongo
+
 from configs.mongo_db import settings
 
 logging.basicConfig(format="%(levelname)s:     %(message)s", level=logging.INFO)
@@ -10,7 +11,7 @@ connection_url = (
 )
 
 
-class Storage(object):
+class Storage:
     def __init__(self, path):
         self.path = path
 

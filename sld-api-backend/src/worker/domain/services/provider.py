@@ -1,10 +1,10 @@
 # DI terraform provider
-from src.worker.providers.hashicorp.actions import Terraform, TerraGrunt, Actions
+
+from src.worker.domain.entities.worker import DeployParams, DownloadBinaryParams
+from src.worker.providers.hashicorp.actions import Actions, Terraform
 from src.worker.providers.hashicorp.artifact import Artifact
 from src.worker.providers.hashicorp.download import BinaryDownload
 from src.worker.providers.hashicorp.templates import Backend, GetVars, Tfvars
-from src.worker.domain.entities.worker import DeployParams, DownloadBinaryParams
-from typing import Type
 
 
 class ProviderRequirements:
@@ -78,16 +78,16 @@ class ProviderActions:
     """
 
     @staticmethod
-    def plan(params: DeployParams, action: Type[Actions] = Terraform) -> dict:
+    def plan(params: DeployParams, action: type[Actions] = Terraform) -> dict:
         config_action = action(params)
         return config_action.execute_deployer_command("plan")
 
     @staticmethod
-    def apply(params: DeployParams, action: Type[Actions] = Terraform) -> dict:
+    def apply(params: DeployParams, action: type[Actions] = Terraform) -> dict:
         config_action = action(params)
         return config_action.execute_deployer_command("apply")
 
     @staticmethod
-    def destroy(params: DeployParams, action: Type[Actions] = Terraform) -> dict:
+    def destroy(params: DeployParams, action: type[Actions] = Terraform) -> dict:
         config_action = action(params)
         return config_action.execute_deployer_command("destroy")

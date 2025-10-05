@@ -1,8 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from src.gcp.infrastructure import repositories as crud_gcp
 from src.gcp.domain.entities import gcp as schemas_gcp
+from src.gcp.infrastructure import repositories as crud_gcp
 from src.shared.security import deps
 from src.users.domain.entities import users as schemas_users
 from src.users.infrastructure import repositories as crud_users

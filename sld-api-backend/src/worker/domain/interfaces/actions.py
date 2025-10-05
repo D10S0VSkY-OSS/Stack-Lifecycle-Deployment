@@ -1,11 +1,11 @@
-from typing import Type
 from abc import ABC, abstractmethod
-from src.worker.domain.services.command import command
+
 from src.worker.domain.entities.actions import StructActionsBase
+from src.worker.domain.services.command import command
 
 
 class Actions(ABC):
-    def __init__(self, params: StructActionsBase, command: Type[command] = command) -> None:
+    def __init__(self, params: StructActionsBase, command: type[command] = command) -> None:
         self.name = params.name
         self.stack_name = params.stack_name
         self.branch = params.branch

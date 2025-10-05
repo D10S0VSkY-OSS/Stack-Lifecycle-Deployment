@@ -1,4 +1,3 @@
-from typing import Tuple
 import re
 
 from dependency_injector import containers, providers
@@ -81,7 +80,7 @@ class UserService:
         self.username_validator = username_validator
         self.password_validator = password_validator
 
-    def validate(self, username: str, password: str) -> Tuple[str, str]:
+    def validate(self, username: str, password: str) -> tuple[str, str]:
         if not self.password_validator.validate(password):
             return (False, "Password weak")
         elif not self.username_validator.validate(username):

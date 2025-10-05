@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 import hcl
 from jinja2 import Template
+
 from src.worker.helpers.hcl2_to_json import convert_to_json
 
 
@@ -89,9 +90,11 @@ class GetVars(StructProject):
                 else (
                     self.process_dict(value)
                     if isinstance(value, dict)
-                    else [self.process_dict(item) for item in value]
-                    if isinstance(value, list)
-                    else value
+                    else (
+                        [self.process_dict(item) for item in value]
+                        if isinstance(value, list)
+                        else value
+                    )
                 )
             )
             for key, value in d.items()
@@ -100,7 +103,7 @@ class GetVars(StructProject):
     def get_vars_json(self) -> dict:
         try:
             file_hcl = self.__set_path()
-            with open(file_hcl, "r") as fp:
+            with open(file_hcl) as fp:
                 hcl_data = hcl.load(fp)
             if hcl_data.get("variable"):
                 return {
@@ -111,7 +114,7 @@ class GetVars(StructProject):
             else:
                 error_msg = "Variable file is empty, not iterable"
                 return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
-        except IOError:
+        except OSError:
             error_msg = "Variable file not accessible"
             return {"command": "get_vars_json", "rc": 1, "stdout": error_msg}
         except ValueError as err:

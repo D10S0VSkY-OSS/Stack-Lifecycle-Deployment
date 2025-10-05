@@ -1,9 +1,9 @@
-from sqlalchemy.orm import Session
 from fastapi import Depends, HTTPException
+from sqlalchemy.orm import Session
 
 from src.shared.security import deps
-from src.users.domain.entities import users as schemas_users
 from src.tasks.infrastructure.repositories import delete_celery_task_meta_by_task_id
+from src.users.domain.entities import users as schemas_users
 
 
 async def get_task_by_id(

@@ -1,4 +1,5 @@
 import requests
+
 from config.api import settings
 
 server = settings.SERVER

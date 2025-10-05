@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from typing import Optional, Dict
 
 
 class StructActionsBase(BaseModel):
@@ -8,9 +7,9 @@ class StructActionsBase(BaseModel):
     branch: str
     environment: str
     squad: str
-    iac_type: Optional[str] = "terraform"
+    iac_type: str | None = "terraform"
     version: str
-    secreto: Dict
-    variables_file: Optional[str]
-    project_path: Optional[str]
+    secreto: dict
+    variables_file: str | None
+    project_path: str | None
     task_id: str

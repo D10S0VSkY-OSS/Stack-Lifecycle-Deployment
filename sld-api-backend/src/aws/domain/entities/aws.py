@@ -1,7 +1,7 @@
 import datetime
-from typing import Optional, Dict, Any
+from typing import Any
 
-from pydantic import BaseModel, constr, SecretStr
+from pydantic import BaseModel, SecretStr, constr
 
 
 class AwsBase(BaseModel):
@@ -10,15 +10,15 @@ class AwsBase(BaseModel):
     access_key_id: constr(strip_whitespace=True)
     secret_access_key: constr(strip_whitespace=True)
     default_region: constr(strip_whitespace=True)
-    extra_variables: Optional[Dict[str, Any]] = None
+    extra_variables: dict[str, Any] | None = None
 
 
 class AwsAsumeProfile(AwsBase):
-    role_arn: Optional[constr(strip_whitespace=True)] = None
+    role_arn: constr(strip_whitespace=True) | None = None
 
 
 class AwsId(BaseModel):
-    id: Optional[int] = None
+    id: int | None = None
 
     class Config:
         from_attributes = True
@@ -28,17 +28,17 @@ class AwsAccountResponseBase(BaseModel):
     id: int
     squad: str
     environment: str
-    default_region: Optional[str]
-    role_arn: Optional[str]
-    created_at: Optional[datetime.datetime] = None
-    updated_at: Optional[datetime.datetime] = None
+    default_region: str | None
+    role_arn: str | None
+    created_at: datetime.datetime | None = None
+    updated_at: datetime.datetime | None = None
 
     class Config:
         from_attributes = True
 
 
 class AwsAccountResponse(AwsAccountResponseBase):
-    extra_variables: Optional[Dict[str, SecretStr]]
+    extra_variables: dict[str, SecretStr] | None
 
     class Config:
         from_attributes = True
@@ -47,18 +47,18 @@ class AwsAccountResponse(AwsAccountResponseBase):
 class AwsAccountResponseRepo(AwsAccountResponseBase):
     access_key_id: str
     secret_access_key: str
-    extra_variables: Optional[Dict[str, Any]] = None
+    extra_variables: dict[str, Any] | None = None
 
     class Config:
         from_attributes = True
 
 
 class AwsAccount(BaseModel):
-    squad: Optional[str] = None
-    environment: Optional[str] = None
-    default_region: Optional[str] = None
-    role_arn: Optional[str] = None
-    access_key_id: Optional[str] = None
+    squad: str | None = None
+    environment: str | None = None
+    default_region: str | None = None
+    role_arn: str | None = None
+    access_key_id: str | None = None
 
 
 class AwsAccountFilter(AwsAccount, AwsId):
@@ -66,5 +66,5 @@ class AwsAccountFilter(AwsAccount, AwsId):
 
 
 class AwsAccountUpdate(AwsAccount):
-    secret_access_key: Optional[str] = None
-    extra_variables: Optional[Dict[str, Any]] = None
+    secret_access_key: str | None = None
+    extra_variables: dict[str, Any] | None = None

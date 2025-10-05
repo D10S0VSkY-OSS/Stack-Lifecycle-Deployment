@@ -1,6 +1,8 @@
 import logging
 import subprocess
+
 import redis
+
 from config.api import settings
 
 redis_client = redis.Redis(host=settings.CACHE_SERVER, port=6379, db=15)

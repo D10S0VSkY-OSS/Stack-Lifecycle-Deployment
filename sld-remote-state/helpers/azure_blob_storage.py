@@ -1,4 +1,5 @@
 from azure.storage.blob import BlobServiceClient
+
 from configs.azure_blob_storage import settings
 
 connect_str = settings.AZURE_STORAGE_CONNECTION_STRING

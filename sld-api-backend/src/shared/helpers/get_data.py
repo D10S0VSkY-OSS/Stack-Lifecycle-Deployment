@@ -2,10 +2,10 @@ from functools import wraps
 
 import redis
 from celery.result import AsyncResult
-from config.api import settings
 from croniter import croniter
 from fastapi import HTTPException
 
+from config.api import settings
 from src.activityLogs.infrastructure import repositories as crud_activity
 from src.aws.infrastructure import repositories as crud_aws
 from src.azure.infrastructure import repositories as crud_azure
@@ -39,9 +39,7 @@ def check_squad_stack(
     # Check if the user with squad * not have role yoda
     if not crud_users.is_master(db, current_user):
         if "darth_vader" not in current_user.role:
-            raise HTTPException(
-                status_code=403, detail=f"Not enough permissions for create a stack"
-            )
+            raise HTTPException(status_code=403, detail="Not enough permissions for create a stack")
         if "*" in stack_squad_access and "yoda" not in current_user.role:
             raise HTTPException(
                 status_code=403,

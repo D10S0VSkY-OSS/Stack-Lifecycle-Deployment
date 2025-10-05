@@ -4,6 +4,7 @@ from datetime import datetime
 
 import boto3
 from botocore.exceptions import ClientError
+
 from configs.bucket_s3 import settings
 
 s3 = boto3.resource(
@@ -16,7 +17,7 @@ s3 = boto3.resource(
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.INFO)
 
 
-class Storage(object):
+class Storage:
     def __init__(self, path):
         self.path = path
 

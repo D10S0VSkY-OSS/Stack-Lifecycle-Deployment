@@ -79,7 +79,7 @@ async def password_reset(
             db=db,
             username=current_user.username,
             squad=current_user.squad,
-            action=f"Reset password",
+            action="Reset password",
         )
         return {"result": "Password updated"}
     except Exception as err:

@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends
-from typing import List
 
 from src.stacks.api.container import create, delete, get, update
 from src.stacks.domain.entities import stacks as schemas_stacks
@@ -21,7 +20,7 @@ def update_stack(
     return update_stack
 
 
-@router.get("/", response_model=List[schemas_stacks.StackResponse])
+@router.get("/", response_model=list[schemas_stacks.StackResponse])
 async def get_all_stacks(
     get_all_stacks: schemas_stacks.Stack = Depends(get.get_all_stacks),
 ):

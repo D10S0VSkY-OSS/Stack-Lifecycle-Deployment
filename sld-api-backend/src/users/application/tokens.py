@@ -1,10 +1,11 @@
 from datetime import datetime, timedelta
-from typing import Any, Union
+from typing import Any
 
-from config.api import settings
 from fastapi import HTTPException
 from jose import jwt
 from passlib.context import CryptContext
+
+from config.api import settings
 
 # Check bug conflict with openapi
 # class TokenDecode:
@@ -21,7 +22,7 @@ def decode_access_token(*, data: str):
 
 
 class TokenCreate:
-    def __init__(self, subject: Union[str, Any], expires_delta: timedelta = None):
+    def __init__(self, subject: str | Any, expires_delta: timedelta = None):
         self.subject = subject
         self.expires_delta = expires_delta
 

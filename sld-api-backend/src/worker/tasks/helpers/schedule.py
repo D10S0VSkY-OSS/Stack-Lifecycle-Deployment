@@ -2,8 +2,9 @@ import datetime
 
 # from dateutil import parser
 import requests
-from config.api import settings
 from fastapi import HTTPException
+
+from config.api import settings
 
 server = settings.SCHEDULE_SERVER
 

@@ -1,8 +1,9 @@
 import datetime
 
-from config.database import Base
 from sqlalchemy import JSON, Column, DateTime, Integer, String, Text
 from sqlalchemy.orm import relationship
+
+from config.database import Base
 
 
 class Stack(Base):

@@ -1,7 +1,5 @@
-from typing import Generator
+from collections.abc import Generator
 
-from config.api import settings
-from config.database import SessionLocal
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -9,6 +7,8 @@ from jose import jwt
 from pydantic import ValidationError
 from sqlalchemy.orm import Session
 
+from config.api import settings
+from config.database import SessionLocal
 from src.users.application.tokens import decode_access_token
 from src.users.application.validator import Container
 from src.users.domain.entities import users as schemas

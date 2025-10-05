@@ -1,20 +1,20 @@
-from typing import List, Optional, Literal
+from datetime import datetime
+from typing import Literal
 
 from pydantic import BaseModel, Field, constr
-from datetime import datetime
 
 
 class StackBase(BaseModel):
     stack_name: constr(strip_whitespace=True)
     git_repo: constr(strip_whitespace=True)
     branch: constr(strip_whitespace=True) = "main"
-    squad_access: List[str] = ["*"]
-    iac_type: Optional[Literal["terraform", "tofu", "terragrunt"]] = "terraform"
+    squad_access: list[str] = ["*"]
+    iac_type: Literal["terraform", "tofu", "terragrunt"] | None = "terraform"
     tf_version: constr(strip_whitespace=True) = "1.6.5"
-    tags: Optional[List[str]] = []
-    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
+    tags: list[str] | None = []
+    project_path: constr(strip_whitespace=True) | None = Field("", example="")
     description: constr(strip_whitespace=True)
-    icon_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
+    icon_path: constr(strip_whitespace=True) | None = Field("", example="")
 
     class Config:
         freeze = True
@@ -32,9 +32,9 @@ class StackCreate(StackBase):
 class StackResponse(StackBase):
     id: int
     task_id: constr(strip_whitespace=True)
-    username: Optional[constr(strip_whitespace=True)]
-    created_at: Optional[datetime]
-    updated_at: Optional[datetime]
+    username: constr(strip_whitespace=True) | None
+    created_at: datetime | None
+    updated_at: datetime | None
 
     class Config:
         freeze = True

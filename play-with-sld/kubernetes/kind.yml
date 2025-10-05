@@ -16,9 +16,10 @@ nodes:
   - containerPort: 443
     hostPort: 443
     protocol: TCP
-- role: worker
-  extraPortMappings:
   - containerPort: 30003
     hostPort: 8000
+    protocol: TCP
   - containerPort: 30005
     hostPort: 5000
+    protocol: TCP
+- role: worker

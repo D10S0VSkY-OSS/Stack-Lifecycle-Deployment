@@ -3,9 +3,11 @@ kind: Service
 metadata:
   name: dashboard
 spec:
+  type: NodePort
   selector:
     name: sld-dashboard
   ports:
     - protocol: TCP
       port: 5000
       targetPort: 5000
+      nodePort: 30005

@@ -1,12 +1,10 @@
-from typing import Optional, Literal, Dict
-
 from pydantic import BaseModel, Field, constr
 
 
 class DeployBase(BaseModel):
     name: constr(strip_whitespace=True)
     stack_name: constr(strip_whitespace=True)
-    stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
+    stack_branch: constr(strip_whitespace=True) | None = Field("", example="")
     username: constr(strip_whitespace=True)
     squad: constr(strip_whitespace=True)
     environment: constr(strip_whitespace=True)
@@ -17,12 +15,12 @@ class DeployCreate(BaseModel):
     name: constr(strip_whitespace=True)
     squad: constr(strip_whitespace=True)
     stack_name: constr(strip_whitespace=True)
-    stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
+    stack_branch: constr(strip_whitespace=True) | None = Field("", example="")
     environment: constr(strip_whitespace=True)
-    start_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 7 * * 0-4")
-    destroy_time: Optional[constr(strip_whitespace=True)] = Field(None, example="30 18 * * 0-4")
-    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
-    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
+    start_time: constr(strip_whitespace=True) | None = Field(None, example="30 7 * * 0-4")
+    destroy_time: constr(strip_whitespace=True) | None = Field(None, example="30 18 * * 0-4")
+    tfvar_file: constr(strip_whitespace=True) | None = Field("", example="terraform.tfvars")
+    project_path: constr(strip_whitespace=True) | None = Field("", example="")
     variables: dict
 
 
@@ -35,11 +33,11 @@ class DeployDeleteMaster(BaseModel):
 
 
 class DeployUpdate(BaseModel):
-    start_time: Optional[constr(strip_whitespace=True)] = Field("")
-    destroy_time: Optional[constr(strip_whitespace=True)] = Field("")
-    stack_branch: Optional[constr(strip_whitespace=True)] = Field("", example="")
-    tfvar_file: Optional[constr(strip_whitespace=True)] = Field("", example="terraform.tfvars")
-    project_path: Optional[constr(strip_whitespace=True)] = Field("", example="")
+    start_time: constr(strip_whitespace=True) | None = Field("")
+    destroy_time: constr(strip_whitespace=True) | None = Field("")
+    stack_branch: constr(strip_whitespace=True) | None = Field("", example="")
+    tfvar_file: constr(strip_whitespace=True) | None = Field("", example="terraform.tfvars")
+    project_path: constr(strip_whitespace=True) | None = Field("", example="")
     variables: dict
 
 

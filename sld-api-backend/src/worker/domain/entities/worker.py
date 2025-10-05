@@ -1,5 +1,6 @@
+from typing import Any
+
 from pydantic import BaseModel
-from typing import Optional, Any, Dict
 
 
 class DownloadBinaryParams(BaseModel):
@@ -16,7 +17,7 @@ class DeployParamsBase(BaseModel):
     stack_name: str
     environment: str
     squad: str
-    project_path: Optional[str] = ""
+    project_path: str | None = ""
 
     class config:
         frozenset = True
@@ -46,12 +47,12 @@ class DeployParams(BaseModel):
     branch: str
     iac_type: str
     version: str
-    variables: Optional[Dict[str, Any]] = {}
+    variables: dict[str, Any] | None = {}
     secreto: Any
-    variables_file: Optional[str] = ""
-    project_path: Optional[str] = ""
-    user: Optional[str] = ""
-    task_id: Optional[str] = ""
+    variables_file: str | None = ""
+    project_path: str | None = ""
+    user: str | None = ""
+    task_id: str | None = ""
 
     class Config:
         frozenset = True
@@ -73,8 +74,8 @@ class DownloadGitRepoParams(BaseModel):
 class ApplyParams(DeployParamsBase, DownloadBinaryParams):
     branch: str
     secreto: Any
-    variables_file: Optional[str] = ""
-    user: Optional[str] = ""
+    variables_file: str | None = ""
+    user: str | None = ""
 
     class Config:
         frozenset = True
@@ -96,6 +97,6 @@ class ActionBase(BaseModel):
     squad: str
     version: str
     secreto: dict
-    project_path: Optional[str] = ""
-    variables_file: Optional[str] = ""
-    task_id: Optional[str] = ""
+    project_path: str | None = ""
+    variables_file: str | None = ""
+    task_id: str | None = ""

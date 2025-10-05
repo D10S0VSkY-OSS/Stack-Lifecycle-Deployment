@@ -1,13 +1,13 @@
-# -*- encoding: utf-8 -*-
 import redis
+from flask import redirect, render_template, request, url_for
+from flask_login import current_user, login_user, logout_user
+
 from app import db, login_manager
 from app.base import blueprint
 from app.base.forms import LoginForm
 from app.base.models import User
 from app.helpers.api_token import get_token
 from app.helpers.security import vault_encrypt
-from flask import redirect, render_template, request, url_for
-from flask_login import current_user, login_user, logout_user
 
 
 @vault_encrypt

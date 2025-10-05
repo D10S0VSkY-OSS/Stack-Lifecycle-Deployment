@@ -3,6 +3,7 @@ import configparser
 import json
 import logging
 import os
+
 import boto3
 
 from config.api import settings

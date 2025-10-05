@@ -1,8 +1,8 @@
 # SLD API Backend - Development with UV
 
-Este proyecto usa [uv](https://github.com/astral-sh/uv) como gestor de paquetes de Python para un desarrollo más rápido y eficiente.
+This project uses [uv](https://github.com/astral-sh/uv) as Python package manager for faster and more efficient development.
 
-## 🚀 Instalación de UV
+## 🚀 Installing UV
 
 ```bash
 # Linux/macOS
@@ -11,113 +11,113 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 # Windows
 powershell -c "irm https://astral.sh/uv/install.ps1 | iex"
 
-# Con pip (alternativa)
+# With pip (alternative)
 pip install uv
 ```
 
-## 📦 Gestión de Dependencias
+## 📦 Dependency Management
 
-### Instalar dependencias
+### Install dependencies
 
 ```bash
-# Instalar todas las dependencias del proyecto
+# Install all project dependencies
 uv pip install -e .
 
-# Instalar con dependencias de desarrollo
+# Install with development dependencies
 uv pip install -e ".[dev]"
 
-# Sincronizar con pyproject.toml
+# Sync with pyproject.toml
 uv pip sync
 ```
 
-### Agregar nuevas dependencias
+### Add new dependencies
 
 ```bash
-# Agregar una dependencia al proyecto
-# 1. Edita pyproject.toml manualmente
-# 2. Instala la nueva dependencia
-uv pip install nombre-paquete==version
+# Add a dependency to the project
+# 1. Edit pyproject.toml manually
+# 2. Install the new dependency
+uv pip install package-name==version
 
-# O instala y deja que uv actualice automáticamente
-uv add nombre-paquete
+# Or install and let uv update automatically
+uv add package-name
 ```
 
-### Actualizar dependencias
+### Update dependencies
 
 ```bash
-# Actualizar todas las dependencias
+# Update all dependencies
 uv pip install --upgrade -e .
 
-# Actualizar una dependencia específica
-uv pip install --upgrade nombre-paquete
+# Update a specific dependency
+uv pip install --upgrade package-name
 ```
 
-## 🏃 Ejecutar la aplicación
+## 🏃 Running the Application
 
-### Desarrollo local
+### Local development
 
 ```bash
-# Con uvicorn directamente
+# With uvicorn directly
 uv run uvicorn main:app --reload --host 0.0.0.0 --port 8000
 
-# Con script personalizado
+# With custom script
 uv run python main.py
 ```
 
 ### Tests
 
 ```bash
-# Ejecutar todos los tests
+# Run all tests
 uv run pytest
 
-# Con cobertura
+# With coverage
 uv run pytest --cov=src --cov-report=html
 
-# Test específico
+# Specific test
 uv run pytest test/test_00_user_init.py
 ```
 
 ## 🐳 Docker
 
-El Dockerfile ya está configurado para usar `uv`. Para construir la imagen:
+The Dockerfile is already configured to use `uv`. To build the image:
 
 ```bash
 docker build -t sld-api-backend:latest .
 ```
 
-## 🔧 Herramientas de Desarrollo
+## 🔧 Development Tools
 
-### Formateo de código
+### Code formatting
 
 ```bash
-# Formatear con black
+# Format with black
 uv run black .
 
-# Lint con ruff
+# Lint with ruff
 uv run ruff check .
 
-# Autofix con ruff
+# Autofix with ruff
 uv run ruff check --fix .
 ```
 
 ### Type checking
 
 ```bash
-# Verificar tipos con mypy
+# Check types with mypy
 uv run mypy src/
 ```
 
-## 📝 Ventajas de UV sobre pip
+## 📝 Advantages of UV over pip
 
-- ⚡ **10-100x más rápido** que pip para instalación de paquetes
-- 🔒 **Resolución de dependencias más confiable**
-- 💾 **Cache inteligente** que ahorra ancho de banda
-- 🎯 **Compatible con pip** - usa el mismo formato de requirements
-- 🛡️ **Reproducibilidad mejorada** con lockfiles
+- ⚡ **10-100x faster** than pip for package installation
+- 🔒 **More reliable dependency resolution**
+- 💾 **Smart cache** that saves bandwidth
+- 🎯 **pip compatible** - uses the same requirements format
+- 🛡️ **Improved reproducibility** with lockfiles
 
-## 🔄 Migración desde pip
+## 🔄 Migration from pip
 
-Si vienes de usar pip, estos son los comandos equivalentes:
+If you're coming from pip, here are the equivalent commands:
 
 | pip | uv |
 |-----|-----|
@@ -127,7 +127,7 @@ Si vienes de usar pip, estos son los comandos equivalentes:
 | `pip freeze > requirements.txt` | `uv pip freeze > requirements.txt` |
 | `pip list` | `uv pip list` |
 
-## 📚 Más información
+## 📚 More Information
 
-- [Documentación oficial de uv](https://github.com/astral-sh/uv)
-- [Guía de pyproject.toml](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/)
+- [Official uv documentation](https://github.com/astral-sh/uv)
+- [pyproject.toml guide](https://packaging.python.org/en/latest/guides/writing-pyproject-toml/)

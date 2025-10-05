@@ -1,17 +1,18 @@
 import logging
 
-from src.shared.api.v1.api import api_router
+from fastapi import FastAPI
+
 from config.api import settings
 from config.database import engine
-from fastapi import FastAPI
 from src.activityLogs.infrastructure import models as model_activity
 from src.aws.infrastructure import models as model_aws
 from src.azure.infrastructure import models as model_azure
+from src.custom_providers.infrastructure import models as model_custom_provider
 from src.deploy.infrastructure import models as model_deploy
 from src.gcp.infrastructure import models as model_gcp
+from src.shared.api.v1.api import api_router
 from src.stacks.infrastructure import models as model_stacks
 from src.tasks.infrastructure import models as model_tasks
-from src.custom_providers.infrastructure import models as model_custom_provider
 
 # from db import models
 ## Need refactor

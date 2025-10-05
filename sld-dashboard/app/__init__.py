@@ -1,4 +1,3 @@
-# -*- encoding: utf-8 -*-
 from importlib import import_module
 from logging import DEBUG, StreamHandler, basicConfig, getLogger
 from os import path
@@ -18,7 +17,7 @@ def register_extensions(app):
 
 def register_blueprints(app):
     for module_name in ("base", "home"):
-        module = import_module("app.{}.routes".format(module_name))
+        module = import_module(f"app.{module_name}.routes")
         app.register_blueprint(module.blueprint)
 
 
@@ -28,7 +27,7 @@ def configure_database(app):
         def initialize_database():
             try:
                 pass
-            except Exception as err:
+            except Exception:
                 pass
 
     @app.teardown_request
