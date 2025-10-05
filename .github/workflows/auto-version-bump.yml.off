@@ -1,0 +1,143 @@
+name: Auto Version Bump on Master
+
+# This workflow automatically bumps version on merge to master
+# based on Conventional Commits (https://www.conventionalcommits.org/)
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  auto-version-bump:
+    runs-on: ubuntu-22.04
+    # Skip if commit message contains [skip-version] or if it's a merge from release branch
+    if: "!contains(github.event.head_commit.message, '[skip-version]') && !contains(github.event.head_commit.message, 'chore: bump version')"
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Analyze commits and determine version bump
+        id: version
+        run: |
+          # Get current version from pyproject.toml
+          CURRENT_VERSION=$(grep -E '^version = ' sld-api-backend/pyproject.toml | sed 's/version = "\(.*\)"/\1/')
+          echo "Current version: ${CURRENT_VERSION}"
+          
+          # Parse version
+          MAJOR=$(echo $CURRENT_VERSION | cut -d. -f1)
+          MINOR=$(echo $CURRENT_VERSION | cut -d. -f2)
+          PATCH=$(echo $CURRENT_VERSION | cut -d. -f3)
+          
+          # Get commits since last tag (or all if no tags)
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -z "$LAST_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"%s")
+          else
+            COMMITS=$(git log ${LAST_TAG}..HEAD --pretty=format:"%s")
+          fi
+          
+          # Check for breaking changes (MAJOR bump)
+          if echo "$COMMITS" | grep -q "BREAKING CHANGE\|!:"; then
+            MAJOR=$((MAJOR + 1))
+            MINOR=0
+            PATCH=0
+            BUMP_TYPE="major"
+          # Check for features (MINOR bump)
+          elif echo "$COMMITS" | grep -q "^feat"; then
+            MINOR=$((MINOR + 1))
+            PATCH=0
+            BUMP_TYPE="minor"
+          # Check for fixes (PATCH bump)
+          elif echo "$COMMITS" | grep -q "^fix\|^perf"; then
+            PATCH=$((PATCH + 1))
+            BUMP_TYPE="patch"
+          else
+            echo "No version bump needed (no feat/fix/breaking changes)"
+            echo "SKIP=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          NEW_VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "NEW_VERSION=${NEW_VERSION}" >> $GITHUB_OUTPUT
+          echo "BUMP_TYPE=${BUMP_TYPE}" >> $GITHUB_OUTPUT
+          echo "New version will be: ${NEW_VERSION} (${BUMP_TYPE})"
+
+      - name: Update versions
+        if: steps.version.outputs.SKIP != 'true'
+        run: |
+          NEW_VERSION=${{ steps.version.outputs.NEW_VERSION }}
+          
+          # Update all pyproject.toml files
+          for service in sld-api-backend sld-dashboard sld-remote-state sld-schedule; do
+            sed -i "s/^version = .*/version = \"${NEW_VERSION}\"/" "${service}/pyproject.toml"
+            echo "✅ Updated ${service}/pyproject.toml"
+          done
+
+      - name: Commit and tag
+        if: steps.version.outputs.SKIP != 'true'
+        run: |
+          NEW_VERSION=${{ steps.version.outputs.NEW_VERSION }}
+          BUMP_TYPE=${{ steps.version.outputs.BUMP_TYPE }}
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          git add sld-*/pyproject.toml
+          git commit -m "chore: bump version to ${NEW_VERSION} [skip-version]
+
+Auto-bumped version based on conventional commits (${BUMP_TYPE} bump)
+
+[skip ci]"
+          
+          git tag -a "v${NEW_VERSION}" -m "Release v${NEW_VERSION}"
+          git push origin master --tags
+
+      - name: Create GitHub Release
+        if: steps.version.outputs.SKIP != 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.version.outputs.NEW_VERSION }}';
+            const bumpType = '${{ steps.version.outputs.BUMP_TYPE }}';
+            
+            // Get commits since last release
+            const { data: commits } = await github.rest.repos.compareCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              base: 'v${{ steps.version.outputs.CURRENT_VERSION }}',
+              head: 'master'
+            });
+            
+            // Generate changelog from commits
+            let changelog = commits.commits.map(c => {
+              const message = c.commit.message.split('\n')[0];
+              return `- ${message} (${c.sha.substring(0, 7)})`;
+            }).join('\n');
+            
+            // Create release
+            await github.rest.repos.createRelease({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              tag_name: `v${version}`,
+              name: `Release v${version}`,
+              body: `## 🚀 Auto-generated Release\n\n**Version bump:** ${bumpType}\n\n### Changes:\n${changelog}\n\n---\n*This release was automatically created based on conventional commits.*`,
+              draft: false,
+              prerelease: false
+            });
+
+      - name: Summary
+        if: steps.version.outputs.SKIP != 'true'
+        run: |
+          echo "✅ Version bumped to ${{ steps.version.outputs.NEW_VERSION }}"
+          echo "🏷️  Tag created: v${{ steps.version.outputs.NEW_VERSION }}"
+          echo "📦 Release created automatically"
+          echo "🔄 build-and-push-images.yml will now trigger"

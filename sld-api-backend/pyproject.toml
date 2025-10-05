@@ -1,6 +1,6 @@
 [project]
 name = "sld-api-backend"
-version = "2.7.0"
+version = "3.6.2"
 description = "Stack Lifecycle Deployment API Backend"
 requires-python = ">=3.11"
 license = { text = "GPL-3.0" }

@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: remote-state
+  labels:
+    name: remote-state
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      name: remote-state
+  template:
+    metadata:
+      labels:
+        name: remote-state
+    spec:
+      subdomain: primary
+      containers:
+        - name: remote-state
+          image: d10s0vsky/sld-remote-state:latest
+          env:
+          - name: PATH
+            value: "/home/sld/.asdf/shims:/home/sld/.asdf/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+          - name: SLD_STORAGE_BACKEND
+            value: mongodb
+          - name: SLD_MONGODB_URL
+            value: "mongodb:27017/"
+          imagePullPolicy: Always
+          command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "1"]
+          ports:
+            - containerPort: 8080
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 8080
+              httpHeaders:
+              - name: status
+                value: healthy
+            initialDelaySeconds: 60
+            periodSeconds: 60

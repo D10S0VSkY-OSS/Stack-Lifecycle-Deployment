@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: schedule
+  labels:
+    name: schedule
+spec:
+  replicas: 1 
+  selector:
+    matchLabels:
+      name: schedule
+  template:
+    metadata:
+      labels:
+        name: schedule
+    spec:
+      subdomain: primary
+      containers:
+        - name: schedule
+          image: d10s0vsky/sld-schedule:latest
+          imagePullPolicy: Always
+          resources:
+            limits:
+              memory: 600Mi
+              cpu: 1
+            requests:
+              memory: 300Mi
+              cpu: 500m
+          command: ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "10000", "--workers", "1"]
+          ports:
+            - containerPort: 10000
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 10000
+              httpHeaders:
+              - name: status
+                value: healthy
+            initialDelaySeconds: 60
+            periodSeconds: 60

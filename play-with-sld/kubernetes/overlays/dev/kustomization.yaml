@@ -1,0 +1,53 @@
+# Development Overlay - Always uses latest images
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: sld-dev
+
+commonLabels:
+  environment: dev
+
+bases:
+  - ../../base
+
+# Override images to always use latest tag
+images:
+  - name: d10s0vsky/sld-api
+    newTag: latest
+  - name: d10s0vsky/sld-dashboard
+    newTag: latest
+  - name: d10s0vsky/sld-remote-state
+    newTag: latest
+  - name: d10s0vsky/sld-schedule
+    newTag: latest
+
+# Development-specific patches
+patches:
+  # Enable debug mode for dashboard
+  - patch: |-
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: sld-dashboard
+      spec:
+        template:
+          spec:
+            containers:
+              - name: sld-dashboard
+                env:
+                  - name: DEBUG
+                    value: "True"
+    target:
+      kind: Deployment
+      name: sld-dashboard
+
+# Resource limits for dev (more relaxed)
+replicas:
+  - name: api-backend
+    count: 1
+  - name: sld-dashboard
+    count: 1
+  - name: remote-state
+    count: 1
+  - name: schedule
+    count: 1

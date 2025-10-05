@@ -1,6 +1,6 @@
 [project]
 name = "sld-schedule"
-version = "2.7.0"
+version = "3.6.2"
 description = "Stack Lifecycle Deployment Schedule Service"
 requires-python = ">=3.11"
 license = { text = "GPL-3.0" }
