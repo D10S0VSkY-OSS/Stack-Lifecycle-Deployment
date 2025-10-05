@@ -18,7 +18,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "bcrypt==4.2.1",
+    "bcrypt==4.0.1",
     "cryptography==46.0.2",
     "email-validator==2.2.0",
     "Flask==3.1.0",
