@@ -17,7 +17,7 @@ python-dateutil==2.9.0.post0
 python-dotenv==1.0.1
 python-hcl2==7.3.1
 python-jose==3.5.0
-python-multipart==0.0.20
+python-multipart==0.0.22
 PyYAML==6.0.2
 redis==6.4.0
 requests==2.32.3
