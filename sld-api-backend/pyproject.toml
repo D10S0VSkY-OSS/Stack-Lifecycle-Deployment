@@ -22,7 +22,7 @@ dependencies = [
     "boto3==1.35.80",
     "celery==5.5.3",
     "click==8.1.8",
-    "cryptography==46.0.2",
+    "cryptography==46.0.5",
     "dependency-injector==4.43.0",
     "email-validator==2.2.0",
     "fastapi==0.118.0",
