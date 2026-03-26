@@ -36,7 +36,7 @@ dependencies = [
     "python-dotenv==1.0.1",
     "python-decouple==3.8",
     "redis==6.4.0",
-    "requests==2.32.3",
+    "requests==2.33.0",
     "SQLAlchemy==2.0.36",
     "WTForms==3.2.1",
 ]
