@@ -4,7 +4,7 @@ jmespath==1.0.1
 mysqlclient==2.2.6
 pydantic==2.10.3
 pydantic-settings==2.6.1
-requests==2.32.3
+requests==2.33.0
 retrying==1.3.4
 SQLAlchemy==2.0.36
 uvicorn==0.37.0
