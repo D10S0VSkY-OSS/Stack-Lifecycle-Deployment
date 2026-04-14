@@ -48,7 +48,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = [
-    "pytest==8.3.4",
+    "pytest==9.0.3",
     "pytest-cov",
     "pytest-asyncio",
     "black",
@@ -65,7 +65,7 @@ packages = ["src"]
 
 [tool.uv]
 dev-dependencies = [
-    "pytest==8.3.4",
+    "pytest==9.0.3",
 ]
 
 [tool.ruff]
