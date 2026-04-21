@@ -33,7 +33,7 @@ dependencies = [
     "mysqlclient==2.2.6",
     "passlib[bcrypt]==1.7.4",
     "pydantic-settings==2.6.1",
-    "python-dotenv==1.0.1",
+    "python-dotenv==1.2.2",
     "python-decouple==3.8",
     "redis==6.4.0",
     "requests==2.32.3",
